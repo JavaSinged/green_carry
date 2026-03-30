@@ -124,7 +124,7 @@ const Login = () => {
           {/* 하단 링크 */}
           <div className="card-footer">
             <a href="#signup">회원가입</a>
-            <a href="#find">아이디/비밀번호 찾기</a>
+            <a href="/account">아이디/비밀번호 찾기</a>
           </div>
         </section>
 

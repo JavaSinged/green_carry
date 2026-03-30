@@ -7,6 +7,7 @@ import StoreView from "./pages/main/StoreView";
 import StoreDetail from "./pages/main/StoreDetail";
 import NotFound from "./pages/error/NotFound";
 import Login from "./pages/login/login";
+import Account from "./pages/login/FindAccount";
 
 const BasicLayout = () => {
   return (
@@ -26,6 +27,7 @@ function App() {
       <Routes>
         {/* 1. 헤더/푸터가 필요 없는 단독 화면 */}
         <Route path="/Login" element={<Login />} />
+        <Route path="/Account" element={<Account />} />
 
         {/* 2. 헤더/푸터가 무조건 붙어야 하는 화면들 (BasicLayout 안에 넣기) */}
         <Route element={<BasicLayout />}>
