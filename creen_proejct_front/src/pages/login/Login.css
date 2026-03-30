@@ -160,7 +160,7 @@ button {
   gap: 8px;
   margin-bottom: 25px;
   font-size: 0.85rem;
-  color: var();
+  color: var(--text-sub);
 }
 
 .admin-login input[type="checkbox"] {
