@@ -1,46 +1,41 @@
 import React, { useState } from "react";
-import "./PaymentPage.css";
-import {
-  Bell,
-  User,
-  LogOut,
-  TreePine,
-  MapPin,
-  MessageSquare,
-  Gift,
-  CreditCard,
-  ChevronDown,
-} from "lucide-react";
+import styles from "./PaymentPage.module.css";
+import RoomIcon from "@mui/icons-material/Room";
+import ChatBubbleIcon from "@mui/icons-material/ChatBubble";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import CardGiftcardIcon from "@mui/icons-material/CardGiftcard";
+import CreditCardIcon from "@mui/icons-material/CreditCard";
 
 const PaymentPage = () => {
   const [storeRequest, setStoreRequest] = useState("");
   const [deliveryRequest, setDeliveryRequest] = useState("");
-  const [ecoPoint, setEcoPoint] = useState("7000");
+  const [ecoPoint, setEcoPoint] = useState(0);
   const [selectedPayment, setSelectedPayment] = useState("card");
+  const [itemPrice, setItemPrice] = useState(45000);
+  const [deliveryPrice, setDeliveryPrice] = useState(1000);
+  const totalPrice = itemPrice + deliveryPrice - ecoPoint;
 
   return (
-    <div className="payment-page">
-      {/* 본문 */}
-      <main className="payment-main">
-        <div className="payment-top-text">
-          <button className="back-btn">&lt; 장바구니로 돌아가기</button>
+    <div className={styles["payment-page"]}>
+      <main className={styles["payment-main"]}>
+        <div className={styles["payment-top-text"]}>
+          <button className={styles["back-btn"]}> 장바구니로 돌아가기</button>
           <p>주문 정보를 확인하고 결제를 완료하세요</p>
         </div>
 
-        <div className="payment-content">
+        <div className={styles["payment-content"]}>
           {/* 왼쪽 영역 */}
-          <section className="payment-left">
-            {/* 배송정보 */}
-            <div className="info-card">
-              <div className="card-title-row">
-                <div className="card-title-left">
-                  <MapPin size={20} />
+          <section className={styles["payment-left"]}>
+            <div className={styles["info-card"]}>
+              <div className={styles["card-title-row"]}>
+                <div className={styles["card-title-left"]}>
+                  <RoomIcon />
                   <h2>배송정보</h2>
                 </div>
-                <button className="text-btn">주소 변경</button>
+                <button className={styles["text-btn"]}>주소 변경</button>
               </div>
 
-              <div className="form-group">
+              <div className={styles["form-group"]}>
                 <label>배송 주소</label>
                 <input
                   type="text"
@@ -49,25 +44,23 @@ const PaymentPage = () => {
                 />
               </div>
 
-              <div className="form-group">
+              <div className={styles["form-group"]}>
                 <label>연락처</label>
                 <input type="text" value="010-0000-0000" readOnly />
               </div>
             </div>
 
-            {/* 요청사항 */}
-            <div className="info-card">
-              <div className="card-title-row">
-                <div className="card-title-left">
-                  <MessageSquare size={20} />
+            <div className={styles["info-card"]}>
+              <div className={styles["card-title-row"]}>
+                <div className={styles["card-title-left"]}>
+                  <ChatBubbleIcon></ChatBubbleIcon>
                   <h2>요청사항</h2>
                 </div>
-                <button className="icon-btn">
-                  <ChevronDown size={20} />
-                </button>
+                <button className={styles["icon-btn"]}></button>
+                <ExpandMoreIcon></ExpandMoreIcon>
               </div>
 
-              <div className="form-group">
+              <div className={styles["form-group"]}>
                 <label>가게 요청사항</label>
                 <input
                   type="text"
@@ -77,9 +70,9 @@ const PaymentPage = () => {
                 />
               </div>
 
-              <div className="form-group">
+              <div className={styles["form-group"]}>
                 <label>배달 요청사항</label>
-                <div className="select-wrap">
+                <div className={styles["select-wrap"]}>
                   <select
                     value={deliveryRequest}
                     onChange={(e) => setDeliveryRequest(e.target.value)}
@@ -93,78 +86,84 @@ const PaymentPage = () => {
               </div>
             </div>
 
-            {/* 에코포인트 */}
-            <div className="info-card">
-              <div className="card-title-row">
-                <div className="card-title-left">
-                  <Gift size={20} />
+            <div className={styles["info-card"]}>
+              <div className={styles["card-title-row"]}>
+                <div className={styles["card-title-left"]}>
+                  <CardGiftcardIcon></CardGiftcardIcon>
                   <h2>에코 포인트 사용 및 적립</h2>
                 </div>
               </div>
 
-              <div className="form-group">
+              <div className={styles["form-group"]}>
                 <label>에코 포인트 사용</label>
-                <div className="point-row">
+                <div className={styles["point-row"]}>
                   <input
                     type="text"
                     value={ecoPoint}
                     onChange={(e) => setEcoPoint(e.target.value)}
                   />
-                  <button className="point-cancel-btn">사용취소</button>
+                  <button
+                    className={styles["point-cancel-btn"]}
+                    onClick={() => {
+                      setEcoPoint(0);
+                    }}
+                  >
+                    사용취소
+                  </button>
                 </div>
-                <p className="point-desc">보유 : 7,000 점(원)</p>
+                <p className={styles["point-desc"]}>보유 : 7,000 점(원)</p>
               </div>
 
-              <div className="form-group">
+              <div className={styles["form-group"]}>
                 <label>이번 주문으로 받을 에코포인트</label>
                 <input type="text" value="450" readOnly />
               </div>
             </div>
           </section>
 
-          {/* 오른쪽 결제 정보 */}
-          <aside className="payment-right">
-            <div className="summary-card">
-              <h2 className="summary-title">결제 정보</h2>
+          {/* 오른쪽 */}
+          <aside className={styles["payment-right"]}>
+            <div className={styles["summary-card"]}>
+              <h2 className={styles["summary-title"]}>결제 정보</h2>
 
-              <div className="price-list">
-                <div className="price-row">
+              <div className={styles["price-list"]}>
+                <div className={styles["price-row"]}>
                   <span>상품합계</span>
-                  <span>51,000원</span>
+                  <span>{itemPrice}원</span>
                 </div>
-                <div className="price-row">
+                <div className={styles["price-row"]}>
                   <span>배달비</span>
-                  <span>1,000원</span>
+                  <span>{deliveryPrice}원</span>
                 </div>
-                <div className="price-row">
+                <div className={styles["price-row"]}>
                   <span>에코포인트 사용</span>
-                  <span>-7,000원</span>
+                  <span>-{ecoPoint}P</span>
                 </div>
               </div>
 
-              <div className="total-row">
+              <div className={styles["total-row"]}>
                 <span>최종 결제 금액</span>
-                <strong>45,000원</strong>
+                <strong>{totalPrice}원</strong>
               </div>
 
-              <div className="carbon-card">
-                <p className="carbon-title">이 주문의 탄소 절감</p>
-                <strong className="carbon-value">450g</strong>
-                <p className="carbon-desc">
+              <div className={styles["carbon-card"]}>
+                <p className={styles["carbon-title"]}>이 주문의 탄소 절감</p>
+                <strong className={styles["carbon-value"]}>450g</strong>
+                <p className={styles["carbon-desc"]}>
                   이번 주문으로 나무 가지 하나를 틔웠습니다!
                 </p>
               </div>
 
-              <div className="payment-method-section">
-                <div className="payment-method-title">
-                  <CreditCard size={18} />
+              <div className={styles["payment-method-section"]}>
+                <div className={styles["payment-method-title"]}>
+                  <CreditCardIcon></CreditCardIcon>
                   <span>결제 수단</span>
                 </div>
 
-                <div className="payment-method-grid">
+                <div className={styles["payment-method-grid"]}>
                   <button
-                    className={`payment-method-btn ${
-                      selectedPayment === "card" ? "active" : ""
+                    className={`${styles["payment-method-btn"]} ${
+                      selectedPayment === "card" ? styles["active"] : ""
                     }`}
                     onClick={() => setSelectedPayment("card")}
                   >
@@ -172,37 +171,19 @@ const PaymentPage = () => {
                   </button>
 
                   <button
-                    className={`payment-method-btn ${
-                      selectedPayment === "toss" ? "active" : ""
+                    className={`${styles["payment-method-btn"]} ${
+                      selectedPayment === "toss" ? styles["active"] : ""
                     }`}
                     onClick={() => setSelectedPayment("toss")}
                   >
                     <span>토스페이</span>
                   </button>
-
-                  <button
-                    className={`payment-method-btn ${
-                      selectedPayment === "kakao" ? "active" : ""
-                    }`}
-                    onClick={() => setSelectedPayment("kakao")}
-                  >
-                    <span>카카오페이</span>
-                  </button>
-
-                  <button
-                    className={`payment-method-btn ${
-                      selectedPayment === "naver" ? "active" : ""
-                    }`}
-                    onClick={() => setSelectedPayment("naver")}
-                  >
-                    <span>네이버페이</span>
-                  </button>
                 </div>
               </div>
 
-              <button className="pay-btn">45,000원 결제하기</button>
+              <button className={styles["pay-btn"]}>45,000원 결제하기</button>
 
-              <p className="pay-notice">
+              <p className={styles["pay-notice"]}>
                 결제 진행 시 주문이 확정되며
                 <br />
                 취소는 가게 승인 전까지 가능합니다.
