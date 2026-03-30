@@ -6,6 +6,7 @@ import Home from "./pages/main/Home";
 import StoreView from "./pages/main/StoreView";
 import StoreDetail from "./pages/main/StoreDetail";
 import NotFound from "./pages/error/NotFound";
+import OrderPage from "./pages/order/OrderPage";
 
 function App() {
   return (
@@ -20,7 +21,7 @@ function App() {
           {/* store */}
           <Route path="/storeView" element={<StoreView />}></Route>
           <Route path="/storeDetail" element={<StoreDetail />}></Route>
-
+          <Route path="/orderPage" element={<OrderPage />}></Route>
           {/* 없는 페이지 라우트 */}
           <Route path="*" element={<NotFound />} />
         </Routes>
