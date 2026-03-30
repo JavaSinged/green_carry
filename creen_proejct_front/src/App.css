@@ -1,17 +1,15 @@
-/* 1. 외부 폰트 페이스 정의 (Jalnan, YeogiGothic) */
+/* 1. 로컬 폰트 페이스 정의 (Jalnan, YeogiGothic) */
 @font-face {
-  font-family: "Jalnan";
-  src: url("https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_four@1.2/Jalnan.woff")
-    format("woff");
+  font-family: 'Jalnan';
+  src: url('/fonts/jalnan2.otf') format('opentype');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: "YeogiGothic";
-  src: url("https://fastly.jsdelivr.net/gh/projectnoonnu/2403-2@1.0/YeogiGothic.woff2")
-    format("woff2");
+  font-family: 'YeogiGothic';
+  src: url('/fonts/jalnanGothic.otf') format('opentype');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
@@ -20,10 +18,10 @@
 /* 2. 전역 변수 설정 (폰트 + 컬러) */
 :root {
   /* 폰트 시스템 */
-  --font-logo: "Gaegu", cursive;
-  --font-title: "Jalnan", sans-serif;
-  --font-sub: "YeogiGothic", sans-serif;
-  --font-body: "Pretendard Variable", "Pretendard", sans-serif;
+  --font-logo: 'Gaegu', cursive;
+  --font-title: 'Jalnan', sans-serif;
+  --font-sub: 'YeogiGothic', sans-serif;
+  --font-body: 'Pretendard Variable', 'Pretendard', sans-serif;
 
   /* 컬러 팔레트 */
   --color-brand: #2e8147; /* 브랜드 메인 그린 */
