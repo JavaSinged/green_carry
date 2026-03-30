@@ -7,6 +7,7 @@ import kr.co.iei.member.model.vo.Member;
 @Mapper
 public interface MemberDao {
 
-	int loginMember(Member member);
+
+	Member loginMember(String memberId);
 
 }

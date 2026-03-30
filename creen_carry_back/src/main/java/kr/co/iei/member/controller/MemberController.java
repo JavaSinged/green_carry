@@ -25,7 +25,6 @@ public class MemberController {
     	System.out.println(member);
     	int result = memberService.loginMember(member);
 
-    	System.out.println(result);
         return ResponseEntity.ok(result);
     }
 }
