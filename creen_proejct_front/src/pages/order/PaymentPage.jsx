@@ -147,6 +147,7 @@ const PaymentPage = () => {
                       setEcoPoint(num);
                       setPayInfo({
                         ...payInfo,
+                        totalPrice: totalPrice,
                         ecoPoint: num,
                       });
                     }}
