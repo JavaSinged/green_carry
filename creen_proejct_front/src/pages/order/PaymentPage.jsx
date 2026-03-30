@@ -5,8 +5,10 @@ import ChatBubbleIcon from "@mui/icons-material/ChatBubble";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import CardGiftcardIcon from "@mui/icons-material/CardGiftcard";
 import CreditCardIcon from "@mui/icons-material/CreditCard";
+import { useNavigate } from "react-router-dom";
 
 const PaymentPage = () => {
+  const navigate = useNavigate();
   const [storeRequest, setStoreRequest] = useState("");
   const [deliveryRequest, setDeliveryRequest] = useState("");
   const [ecoPoint, setEcoPoint] = useState(0);
@@ -14,12 +16,21 @@ const PaymentPage = () => {
   const [itemPrice, setItemPrice] = useState(45000);
   const [deliveryPrice, setDeliveryPrice] = useState(1000);
   const totalPrice = itemPrice + deliveryPrice - ecoPoint;
+  const phone = /^010-\d{4}-\d{4}$/;
 
   return (
     <div className={styles["payment-page"]}>
       <main className={styles["payment-main"]}>
         <div className={styles["payment-top-text"]}>
-          <button className={styles["back-btn"]}> 장바구니로 돌아가기</button>
+          <button
+            className={styles["back-btn"]}
+            onClick={() => {
+              navigate("/shoppingCart");
+            }}
+          >
+            {" "}
+            장바구니로 돌아가기
+          </button>
           <p>주문 정보를 확인하고 결제를 완료하세요</p>
         </div>
 
@@ -32,7 +43,14 @@ const PaymentPage = () => {
                   <RoomIcon />
                   <h2>배송정보</h2>
                 </div>
-                <button className={styles["text-btn"]}>주소 변경</button>
+                <button
+                  className={styles["text-btn"]}
+                  onClick={() => {
+                    navigate("/changeAddr");
+                  }}
+                >
+                  주소 변경
+                </button>
               </div>
 
               <div className={styles["form-group"]}>
@@ -56,7 +74,6 @@ const PaymentPage = () => {
                   <ChatBubbleIcon></ChatBubbleIcon>
                   <h2>요청사항</h2>
                 </div>
-                <button className={styles["icon-btn"]}></button>
                 <ExpandMoreIcon></ExpandMoreIcon>
               </div>
 
@@ -100,7 +117,17 @@ const PaymentPage = () => {
                   <input
                     type="text"
                     value={ecoPoint}
-                    onChange={(e) => setEcoPoint(e.target.value)}
+                    onChange={(e) => {
+                      const value = e.target.value;
+
+                      // 숫자만 허용
+                      if (!/^[0-9]*$/.test(value)) return;
+
+                      // 최대값 제한 (itemPrice)
+                      if (Number(value) > itemPrice) return;
+
+                      setEcoPoint(value);
+                    }}
                   />
                   <button
                     className={styles["point-cancel-btn"]}
@@ -154,34 +181,14 @@ const PaymentPage = () => {
                 </p>
               </div>
 
-              <div className={styles["payment-method-section"]}>
-                <div className={styles["payment-method-title"]}>
-                  <CreditCardIcon></CreditCardIcon>
-                  <span>결제 수단</span>
-                </div>
-
-                <div className={styles["payment-method-grid"]}>
-                  <button
-                    className={`${styles["payment-method-btn"]} ${
-                      selectedPayment === "card" ? styles["active"] : ""
-                    }`}
-                    onClick={() => setSelectedPayment("card")}
-                  >
-                    <span>신용카드</span>
-                  </button>
-
-                  <button
-                    className={`${styles["payment-method-btn"]} ${
-                      selectedPayment === "toss" ? styles["active"] : ""
-                    }`}
-                    onClick={() => setSelectedPayment("toss")}
-                  >
-                    <span>토스페이</span>
-                  </button>
-                </div>
-              </div>
-
-              <button className={styles["pay-btn"]}>45,000원 결제하기</button>
+              <button
+                className={styles["pay-btn"]}
+                onClick={() => {
+                  navigate("/checkoutPage");
+                }}
+              >
+                {totalPrice}원 결제하기
+              </button>
 
               <p className={styles["pay-notice"]}>
                 결제 진행 시 주문이 확정되며
