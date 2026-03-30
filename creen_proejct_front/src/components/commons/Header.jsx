@@ -39,7 +39,9 @@ export default function Header() {
         <Link to="/mypage">
           <PersonIcon />
         </Link>
-        <LogoutIcon />
+        <Link to="/Login">
+          <LogoutIcon />
+        </Link>
       </div>
     </header>
   );
