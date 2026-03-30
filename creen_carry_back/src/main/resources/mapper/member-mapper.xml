@@ -9,4 +9,7 @@
       AND TRIM(member_pw) = #{memberPw}
     </select>
 
+
+
+
 </mapper>

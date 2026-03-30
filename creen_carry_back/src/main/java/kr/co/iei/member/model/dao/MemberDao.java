@@ -8,4 +8,5 @@ import kr.co.iei.member.model.vo.Member;
 public interface MemberDao {
 
 	int loginMember(Member member);
+
 }

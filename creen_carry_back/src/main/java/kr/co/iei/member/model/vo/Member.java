@@ -1,4 +1,12 @@
+
 package kr.co.iei.member.model.vo; // 본인 프로젝트의 패키지 경로로 수정하세요!
+
+package kr.co.iei.member.model.vo;
+
+import java.sql.Date;
+
+import org.apache.ibatis.type.Alias;
+
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -34,3 +42,4 @@ public class Member {
     private String openingDate;      // OPENING_DATE (DATE) : 개업일 (화면 출력을 위해 String으로 받음)
     
 }
+
