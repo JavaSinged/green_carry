@@ -27,12 +27,10 @@ public class MemberService {
             System.out.println("입력비번: [" + member.getMemberPw() + "]");
             System.out.println("### 진짜 암호문: " + passwordEncoder.encode("Green1234!"));
 
-            // 🌟 핵심: DB에서 가져온 암호화된 비밀번호의 모든 공백을 제거합니다.
-            String trimmedDbPw = dbMember.getMemberPw().trim();
-            System.out.println("DB비번: [" + trimmedDbPw + "]");
+            String Pw = dbMember.getMemberPw();
+            System.out.println("DB비번: [" + Pw + "]");
 
-            // 2. matches 함수로 비교 (반드시 trim된 값을 넣어야 합니다)
-            if (passwordEncoder.matches(member.getMemberPw(), trimmedDbPw)) {
+            if (passwordEncoder.matches(member.getMemberPw(), Pw)) {
                 return 1; // ✨ 드디어 성공!
             } else {
                 System.out.println("비밀번호가 일치하지 않습니다.");
