@@ -2,7 +2,7 @@
   min-height: 100vh;
   background-color: var(--color-bg);
   padding: 40px 0 60px;
-  color: #222;
+  color: var(--text-main);
 }
 
 .main {
@@ -41,7 +41,7 @@
 .completeDesc {
   margin: 0 0 36px;
   font-size: 22px;
-  color: rgba(255, 255, 255, 0.92);
+  color: var(--color-bg);
 }
 
 .orderCheckBtn {
@@ -126,7 +126,7 @@
 .timelineLabel {
   margin: 0;
   font-size: 22px;
-  color: #b6b6b6;
+  color: var(--text-sub);
   font-weight: 700;
 }
 
@@ -141,7 +141,7 @@
   display: inline-block;
   margin-top: 8px;
   font-size: 18px;
-  color: #666;
+  color: var(--text-sub);
 }
 
 .statusMessage {
@@ -294,7 +294,7 @@
 
 .orderSubRow {
   font-size: 18px;
-  color: #666;
+  color: var(--text-sub);
   padding-left: 10px;
 }
 
@@ -344,7 +344,7 @@
 .ecoInnerDesc {
   margin: 0;
   font-size: 16px;
-  color: #666;
+  color: var(--text-sub);
 }
 
 .ecoInfoRow {

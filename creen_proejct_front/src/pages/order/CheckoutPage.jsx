@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import styles from "./CheckoutPage.module.css";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 const CheckoutPage = () => {
+  const navigate = useNavigate();
   const location = useLocation();
   const mapElement = useRef(null);
   const [mapLoaded, setMapLoaded] = useState(false);
@@ -214,8 +215,22 @@ const CheckoutPage = () => {
               </div>
             </div>
 
-            <button className={styles.primaryBtn}>주문 내역보기</button>
-            <button className={styles.secondaryBtn}>주문 취소</button>
+            <button
+              className={styles.primaryBtn}
+              onClick={() => {
+                navigate("/");
+              }}
+            >
+              주문 내역보기
+            </button>
+            <button
+              className={styles.secondaryBtn}
+              onClick={() => {
+                navigate("/");
+              }}
+            >
+              주문 취소
+            </button>
           </aside>
         </div>
       </main>
