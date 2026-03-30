@@ -6,15 +6,13 @@ import { useState } from "react";
 
 export default function CartBar() {
   const cart = useCartStore((state) => state.cart);
-
-  if (cart.length === 0) return null;
-
   const totalQuantity = cart.reduce((sum, item) => sum + item.quantity, 0);
   const totalPrice = cart.reduce((sum, item) => sum + item.totalPrice, 0);
   const totalCarbon = cart.reduce((sum, item) => sum + item.carbonSaved, 0);
   const navigate = useNavigate();
   const cartList = useCartStore((state) => state.cart);
 
+  if (cart.length === 0) return null;
   return (
     <div className={styles.cart_container}>
       <button className={styles.cart_button} onClick={() => {

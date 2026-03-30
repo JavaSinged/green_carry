@@ -116,14 +116,17 @@ const OrderPage = () => {
 
 const MenuList = () => {
     const cartList = useCartStore((state) => state.cart);
-    const count = cartList[0].quantity;
-    return (
-        cartList.map((cart) => {
-            return (<CartItem key={`cartList-${cartList.length}`} cart={cart} />)
-        })
+    if (cartList !== null) {
+
+        return (
+
+            cartList.map((cart) => {
+                return (<CartItem key={`cartList-${cartList.length}`} cart={cart} />)
+            })
 
 
-    )
+        )
+    }
 }
 export default OrderPage;
 
