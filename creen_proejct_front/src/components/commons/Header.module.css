@@ -4,34 +4,31 @@
   align-items: center;
   padding: 0 40px;
   height: 80px;
-  background-color: var(--color-brand); /* 브랜드 그린 컬러 */
+  background-color: var(--color-brand);
   color: #ffffff;
 }
 
-/* 1. 왼쪽 로고 영역 */
 .logo_wrap {
   cursor: pointer;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
 }
 
 .logo_wrap img {
-  height: 45px; /* 로고 이미지 크기 조절 */
+  height: 45px;
   width: auto;
-  filter: brightness(0) invert(1); /* 검정 스케치 로고를 흰색으로 변경 */
+  filter: brightness(0) invert(1);
 }
 
 .logo_text {
   font-family: var(--font-logo);
-  color: #ffffff !important; /* 배경이 녹색이라 흰색으로 처리 */
+  color: #ffffff !important;
   font-size: 1.4rem;
   margin: 0;
   font-weight: 400;
 }
 
-/* 2. 중앙 나무 심기 정보 영역 */
 .center_wrap {
   display: flex;
   flex-direction: column;
@@ -45,7 +42,7 @@
 }
 
 .center_wrap h5 {
-  font-family: var(--font-sub); /* 여기어때 고딕/잘난체 계열 */
+  font-family: var(--font-sub);
   font-size: 1.1rem;
   margin: 0;
   font-weight: normal;
@@ -55,15 +52,14 @@
 }
 
 .badge {
-  background-color: var(--color-point); /* 포인트 컬러 #FFB300 */
+  background-color: var(--color-point);
   color: #ffffff;
   padding: 2px 10px;
   border-radius: 8px;
   font-weight: bold;
-  font-family: var(--font-body); /* 숫자 가독성을 위해 프리텐다드 */
+  font-family: var(--font-body);
 }
 
-/* 3. 오른쪽 아이콘 버튼 영역 */
 .button_wrap {
   display: flex;
   align-items: center;
