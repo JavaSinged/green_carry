@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "./FindAccount.css";
+import { Link } from "react-router-dom";
 
 const account = () => {
   // 1. 상태 관리
@@ -34,6 +35,7 @@ const account = () => {
 
   return (
     <div className="screen-container">
+      {/* 🌟 헤더 태그 없이 로고 텍스트만 단독으로 중앙 배치 🌟 */}
       <h1
         className="logo"
         style={{
@@ -44,7 +46,10 @@ const account = () => {
           fontWeight: 700,
         }}
       >
-        GreenCarry
+        {/* ✨ 2. Link 태그로 글씨 감싸기 */}
+        <Link to="/" style={{ textDecoration: "none", color: "inherit" }}>
+          GreenCarry
+        </Link>
       </h1>
 
       <div className="main-content find-content">

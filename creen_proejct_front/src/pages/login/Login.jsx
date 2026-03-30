@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "./Login.css";
+import { Link } from "react-router-dom";
 
 const login = () => {
   // 탭 상태 관리 (개인 이용자 vs 사업자)
@@ -37,7 +38,10 @@ const login = () => {
           fontWeight: 700,
         }}
       >
-        GreenCarry
+        {/* ✨ 2. Link 태그로 글씨 감싸기 */}
+        <Link to="/" style={{ textDecoration: "none", color: "inherit" }}>
+          GreenCarry
+        </Link>
       </h1>
 
       {/* 메인 콘텐츠 구역 */}
