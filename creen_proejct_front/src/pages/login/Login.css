@@ -45,12 +45,12 @@ button {
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  background-color: #388e3c;
+  background-color: var(--color-brand);
 
   /* 내부 정렬 */
   display: flex;
   flex-direction: column;
-  color: white;
+  color: var(--color-bg);
   overflow-y: auto;
 }
 
@@ -65,7 +65,7 @@ button {
   font-size: 2.2rem;
   font-weight: 700;
   margin: 0;
-  color: white;
+  color: var(--color-bg);
 }
 
 .main-content {
@@ -97,8 +97,8 @@ button {
   align-items: center;
   width: 24px;
   height: 24px;
-  background-color: white;
-  color: #388e3c;
+  background-color: var(--color-bg);
+  color: var(--color-brand);
   border-radius: 5px;
   font-weight: 900;
 }
@@ -134,10 +134,10 @@ button {
 
 /* 중앙 로그인 폼 카드 */
 .login-card {
-  background-color: white;
+  background-color: var(--color-bg);
   border-radius: 20px;
   padding: 40px;
-  color: #333;
+  color: var(--text-main);
   width: 420px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
 }
@@ -150,21 +150,12 @@ button {
 
 .card-description {
   font-size: 0.95rem;
-  color: #666;
+  color: var(--text-sub);
   margin: 0 0 15px 0;
 }
 
-.admin-login {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 25px;
-  font-size: 0.85rem;
-  color: #555;
-}
-
 .admin-login input[type="checkbox"] {
-  accent-color: #388e3c;
+  accent-color: var(--color-brand);
 }
 
 /* 탭 스타일 */
@@ -186,13 +177,13 @@ button {
 }
 
 .tab-button.active {
-  background-color: #388e3c;
-  color: white;
+  background-color: var(--color-brand);
+  color: var(--color-bg);
 }
 
 .tab-button:not(.active) {
-  background-color: #f5f5f5;
-  color: #888;
+  background-color: var(--color-bg);
+  color: var(--text-sub);
 }
 
 /* 로그인 폼 입력 필드 및 버튼 스타일 */
@@ -206,13 +197,13 @@ button {
 .login-form input[type="password"] {
   padding: 18px;
   border-radius: 15px;
-  border: 1px solid #ddd;
+  border: 1px solid var(--color-surface);
   font-size: 1rem;
   outline: none;
 }
 
 .login-form input:focus {
-  border-color: #388e3c;
+  border-color: var(--color-brand);
 }
 
 .remember-me {
@@ -220,16 +211,16 @@ button {
   align-items: center;
   gap: 8px;
   font-size: 0.85rem;
-  color: #555;
+  color: var(--text-sub);
 }
 
 .remember-me input[type="checkbox"] {
-  accent-color: #388e3c;
+  accent-color: var(--color-brand);
 }
 
 .login-button {
   padding: 18px;
-  background-color: #388e3c;
+  background-color: var(--color-brand);
   color: white;
   border: none;
   border-radius: 15px;
@@ -241,7 +232,7 @@ button {
 }
 
 .login-button:hover {
-  background-color: #2e7d32;
+  background-color: var(--color-brand);
 }
 
 /* 카드 하단 링크 */
@@ -255,12 +246,12 @@ button {
 
 .card-footer a {
   text-decoration: none;
-  color: #888;
+  color: var(--text-sub);
   transition: color 0.3s;
 }
 
 .card-footer a:hover {
-  color: #388e3c;
+  color: var(--color-brand);
 }
 
 /* 3. 우측 일러스트 섹션 (좌측과 똑같은 너비로 변경) */
@@ -275,8 +266,8 @@ button {
 
 /* 말풍선 스타일 */
 .speech-bubble {
-  background-color: white;
-  color: #333;
+  background-color: var(--color-bg);
+  color: var(--text-main);
   border-radius: 20px;
   padding: 15px 20px;
   font-size: 0.9rem;
@@ -296,7 +287,7 @@ button {
   height: 0;
   border-left: 10px solid transparent;
   border-right: 10px solid transparent;
-  border-top: 10px solid white;
+  border-top: 10px solid var(--color-bg);
 }
 
 .character-illustration {

@@ -94,7 +94,7 @@
   background-color: var(--color-bg);
   border-radius: 20px;
   padding: 40px;
-  color: #333;
+  color: var(--text-main);
   width: 450px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
 }
@@ -103,7 +103,7 @@
 .find-tabs {
   display: flex;
   margin-bottom: 30px;
-  border-bottom: 2px solid #e0e0e0; /* 전체 회색 밑줄 */
+  border-bottom: 2px solid var(--color-surface); /* 전체 회색 밑줄 */
 }
 
 .find-tab-btn {
@@ -145,7 +145,7 @@
 input {
   padding: 18px;
   border-radius: 12px;
-  border: 1px solid #ddd;
+  border: 1px solid var(--color-surface);
   font-size: 0.95rem;
   outline: none;
   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.02); /* 살짝 입체감 */
@@ -185,7 +185,7 @@ input:focus {
 }
 
 .verify-send-btn:hover {
-  background-color: #f1f8f1;
+  background-color: var(--color-surface);
 }
 
 /* 인증 확인 버튼 (초록 바탕) */
