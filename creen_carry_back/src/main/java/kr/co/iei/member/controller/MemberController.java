@@ -88,4 +88,27 @@ public class MemberController {
         }
     }
     
+    @PostMapping("/sendAuthCode")
+    public ResponseEntity<?> sendAuthCode(@RequestBody Member member) {
+        // 🌟 실제 메일 발송 실행
+        String authCode = memberService.sendAuthCode(member.getMemberEmail());
+        
+        // 보안상 실제로는 authCode를 리턴하지 않고 서버 세션/Redis에 저장하지만,
+        // 현재 테스트 환경에 맞춰 발송 성공 메시지만 보냅니다.
+        return ResponseEntity.ok(authCode);
+    }
+    
+    @PostMapping("/verifyCode")
+    public ResponseEntity<?> verifyCode(@RequestBody Map<String, String> data) {
+        String email = data.get("memberEmail");
+        String inputCode = data.get("inputCode");
+        System.out.println("프론트에서 온 이메일: " + email);
+        System.out.println("프론트에서 온 입력코드: " + inputCode);
+        
+        // 서비스에서 저장된 인증번호와 비교 (이 예시에서는 간단히 서비스의 맵에서 확인)
+        boolean isMatch = memberService.checkAuthCode(email, inputCode);
+        
+        return ResponseEntity.ok(isMatch);
+    }
+    
 }

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import "./FindAccount.css";
 import { Link, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
-import api from "../../utils/accessToken"; // 🌟 만들어둔 axios 인스턴스 임포트
+import api from "../../utils/accessToken";
 
 const Account = () => {
   const navigate = useNavigate();
@@ -13,11 +13,10 @@ const Account = () => {
   const [isVerified, setIsVerified] = useState(false);
   const [inputCode, setInputCode] = useState("");
 
-  // 폼 입력 데이터 상태 추가
   const [formData, setFormData] = useState({
     memberName: "",
     memberEmail: "",
-    memberId: "", // 비밀번호 재설정 시 필요
+    memberId: "",
   });
 
   // 2. 새 비밀번호 관련 상태
@@ -48,12 +47,26 @@ const Account = () => {
       Swal.fire({ icon: "warning", title: "이메일을 입력해주세요." });
       return;
     }
-    setIsCodeSent(true);
-    Swal.fire({
-      icon: "info",
-      title: "인증번호 발송",
-      text: "테스트용 인증번호는 [111111] 입니다.",
-    });
+
+    api
+      .post("/api/member/sendAuthCode", {
+        memberEmail: formData.memberEmail,
+      })
+      .then(() => {
+        setIsCodeSent(true);
+        Swal.fire({
+          icon: "success",
+          title: "인증번호 발송 완료",
+          text: "입력하신 이메일로 인증번호가 발송되었습니다. (3분 이내 입력)",
+        });
+      })
+      .catch(() => {
+        Swal.fire({
+          icon: "error",
+          title: "발송 실패",
+          text: "이메일 주소를 확인하거나 잠시 후 다시 시도해주세요.",
+        });
+      });
   };
 
   const handlePwChange = (val) => {
@@ -81,83 +94,98 @@ const Account = () => {
     }
   };
 
-  // 🌟 [백엔드 연동] 아이디 찾기 및 인증 확인
+  // 🌟 [핵심 수정 부분] 중복 코드 모두 제거하고 하나로 합침
   const handleVerifySubmit = (e) => {
     e.preventDefault();
 
-    // 1. 공통: 인증번호 검사
-    if (inputCode !== "111111") {
-      Swal.fire({
-        icon: "error",
-        title: "인증 실패",
-        text: "인증번호가 일치하지 않습니다.",
-      });
+    if (!inputCode) {
+      Swal.fire({ icon: "warning", title: "인증번호를 입력해주세요." });
       return;
     }
 
-    if (activeTab === "findId") {
-      // 🚀 아이디 찾기 로직 (기존과 동일)
-      api
-        .post("/api/member/findId", {
-          memberName: formData.memberName,
-          memberEmail: formData.memberEmail,
-        })
-        .then((res) => {
-          Swal.fire({
-            icon: "success",
-            title: "아이디 찾기 성공",
-            html: `고객님의 아이디는 <b>${res.data}</b> 입니다.`,
-          });
-        })
-        .catch(() => {
-          Swal.fire({
-            icon: "error",
-            title: "조회 실패",
-            text: "일치하는 정보가 없습니다.",
-          });
-        });
-    } else {
-      // 🚀 비밀번호 재설정 1차 검증 (아이디 + 이메일 존재 여부 확인)
-      // 🌟 이 부분을 추가하여 DB에 실제 사용자가 있는지 확인합니다.
-      api
-        .post("/api/member/checkMember", {
-          memberId: formData.memberId,
-          memberEmail: formData.memberEmail,
-        })
-        .then((res) => {
-          if (res.data === 1) {
-            // DB에 사용자가 확인됨 -> 비밀번호 변경 창으로 전환
-            setIsVerified(true);
+    // 1. 서버에 인증 확인 요청
+    api
+      .post("/api/member/verifyCode", {
+        memberEmail: formData.memberEmail,
+        inputCode: inputCode,
+      })
+      .then((res) => {
+        if (res.data === true || res.data === "true") {
+          // 인증번호가 일치하는 경우
+          if (activeTab === "findId") {
+            api
+              .post("/api/member/findId", {
+                memberName: formData.memberName,
+                memberEmail: formData.memberEmail,
+              })
+              .then((resId) => {
+                Swal.fire({
+                  icon: "success",
+                  title: "아이디 찾기 성공",
+                  html: `고객님의 아이디는 <b>${resId.data}</b> 입니다.`,
+                });
+              })
+              .catch(() => {
+                Swal.fire({
+                  icon: "error",
+                  title: "조회 실패",
+                  text: "일치하는 정보가 없습니다.",
+                });
+              });
           } else {
-            Swal.fire({
-              icon: "error",
-              title: "인증 실패",
-              text: "정보가 일치하는 회원이 없습니다.",
-            });
+            // 비밀번호 재설정 탭
+            api
+              .post("/api/member/checkMember", {
+                memberId: formData.memberId,
+                memberEmail: formData.memberEmail,
+              })
+              .then((resCheck) => {
+                if (resCheck.data === true || resCheck.data === 1) {
+                  setIsVerified(true);
+                } else {
+                  Swal.fire({
+                    icon: "error",
+                    title: "인증 실패",
+                    text: "정보가 일치하는 회원이 없습니다.",
+                  });
+                }
+              })
+              .catch(() => {
+                Swal.fire({
+                  icon: "error",
+                  title: "오류",
+                  text: "회원 정보 확인 중 문제가 발생했습니다.",
+                });
+              });
           }
-        })
-        .catch(() => {
+        } else {
+          // 인증번호가 틀린 경우
           Swal.fire({
             icon: "error",
             title: "인증 실패",
-            text: "정보가 일치하는 회원이 없습니다.",
+            text: "인증번호가 일치하지 않습니다. 다시 확인해주세요.",
           });
+        }
+      })
+      .catch((err) => {
+        Swal.fire({
+          icon: "error",
+          title: "오류",
+          text: "인증 확인 중 문제가 발생했습니다.",
         });
-    }
+      });
   };
 
-  // 🌟 [백엔드 연동] 비밀번호 변경 최종 제출
   const handlePasswordChangeSubmit = (e) => {
     e.preventDefault();
     if (pwError || matchError || !newPassword || !confirmPassword) return;
 
-    // 🚀 비밀번호 재설정 API 호출
     api
       .post("/api/member/resetPw", {
         memberId: formData.memberId,
-        memberPw: newPassword, // 서버 서비스단에서 암호화 처리됨
+        memberPw: newPassword,
       })
-      .then((res) => {
+      .then(() => {
         Swal.fire({
           icon: "success",
           title: "변경 완료",
@@ -166,7 +194,7 @@ const Account = () => {
           navigate("/login");
         });
       })
-      .catch((err) => {
+      .catch(() => {
         Swal.fire({
           icon: "error",
           title: "변경 실패",
@@ -280,7 +308,7 @@ const Account = () => {
                   <input
                     type="text"
                     className="full-input"
-                    placeholder="인증번호 입력 (111111)"
+                    placeholder="인증번호 입력"
                     value={inputCode}
                     onChange={(e) => setInputCode(e.target.value)}
                     required
@@ -325,7 +353,7 @@ const Account = () => {
                   <input
                     type="text"
                     className="full-input"
-                    placeholder="테스트용 인증번호 (111111)"
+                    placeholder="인증번호 입력"
                     value={inputCode}
                     onChange={(e) => setInputCode(e.target.value)}
                     required
