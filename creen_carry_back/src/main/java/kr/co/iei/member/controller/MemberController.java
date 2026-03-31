@@ -28,6 +28,7 @@ public class MemberController {
     @Autowired
     private JwtUtil jwtUtil; // ✨ JwtUtil 주입
 
+    //1.로그인기능
     @PostMapping("/login")
     public ResponseEntity<?> loginMember(@RequestBody Member member) {
         System.out.println("로그인 요청 데이터: " + member);
@@ -54,4 +55,37 @@ public class MemberController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
     }
+ // 2. 아이디 찾기 (이름 + 이메일)
+    @PostMapping("/findId")
+    public ResponseEntity<?> findId(@RequestBody Member member) {
+        // DB에서 이름과 이메일이 일치하는 사용자의 ID를 가져옴
+        String memberId = memberService.findId(member);
+        
+        if (memberId != null) {
+            return ResponseEntity.ok(memberId);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("일치하는 회원이 없습니다.");
+        }
+    }
+    //비밀번호 재설정 1차 인증
+    @PostMapping("/checkMember")
+    public ResponseEntity<?> checkMember(@RequestBody Member member) {
+        // 아이디와 이메일이 일치하는 행이 있는지 COUNT 조회
+        int result = memberService.checkMember(member);
+        return ResponseEntity.ok(result);
+    }
+
+    // 3. 비밀번호 재설정 (아이디 + 새 비밀번호)
+    @PostMapping("/resetPw")
+    public ResponseEntity<?> resetPw(@RequestBody Member member) {
+        // 서비스에서 암호화 후 업데이트 진행
+        int result = memberService.resetPw(member);
+        
+        if (result > 0) {
+            return ResponseEntity.ok(result);
+        } else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("변경 실패");
+        }
+    }
+    
 }

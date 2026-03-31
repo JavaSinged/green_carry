@@ -1,11 +1,11 @@
 import axios from "axios";
 
-const accessToken = axios.create({
+const api = axios.create({
   baseURL: "http://localhost:10400", // 백엔드 주소
 });
 
 // 🌟 요청 인터셉터: 서버로 보내기 직전에 실행
-accessToken.interceptors.request.use(
+api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("accessToken");
     if (token) {
@@ -19,4 +19,4 @@ accessToken.interceptors.request.use(
   },
 );
 
-export default accessToken;
+export default api;

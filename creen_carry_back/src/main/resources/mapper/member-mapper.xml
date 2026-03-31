@@ -6,7 +6,33 @@
 		SELECT *
 		FROM MEMBER_TBL
 		WHERE MEMBER_ID = #{memberId}
-		AND MEMBER_GRADE = #{memberGrade}
+
+		<if test='!memberId.equals("admin1111")'>
+			AND MEMBER_GRADE = #{memberGrade}
+		</if>
+
+
+	</select>
+
+	<select id="findId" resultType="string">
+		SELECT MEMBER_ID
+		FROM MEMBER_TBL
+		WHERE MEMBER_NAME = #{memberName}
+		AND MEMBER_EMAIL = #{memberEmail}
+	</select>
+
+	<update id="resetPassword">
+		UPDATE MEMBER_TBL
+		SET MEMBER_PW = #{memberPw}
+		WHERE
+		MEMBER_ID = #{memberId}
+	</update>
+
+	<select id="checkMember" resultType="int">
+		SELECT COUNT(*)
+		FROM MEMBER_TBL
+		WHERE MEMBER_ID = #{memberId}
+		AND MEMBER_EMAIL = #{memberEmail}
 	</select>
 
 

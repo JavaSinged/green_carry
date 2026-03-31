@@ -41,7 +41,7 @@ button {
   height: 100vh;
 
   /* 배경 이미지 */
-  background-image: url('/image/login/loginsign.jpg');
+  background-image: url("/image/login/loginsign.jpg");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -67,13 +67,28 @@ button {
   margin: 0;
   color: var(--color-bg);
 }
-
+.leaf-point {
+  position: relative; /* 🌟 기준점 설정 */
+  display: inline-block;
+}
+.card-info {
+  font-size: 14px;
+  color: var(--text-sub);
+}
+.leaf-point::before {
+  content: "🌱"; /* 🌟 이모지를 쓰거나 이미지를 넣으려면 url() 사용 */
+  position: absolute;
+  top: -19px; /* 글자 위로 올리기 */
+  left: 35%; /* 정중앙 정렬 시작 */
+  transform: translateX(-50%); /* 정확히 중앙 정렬 */
+  font-size: 1rem;
+}
 .main-content {
   flex: 1;
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 50px;
+  gap: 70px;
   padding: 0 50px; /* 위아래 패딩을 똑같이 0으로 맞춰서 완벽한 세로 중앙으로! */
 }
 
@@ -163,7 +178,7 @@ button {
   color: var(--text-sub);
 }
 
-.admin-login input[type='checkbox'] {
+.admin-login input[type="checkbox"] {
   accent-color: var(--color-brand);
 }
 
@@ -191,8 +206,8 @@ button {
 }
 
 .tab-button:not(.active) {
-  background-color: #f5f5f5;
-  color: #888;
+  background-color: var(--color-surface);
+  color: var(--text-sub);
 }
 
 /* 로그인 폼 입력 필드 및 버튼 스타일 */
@@ -202,10 +217,10 @@ button {
   gap: 15px;
 }
 
-.login-form input[type='text'],
-.login-form input[type='password'] {
+.login-form input[type="text"],
+.login-form input[type="password"] {
   padding: 18px;
-  border-radius: 15px;
+  border-radius: 20px;
   border: 1px solid var(--color-surface);
   font-size: 1rem;
   outline: none;
@@ -223,7 +238,7 @@ button {
   color: var(--text-sub);
 }
 
-.remember-me input[type='checkbox'] {
+.remember-me input[type="checkbox"] {
   accent-color: var(--color-brand);
 }
 
@@ -288,7 +303,7 @@ button {
 
 /* 말풍선 꼬리 효과 */
 .speech-bubble::after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: -10px;
   left: 30px;
@@ -307,4 +322,20 @@ button {
 .character-illustration img {
   width: 70%; /* 부모 상자(320px)에 꽉 차게 비율 유지 */
   height: auto;
+}
+.MuiOutlinedInput-root {
+  border-radius: 20px !important; /* 원하시는 수치로 조정 */
+}
+
+/* 필드 내부의 실제 테두리 선(notchedOutline) 조절 */
+.MuiOutlinedInput-notchedOutline {
+  border-radius: 20px !important;
+}
+.MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
+  border-color: #b0b0b0 !important; /* 마우스 올렸을 때 회색 */
+}
+
+/* 3. 포커스(클릭) 시에는 다시 브랜드 컬러로! */
+.MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+  border-color: var(--color-brand) !important;
 }
