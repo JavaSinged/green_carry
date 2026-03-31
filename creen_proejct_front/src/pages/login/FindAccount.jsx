@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react"; // 🌟 useEffect 추가
+import React, { useState, useEffect } from "react";
 import "./FindAccount.css";
 import { Link, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
@@ -13,8 +13,7 @@ const Account = () => {
   const [isVerified, setIsVerified] = useState(false);
   const [inputCode, setInputCode] = useState("");
 
-  // 🌟 타이머 관련 상태 추가
-  const [timeLeft, setTimeLeft] = useState(180); // 3분 = 180초
+  const [timeLeft, setTimeLeft] = useState(180);
   const [isTimerActive, setIsTimerActive] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -29,7 +28,7 @@ const Account = () => {
   const [pwError, setPwError] = useState("");
   const [matchError, setMatchError] = useState("");
 
-  // 🌟 타이머 카운트다운 로직
+  // 타이머 카운트다운 로직
   useEffect(() => {
     let timer;
     if (isTimerActive && timeLeft > 0) {
@@ -43,7 +42,6 @@ const Account = () => {
     return () => clearInterval(timer);
   }, [isTimerActive, timeLeft]);
 
-  // 🌟 초 단위를 분:초로 변환
   const formatTime = (seconds) => {
     const min = Math.floor(seconds / 60);
     const sec = seconds % 60;
@@ -59,7 +57,7 @@ const Account = () => {
     setActiveTab(tab);
     setIsCodeSent(false);
     setIsVerified(false);
-    setIsTimerActive(false); // 탭 전환 시 타이머 정지
+    setIsTimerActive(false);
     setTimeLeft(180);
     setInputCode("");
     setNewPassword("");
@@ -80,13 +78,12 @@ const Account = () => {
         memberEmail: formData.memberEmail,
       })
       .then(() => {
-        setTimeLeft(180); // 🌟 타이머 3분으로 다시 세팅
-        setIsTimerActive(true); // 🌟 타이머 (재)시작
-        setInputCode(""); // 🌟 [추가] 재전송 시, 기존에 적어둔 번호 지우기
+        setTimeLeft(180);
+        setIsTimerActive(true);
+        setInputCode("");
 
         Swal.fire({
           icon: "success",
-          // 🌟 [추가] 처음 전송인지, 재전송인지에 따라 타이틀 다르게 보여주기
           title: isCodeSent ? "인증번호 재전송 완료" : "인증번호 발송 완료",
           text: "입력하신 이메일로 인증번호가 발송되었습니다. (3분 이내 입력)",
         });
@@ -102,10 +99,39 @@ const Account = () => {
       });
   };
 
+  const handlePwChange = (val) => {
+    setNewPassword(val);
+    const pwRegex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{10,}$/;
+    if (val && !pwRegex.test(val)) {
+      setPwError("대/소문자, 숫자, 특수문자 포함 10자 이상이어야 합니다.");
+    } else {
+      setPwError("");
+    }
+    if (confirmPassword && val !== confirmPassword) {
+      setMatchError("비밀번호가 일치하지 않습니다.");
+    } else {
+      setMatchError("");
+    }
+  };
+
+  const handleConfirmPwChange = (val) => {
+    setConfirmPassword(val);
+    if (newPassword !== val) {
+      setMatchError("비밀번호가 일치하지 않습니다.");
+    } else {
+      setMatchError("");
+    }
+  };
+
   const handleVerifySubmit = (e) => {
     e.preventDefault();
 
-    // 🌟 시간 초과 체크
+    if (!inputCode) {
+      Swal.fire({ icon: "warning", title: "인증번호를 입력해주세요." });
+      return;
+    }
+
     if (timeLeft <= 0) {
       Swal.fire({
         icon: "error",
@@ -122,7 +148,8 @@ const Account = () => {
       })
       .then((res) => {
         if (res.data === true || res.data === "true") {
-          setIsTimerActive(false); // 인증 성공 시 타이머 중지
+          setIsTimerActive(false); // 타이머 멈춤
+
           if (activeTab === "findId") {
             api
               .post("/api/member/findId", {
@@ -130,10 +157,13 @@ const Account = () => {
                 memberEmail: formData.memberEmail,
               })
               .then((resId) => {
+                // 🌟 [수정됨] Swal 확인을 누르면 로그인 화면으로 자동 이동
                 Swal.fire({
                   icon: "success",
                   title: "아이디 찾기 성공",
                   html: `고객님의 아이디는 <b>${resId.data}</b> 입니다.`,
+                }).then(() => {
+                  navigate("/login");
                 });
               })
               .catch(() => {
@@ -328,8 +358,6 @@ const Account = () => {
 
               {isCodeSent && (
                 <>
-                  {" "}
-                  {/* 🌟 프래그먼트로 감싸기 */}
                   <div className="timer-wrapper">
                     <input
                       type="text"
@@ -346,7 +374,6 @@ const Account = () => {
                       {formatTime(timeLeft)}
                     </span>
                   </div>
-                  {/* 🌟 버튼을 timer-wrapper 밖으로 꺼냈습니다! */}
                   <button
                     type="submit"
                     className="submit-verify-btn"
@@ -373,7 +400,7 @@ const Account = () => {
               <p
                 style={{
                   textAlign: "center",
-                  color: "#888",
+                  color: "var(--text-sub)",
                   fontSize: "0.85rem",
                   marginTop: "0",
                   marginBottom: "20px",
@@ -381,11 +408,12 @@ const Account = () => {
               >
                 새롭게 사용할 비밀번호를 입력해주세요.
               </p>
+
               <div style={{ marginBottom: "15px" }}>
                 <input
                   type="password"
                   className="full-input"
-                  placeholder="새 비밀번호"
+                  placeholder="새 비밀번호 (대문자+소문자+숫자+특수문자 10자 이상)"
                   value={newPassword}
                   onChange={(e) => handlePwChange(e.target.value)}
                   required
@@ -402,6 +430,7 @@ const Account = () => {
                   </div>
                 )}
               </div>
+
               <div style={{ marginBottom: "15px" }}>
                 <input
                   type="password"
@@ -423,12 +452,18 @@ const Account = () => {
                   </div>
                 )}
               </div>
+
               <button
                 type="submit"
                 className="submit-verify-btn"
-                disabled={pwError || matchError || !confirmPassword}
+                disabled={
+                  pwError || matchError || !confirmPassword || !newPassword
+                }
                 style={{
-                  opacity: pwError || matchError || !confirmPassword ? 0.5 : 1,
+                  opacity:
+                    pwError || matchError || !confirmPassword || !newPassword
+                      ? 0.5
+                      : 1,
                 }}
               >
                 비밀번호 변경 완료
