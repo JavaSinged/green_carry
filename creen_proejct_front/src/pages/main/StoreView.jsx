@@ -18,6 +18,7 @@ export default function StoreView() {
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     // 🚀 서버에서 메뉴 리스트 가져오기
     axios
       .get(`${import.meta.env.VITE_BACKSERVER}/stores/${storeId}/menus`)
