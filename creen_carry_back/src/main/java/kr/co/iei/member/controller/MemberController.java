@@ -75,15 +75,22 @@ public class MemberController {
         return ResponseEntity.ok(result);
     }
 
-    // 3. 비밀번호 재설정 (아이디 + 새 비밀번호)
+ // 3. 비밀번호 재설정 (아이디 + 새 비밀번호)
     @PostMapping("/resetPw")
     public ResponseEntity<?> resetPw(@RequestBody Member member) {
+    	System.out.println("넘어온 아이디: " + member.getMemberId()); // 👈 이거 꼭 확인!
+        System.out.println("넘어온 비번: " + member.getMemberPw());
         // 서비스에서 암호화 후 업데이트 진행
         int result = memberService.resetPw(member);
         
-        if (result > 0) {
+        if (result == -1) {
+            // 🌟 기존 비밀번호와 동일할 경우 프론트엔드로 반환
+            return ResponseEntity.ok(-1);
+        } else if (result > 0) {
+            // 성공 시
             return ResponseEntity.ok(result);
         } else {
+            // 실패 시
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("변경 실패");
         }
     }

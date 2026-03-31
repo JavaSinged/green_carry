@@ -34,6 +34,10 @@
 		WHERE MEMBER_ID = #{memberId}
 		AND MEMBER_EMAIL = #{memberEmail}
 	</select>
+	
+	<select id="selectOneMember" resultType="member">
+	    select * from member_tbl where member_id = #{memberId}
+	</select>
 
 
 

@@ -54,13 +54,28 @@ public class MemberService {
         return memberDao.findId(member);
     }
 
-    // 비밀번호 재설정 로직
     @Transactional // 수정 작업이므로 트랜잭션 처리
     public int resetPw(Member member) {
-        // 🌟 핵심: 프론트에서 넘어온 새 비밀번호를 암호화합니다.
+        
+        // 1. DB에서 현재 회원의 정보(암호화된 기존 비밀번호)를 먼저 불러옵니다.
+        // 🚨 주의: 아이디로 회원 1명을 조회하는 메서드명(예: selectOneMember)을 
+        // 본인 DAO에 만들어져 있는 이름으로 맞춰주세요!
+        Member existingMember = memberDao.selectOneMember(member.getMemberId());
+        
+        // 2. 기존 회원이 존재한다면, 새 비밀번호와 기존 비밀번호를 비교합니다.
+        if (existingMember != null) {
+            // member.getMemberPw() : 방금 입력한 새 비밀번호 (평문)
+            // existingMember.getMemberPw() : DB에 있던 예전 비밀번호 (암호문)
+            if (passwordEncoder.matches(member.getMemberPw(), existingMember.getMemberPw())) {
+                return -1; // 🌟 똑같으면 업데이트를 멈추고 -1을 반환! (이게 컨트롤러로 갑니다)
+            }
+        }
+
+        // 3. 기존 비밀번호와 다를 경우에만! 새 비밀번호를 암호화합니다.
         String encodedPassword = passwordEncoder.encode(member.getMemberPw());
         member.setMemberPw(encodedPassword);
         
+        // 4. 암호화된 비밀번호로 DB 업데이트 진행
         return memberDao.resetPassword(member);
     }
 	public int checkMember(Member member) {

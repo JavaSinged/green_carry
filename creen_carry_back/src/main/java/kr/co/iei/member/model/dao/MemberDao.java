@@ -16,4 +16,6 @@ public interface MemberDao {
 
 	int checkMember(Member member);
 
+	Member selectOneMember(String memberId);
+
 }

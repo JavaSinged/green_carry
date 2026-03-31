@@ -175,7 +175,15 @@ const Account = () => {
         memberId: formData.memberId,
         memberPw: newPassword,
       })
-      .then(() => {
+      .then((res) => {
+        if (res.data === -1) {
+          Swal.fire({
+            icon: "warning",
+            title: "변경 불가",
+            text: "기존과 동일한 비밀번호입니다. 다른 비밀번호를 입력해주세요.",
+          });
+          return; // 여기서 함수를 끝내서, 아래의 '성공' 팝업이 안 뜨게 막습니다.
+        }
         Swal.fire({
           icon: "success",
           title: "변경 완료",
@@ -186,7 +194,7 @@ const Account = () => {
         Swal.fire({
           icon: "error",
           title: "변경 실패",
-          text: "오류가 발생했습니다.",
+          text: "비밀번호 변경 중 서버 오류가 발생했습니다.",
         }),
       );
   };
