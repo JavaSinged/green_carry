@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styles from "./ManagerSignup.module.css";
 import { useNavigate } from "react-router-dom";
 import Calendar from "react-calendar";
@@ -22,10 +22,13 @@ const ManagerSignup = () => {
   // 제출 버튼 클릭 여부 (이 값을 기준으로 빈 칸 에러 표시)
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-  // UI 흐름 제어용 State (백엔드 없이 가짜 상태 관리)
-  const [checkId, setCheckId] = useState(0); // 0: 확인 전, 2: 사용 가능
-  const [mailAuth, setMailAuth] = useState(0); // 0: 전송 전, 1: 전송 완료, 3: 인증 완료
-  const [checkBiz, setCheckBiz] = useState(0); // 0: 확인 전, 2: 사용 가능
+  const [checkId, setCheckId] = useState(0);
+  const [mailAuth, setMailAuth] = useState(0);
+  const [checkStoreOwnerNo, setCheckStoreOwnerNo] = useState(0);
+  const [mailAuthCode, setMailAuthCode] = useState(null);
+  const [mailAuthInput, setMailAuthInput] = useState("");
+  const [time, setTime] = useState(180);
+  const [timeout, setTimeout] = useState(null);
 
   // 정규식 모음
   const idRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
@@ -50,8 +53,26 @@ const ManagerSignup = () => {
       alert("아이디 형식을 먼저 맞춰주세요.");
       return;
     }
-    alert("사용 가능한 아이디입니다! (UI 테스트)");
-    setCheckId(2);
+    axios
+      .get(
+        `${import.meta.env.VITE_BACKSERVER}/api/member/exists?memberId=${member.memberId}`,
+      )
+      .then((res) => {
+        console.log("중복 체크 결과:", res.data);
+
+        // res.data가 true면 중복(사용 불가), false면 사용 가능으로 가정
+        if (res.data) {
+          alert("사용 가능한 아이디입니다.");
+          setCheckId(2); // 사용가능
+        } else {
+          alert("이미 사용중인 아이디입니다!");
+          setCheckId(1); // 아이디 중복
+        }
+      })
+      .catch((err) => {
+        console.error("통신 에러:", err);
+        alert("서버와 통신 중 오류가 발생했습니다.");
+      });
   };
 
   const handleSendMail = () => {
@@ -59,17 +80,67 @@ const ManagerSignup = () => {
       alert("올바른 이메일 형식을 먼저 입력해주세요.");
       return;
     }
-    alert("인증 메일이 전송되었습니다. (테스트용: 아무 번호나 입력하세요)");
-    setMailAuth(1);
+    setTime(180); // 180초 초기화
+    if (timeout) {
+      window.clearInterval(timeout); // 기존 타이머가 있다면 초기화
+    }
+
+    setMailAuth(1); // 로딩 또는 전송 중 상태 (상황에 따라 2로 바로 넘어가도 됨)
+
+    const obj = { memberEmail: member.memberEmail };
+    axios
+      .post(
+        `${import.meta.env.VITE_BACKSERVER}/api/member/email-verification`,
+        obj,
+      )
+      .then((res) => {
+        console.log("인증번호 발송 성공:", res.data);
+        setMailAuthCode(res.data); // 서버에서 보낸 인증번호 저장
+        setMailAuth(2); // 입력창 활성화 상태
+
+        // 타이머 시작
+        const intervalId = window.setInterval(() => {
+          setTime((prev) => prev - 1);
+        }, 1000);
+        setTimeout(intervalId); // 타이머 멈추기 위해 ID 저장
+      })
+      .catch((err) => {
+        console.error("메일 발송 에러:", err);
+        alert("메일 발송 중 오류가 발생했습니다.");
+      });
   };
 
   const handleVerifyMail = () => {
-    if (mailAuth !== 1) {
+    if (mailAuth !== 2) {
       alert("먼저 인증 이메일 전송 버튼을 눌러주세요.");
       return;
     }
-    alert("이메일 인증이 완료되었습니다! (UI 테스트)");
-    setMailAuth(3);
+
+    // 서버에서 받은 번호와 사용자가 입력한 번호 비교
+    if (String(mailAuthCode) === mailAuthInput) {
+      alert("이메일 인증이 완료되었습니다!");
+      setMailAuth(3); // 인증 완료 상태
+      window.clearInterval(timeout); // 타이머 멈춤
+      setTimeout(null);
+    } else {
+      alert("인증번호가 일치하지 않습니다. 다시 확인해주세요.");
+    }
+  };
+  useEffect(() => {
+    if (time === 0) {
+      window.clearInterval(timeout);
+      setMailAuthCode(null); // 인증번호 파기
+      setTimeout(null);
+      alert("인증 시간이 만료되었습니다. 다시 시도해주세요.");
+      setMailAuth(0); // 초기 상태로 되돌림
+    }
+  }, [time]);
+
+  // 4. 시간 표시 포맷 함수
+  const showTime = () => {
+    const min = Math.floor(time / 60);
+    const sec = String(time % 60).padStart(2, "0");
+    return `${min}:${sec}`;
   };
 
   const handleBizCheck = () => {
@@ -130,9 +201,17 @@ const ManagerSignup = () => {
       return { text: "올바른 이메일 형식을 입력해주세요.", isError: true };
     if (mailAuth === 0)
       return { text: "인증 이메일을 전송해주세요.", isError: true };
-    if (mailAuth === 1)
-      return { text: "인증번호를 입력하고 확인을 눌러주세요.", isError: true };
-    return { text: "이메일 인증이 완료되었습니다.", isError: false };
+    if (mailAuth === 2) {
+      return {
+        text: `인증번호를 입력하세요. (남은 시간: ${showTime()})`,
+        isError: true,
+      };
+    }
+
+    if (mailAuth === 3)
+      return { text: "이메일 인증이 완료되었습니다.", isError: false };
+
+    return { text: "\u00A0", isError: false };
   };
 
   const getBizNoMessage = () => {
@@ -337,9 +416,9 @@ const ManagerSignup = () => {
                   type="button"
                   className={styles.buttonOutlined}
                   onClick={handleSendMail}
-                  disabled={mailAuth === 3}
+                  disabled={mailAuth === 1 || mailAuth === 3}
                 >
-                  인증 이메일 전송
+                  {mailAuth === 0 ? "인증 메일 전송" : "재전송"}
                 </button>
               </div>
 
@@ -348,13 +427,17 @@ const ManagerSignup = () => {
                   type="text"
                   className={styles.inputUnderline}
                   placeholder="인증번호"
-                  disabled={mailAuth === 3}
+                  value={mailAuthInput}
+                  onChange={(e) => {
+                    setMailAuthInput(e.target.value);
+                  }}
+                  disabled={mailAuth !== 2}
                 />
                 <button
                   type="button"
                   className={styles.buttonFilled}
                   onClick={handleVerifyMail}
-                  disabled={mailAuth === 3}
+                  disabled={mailAuth !== 2}
                 >
                   인증번호 확인
                 </button>
@@ -362,7 +445,9 @@ const ManagerSignup = () => {
 
               <p
                 className={`${styles.statusMessage} ${emailStatus.isError ? styles.errorMessage : ""}`}
-                style={!emailStatus.isError ? { color: "#3a8a56" } : {}}
+                style={
+                  !emailStatus.isError ? { color: "var(--color-brand)" } : {}
+                }
               >
                 {emailStatus.text}
               </p>

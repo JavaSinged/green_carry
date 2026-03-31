@@ -65,7 +65,7 @@
   font-weight: 300; /* 400에서 300으로 더 얇게 수정됨 */
   color: var(--text-main); /* 라벨 색상 적용 */
   font-family: var(--font-sub); /* 라벨은 서브 폰트로 강조 */
-  padding-top: 5px; /* 밑줄과 텍스트 수평 정렬용 */
+  padding-top: 5px; /* 밑줄과 텍스트 수평 정렬용 commit test*/
 }
 
 .inputArea {

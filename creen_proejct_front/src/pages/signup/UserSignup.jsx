@@ -12,6 +12,7 @@ const UserSignup = () => {
     memberPw: "",
     memberName: "",
     memberEmail: "",
+    memberPhone: "",
     memberAddrCode: "",
     memberAddr: "",
     memberDetailAddr: "",
@@ -61,7 +62,7 @@ const UserSignup = () => {
         `${import.meta.env.VITE_BACKSERVER}/api/member/exists?memberId=${member.memberId}`,
       )
       .then((res) => {
-        console.log("중복 체크 결과:", res);
+        console.log("중복 체크 결과:", res.data);
 
         // res.data가 true면 중복(사용 불가), false면 사용 가능으로 가정
         if (res.data) {
@@ -107,7 +108,7 @@ const UserSignup = () => {
         // 타이머 시작
         const intervalId = window.setInterval(() => {
           setTime((prev) => prev - 1);
-        }, 100);
+        }, 1000);
         setTimeout(intervalId); // 타이머 멈추기 위해 ID 저장
       })
       .catch((err) => {
@@ -248,6 +249,14 @@ const UserSignup = () => {
       };
     return { text: "\u00A0", isError: false };
   };
+  const getPhoneMessage = () => {
+    if (!member.memberPhone.trim())
+      return {
+        text: isSubmitted ? "휴대폰 번호를 입력하세요." : "\u00A0",
+        isError: isSubmitted,
+      };
+    return { text: "\u00A0", isError: false };
+  };
 
   const getAddrMessage = () => {
     if (!member.memberAddrCode || !member.memberDetailAddr.trim())
@@ -264,6 +273,7 @@ const UserSignup = () => {
   const emailStatus = getEmailMessage();
   const nameStatus = getNameMessage();
   const addrStatus = getAddrMessage();
+  const phoneStatus = getPhoneMessage();
 
   const joinSubmit = (e) => {
     e.preventDefault();
@@ -275,6 +285,7 @@ const UserSignup = () => {
       !memberPwRe ||
       !member.memberEmail ||
       !member.memberName.trim() ||
+      !member.memberPhone.trim() ||
       !member.memberAddrCode ||
       !member.memberDetailAddr.trim();
 
@@ -285,15 +296,22 @@ const UserSignup = () => {
       pwReStatus.isError ||
       emailStatus.isError ||
       nameStatus.isError ||
+      phoneStatus.isError ||
       addrStatus.isError
     ) {
       alert("입력하신 정보를 다시 확인해주세요.");
       return;
     }
-
-    console.log("가입 진행 데이터:", member);
-    alert("모든 절차를 통과했습니다! 회원가입 완료! (UI 테스트)");
-    navigate("/member/login");
+    axios
+      .post(`${import.meta.env.VITE_BACKSERVER}/api/member/userSignup`, member)
+      .then((res) => {
+        console.log("가입 진행 데이터:", res.data);
+        alert("회원가입이 완료됐습니다. 로그인페이지로 이동합니다.");
+        navigate("/login");
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
 
   return (
@@ -312,7 +330,7 @@ const UserSignup = () => {
         <form className={styles.form} onSubmit={joinSubmit}>
           {/* 아이디 */}
           <div className={styles.fieldGroup}>
-            <label className={styles.label}>아이디 *</label>
+            <label className={styles.label}>아이디</label>
             <div className={styles.inputArea}>
               <div className={styles.inputAreaInner}>
                 <input
@@ -344,7 +362,7 @@ const UserSignup = () => {
 
           {/* 비밀번호 */}
           <div className={styles.fieldGroup}>
-            <label className={styles.label}>비밀번호 *</label>
+            <label className={styles.label}>비밀번호</label>
             <div className={styles.inputArea}>
               <input
                 type="password"
@@ -386,7 +404,7 @@ const UserSignup = () => {
 
           {/* 이름 */}
           <div className={styles.fieldGroup}>
-            <label className={styles.label}>이름 *</label>
+            <label className={styles.label}>이름</label>
             <div className={styles.inputArea}>
               <input
                 type="text"
@@ -405,7 +423,7 @@ const UserSignup = () => {
 
           {/* 이메일 */}
           <div className={styles.fieldGroup}>
-            <label className={styles.label}>이메일 *</label>
+            <label className={styles.label}>이메일</label>
             <div className={styles.inputArea}>
               <div className={styles.inputAreaInner}>
                 <input
@@ -456,6 +474,25 @@ const UserSignup = () => {
                 }
               >
                 {emailStatus.text}
+              </p>
+            </div>
+          </div>
+          {/* 연락처 */}
+          <div className={styles.fieldGroup}>
+            <label className={styles.label}>휴대폰 번호</label>
+            <div className={styles.inputArea}>
+              <input
+                type="text"
+                name="memberPhone"
+                value={member.memberPhone}
+                onChange={inputMember}
+                className={styles.inputUnderline}
+                placeholder="(-)을 제외한 숫자를 입력하세요"
+              />
+              <p
+                className={`${styles.statusMessage} ${phoneStatus.isError ? styles.errorMessage : ""}`}
+              >
+                {phoneStatus.text}
               </p>
             </div>
           </div>

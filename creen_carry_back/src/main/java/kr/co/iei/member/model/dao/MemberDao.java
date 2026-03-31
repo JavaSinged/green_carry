@@ -10,6 +10,13 @@ public interface MemberDao {
 
 	Member loginMember(Member member);
 
+	int insertManager(Member member);
+
+	Member storeDupCheck(int storeOwnerNo);
 	Member selectOneMember(String memberId);
+
+	int insertUser(Member member);
+
+	
 
 }

@@ -87,6 +87,39 @@ public class MemberController {
 
        return ResponseEntity.ok(authCode); //React로 인증번호를 보내는 것
     }
+    
+    //user아이디 중복체크
+    @GetMapping(value="/exists")
+    public ResponseEntity<?> handleIdCheck(@RequestParam String memberId){
+    	Member member = memberService.selectOneMember(memberId);
+    	return ResponseEntity.ok(member == null);
+    }
+    
+  //메일전송요청
+    @PostMapping(value="/email-verification")
+    public ResponseEntity<?> sendMail(@RequestBody Member m){
+       String emailTitle = "Greencarry 회원가입 인증메일";
+       Random r = new Random();
+       StringBuffer sb = new StringBuffer();
+       for(int i=0; i<6; i++) {
+          //숫자 6자리랜덤
+          sb.append(r.nextInt(10));
+       }
+       String authCode = sb.toString();
+       String emailContent = "<h1>안녕하세요 Greencarry입니다.</h1>"
+             +"<h3>인증번호는 </h3>"
+             +"[<b>"+authCode+"</b>] 입니다.";
+       sender.sendMail(emailTitle, m.getMemberEmail(), emailContent);
+
+       return ResponseEntity.ok(authCode); //React로 인증번호를 보내는 것
+    }
+    
+    //user회원가입
+    @PostMapping(value="/userSignup")
+    public ResponseEntity<?> userSignup(@RequestBody Member member){
+    	int result = memberService.insertUser(member);
+    	return ResponseEntity.ok(result);
+    }
 
     
     
