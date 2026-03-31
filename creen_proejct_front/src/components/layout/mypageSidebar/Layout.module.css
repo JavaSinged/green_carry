@@ -6,7 +6,6 @@
   margin: 40px auto;
   padding: 0 20px;
   gap: 30px;
-  align-items: flex-start; /* 사이드바가 내용에 따라 늘어나지 않도록 고정 */
 }
 
 .sidebar {

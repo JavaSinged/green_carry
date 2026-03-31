@@ -14,6 +14,7 @@ import Account from './pages/login/FindAccount';
 import UserLayout from './components/layout/mypageSidebar/UserLayout';
 import ManagerLayout from './components/layout/mypageSidebar/ManagerLayout';
 import AdminLayout from './components/layout/mypageSidebar/AdminLayout';
+import UserProfile from './pages/mypage/user/UserProfile';
 
 const BasicLayout = () => {
   return (
@@ -43,9 +44,9 @@ function App() {
 
           {/* 🧑 일반 유저 마이페이지 */}
           <Route path="/mypage/user" element={<UserLayout />}>
-            {/* <Route index element={<UserProfile />} />{' '} */}
+            <Route index element={<UserProfile />} />
             {/* 기본 화면: 개인정보 수정 */}
-            {/* <Route path="orders" element={<UserOrders />} />{' '} */}
+            {/* <Route path="orders" element={<UserOrders />} /> */}
             {/* /mypage/user/orders */}
             {/* 필요한 메뉴만큼 Route를 추가하세요 */}
           </Route>
