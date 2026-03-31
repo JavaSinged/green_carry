@@ -8,8 +8,26 @@
 		WHERE MEMBER_ID = #{memberId}
 		AND MEMBER_GRADE = #{memberGrade}
 	</select>
-
-
-
-
+	<insert id="insertManager">
+		INSERT INTO MEMBER_TBL
+			(MEMBER_ID, 
+	        MEMBER_PW, 
+	        MEMBER_NAME, 
+	        MEMBER_PHONE, 
+	        MEMBER_EMAIL, 
+	        STORE_OWNER_NO, 
+	        STORE_NAME, 
+	        OPENING_DATE,
+	        MEMBER_GRADE  
+		) VALUES (
+	        #{memberId}, 
+	        #{memberPw}, 
+	        #{memberName}, 
+	        #{memberPhone}, 
+	        #{memberEmail}, 
+	        #{storeOwnerNo}, 
+	        #{storeName}, 
+	        #{openingDate},
+	        #{memberGrade})
+	</insert>
 </mapper>

@@ -54,4 +54,9 @@ public class MemberController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
     }
+    @PostMapping("/signupManager")
+    public ResponseEntity<?> signupManager(@RequestBody Member member){
+    	int result = memberService.insertManager(member);
+    	return ResponseEntity.ok(result);
+    }
 }

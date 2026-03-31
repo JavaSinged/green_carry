@@ -38,7 +38,14 @@ const Signup = () => {
 
         <p className={styles.footer_text}>
           회원 정보를 잊어버리셨나요?
-          <span className={styles.find_link}>아이디/비밀번호 찾기</span>
+          <span
+            className={styles.find_link}
+            onClick={() => {
+              navigate("/account");
+            }}
+          >
+            아이디/비밀번호 찾기
+          </span>
         </p>
       </main>
     </div>

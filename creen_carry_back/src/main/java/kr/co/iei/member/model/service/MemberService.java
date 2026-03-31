@@ -40,6 +40,18 @@ public class MemberService {
         // ✨ 로그인 실패 시: null 리턴
         return null;
     }
+
+	public int insertManager(Member member) {
+		String memberPw = member.getMemberPw();
+		System.out.println(memberPw);
+		String encPw=passwordEncoder.encode(memberPw);
+		System.out.println(encPw);
+		member.setMemberPw(encPw);
+		int result = memberDao.insertManager(member);
+		System.out.println(member);
+		
+		return 0;
+	}
 }
 
 
