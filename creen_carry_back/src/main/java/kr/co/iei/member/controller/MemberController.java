@@ -105,7 +105,7 @@ public class MemberController {
         System.out.println("프론트에서 온 이메일: " + email);
         System.out.println("프론트에서 온 입력코드: " + inputCode);
         
-        // 서비스에서 저장된 인증번호와 비교 (이 예시에서는 간단히 서비스의 맵에서 확인)
+        // 서비스에서 저장된 인증번호와 비교 
         boolean isMatch = memberService.checkAuthCode(email, inputCode);
         
         return ResponseEntity.ok(isMatch);
