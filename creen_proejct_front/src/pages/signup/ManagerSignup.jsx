@@ -1,23 +1,23 @@
-import React, { useState } from "react";
-import styles from "./ManagerSignup.module.css";
-import { useNavigate } from "react-router-dom";
-import Calendar from "react-calendar";
-import "react-calendar/dist/Calendar.css";
-import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
+import React, { useState } from 'react';
+import styles from './ManagerSignup.module.css';
+import { useNavigate } from 'react-router-dom';
+import Calendar from 'react-calendar';
+import 'react-calendar/dist/Calendar.css';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 
 const ManagerSignup = () => {
   const navigate = useNavigate();
 
   const [manager, setManager] = useState({
-    managerId: "",
-    managerPw: "",
-    managerEmail: "",
-    bizNo: "",
-    bizName: "",
-    ceoName: "",
-    openDate: "",
+    managerId: '',
+    managerPw: '',
+    managerEmail: '',
+    bizNo: '',
+    bizName: '',
+    ceoName: '',
+    openDate: '',
   });
-  const [managerPwRe, setManagerPwRe] = useState("");
+  const [managerPwRe, setManagerPwRe] = useState('');
 
   // 제출 버튼 클릭 여부 (이 값을 기준으로 빈 칸 에러 표시)
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -39,45 +39,45 @@ const ManagerSignup = () => {
     setManager({ ...manager, [name]: value });
 
     // 입력값이 바뀌면 관련 상태 초기화
-    if (name === "managerId") setCheckId(0);
-    if (name === "managerEmail") setMailAuth(0);
-    if (name === "bizNo") setCheckBiz(0);
+    if (name === 'managerId') setCheckId(0);
+    if (name === 'managerEmail') setMailAuth(0);
+    if (name === 'bizNo') setCheckBiz(0);
   };
 
   // 💡 가짜 연동 로직 (UI 테스트용)
   const handleIdCheck = () => {
     if (!idRegex.test(manager.managerId)) {
-      alert("아이디 형식을 먼저 맞춰주세요.");
+      alert('아이디 형식을 먼저 맞춰주세요.');
       return;
     }
-    alert("사용 가능한 아이디입니다! (UI 테스트)");
+    alert('사용 가능한 아이디입니다! (UI 테스트)');
     setCheckId(2);
   };
 
   const handleSendMail = () => {
     if (!emailRegex.test(manager.managerEmail)) {
-      alert("올바른 이메일 형식을 먼저 입력해주세요.");
+      alert('올바른 이메일 형식을 먼저 입력해주세요.');
       return;
     }
-    alert("인증 메일이 전송되었습니다. (테스트용: 아무 번호나 입력하세요)");
+    alert('인증 메일이 전송되었습니다. (테스트용: 아무 번호나 입력하세요)');
     setMailAuth(1);
   };
 
   const handleVerifyMail = () => {
     if (mailAuth !== 1) {
-      alert("먼저 인증 이메일 전송 버튼을 눌러주세요.");
+      alert('먼저 인증 이메일 전송 버튼을 눌러주세요.');
       return;
     }
-    alert("이메일 인증이 완료되었습니다! (UI 테스트)");
+    alert('이메일 인증이 완료되었습니다! (UI 테스트)');
     setMailAuth(3);
   };
 
   const handleBizCheck = () => {
     if (!bizNoRegex.test(manager.bizNo)) {
-      alert("사업자번호를 000-00-00000 형식으로 입력해주세요.");
+      alert('사업자번호를 000-00-00000 형식으로 입력해주세요.');
       return;
     }
-    alert("가입 가능한 사업자번호입니다! (UI 테스트)");
+    alert('가입 가능한 사업자번호입니다! (UI 테스트)');
     setCheckBiz(2);
   };
 
@@ -85,94 +85,94 @@ const ManagerSignup = () => {
   const getIdMessage = () => {
     if (!manager.managerId)
       return {
-        text: isSubmitted ? "아이디를 입력하세요." : "\u00A0",
+        text: isSubmitted ? '아이디를 입력하세요.' : '\u00A0',
         isError: isSubmitted,
       };
     if (!idRegex.test(manager.managerId))
-      return { text: "영문, 숫자 조합 8자 이상 입력해주세요.", isError: true };
+      return { text: '영문, 숫자 조합 8자 이상 입력해주세요.', isError: true };
     if (checkId !== 2)
-      return { text: "중복 확인 버튼을 눌러주세요.", isError: true };
-    return { text: "사용 가능한 아이디입니다.", isError: false };
+      return { text: '중복 확인 버튼을 눌러주세요.', isError: true };
+    return { text: '사용 가능한 아이디입니다.', isError: false };
   };
 
   const getPwMessage = () => {
     if (!manager.managerPw)
       return {
-        text: isSubmitted ? "비밀번호를 입력하세요." : "\u00A0",
+        text: isSubmitted ? '비밀번호를 입력하세요.' : '\u00A0',
         isError: isSubmitted,
       };
     if (!pwRegex.test(manager.managerPw))
       return {
-        text: "영문 대/소문자, 숫자, 특수기호 포함 10자 이상 입력해주세요.",
+        text: '영문 대/소문자, 숫자, 특수기호 포함 10자 이상 입력해주세요.',
         isError: true,
       };
-    return { text: "사용 가능한 비밀번호입니다.", isError: false };
+    return { text: '사용 가능한 비밀번호입니다.', isError: false };
   };
 
   const getPwReMessage = () => {
     if (!managerPwRe)
       return {
-        text: isSubmitted ? "비밀번호 확인을 입력하세요." : "\u00A0",
+        text: isSubmitted ? '비밀번호 확인을 입력하세요.' : '\u00A0',
         isError: isSubmitted,
       };
     if (manager.managerPw !== managerPwRe)
-      return { text: "비밀번호와 일치하지 않습니다.", isError: true };
-    return { text: "비밀번호와 일치합니다.", isError: false };
+      return { text: '비밀번호와 일치하지 않습니다.', isError: true };
+    return { text: '비밀번호와 일치합니다.', isError: false };
   };
 
   const getEmailMessage = () => {
     if (!manager.managerEmail)
       return {
-        text: isSubmitted ? "이메일을 입력하세요." : "\u00A0",
+        text: isSubmitted ? '이메일을 입력하세요.' : '\u00A0',
         isError: isSubmitted,
       };
     if (!emailRegex.test(manager.managerEmail))
-      return { text: "올바른 이메일 형식을 입력해주세요.", isError: true };
+      return { text: '올바른 이메일 형식을 입력해주세요.', isError: true };
     if (mailAuth === 0)
-      return { text: "인증 이메일을 전송해주세요.", isError: true };
+      return { text: '인증 이메일을 전송해주세요.', isError: true };
     if (mailAuth === 1)
-      return { text: "인증번호를 입력하고 확인을 눌러주세요.", isError: true };
-    return { text: "이메일 인증이 완료되었습니다.", isError: false };
+      return { text: '인증번호를 입력하고 확인을 눌러주세요.', isError: true };
+    return { text: '이메일 인증이 완료되었습니다.', isError: false };
   };
 
   const getBizNoMessage = () => {
     if (!manager.bizNo)
       return {
-        text: isSubmitted ? "사업자번호를 입력하세요." : "\u00A0",
+        text: isSubmitted ? '사업자번호를 입력하세요.' : '\u00A0',
         isError: isSubmitted,
       };
     if (!bizNoRegex.test(manager.bizNo))
-      return { text: "000-00-00000 형식으로 입력해주세요.", isError: true };
+      return { text: '000-00-00000 형식으로 입력해주세요.', isError: true };
     if (checkBiz !== 2)
-      return { text: "사업자번호 중복 확인을 눌러주세요.", isError: true };
-    return { text: "가입 가능한 사업자 번호입니다.", isError: false };
+      return { text: '사업자번호 중복 확인을 눌러주세요.', isError: true };
+    return { text: '가입 가능한 사업자 번호입니다.', isError: false };
   };
 
   const getBizNameMessage = () => {
     if (!manager.bizName.trim())
       return {
-        text: isSubmitted ? "상호명을 입력하세요." : "\u00A0",
+        text: isSubmitted ? '상호명을 입력하세요.' : '\u00A0',
         isError: isSubmitted,
       };
-    return { text: "\u00A0", isError: false };
+    return { text: '\u00A0', isError: false };
   };
 
   const getCeoNameMessage = () => {
     if (!manager.ceoName.trim())
       return {
-        text: isSubmitted ? "대표자성명을 입력하세요." : "\u00A0",
+        text: isSubmitted ? '대표자성명을 입력하세요.' : '\u00A0',
         isError: isSubmitted,
       };
-    return { text: "\u00A0", isError: false };
+    return { text: '\u00A0', isError: false };
   };
 
   const getOpenDateMessage = () => {
     if (!manager.openDate.trim())
       return {
-        text: isSubmitted ? "개업일자를 선택하세요." : "\u00A0",
+        text: isSubmitted ? '개업일자를 선택하세요.' : '\u00A0',
         isError: isSubmitted,
       };
-    return { text: "\u00A0", isError: false };
+    return { text: '\u00A0', isError: false };
   };
 
   // 현재 입력 상태에 따른 메세지 변수 세팅
@@ -211,20 +211,20 @@ const ManagerSignup = () => {
       ceoNameStatus.isError ||
       openDateStatus.isError
     ) {
-      alert("입력하신 정보를 다시 확인해주세요.");
+      alert('입력하신 정보를 다시 확인해주세요.');
       return;
     }
 
-    console.log("사업자 가입 진행 데이터:", manager);
-    alert("사업자 회원가입이 완료되었습니다! (UI 테스트)");
-    navigate("/member/login");
+    console.log('사업자 가입 진행 데이터:', manager);
+    alert('사업자 회원가입이 완료되었습니다! (UI 테스트)');
+    navigate('/member/login');
   };
 
   const [showCalendar, setShowCalendar] = useState(false);
   const handleDateChange = (date) => {
     const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
     const formattedDate = `${year}-${month}-${day}`;
 
     setManager({ ...manager, openDate: formattedDate });
@@ -235,8 +235,8 @@ const ManagerSignup = () => {
     <div className={styles.signupPage}>
       <h1
         className={styles.mainLogo}
-        onClick={() => navigate("/")}
-        style={{ cursor: "pointer" }}
+        onClick={() => navigate('/')}
+        style={{ cursor: 'pointer' }}
       >
         GreenCarry
       </h1>
@@ -269,8 +269,7 @@ const ManagerSignup = () => {
                 </button>
               </div>
               <p
-                className={`${styles.statusMessage} ${idStatus.isError ? styles.errorMessage : ""}`}
-                style={!idStatus.isError ? { color: "#3a8a56" } : {}}
+                className={`${styles.statusMessage} ${idStatus.isError ? styles.errorMessage : styles.successMessage}`}
               >
                 {idStatus.text}
               </p>
@@ -290,8 +289,8 @@ const ManagerSignup = () => {
                 placeholder="영문 대/소문자, 숫자, 특수기호 포함 10자 이상" /* 추가됨 */
               />
               <p
-                className={`${styles.statusMessage} ${pwStatus.isError ? styles.errorMessage : ""}`}
-                style={!pwStatus.isError ? { color: "#3a8a56" } : {}}
+                className={`${styles.statusMessage} ${pwStatus.isError ? styles.errorMessage : ''}`}
+                style={!pwStatus.isError ? { color: '#3a8a56' } : {}}
               >
                 {pwStatus.text}
               </p>
@@ -311,8 +310,8 @@ const ManagerSignup = () => {
                 placeholder="비밀번호 재입력" /* 추가됨 */
               />
               <p
-                className={`${styles.statusMessage} ${pwReStatus.isError ? styles.errorMessage : ""}`}
-                style={!pwReStatus.isError ? { color: "#3a8a56" } : {}}
+                className={`${styles.statusMessage} ${pwReStatus.isError ? styles.errorMessage : ''}`}
+                style={!pwReStatus.isError ? { color: '#3a8a56' } : {}}
               >
                 {pwReStatus.text}
               </p>
@@ -361,8 +360,8 @@ const ManagerSignup = () => {
               </div>
 
               <p
-                className={`${styles.statusMessage} ${emailStatus.isError ? styles.errorMessage : ""}`}
-                style={!emailStatus.isError ? { color: "#3a8a56" } : {}}
+                className={`${styles.statusMessage} ${emailStatus.isError ? styles.errorMessage : ''}`}
+                style={!emailStatus.isError ? { color: '#3a8a56' } : {}}
               >
                 {emailStatus.text}
               </p>
@@ -393,8 +392,8 @@ const ManagerSignup = () => {
                 </button>
               </div>
               <p
-                className={`${styles.statusMessage} ${bizNoStatus.isError ? styles.errorMessage : ""}`}
-                style={!bizNoStatus.isError ? { color: "#3a8a56" } : {}}
+                className={`${styles.statusMessage} ${bizNoStatus.isError ? styles.errorMessage : ''}`}
+                style={!bizNoStatus.isError ? { color: '#3a8a56' } : {}}
               >
                 {bizNoStatus.text}
               </p>
@@ -413,7 +412,7 @@ const ManagerSignup = () => {
                 className={styles.inputUnderline}
               />
               <p
-                className={`${styles.statusMessage} ${bizNameStatus.isError ? styles.errorMessage : ""}`}
+                className={`${styles.statusMessage} ${bizNameStatus.isError ? styles.errorMessage : ''}`}
               >
                 {bizNameStatus.text}
               </p>
@@ -432,7 +431,7 @@ const ManagerSignup = () => {
                 className={styles.inputUnderline}
               />
               <p
-                className={`${styles.statusMessage} ${ceoNameStatus.isError ? styles.errorMessage : ""}`}
+                className={`${styles.statusMessage} ${ceoNameStatus.isError ? styles.errorMessage : ''}`}
               >
                 {ceoNameStatus.text}
               </p>
@@ -448,17 +447,15 @@ const ManagerSignup = () => {
                   type="text"
                   name="openDate"
                   value={manager.openDate}
-                  className={`${styles.inputUnderline} ${styles.dateInput}`}
+                  className={`${styles.inputUnderline}`}
                   placeholder="YYYY-MM-DD"
                   readOnly
                   onClick={() => setShowCalendar(!showCalendar)}
                 />
-
                 <CalendarMonthIcon
                   className={styles.muiCalendarIcon}
                   onClick={() => setShowCalendar(!showCalendar)}
                 />
-
                 {showCalendar && (
                   <div className={styles.calendarWrapper}>
                     <Calendar
@@ -468,16 +465,14 @@ const ManagerSignup = () => {
                           ? new Date(manager.openDate)
                           : new Date()
                       }
-                      formatDay={(locale, date) =>
-                        date.toLocaleString("en", { day: "numeric" })
-                      }
+                      /* 달력 헤더/요일 폰트 스타일 등을 맞추기 위해 formatDay 등 유지 */
                     />
                   </div>
                 )}
               </div>
 
               <p
-                className={`${styles.statusMessage} ${openDateStatus.isError ? styles.errorMessage : ""}`}
+                className={`${styles.statusMessage} ${openDateStatus.isError ? styles.errorMessage : ''}`}
               >
                 {openDateStatus.text}
               </p>

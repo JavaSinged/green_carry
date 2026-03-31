@@ -1,21 +1,21 @@
-import React, { useState } from "react";
-import styles from "./UserSignup.module.css";
-import { useNavigate } from "react-router-dom";
-import { useDaumPostcodePopup } from "react-daum-postcode";
+import React, { useState } from 'react';
+import styles from './UserSignup.module.css';
+import { useNavigate } from 'react-router-dom';
+import { useDaumPostcodePopup } from 'react-daum-postcode';
 
 const UserSignup = () => {
   const navigate = useNavigate();
 
   const [member, setMember] = useState({
-    memberId: "",
-    memberPw: "",
-    memberName: "",
-    memberEmail: "",
-    memberAddrCode: "",
-    memberAddr: "",
-    memberDetailAddr: "",
+    memberId: '',
+    memberPw: '',
+    memberName: '',
+    memberEmail: '',
+    memberAddrCode: '',
+    memberAddr: '',
+    memberDetailAddr: '',
   });
-  const [memberPwRe, setMemberPwRe] = useState("");
+  const [memberPwRe, setMemberPwRe] = useState('');
 
   // 제출 버튼 클릭 여부 (이 값을 기준으로 빈 칸 에러 표시)
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -35,53 +35,53 @@ const UserSignup = () => {
     setMember({ ...member, [name]: value });
 
     // 입력값이 바뀌면 중복확인 및 이메일 인증 상태 초기화
-    if (name === "memberId") setCheckId(0);
-    if (name === "memberEmail") setMailAuth(0);
+    if (name === 'memberId') setCheckId(0);
+    if (name === 'memberEmail') setMailAuth(0);
   };
 
   // 💡 [복구] 아이디 중복 확인 가짜 로직
   const handleIdCheck = () => {
     if (!idRegex.test(member.memberId)) {
-      alert("아이디 형식을 먼저 맞춰주세요.");
+      alert('아이디 형식을 먼저 맞춰주세요.');
       return;
     }
-    alert("사용 가능한 아이디입니다! (UI 테스트)");
+    alert('사용 가능한 아이디입니다! (UI 테스트)');
     setCheckId(2);
   };
 
   // 💡 [복구] 이메일 인증 전송 가짜 로직
   const handleSendMail = () => {
     if (!emailRegex.test(member.memberEmail)) {
-      alert("올바른 이메일 형식을 먼저 입력해주세요.");
+      alert('올바른 이메일 형식을 먼저 입력해주세요.');
       return;
     }
-    alert("인증 메일이 전송되었습니다. (테스트용: 아무 번호나 입력하세요)");
+    alert('인증 메일이 전송되었습니다. (테스트용: 아무 번호나 입력하세요)');
     setMailAuth(1);
   };
 
   // 💡 [복구] 이메일 인증번호 확인 가짜 로직
   const handleVerifyMail = () => {
     if (mailAuth !== 1) {
-      alert("먼저 인증 이메일 전송 버튼을 눌러주세요.");
+      alert('먼저 인증 이메일 전송 버튼을 눌러주세요.');
       return;
     }
-    alert("이메일 인증이 완료되었습니다! (UI 테스트)");
+    alert('이메일 인증이 완료되었습니다! (UI 테스트)');
     setMailAuth(3);
   };
 
   // 우편번호 API 설정
   const openPostcode = useDaumPostcodePopup(
-    "https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js",
+    'https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js',
   );
   const handleCompletePostcode = (data) => {
     let fullAddress = data.address;
-    let extraAddress = "";
-    if (data.addressType === "R") {
-      if (data.bname !== "") extraAddress += data.bname;
-      if (data.buildingName !== "")
+    let extraAddress = '';
+    if (data.addressType === 'R') {
+      if (data.bname !== '') extraAddress += data.bname;
+      if (data.buildingName !== '')
         extraAddress +=
-          extraAddress !== "" ? `, ${data.buildingName}` : data.buildingName;
-      fullAddress += extraAddress !== "" ? ` (${extraAddress})` : "";
+          extraAddress !== '' ? `, ${data.buildingName}` : data.buildingName;
+      fullAddress += extraAddress !== '' ? ` (${extraAddress})` : '';
     }
     setMember((prev) => ({
       ...prev,
@@ -97,72 +97,72 @@ const UserSignup = () => {
   const getIdMessage = () => {
     if (!member.memberId)
       return {
-        text: isSubmitted ? "아이디를 입력하세요." : "\u00A0",
+        text: isSubmitted ? '아이디를 입력하세요.' : '\u00A0',
         isError: isSubmitted,
       };
     if (!idRegex.test(member.memberId))
-      return { text: "영문, 숫자 조합 8자 이상 입력해주세요.", isError: true };
+      return { text: '영문, 숫자 조합 8자 이상 입력해주세요.', isError: true };
     if (checkId !== 2)
-      return { text: "중복 확인 버튼을 눌러주세요.", isError: true };
-    return { text: "사용 가능한 아이디입니다.", isError: false };
+      return { text: '중복 확인 버튼을 눌러주세요.', isError: true };
+    return { text: '사용 가능한 아이디입니다.', isError: false };
   };
 
   const getPwMessage = () => {
     if (!member.memberPw)
       return {
-        text: isSubmitted ? "비밀번호를 입력하세요." : "\u00A0",
+        text: isSubmitted ? '비밀번호를 입력하세요.' : '\u00A0',
         isError: isSubmitted,
       };
     if (!pwRegex.test(member.memberPw))
       return {
-        text: "영문 대/소문자, 숫자, 특수기호 포함 10자 이상 입력해주세요.",
+        text: '영문 대/소문자, 숫자, 특수기호 포함 10자 이상 입력해주세요.',
         isError: true,
       };
-    return { text: "사용 가능한 비밀번호입니다.", isError: false };
+    return { text: '사용 가능한 비밀번호입니다.', isError: false };
   };
 
   const getPwReMessage = () => {
     if (!memberPwRe)
       return {
-        text: isSubmitted ? "비밀번호 확인을 입력하세요." : "\u00A0",
+        text: isSubmitted ? '비밀번호 확인을 입력하세요.' : '\u00A0',
         isError: isSubmitted,
       };
     if (member.memberPw !== memberPwRe)
-      return { text: "비밀번호와 일치하지 않습니다.", isError: true };
-    return { text: "비밀번호와 일치합니다.", isError: false };
+      return { text: '비밀번호와 일치하지 않습니다.', isError: true };
+    return { text: '비밀번호와 일치합니다.', isError: false };
   };
 
   const getEmailMessage = () => {
     if (!member.memberEmail)
       return {
-        text: isSubmitted ? "이메일을 입력하세요." : "\u00A0",
+        text: isSubmitted ? '이메일을 입력하세요.' : '\u00A0',
         isError: isSubmitted,
       };
     if (!emailRegex.test(member.memberEmail))
-      return { text: "올바른 이메일 형식을 입력해주세요.", isError: true };
+      return { text: '올바른 이메일 형식을 입력해주세요.', isError: true };
     if (mailAuth === 0)
-      return { text: "인증 이메일을 전송해주세요.", isError: true };
+      return { text: '인증 이메일을 전송해주세요.', isError: true };
     if (mailAuth === 1)
-      return { text: "인증번호를 입력하고 확인을 눌러주세요.", isError: true };
-    return { text: "이메일 인증이 완료되었습니다.", isError: false };
+      return { text: '인증번호를 입력하고 확인을 눌러주세요.', isError: true };
+    return { text: '이메일 인증이 완료되었습니다.', isError: false };
   };
 
   const getNameMessage = () => {
     if (!member.memberName.trim())
       return {
-        text: isSubmitted ? "이름을 입력하세요." : "\u00A0",
+        text: isSubmitted ? '이름을 입력하세요.' : '\u00A0',
         isError: isSubmitted,
       };
-    return { text: "\u00A0", isError: false };
+    return { text: '\u00A0', isError: false };
   };
 
   const getAddrMessage = () => {
     if (!member.memberAddrCode || !member.memberDetailAddr.trim())
       return {
-        text: isSubmitted ? "주소 및 상세 주소를 모두 입력해주세요." : "\u00A0",
+        text: isSubmitted ? '주소 및 상세 주소를 모두 입력해주세요.' : '\u00A0',
         isError: isSubmitted,
       };
-    return { text: "\u00A0", isError: false };
+    return { text: '\u00A0', isError: false };
   };
 
   const idStatus = getIdMessage();
@@ -194,21 +194,21 @@ const UserSignup = () => {
       nameStatus.isError ||
       addrStatus.isError
     ) {
-      alert("입력하신 정보를 다시 확인해주세요.");
+      alert('입력하신 정보를 다시 확인해주세요.');
       return;
     }
 
-    console.log("가입 진행 데이터:", member);
-    alert("모든 절차를 통과했습니다! 회원가입 완료! (UI 테스트)");
-    navigate("/member/login");
+    console.log('가입 진행 데이터:', member);
+    alert('모든 절차를 통과했습니다! 회원가입 완료! (UI 테스트)');
+    navigate('/member/login');
   };
 
   return (
     <div className={styles.signupPage}>
       <h1
         className={styles.mainLogo}
-        onClick={() => navigate("/")}
-        style={{ cursor: "pointer" }}
+        onClick={() => navigate('/')}
+        style={{ cursor: 'pointer' }}
       >
         GreenCarry
       </h1>
@@ -241,8 +241,7 @@ const UserSignup = () => {
                 </button>
               </div>
               <p
-                className={`${styles.statusMessage} ${idStatus.isError ? styles.errorMessage : ""}`}
-                style={!idStatus.isError ? { color: "#3a8a56" } : {}}
+                className={`${styles.statusMessage} ${idStatus.isError ? styles.errorMessage : styles.successMessage}`}
               >
                 {idStatus.text}
               </p>
@@ -262,8 +261,8 @@ const UserSignup = () => {
                 placeholder="영문 대/소문자, 숫자, 특수기호 포함 10자 이상"
               />
               <p
-                className={`${styles.statusMessage} ${pwStatus.isError ? styles.errorMessage : ""}`}
-                style={!pwStatus.isError ? { color: "#3a8a56" } : {}}
+                className={`${styles.statusMessage} ${pwStatus.isError ? styles.errorMessage : ''}`}
+                style={!pwStatus.isError ? { color: '#3a8a56' } : {}}
               >
                 {pwStatus.text}
               </p>
@@ -283,8 +282,8 @@ const UserSignup = () => {
                 placeholder="비밀번호 재입력"
               />
               <p
-                className={`${styles.statusMessage} ${pwReStatus.isError ? styles.errorMessage : ""}`}
-                style={!pwReStatus.isError ? { color: "#3a8a56" } : {}}
+                className={`${styles.statusMessage} ${pwReStatus.isError ? styles.errorMessage : ''}`}
+                style={!pwReStatus.isError ? { color: '#3a8a56' } : {}}
               >
                 {pwReStatus.text}
               </p>
@@ -303,7 +302,7 @@ const UserSignup = () => {
                 className={styles.inputUnderline}
               />
               <p
-                className={`${styles.statusMessage} ${nameStatus.isError ? styles.errorMessage : ""}`}
+                className={`${styles.statusMessage} ${nameStatus.isError ? styles.errorMessage : ''}`}
               >
                 {nameStatus.text}
               </p>
@@ -352,8 +351,8 @@ const UserSignup = () => {
               </div>
 
               <p
-                className={`${styles.statusMessage} ${emailStatus.isError ? styles.errorMessage : ""}`}
-                style={!emailStatus.isError ? { color: "#3a8a56" } : {}}
+                className={`${styles.statusMessage} ${emailStatus.isError ? styles.errorMessage : ''}`}
+                style={!emailStatus.isError ? { color: '#3a8a56' } : {}}
               >
                 {emailStatus.text}
               </p>
@@ -403,7 +402,7 @@ const UserSignup = () => {
                 />
               </div>
               <p
-                className={`${styles.statusMessage} ${addrStatus.isError ? styles.errorMessage : ""}`}
+                className={`${styles.statusMessage} ${addrStatus.isError ? styles.errorMessage : ''}`}
               >
                 {addrStatus.text}
               </p>

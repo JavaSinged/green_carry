@@ -1,56 +1,50 @@
-/* NormalUserSignup.module.css */
+/* ManagerSignup.module.css */
 
-/* 1. 폰트 불러오기 */
-
-/* 2. 전역 변수 설정 (폰트 + 컬러) */
-
-/* 3. 컴포넌트 스타일 */
 .signupPage {
   min-height: 100vh;
   display: flex;
-  flex-direction: column; /* 로고와 카드를 세로로 정렬 */
+  flex-direction: column;
   justify-content: center;
   align-items: center;
-  background: url("/image/login/loginsign.jpg") no-repeat center center/cover;
-  padding: 40px;
-  font-family: var(--font-body); /* 기본 본문 폰트 적용 */
+  background:
+    linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)),
+    url('/image/login/loginsign.jpg') no-repeat center center/cover;
+  padding: 40px 20px;
+  font-family: var(--font-body);
 }
 
 .mainLogo {
-  color: var(--color-bg);
-  font-size: 32px;
-  font-weight: 700;
-  margin-bottom: 25px;
-  letter-spacing: 1px;
-  font-family: var(--font-logo); /* 로고 폰트 적용 */
+  font-family: var(--font-logo);
+  color: #ffffff;
+  font-size: 3.5rem;
+  margin-bottom: 20px;
   cursor: pointer;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
 }
 
 .card {
   background-color: var(--color-bg);
-  border-radius: 20px;
+  border-radius: 30px;
   padding: 50px 60px;
   width: 100%;
-  max-width: 650px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  max-width: 600px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
 }
 
 .title {
+  font-family: var(--font-title);
   text-align: center;
-  font-size: 24px;
-  font-weight: 600;
-  margin-bottom: 40px;
-  color: var(--text-main); /* 타이틀 색상 적용 */
-  font-family: var(--font-title); /* 타이틀 폰트 적용 */
+  font-size: 1.8rem;
+  margin-bottom: 45px;
+  color: var(--text-main);
 }
 
 .form {
   display: flex;
   flex-direction: column;
-  gap: 22px;
+  gap: 25px;
 }
 
-/* 안정적인 Flexbox 정렬 (사업자 회원가입과 동일) */
 .fieldGroup {
   display: flex;
   align-items: flex-start;
@@ -58,14 +52,12 @@
 }
 
 .label {
-  width: 120px;
+  width: 110px;
   flex-shrink: 0;
-  text-align: left;
-  font-size: 15px;
-  font-weight: 300; /* 400에서 300으로 더 얇게 수정됨 */
-  color: var(--text-main); /* 라벨 색상 적용 */
-  font-family: var(--font-sub); /* 라벨은 서브 폰트로 강조 */
-  padding-top: 5px; /* 밑줄과 텍스트 수평 정렬용 */
+  font-family: var(--font-sub);
+  font-size: 0.95rem;
+  color: var(--text-main);
+  padding-top: 8px;
 }
 
 .inputArea {
@@ -78,93 +70,134 @@
 .inputAreaInner {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   width: 100%;
 }
 
 .inputUnderline {
   flex: 1;
   border: none;
-  border-bottom: 1px solid #777; /* 적용할 변수가 없어 기존 색상 유지 */
-  padding: 5px 0;
-  font-size: 14px;
+  border-bottom: 2px solid #eeeeee;
+  padding: 8px 0;
+  font-size: 0.95rem;
   outline: none;
   background: transparent;
-  color: var(--text-main); /* 입력 텍스트 색상 적용 */
-  font-family: var(--font-body); /* 입력창 기본 폰트 */
+  color: var(--text-main);
+  transition: border-color 0.3s;
 }
 
 .inputUnderline:focus {
-  border-bottom: 1px solid var(--color-brand); /* 포커스 시 브랜드 색상 적용 */
+  border-bottom: 2px solid var(--color-brand);
 }
 
-.inputUnderline::placeholder {
-  color: #999; /* 적용할 변수가 없어 기존 placeholder 색상 유지 */
-}
-
-/* 주소 입력을 위한 텍스트 중앙 정렬 설정 */
-.textCenter {
-  text-align: center;
-}
-
-/* 여러 줄 입력을 위한 상단 마진 */
 .mt10 {
   margin-top: 10px;
 }
 
+/* 버튼 공통 스타일 */
 .buttonFilled {
-  background-color: var(--color-brand); /* 브랜드 색상 적용 */
-  color: var(--color-bg);
+  background-color: var(--color-brand);
+  color: #ffffff;
   border: none;
-  border-radius: 20px;
-  padding: 6px 14px;
-  font-size: 12px;
-  font-weight: 600; /* 버튼 폰트 굵기 명시적 감소 */
-  font-family: var(--font-body); /* 버튼 텍스트 서브 폰트 적용 */
+  border-radius: 12px;
+  padding: 8px 16px;
+  font-family: var(--font-sub);
+  font-size: 0.85rem;
   cursor: pointer;
   white-space: nowrap;
-  flex-shrink: 0;
 }
 
 .buttonOutlined {
-  background-color: var(--color-bg);
-  color: var(--color-brand); /* 브랜드 색상 적용 */
-  border: 1px solid var(--color-brand); /* 브랜드 색상 적용 */
-  border-radius: 20px;
-  padding: 6px 14px;
-  font-size: 12px;
-  font-weight: 600; /* 버튼 폰트 굵기 명시적 감소 */
-  font-family: var(--font-body); /* 버튼 텍스트 서브 폰트 적용 */
+  background-color: transparent;
+  color: var(--color-brand);
+  border: 1.5px solid var(--color-brand);
+  border-radius: 12px;
+  padding: 7px 15px;
+  font-family: var(--font-sub);
+  font-size: 0.85rem;
   cursor: pointer;
   white-space: nowrap;
-  flex-shrink: 0;
 }
 
+/* 📅 달력 관련 스타일 */
+.dateInputWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.muiCalendarIcon {
+  position: absolute;
+  right: 5px;
+  color: var(--color-brand);
+  cursor: pointer;
+  font-size: 20px;
+}
+
+.calendarWrapper {
+  position: absolute;
+  top: 45px;
+  left: 0;
+  z-index: 100;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+/* react-calendar 내부 스타일 오버라이딩 */
+:global(.react-calendar) {
+  border: none !important;
+  font-family: var(--font-body);
+}
+
+:global(.react-calendar__tile--active) {
+  background: var(--color-brand) !important;
+  color: white !important;
+}
+
+:global(.react-calendar__tile--now) {
+  background: var(--color-surface) !important;
+  color: var(--color-brand) !important;
+}
+
+/* 상태 메시지 */
 .statusMessage {
-  font-size: 11px;
-  color: var(--text-sub); /* 부가설명 텍스트 색상 적용 */
+  font-size: 0.75rem;
+  color: var(--text-sub);
   margin-top: 6px;
-  margin-left: 2px;
+  min-height: 1rem;
 }
 
 .errorMessage {
-  color: #d9534f; /* 에러 메시지용 변수가 없어 기존 빨간색 유지 */
+  color: #e53935;
+  font-weight: 500;
+}
+
+.successMessage {
+  color: var(--color-brand);
+  font-weight: 500;
 }
 
 .submitContainer {
   display: flex;
   justify-content: center;
-  margin-top: 30px;
+  margin-top: 20px;
 }
 
 .submitButton {
-  background-color: var(--color-brand); /* 브랜드 색상 적용 */
-  color: var(--color-bg);
+  background-color: var(--color-brand);
+  color: #ffffff;
   border: none;
-  border-radius: 25px;
-  padding: 10px 50px;
-  font-size: 15px;
-  font-weight: 600; /* 600에서 400으로 얇게 수정됨 */
-  font-family: var(--font-body); /* 제출 버튼 서브 폰트 적용 */
+  border-radius: 15px;
+  padding: 15px 80px;
+  font-family: var(--font-title);
+  font-size: 1.2rem;
   cursor: pointer;
+  box-shadow: 0 4px 15px rgba(46, 129, 71, 0.3);
+  transition: all 0.2s;
+}
+
+.submitButton:hover {
+  background-color: #246a3a;
+  transform: translateY(-2px);
 }
