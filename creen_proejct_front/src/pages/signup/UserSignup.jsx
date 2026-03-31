@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styles from "./UserSignup.module.css";
 import { useNavigate } from "react-router-dom";
 import { useDaumPostcodePopup } from "react-daum-postcode";
+import axios from "axios";
 
 const UserSignup = () => {
   const navigate = useNavigate();
@@ -11,24 +12,33 @@ const UserSignup = () => {
     memberPw: "",
     memberName: "",
     memberEmail: "",
+    memberPhone: "000-0000-0000",
     memberAddrCode: "",
     memberAddr: "",
     memberDetailAddr: "",
   });
-  const [memberPwRe, setMemberPwRe] = useState("");
-
-  // 제출 버튼 클릭 여부 (이 값을 기준으로 빈 칸 에러 표시)
-  const [isSubmitted, setIsSubmitted] = useState(false);
-
-  // UI 흐름 제어용 State (백엔드 없이 가짜 상태 관리)
-  const [checkId, setCheckId] = useState(0); // 0: 확인 전, 2: 사용 가능(확인 완료)
-  const [mailAuth, setMailAuth] = useState(0); // 0: 전송 전, 1: 전송 완료(입력 대기), 3: 인증 완료
 
   // 정규식 모음
   const idRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
   const pwRegex =
     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{10,}$/;
   const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+
+  //아이디 중복검사용(0:중복검사전, 1:아이디 중복, 2: 사용가능한 아이디)
+  const [checkId, setCheckId] = useState(0);
+
+  //비번확인용
+  const [memberPwRe, setMemberPwRe] = useState("");
+  //이메일 인증 상태관리용
+  const [mailAuth, setMailAuth] = useState(0); //0:메일전송 누르기 전, 1: 전송완료(코드받기 전), 2: 전송완료(코드받은 후), 3: 인증완료된 상태
+  const [mailAuthCode, setMailAuthCode] = useState(null); //인증번호 저장용
+  const [mailAuthInput, setMailAuthInput] = useState(""); //인증번호 input입력값
+  //인증 유효시간 처리
+  const [time, setTime] = useState(180); // 메일인증 유효시간 3분(180초)
+  const [timeout, setTimeout] = useState(null);
+
+  // 제출 버튼 클릭 여부 (이 값을 기준으로 빈 칸 에러 표시)
+  const [isSubmitted, setIsSubmitted] = useState(false);
 
   const inputMember = (e) => {
     const { name, value } = e.target;
@@ -39,34 +49,108 @@ const UserSignup = () => {
     if (name === "memberEmail") setMailAuth(0);
   };
 
-  // 💡 [복구] 아이디 중복 확인 가짜 로직
+  // 아이디 중복체크
   const handleIdCheck = () => {
+    // 1. 먼저 정규표현식으로 형식 검사
     if (!idRegex.test(member.memberId)) {
       alert("아이디 형식을 먼저 맞춰주세요.");
       return;
     }
-    alert("사용 가능한 아이디입니다! (UI 테스트)");
-    setCheckId(2);
+
+    axios
+      .get(
+        `${import.meta.env.VITE_BACKSERVER}/api/member/exists?memberId=${member.memberId}`,
+      )
+      .then((res) => {
+        console.log("중복 체크 결과:", res.data);
+
+        // res.data가 true면 중복(사용 불가), false면 사용 가능으로 가정
+        if (res.data) {
+          alert("사용 가능한 아이디입니다.");
+          setCheckId(2); // 사용가능
+        } else {
+          alert("이미 사용중인 아이디입니다!");
+          setCheckId(1); // 아이디 중복
+        }
+      })
+      .catch((err) => {
+        console.error("통신 에러:", err);
+        alert("서버와 통신 중 오류가 발생했습니다.");
+      });
   };
 
-  // 💡 [복구] 이메일 인증 전송 가짜 로직
+  // 1. 이메일 발송 함수
   const handleSendMail = () => {
+    // 형식 검사
     if (!emailRegex.test(member.memberEmail)) {
       alert("올바른 이메일 형식을 먼저 입력해주세요.");
       return;
     }
-    alert("인증 메일이 전송되었습니다. (테스트용: 아무 번호나 입력하세요)");
-    setMailAuth(1);
+
+    setTime(180); // 180초 초기화
+    if (timeout) {
+      window.clearInterval(timeout); // 기존 타이머가 있다면 초기화
+    }
+
+    setMailAuth(1); // 로딩 또는 전송 중 상태 (상황에 따라 2로 바로 넘어가도 됨)
+
+    const obj = { memberEmail: member.memberEmail };
+    axios
+      .post(
+        `${import.meta.env.VITE_BACKSERVER}/api/member/email-verification`,
+        obj,
+      )
+      .then((res) => {
+        console.log("인증번호 발송 성공:", res.data);
+        setMailAuthCode(res.data); // 서버에서 보낸 인증번호 저장
+        setMailAuth(2); // 입력창 활성화 상태
+
+        // 타이머 시작
+        const intervalId = window.setInterval(() => {
+          setTime((prev) => prev - 1);
+        }, 1000);
+        setTimeout(intervalId); // 타이머 멈추기 위해 ID 저장
+      })
+      .catch((err) => {
+        console.error("메일 발송 에러:", err);
+        alert("메일 발송 중 오류가 발생했습니다.");
+      });
   };
 
-  // 💡 [복구] 이메일 인증번호 확인 가짜 로직
+  // 2. 이메일 인증번호 확인 함수 (실제 비교)
   const handleVerifyMail = () => {
-    if (mailAuth !== 1) {
+    if (mailAuth !== 2) {
       alert("먼저 인증 이메일 전송 버튼을 눌러주세요.");
       return;
     }
-    alert("이메일 인증이 완료되었습니다! (UI 테스트)");
-    setMailAuth(3);
+
+    // 서버에서 받은 번호와 사용자가 입력한 번호 비교
+    if (String(mailAuthCode) === mailAuthInput) {
+      alert("이메일 인증이 완료되었습니다!");
+      setMailAuth(3); // 인증 완료 상태
+      window.clearInterval(timeout); // 타이머 멈춤
+      setTimeout(null);
+    } else {
+      alert("인증번호가 일치하지 않습니다. 다시 확인해주세요.");
+    }
+  };
+
+  // 3. 타이머 종료 감지 (useEffect)
+  useEffect(() => {
+    if (time === 0) {
+      window.clearInterval(timeout);
+      setMailAuthCode(null); // 인증번호 파기
+      setTimeout(null);
+      alert("인증 시간이 만료되었습니다. 다시 시도해주세요.");
+      setMailAuth(0); // 초기 상태로 되돌림
+    }
+  }, [time]);
+
+  // 4. 시간 표시 포맷 함수
+  const showTime = () => {
+    const min = Math.floor(time / 60);
+    const sec = String(time % 60).padStart(2, "0");
+    return `${min}:${sec}`;
   };
 
   // 우편번호 API 설정
@@ -142,9 +226,19 @@ const UserSignup = () => {
       return { text: "올바른 이메일 형식을 입력해주세요.", isError: true };
     if (mailAuth === 0)
       return { text: "인증 이메일을 전송해주세요.", isError: true };
-    if (mailAuth === 1)
-      return { text: "인증번호를 입력하고 확인을 눌러주세요.", isError: true };
-    return { text: "이메일 인증이 완료되었습니다.", isError: false };
+
+    // 💡 인증번호 발송 후 입력 대기 상태(2)일 때 메시지와 시간을 함께 리턴
+    if (mailAuth === 2) {
+      return {
+        text: `인증번호를 입력하세요. (남은 시간: ${showTime()})`,
+        isError: true,
+      };
+    }
+
+    if (mailAuth === 3)
+      return { text: "이메일 인증이 완료되었습니다.", isError: false };
+
+    return { text: "\u00A0", isError: false };
   };
 
   const getNameMessage = () => {
@@ -197,10 +291,16 @@ const UserSignup = () => {
       alert("입력하신 정보를 다시 확인해주세요.");
       return;
     }
-
-    console.log("가입 진행 데이터:", member);
-    alert("모든 절차를 통과했습니다! 회원가입 완료! (UI 테스트)");
-    navigate("/member/login");
+    axios
+      .post(`${import.meta.env.VITE_BACKSERVER}/api/member/userSignup`, member)
+      .then((res) => {
+        console.log("가입 진행 데이터:", res.data);
+        alert("회원가입이 완료됐습니다. 로그인페이지로 이동합니다.");
+        navigate("/login");
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
 
   return (
@@ -328,9 +428,9 @@ const UserSignup = () => {
                   type="button"
                   className={styles.buttonOutlined}
                   onClick={handleSendMail}
-                  disabled={mailAuth === 3}
+                  disabled={mailAuth === 1 || mailAuth === 3}
                 >
-                  인증 이메일 전송
+                  {mailAuth === 0 ? "인증 메일 전송" : "재전송"}
                 </button>
               </div>
 
@@ -339,13 +439,18 @@ const UserSignup = () => {
                   type="text"
                   className={styles.inputUnderline}
                   placeholder="인증번호"
-                  disabled={mailAuth === 3}
+                  value={mailAuthInput}
+                  onChange={(e) => {
+                    setMailAuthInput(e.target.value);
+                  }}
+                  disabled={mailAuth !== 2}
                 />
+
                 <button
                   type="button"
                   className={styles.buttonFilled}
                   onClick={handleVerifyMail}
-                  disabled={mailAuth === 3}
+                  disabled={mailAuth !== 2}
                 >
                   인증번호 확인
                 </button>
@@ -353,7 +458,9 @@ const UserSignup = () => {
 
               <p
                 className={`${styles.statusMessage} ${emailStatus.isError ? styles.errorMessage : ""}`}
-                style={!emailStatus.isError ? { color: "#3a8a56" } : {}}
+                style={
+                  !emailStatus.isError ? { color: "var(--color-brand)" } : {}
+                }
               >
                 {emailStatus.text}
               </p>

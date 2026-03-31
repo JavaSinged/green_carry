@@ -57,6 +57,16 @@ public class MemberService {
 		Member member = memberDao.storeDupCheck(storeOwnerNo);
 		return member;
 	}
+    //user 아이디 중복체크
+	public Member selectOneMember(String memberId) {
+		Member member = memberDao.selectOneMember(memberId);
+		return member;
+	}
+
+	public int insertUser(Member member) {
+		int result = memberDao.insertUser(member);
+		return result;
+	}
 }
 
 

@@ -35,4 +35,22 @@
 		FROM MEMBER_TBL
 		WHERE STORE_OWNER_NO=#{storeOwnerNo}
 	</select>
+
+	<select id="selectOneMember" resultType="member">
+		select * from member_tbl where member_id = #{memberId}
+	</select>
+
+	<insert id="insertUser">
+		INSERT INTO MEMBER_TBL (
+		    MEMBER_ID, MEMBER_PW, MEMBER_NAME, MEMBER_PHONE, MEMBER_THUMB, 
+		    MEMBER_EMAIL, MEMBER_ADDRCODE, MEMBER_ADDR, MEMBER_DETAIL_ADDR, 
+		    MEMBER_GRADE, MEMBER_POINT, ENROLL_DATE, MEMBER_STATUS
+		) VALUES (
+		    #{memberId}, #{memberPw}, #{memberName}, #{memberPhone}, NULL, 
+		    #{memberEmail}, NULL, NULL, NULL, 
+		    1, 0, SYSDATE, 1
+		)
+	</insert>
+
+
 </mapper>
