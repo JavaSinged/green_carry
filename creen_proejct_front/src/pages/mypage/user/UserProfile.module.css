@@ -1,0 +1,208 @@
+.right_main {
+  background-color: var(--color-brand);
+  color: white;
+  padding: 30px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  gap: 15px 100px;
+  border-radius: 12px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+.icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #5cb875;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+.icon svg {
+  font-size: 2rem;
+  color: white;
+}
+.icon_content {
+  display: flex;
+  gap: 10px;
+}
+.dashboard {
+  text-align: left;
+}
+
+.dashboard_title {
+  font-size: 12px;
+  margin: 3px;
+}
+
+.dashboard_value {
+  font-size: 20px;
+  margin: 3px;
+}
+
+.dashbboard_subtitle {
+  font-size: 12px;
+  margin: 3px;
+}
+
+/*서브 3줄*/
+
+.my_point {
+  background-color: var(--color-brand);
+  color: white;
+  margin-top: 30px;
+  padding: 20px;
+  border-radius: 12px;
+}
+.my_point > span {
+  font-size: 24px;
+  font-weight: bold;
+  width: auto;
+}
+.my_point > p {
+  font-size: 24px;
+  margin-bottom: 0px;
+  text-align: left;
+}
+.right_sub {
+  margin: auto;
+}
+.my_eco {
+  background-color: white;
+  color: #222222;
+  margin-top: 10px;
+  padding: 23px;
+  border-radius: 12px;
+  font-size: 24px;
+  font-weight: bold;
+  width: auto;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+}
+/* --- 하단 서브 메뉴 공통 래퍼 (그림자 처리) --- */
+.collapse_wrapper {
+  background-color: white;
+  margin-top: 15px;
+  border-radius: 12px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  overflow: hidden; /* 모서리 둥글게 깎인 거 안 튀어나가게 */
+}
+
+/* --- 클릭하는 헤더 부분 (에코 포인트란?, 적립 내역) --- */
+.collapse_header {
+  padding: 20px 25px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  font-size: 18px; /* 글자 크기 약간 조정 */
+  font-weight: bold;
+  color: #222;
+}
+
+.history_sub {
+  font-size: 14px;
+  font-weight: normal;
+  color: #888;
+  margin-left: 10px;
+}
+
+/* --- 1. 에코 포인트 내용 스타일 --- */
+.eco_content_box {
+  padding: 0 25px 30px 25px;
+  font-size: 15px;
+  color: #111;
+  line-height: 1.8;
+  font-weight: 500;
+}
+
+.eco_content_box p {
+  margin: 15px 0;
+}
+
+.eco_slogan {
+  font-weight: bold;
+  color: #222;
+  margin-top: 25px !important;
+}
+
+/* --- 2. 적립 내역 리스트 스타일 --- */
+.history_list {
+  padding: 0 25px 20px 25px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px; /* 아이템 사이 간격 */
+}
+
+.history_item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  font-size: 16px;
+  font-weight: bold;
+  color: #111;
+}
+
+.history_left {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* 가게 아이콘과 글자 사이 간격 */
+}
+
+.store_icon {
+  color: #333;
+}
+
+.history_date {
+  font-size: 14px;
+  font-weight: normal;
+  color: #888;
+  margin-left: 15px;
+}
+
+.plus_point {
+  color: #5cb875; /* 초록색 플러스 포인트 */
+}
+.point_history span {
+  font-size: 16px;
+  color: #6b6666;
+}
+.my_icon {
+  cursor: pointer;
+}
+.hs_icon {
+  cursor: pointer;
+}
+/* --- 게이지 바 스타일--- */
+.gauge_container {
+  width: 100%;
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.gauge_bg {
+  width: 100%;
+  height: 8px;
+  background-color: rgba(255, 255, 255, 0.4);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.gauge_fill {
+  height: 100%;
+  background-color: #ffffff;
+  border-radius: 10px;
+  transition: width 1s ease-in-out;
+}
+
+.gauge_info {
+  font-size: 13px;
+  font-weight: bold;
+  color: white;
+}

@@ -1,0 +1,71 @@
+/* Layout.module.css */
+
+.container {
+  display: flex;
+  max-width: 1200px;
+  margin: 40px auto;
+  padding: 0 20px;
+  gap: 30px;
+}
+
+.sidebar {
+  width: 260px;
+  background-color: var(--color-surface);
+  border-radius: 24px; /* 이미지처럼 둥근 모서리 */
+  padding: 30px 20px;
+  position: sticky; /* 스크롤 시 사이드바 고정 */
+  top: 100px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+}
+
+.sidebarTitle {
+  font-family: var(--font-title);
+  font-size: 1.4rem;
+  color: var(--color-brand);
+  margin-bottom: 25px;
+  padding-left: 10px;
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sidebar li a {
+  display: block;
+  padding: 14px 20px;
+  text-decoration: none;
+  color: var(--text-main);
+  font-family: var(--font-sub);
+  font-size: 1.05rem;
+  border-radius: 14px;
+  transition: all 0.2s ease-in-out;
+}
+
+/* 마우스 호버 시 스타일 */
+.sidebar li a:hover {
+  background-color: rgba(46, 129, 71, 0.1); /* 브랜드 컬러 연하게 */
+  color: var(--color-brand);
+  transform: translateX(5px); /* 살짝 오른쪽으로 이동하는 애니메이션 */
+}
+
+/* 현재 활성화된 메뉴 스타일 (NavLink 사용 시) */
+.activeMenu {
+  background-color: var(--color-brand) !important;
+  color: #ffffff !important;
+  font-weight: bold;
+}
+
+.content {
+  flex: 1;
+  background-color: #ffffff;
+  border-radius: 24px;
+  padding: 40px;
+  min-height: 600px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  border: 1px solid #f0f0f0;
+}

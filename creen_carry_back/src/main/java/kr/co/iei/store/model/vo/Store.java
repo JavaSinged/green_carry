@@ -21,7 +21,7 @@ public class Store {
     private String storeOriginInfo;
     private String storeOwnerNo;
     private String storeCategory;
-    private Integer storeRating;
+    private Double storeRating;
     private Double LATITUDE;
     private Double LONGITUDE;
     private String storeThumb;

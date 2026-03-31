@@ -10,6 +10,9 @@ import 'swiper/css/pagination';
 import 'swiper/css/navigation';
 
 import SearchIcon from '@mui/icons-material/Search';
+import StarIcon from '@mui/icons-material/Star';
+import StarHalfIcon from '@mui/icons-material/StarHalf';
+import StarOutlineIcon from '@mui/icons-material/StarOutline';
 
 const banners = [
   {
@@ -70,6 +73,36 @@ export default function Home() {
 
     return isCategoryMatch && isSearchMatch;
   });
+
+  // 별 렌더링
+  const renderStars = (rating) => {
+    const stars = [];
+    for (let i = 1; i <= 5; i++) {
+      if (i <= Math.floor(rating)) {
+        // 꽉 찬 별
+        stars.push(
+          <StarIcon key={i} sx={{ color: '#ffb300', fontSize: '1.2rem' }} />,
+        );
+      } else if (i === Math.ceil(rating) && rating % 1 !== 0) {
+        // 반 개 별 (소수점이 있는 경우)
+        stars.push(
+          <StarHalfIcon
+            key={i}
+            sx={{ color: '#ffb300', fontSize: '1.2rem' }}
+          />,
+        );
+      } else {
+        // 빈 별
+        stars.push(
+          <StarOutlineIcon
+            key={i}
+            sx={{ color: '#ccc', fontSize: '1.2rem' }}
+          />,
+        );
+      }
+    }
+    return stars;
+  };
 
   return (
     <div className={styles.page_container}>
@@ -161,9 +194,15 @@ export default function Home() {
                     <span>{store.storeCategory}</span>
                     <span>30분</span>
                   </div>
-                  <div className={styles.store_rating}>
-                    {/* 별점 숫자만큼 아이콘이나 점수 표시 */}
-                    <span>😊 {store.storeRating * 20}%</span>
+                  <div className={styles.store_rating_wrap}>
+                    <div className={styles.stars_box}>
+                      {/* 별 아이콘들 출력 */}
+                      {renderStars(store.storeRating)}
+                    </div>
+                    {/* 실제 숫자 점수 표시 */}
+                    <span className={styles.rating_number}>
+                      {store.storeRating.toFixed(1)}
+                    </span>
                   </div>
                 </div>
               </div>

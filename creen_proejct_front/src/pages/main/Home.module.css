@@ -217,9 +217,23 @@
   margin-bottom: 10px;
 }
 
-.store_rating {
-  font-family: var(--font-body);
-  font-size: 0.9rem;
+.store_rating_wrap {
+  display: flex;
+  align-items: center;
+  gap: 4px; /* 별과 숫자 사이 간격 */
+  margin-top: 5px;
+}
+
+.stars_box {
+  display: flex;
+  align-items: center;
+  /* MUI 아이콘 높이가 제각각일 때를 대비해 세로 정렬 */
+}
+
+.rating_number {
+  font-family: var(--font-sub);
+  font-size: 0.95rem;
   font-weight: bold;
-  color: var(--color-info);
+  color: var(--text-main);
+  margin-left: 2px;
 }
