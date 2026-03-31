@@ -20,13 +20,13 @@ const OrderPage = () => {
   const list = useLocation();
   const cartList = useCartStore((state) => state.cart);
   const [realTotal, setRealTotal] = useState(0);
-  const [deliveryTpye, setDeliverType] = useState(0);
+  const [deliveryType, setDeliveryType] = useState(0);
   const [num, setNum] = useState(0);
+  const setSuperTotalPrice = useCartStore((state) => state.setSuperTotalPrice);
+  const setDeilveryPrice = useCartStore((state) => state.setDeilveryPrice);
   useEffect(() => {
-    setNum(deliveryTpye === 1 ? 0 : deliveryTpye === 2 ? 1000 : 3000);
-  }, [deliveryTpye]);
-  console.log(deliveryTpye);
-  console.log(num);
+    setNum(deliveryType === 1 ? 0 : deliveryType === 2 ? 1000 : 3000);
+  }, [deliveryType]);
   return (
     <div className={styles.pageWrapper}>
       <main className={styles.mainContainer}>
@@ -63,18 +63,13 @@ const OrderPage = () => {
             {/* 1. 픽업 카드 */}
             <div
               className={`${styles.miniCard} ${selectedRide === "pickup" ? styles.selected : ""}`}
-              onClick={() => setSelectedRide("pickup")}
+              onClick={() => {
+                (setSelectedRide("pickup"), setDeliveryType(1));
+              }}
             >
               <DirectionsRunIcon />
               <p>픽업</p>
-              <p
-                className={styles.feeText}
-                onClick={() => {
-                  setDeliverType(1);
-                }}
-              >
-                배달비 0원
-              </p>
+              <p className={styles.feeText}>배달비 0원</p>
               <div className={styles.carbonBadge}>
                 <p>🌱1km당 탄소 -150g</p>
               </div>
@@ -83,18 +78,13 @@ const OrderPage = () => {
             {/* 2. 도보 / 자전거 카드 */}
             <div
               className={`${styles.miniCard} ${selectedRide === "bike" ? styles.selected : ""}`}
-              onClick={() => setSelectedRide("bike")}
+              onClick={() => {
+                (setSelectedRide("bike"), setDeliveryType(2));
+              }}
             >
               <DirectionsBikeIcon />
               <p>도보 / 자전거</p>
-              <p
-                className={styles.feeText}
-                onClick={() => {
-                  setDeliverType(2);
-                }}
-              >
-                1,000원
-              </p>
+              <p className={styles.feeText}>1,000원</p>
               <span>예상 배달 시간 30분</span>
               <div className={styles.carbonBadge}>
                 <p>🌱1km당 탄소 -150g</p>
@@ -104,18 +94,13 @@ const OrderPage = () => {
             {/* 3. 오토바이 카드 */}
             <div
               className={`${styles.miniCard} ${selectedRide === "moto" ? styles.selected : ""}`}
-              onClick={() => setSelectedRide("moto")}
+              onClick={() => {
+                (setSelectedRide("moto"), setDeliveryType(3));
+              }}
             >
               <TwoWheelerIcon />
               <p>오토바이</p>
-              <p
-                className={styles.feeText}
-                onClick={() => {
-                  setDeliverType(3);
-                }}
-              >
-                3,000원
-              </p>
+              <p className={styles.feeText}>3,000원</p>
               <span>예상 배달 시간 25분</span>
             </div>
 
@@ -143,7 +128,9 @@ const OrderPage = () => {
           <div
             className={styles.payButton}
             onClick={() => {
-              navigate("/paymentPage");
+              (setSuperTotalPrice(realTotal),
+                setDeilveryPrice(num),
+                navigate("/paymentPage"));
             }}
           >
             결제하기
