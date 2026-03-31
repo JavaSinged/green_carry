@@ -12,33 +12,33 @@ import kr.co.iei.member.model.vo.Member;
 
 @Service
 public class MemberService {
-	@Autowired
+    @Autowired
     private BCryptPasswordEncoder passwordEncoder;
 
     @Autowired
     private MemberDao memberDao;
 
-    public int loginMember(Member member) {
-        // 1. 아이디로 회원 정보 가져오기
-        Member dbMember = memberDao.loginMember(member.getMemberId());
+    public Member loginMember(Member member) {
+        // 1. 아이디 + 등급으로 DB 조회
+        Member dbMember = memberDao.loginMember(member);
 
         if (dbMember != null) {
-            // [테스트 로그] 공백 확인을 위해 대괄호로 감싸서 출력해보세요
-            System.out.println("입력비번: [" + member.getMemberPw() + "]");
-            System.out.println("### 진짜 암호문: " + passwordEncoder.encode(member.getMemberPw()));
-
-            String Pw = dbMember.getMemberPw();
-            System.out.println("DB비번: [" + Pw + "]");
-
-            if (passwordEncoder.matches(member.getMemberPw(), Pw)) {
-                return 1; // ✨ 드디어 성공!
+            // 2. 비밀번호 비교 (공백 제거 필수!)
+            String dbPw = dbMember.getMemberPw().trim();
+            
+            if (passwordEncoder.matches(member.getMemberPw(), dbPw)) {
+                // ✨ 로그인 성공 시: 비번은 보안상 비우고 객체 자체를 리턴
+                dbMember.setMemberPw(null); 
+                return dbMember; 
             } else {
-                System.out.println("비밀번호가 일치하지 않습니다.");
+                System.out.println("비밀번호 불일치");
             }
         } else {
-            System.out.println("해당 아이디의 회원이 없습니다.");
+            System.out.println("회원 정보 없음 (ID 또는 Grade 불일치)");
         }
-        return 0;
+        
+        // ✨ 로그인 실패 시: null 리턴
+        return null;
     }
 }
 

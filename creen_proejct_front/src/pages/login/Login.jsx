@@ -1,92 +1,126 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import Swal from "sweetalert2"; // ✨ SweetAlert2 유지
+import Swal from "sweetalert2";
 import "./Login.css";
 
 const Login = () => {
-  // 1. 상태 관리: 객체 하나로 묶어서 관리 (memberGrade 기본값 1 유지)
+  // 1. 상태 관리 (memberGrade 기본값 1 추가)
   const [member, setMember] = useState({
     memberId: "",
     memberPw: "",
+    memberGrade: 1, // 기본값: 개인 이용자(1)
   });
   const [activeTab, setActiveTab] = useState("personal");
   const [rememberId, setRememberId] = useState(false);
 
-  // ✨ 라우터 이동을 위한 useNavigate
   const navigate = useNavigate();
 
-  // 🌟 화면이 처음 켜질 때, 로컬 스토리지에 저장된 아이디 확인
   useEffect(() => {
     const savedId = localStorage.getItem("savedUserId");
     if (savedId) {
-      setMember((prev) => ({ ...prev, memberId: savedId })); // 기존 상태 유지하며 아이디만 덮어쓰기
+      setMember((prev) => ({ ...prev, memberId: savedId }));
       setRememberId(true);
     }
   }, []);
 
-  // 🌟 공통 입력 핸들러
   const inputMember = (e) => {
     const { name, value } = e.target;
     setMember({ ...member, [name]: value });
   };
 
-  // 🌟 탭 변경 시 회원 등급(grade)도 같이 변경해주는 함수
+  // 🌟 탭 변경 시 등급(1 또는 2) 자동 업데이트
   const handleTabChange = (tab) => {
     setActiveTab(tab);
-    setMember({ ...member, memberGrade: tab === "personal" ? 1 : 2 });
+    setMember((prev) => ({
+      ...prev,
+      memberGrade: tab === "personal" ? 1 : 2,
+    }));
   };
 
-  // 🌟 로그인 폼 제출 로직 (순수 테스트용)
+  // 🌟 유효성 검사 및 로그인 로직
   const login = () => {
-    // 1. 빈 칸 검사 (Swal 적용)
-    if (member.memberId === "" || member.memberPw === "") {
+    const { memberId, memberPw } = member;
+
+    // 1. 빈 칸 검사
+    if (!memberId || !memberPw) {
       Swal.fire({
-        icon: "error",
+        icon: "warning",
         title: "아이디와 비밀번호를 입력해주세요.",
       });
       return;
     }
 
-    // 2. 백엔드 통신
+    // 2. 아이디 유효성 검사 (영문+숫자 8자 이상)
+    const idRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+    if (!idRegex.test(memberId)) {
+      Swal.fire({
+        icon: "error",
+        title: "아이디 형식 오류",
+        text: "아이디는 영문과 숫자를 포함하여 8자 이상이어야 합니다.",
+      });
+      return;
+    }
+
+    // 3. 비밀번호 유효성 검사 (소문자+대문자+숫자+특수문자 10자 이상)
+    const pwRegex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{10,}$/;
+    if (!pwRegex.test(memberPw)) {
+      Swal.fire({
+        icon: "error",
+        title: "비밀번호 형식 오류",
+        text: "비밀번호는 영문 대/소문자, 숫자, 특수문자를 모두 포함하여 10자 이상이어야 합니다.",
+      });
+      return;
+    }
+
+    // 4. 백엔드 통신
     axios
       .post(`http://localhost:10400/api/member/login`, member)
       .then((res) => {
-        console.log("DB 통신 결과 (res.data):", res.data); // 결과 확인용 로그
+        console.log("로그인 응답 데이터:", res.data);
 
-        // 🌟 백엔드가 성공 시 숫자 1을 리턴한다고 가정합니다.
-        if (res.data === 1 || res.data > 0) {
-          // 성공 알림창
+        // 🌟 백엔드에서 보낸 Map 구조 분해 할당
+        // res.data = { member: {...}, accessToken: "ey..." }
+        const { member: loginUser, accessToken } = res.data;
+
+        // 회원이 존재하고 토큰이 정상적으로 넘어왔다면 성공
+        if (loginUser && accessToken) {
+          // 1. 브라우저 저장소에 중요 정보 보관
+          localStorage.setItem("accessToken", accessToken); // 🔑 모든 API 요청에 쓸 토큰
+          localStorage.setItem("memberName", loginUser.memberName); // 화면 표시용 이름
+          localStorage.setItem("memberGrade", loginUser.memberGrade); // 권한 체크용 등급
+
+          // 2. 등급 텍스트 변환 (1: 개인, 2: 사업자)
+          const gradeText =
+            loginUser.memberGrade === 1 ? "개인 이용자" : "사업자";
+
+          // 3. 성공 알림창
           Swal.fire({
             icon: "success",
             title: "로그인 성공!",
+            html: `<b>${loginUser.memberName}</b>님 (${gradeText}) 환영합니다!`,
             showConfirmButton: false,
-            timer: 1500,
+            timer: 2000,
           });
 
-          // 아이디 저장 체크박스 처리
+          // 4. 아이디 저장 로직 (로그인 시 입력한 member.memberId 사용)
           if (rememberId) {
             localStorage.setItem("savedUserId", member.memberId);
           } else {
             localStorage.removeItem("savedUserId");
           }
 
-          // 메인 페이지로 이동
+          // 5. 메인으로 이동
           navigate("/");
-        } else {
-          // 백엔드에서 0 또는 실패 값을 돌려줬을 때
-          Swal.fire({
-            title: "로그인 실패",
-            text: "아이디 또는 비밀번호가 틀렸습니다.",
-            icon: "error",
-          });
         }
       })
       .catch((err) => {
         console.error("로그인 에러:", err);
+        // 401 에러(Unauthorized) 등 실패 상황 처리
         Swal.fire({
-          title: "통신 실패",
-          text: "서버 연결에 실패했습니다.",
+          title: "로그인 실패",
+          text: "아이디, 비밀번호 또는 회원 유형을 확인해주세요.",
           icon: "error",
         });
       });
@@ -94,6 +128,7 @@ const Login = () => {
 
   return (
     <div className="screen-container">
+      {/* 상단 로고 및 나머지 UI는 기존과 동일 */}
       <h1
         className="logo"
         style={{
@@ -110,7 +145,6 @@ const Login = () => {
       </h1>
 
       <div className="main-content">
-        {/* 좌측 정보 섹션 */}
         <section className="info-section">
           <div className="eco-brand">
             <span className="eco-icon">E</span>
@@ -123,23 +157,16 @@ const Login = () => {
           </h2>
           <div className="stats">
             <div className="stat-item leaf">
-              🌿 오늘 우리가 함께 아낀 탄소{" "}
-              <span className="stat-value">1,245kg</span>
+              🌿 오늘 아낀 탄소 <span className="stat-value">1,245kg</span>
             </div>
             <div className="stat-item tree">
-              🌳 식재된 나무 효과 <span className="stat-value">156그루</span>
+              🌳 식재 효과 <span className="stat-value">156그루</span>
             </div>
           </div>
         </section>
 
-        {/* 중앙 로그인 폼 카드 */}
         <section className="login-card">
           <h3 className="card-title">반가워요, 에코 히어로!</h3>
-          <p className="card-description">
-            로그인하여 친환경 배달을 시작하세요
-          </p>
-
-          {/* 탭 버튼 */}
           <div className="tabs">
             <button
               type="button"
@@ -157,26 +184,24 @@ const Login = () => {
             </button>
           </div>
 
-          {/* 🌟 폼 제출 */}
           <form
             className="login-form"
             onSubmit={(e) => {
               e.preventDefault();
               login();
             }}
-            autoComplete="off"
           >
             <input
               type="text"
               name="memberId"
-              placeholder="아이디를 입력하세요"
+              placeholder="아이디 (영문+숫자 8자 이상)"
               value={member.memberId}
               onChange={inputMember}
             />
             <input
               type="password"
               name="memberPw"
-              placeholder="비밀번호를 입력하세요"
+              placeholder="비밀번호 (대문자+소문자+숫자+특수문자 10자 이상)"
               value={member.memberPw}
               onChange={inputMember}
             />
@@ -190,7 +215,6 @@ const Login = () => {
               />
               <label htmlFor="remember_check">아이디 저장</label>
             </div>
-
             <button type="submit" className="login-button">
               로그인
             </button>
