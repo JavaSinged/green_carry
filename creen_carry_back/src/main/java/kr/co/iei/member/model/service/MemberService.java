@@ -50,7 +50,7 @@ public class MemberService {
 		int result = memberDao.insertManager(member);
 		System.out.println(member);
 		
-		return 0;
+		return result;
 	}
 
 	public Member storeDupCheck(int storeOwnerNo) {
@@ -64,6 +64,9 @@ public class MemberService {
 	}
 
 	public int insertUser(Member member) {
+		String memberPw = member.getMemberPw();
+		String encPw=passwordEncoder.encode(memberPw);
+		member.setMemberPw(encPw);
 		int result = memberDao.insertUser(member);
 		return result;
 	}
