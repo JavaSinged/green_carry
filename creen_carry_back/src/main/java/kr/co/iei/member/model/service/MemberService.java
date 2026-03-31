@@ -40,6 +40,12 @@ public class MemberService {
         // ✨ 로그인 실패 시: null 리턴
         return null;
     }
+
+    //user 아이디 중복체크
+	public Member selectOneMember(String memberId) {
+		Member member = memberDao.selectOneMember(memberId);
+		return member;
+	}
 }
 
 

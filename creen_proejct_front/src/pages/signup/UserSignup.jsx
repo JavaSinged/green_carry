@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import styles from "./UserSignup.module.css";
 import { useNavigate } from "react-router-dom";
 import { useDaumPostcodePopup } from "react-daum-postcode";
+import axios from "axios";
 
 const UserSignup = () => {
   const navigate = useNavigate();
@@ -15,20 +16,28 @@ const UserSignup = () => {
     memberAddr: "",
     memberDetailAddr: "",
   });
-  const [memberPwRe, setMemberPwRe] = useState("");
-
-  // 제출 버튼 클릭 여부 (이 값을 기준으로 빈 칸 에러 표시)
-  const [isSubmitted, setIsSubmitted] = useState(false);
-
-  // UI 흐름 제어용 State (백엔드 없이 가짜 상태 관리)
-  const [checkId, setCheckId] = useState(0); // 0: 확인 전, 2: 사용 가능(확인 완료)
-  const [mailAuth, setMailAuth] = useState(0); // 0: 전송 전, 1: 전송 완료(입력 대기), 3: 인증 완료
 
   // 정규식 모음
   const idRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
   const pwRegex =
     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{10,}$/;
   const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+
+  //아이디 중복검사용(0:중복검사전, 1:아이디 중복, 2: 사용가능한 아이디)
+  const [checkId, setCheckId] = useState(0);
+
+  //비번확인용
+  const [memberPwRe, setMemberPwRe] = useState("");
+  //이메일 인증 상태관리용
+  const [mailAuth, setMailAuth] = useState(0); //0:메일전송 누르기 전, 1: 전송완료(코드받기 전), 2: 전송완료(코드받은 후), 3: 인증완료된 상태
+  const [mailAuthCode, setMailAuthCode] = useState(null); //인증번호 저장용
+  const [mailAuthInput, setMailAuthInput] = useState(""); //인증번호 input입력값
+  //인증 유효시간 처리
+  const [time, setTime] = useState(180); // 메일인증 유효시간 3분(180초)
+  const [timeout, setTimeout] = useState(null);
+
+  // 제출 버튼 클릭 여부 (이 값을 기준으로 빈 칸 에러 표시)
+  const [isSubmitted, setIsSubmitted] = useState(false);
 
   const inputMember = (e) => {
     const { name, value } = e.target;
@@ -39,18 +48,39 @@ const UserSignup = () => {
     if (name === "memberEmail") setMailAuth(0);
   };
 
-  // 💡 [복구] 아이디 중복 확인 가짜 로직
+  // 아이디 중복체크
   const handleIdCheck = () => {
+    // 1. 먼저 정규표현식으로 형식 검사
     if (!idRegex.test(member.memberId)) {
       alert("아이디 형식을 먼저 맞춰주세요.");
       return;
     }
-    alert("사용 가능한 아이디입니다! (UI 테스트)");
-    setCheckId(2);
+
+    axios
+      .get(
+        `${import.meta.env.VITE_BACKSERVER}/api/member/exists?memberId=${member.memberId}`,
+      )
+      .then((res) => {
+        console.log("중복 체크 결과:", res);
+
+        // res.data가 true면 중복(사용 불가), false면 사용 가능으로 가정
+        if (res.data) {
+          alert("사용 가능한 아이디입니다.");
+          setCheckId(2); // 사용가능
+        } else {
+          alert("이미 사용중인 아이디입니다!");
+          setCheckId(1); // 아이디 중복
+        }
+      })
+      .catch((err) => {
+        console.error("통신 에러:", err);
+        alert("서버와 통신 중 오류가 발생했습니다.");
+      });
   };
 
   // 💡 [복구] 이메일 인증 전송 가짜 로직
   const handleSendMail = () => {
+    //형식검사
     if (!emailRegex.test(member.memberEmail)) {
       alert("올바른 이메일 형식을 먼저 입력해주세요.");
       return;

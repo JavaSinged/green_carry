@@ -10,4 +10,6 @@ public interface MemberDao {
 
 	Member loginMember(Member member);
 
+	Member selectOneMember(String memberId);
+
 }
