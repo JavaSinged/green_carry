@@ -12,7 +12,7 @@ const UserSignup = () => {
     memberPw: "",
     memberName: "",
     memberEmail: "",
-    memberPhone: "000-0000-0000",
+    memberPhone: "",
     memberAddrCode: "",
     memberAddr: "",
     memberDetailAddr: "",
@@ -249,6 +249,14 @@ const UserSignup = () => {
       };
     return { text: "\u00A0", isError: false };
   };
+  const getPhoneMessage = () => {
+    if (!member.memberPhone.trim())
+      return {
+        text: isSubmitted ? "휴대폰 번호를 입력하세요." : "\u00A0",
+        isError: isSubmitted,
+      };
+    return { text: "\u00A0", isError: false };
+  };
 
   const getAddrMessage = () => {
     if (!member.memberAddrCode || !member.memberDetailAddr.trim())
@@ -265,6 +273,7 @@ const UserSignup = () => {
   const emailStatus = getEmailMessage();
   const nameStatus = getNameMessage();
   const addrStatus = getAddrMessage();
+  const phoneStatus = getPhoneMessage();
 
   const joinSubmit = (e) => {
     e.preventDefault();
@@ -276,6 +285,7 @@ const UserSignup = () => {
       !memberPwRe ||
       !member.memberEmail ||
       !member.memberName.trim() ||
+      !member.memberPhone.trim() ||
       !member.memberAddrCode ||
       !member.memberDetailAddr.trim();
 
@@ -286,6 +296,7 @@ const UserSignup = () => {
       pwReStatus.isError ||
       emailStatus.isError ||
       nameStatus.isError ||
+      phoneStatus.isError ||
       addrStatus.isError
     ) {
       alert("입력하신 정보를 다시 확인해주세요.");
@@ -319,7 +330,7 @@ const UserSignup = () => {
         <form className={styles.form} onSubmit={joinSubmit}>
           {/* 아이디 */}
           <div className={styles.fieldGroup}>
-            <label className={styles.label}>아이디 *</label>
+            <label className={styles.label}>아이디</label>
             <div className={styles.inputArea}>
               <div className={styles.inputAreaInner}>
                 <input
@@ -351,7 +362,7 @@ const UserSignup = () => {
 
           {/* 비밀번호 */}
           <div className={styles.fieldGroup}>
-            <label className={styles.label}>비밀번호 *</label>
+            <label className={styles.label}>비밀번호</label>
             <div className={styles.inputArea}>
               <input
                 type="password"
@@ -393,7 +404,7 @@ const UserSignup = () => {
 
           {/* 이름 */}
           <div className={styles.fieldGroup}>
-            <label className={styles.label}>이름 *</label>
+            <label className={styles.label}>이름</label>
             <div className={styles.inputArea}>
               <input
                 type="text"
@@ -412,7 +423,7 @@ const UserSignup = () => {
 
           {/* 이메일 */}
           <div className={styles.fieldGroup}>
-            <label className={styles.label}>이메일 *</label>
+            <label className={styles.label}>이메일</label>
             <div className={styles.inputArea}>
               <div className={styles.inputAreaInner}>
                 <input
@@ -463,6 +474,25 @@ const UserSignup = () => {
                 }
               >
                 {emailStatus.text}
+              </p>
+            </div>
+          </div>
+          {/* 연락처 */}
+          <div className={styles.fieldGroup}>
+            <label className={styles.label}>휴대폰 번호</label>
+            <div className={styles.inputArea}>
+              <input
+                type="text"
+                name="memberPhone"
+                value={member.memberPhone}
+                onChange={inputMember}
+                className={styles.inputUnderline}
+                placeholder="(-)을 제외한 숫자를 입력하세요"
+              />
+              <p
+                className={`${styles.statusMessage} ${phoneStatus.isError ? styles.errorMessage : ""}`}
+              >
+                {phoneStatus.text}
               </p>
             </div>
           </div>
