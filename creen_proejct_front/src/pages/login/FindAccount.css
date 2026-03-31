@@ -151,6 +151,10 @@
   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.02);
 }
 
+.find-content input:hover {
+  border-color: var(--text-sub);
+}
+
 input:focus {
   border-color: var(--color-brand);
 }
