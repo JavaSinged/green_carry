@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react"; // 🌟 useEffect 추가
 import "./FindAccount.css";
 import { Link, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
@@ -13,6 +13,10 @@ const Account = () => {
   const [isVerified, setIsVerified] = useState(false);
   const [inputCode, setInputCode] = useState("");
 
+  // 🌟 타이머 관련 상태 추가
+  const [timeLeft, setTimeLeft] = useState(180); // 3분 = 180초
+  const [isTimerActive, setIsTimerActive] = useState(false);
+
   const [formData, setFormData] = useState({
     memberName: "",
     memberEmail: "",
@@ -25,6 +29,27 @@ const Account = () => {
   const [pwError, setPwError] = useState("");
   const [matchError, setMatchError] = useState("");
 
+  // 🌟 타이머 카운트다운 로직
+  useEffect(() => {
+    let timer;
+    if (isTimerActive && timeLeft > 0) {
+      timer = setInterval(() => {
+        setTimeLeft((prev) => prev - 1);
+      }, 1000);
+    } else if (timeLeft === 0) {
+      setIsTimerActive(false);
+      clearInterval(timer);
+    }
+    return () => clearInterval(timer);
+  }, [isTimerActive, timeLeft]);
+
+  // 🌟 초 단위를 분:초로 변환
+  const formatTime = (seconds) => {
+    const min = Math.floor(seconds / 60);
+    const sec = seconds % 60;
+    return `${min}:${sec < 10 ? "0" : ""}${sec}`;
+  };
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -34,6 +59,8 @@ const Account = () => {
     setActiveTab(tab);
     setIsCodeSent(false);
     setIsVerified(false);
+    setIsTimerActive(false); // 탭 전환 시 타이머 정지
+    setTimeLeft(180);
     setInputCode("");
     setNewPassword("");
     setConfirmPassword("");
@@ -53,12 +80,18 @@ const Account = () => {
         memberEmail: formData.memberEmail,
       })
       .then(() => {
-        setIsCodeSent(true);
+        setTimeLeft(180); // 🌟 타이머 3분으로 다시 세팅
+        setIsTimerActive(true); // 🌟 타이머 (재)시작
+        setInputCode(""); // 🌟 [추가] 재전송 시, 기존에 적어둔 번호 지우기
+
         Swal.fire({
           icon: "success",
-          title: "인증번호 발송 완료",
+          // 🌟 [추가] 처음 전송인지, 재전송인지에 따라 타이틀 다르게 보여주기
+          title: isCodeSent ? "인증번호 재전송 완료" : "인증번호 발송 완료",
           text: "입력하신 이메일로 인증번호가 발송되었습니다. (3분 이내 입력)",
         });
+
+        setIsCodeSent(true);
       })
       .catch(() => {
         Swal.fire({
@@ -69,41 +102,19 @@ const Account = () => {
       });
   };
 
-  const handlePwChange = (val) => {
-    setNewPassword(val);
-    const pwRegex =
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{10,}$/;
-    if (val && !pwRegex.test(val)) {
-      setPwError("대/소문자, 숫자, 특수문자 포함 10자 이상이어야 합니다.");
-    } else {
-      setPwError("");
-    }
-    if (confirmPassword && val !== confirmPassword) {
-      setMatchError("비밀번호가 일치하지 않습니다.");
-    } else {
-      setMatchError("");
-    }
-  };
-
-  const handleConfirmPwChange = (val) => {
-    setConfirmPassword(val);
-    if (newPassword !== val) {
-      setMatchError("비밀번호가 일치하지 않습니다.");
-    } else {
-      setMatchError("");
-    }
-  };
-
-  // 🌟 [핵심 수정 부분] 중복 코드 모두 제거하고 하나로 합침
   const handleVerifySubmit = (e) => {
     e.preventDefault();
 
-    if (!inputCode) {
-      Swal.fire({ icon: "warning", title: "인증번호를 입력해주세요." });
+    // 🌟 시간 초과 체크
+    if (timeLeft <= 0) {
+      Swal.fire({
+        icon: "error",
+        title: "인증 시간 만료",
+        text: "인증 시간이 초과되었습니다. 인증번호를 다시 받아주세요.",
+      });
       return;
     }
 
-    // 1. 서버에 인증 확인 요청
     api
       .post("/api/member/verifyCode", {
         memberEmail: formData.memberEmail,
@@ -111,7 +122,7 @@ const Account = () => {
       })
       .then((res) => {
         if (res.data === true || res.data === "true") {
-          // 인증번호가 일치하는 경우
+          setIsTimerActive(false); // 인증 성공 시 타이머 중지
           if (activeTab === "findId") {
             api
               .post("/api/member/findId", {
@@ -133,7 +144,6 @@ const Account = () => {
                 });
               });
           } else {
-            // 비밀번호 재설정 탭
             api
               .post("/api/member/checkMember", {
                 memberId: formData.memberId,
@@ -159,15 +169,14 @@ const Account = () => {
               });
           }
         } else {
-          // 인증번호가 틀린 경우
           Swal.fire({
             icon: "error",
             title: "인증 실패",
-            text: "인증번호가 일치하지 않습니다. 다시 확인해주세요.",
+            text: "인증번호가 일치하지 않습니다.",
           });
         }
       })
-      .catch((err) => {
+      .catch(() => {
         Swal.fire({
           icon: "error",
           title: "오류",
@@ -274,62 +283,30 @@ const Account = () => {
             </button>
           </div>
 
-          {activeTab === "findId" ? (
+          {!isVerified ? (
             <form className="find-form" onSubmit={handleVerifySubmit}>
-              <input
-                type="text"
-                name="memberName"
-                className="full-input"
-                placeholder="이름"
-                value={formData.memberName}
-                onChange={handleInputChange}
-                required
-              />
-              <div className="input-with-btn">
+              {activeTab === "findId" ? (
                 <input
-                  type="email"
-                  name="memberEmail"
-                  className="flex-input"
-                  placeholder="이메일"
-                  value={formData.memberEmail}
+                  type="text"
+                  name="memberName"
+                  className="full-input"
+                  placeholder="이름"
+                  value={formData.memberName}
                   onChange={handleInputChange}
                   required
                 />
-                <button
-                  type="button"
-                  className="verify-send-btn"
-                  onClick={sendCode}
-                >
-                  {isCodeSent ? "재전송" : "인증번호 전송"}
-                </button>
-              </div>
-              {isCodeSent && (
-                <>
-                  <input
-                    type="text"
-                    className="full-input"
-                    placeholder="인증번호 입력"
-                    value={inputCode}
-                    onChange={(e) => setInputCode(e.target.value)}
-                    required
-                  />
-                  <button type="submit" className="submit-verify-btn">
-                    아이디 찾기
-                  </button>
-                </>
+              ) : (
+                <input
+                  type="text"
+                  name="memberId"
+                  className="full-input"
+                  placeholder="아이디"
+                  value={formData.memberId}
+                  onChange={handleInputChange}
+                  required
+                />
               )}
-            </form>
-          ) : !isVerified ? (
-            <form className="find-form" onSubmit={handleVerifySubmit}>
-              <input
-                type="text"
-                name="memberId"
-                className="full-input"
-                placeholder="아이디"
-                value={formData.memberId}
-                onChange={handleInputChange}
-                required
-              />
+
               <div className="input-with-btn">
                 <input
                   type="email"
@@ -348,18 +325,34 @@ const Account = () => {
                   {isCodeSent ? "재전송" : "인증번호 전송"}
                 </button>
               </div>
+
               {isCodeSent && (
                 <>
-                  <input
-                    type="text"
-                    className="full-input"
-                    placeholder="인증번호 입력"
-                    value={inputCode}
-                    onChange={(e) => setInputCode(e.target.value)}
-                    required
-                  />
-                  <button type="submit" className="submit-verify-btn">
-                    인증 확인
+                  {" "}
+                  {/* 🌟 프래그먼트로 감싸기 */}
+                  <div className="timer-wrapper">
+                    <input
+                      type="text"
+                      className="full-input"
+                      placeholder="인증번호 입력"
+                      value={inputCode}
+                      onChange={(e) => setInputCode(e.target.value)}
+                      required
+                      style={{ paddingRight: "75px" }}
+                    />
+                    <span
+                      className={`timer-text ${timeLeft < 30 ? "danger" : ""}`}
+                    >
+                      {formatTime(timeLeft)}
+                    </span>
+                  </div>
+                  {/* 🌟 버튼을 timer-wrapper 밖으로 꺼냈습니다! */}
+                  <button
+                    type="submit"
+                    className="submit-verify-btn"
+                    style={{ marginTop: "15px" }}
+                  >
+                    {activeTab === "findId" ? "아이디 찾기" : "인증 확인"}
                   </button>
                 </>
               )}
@@ -392,7 +385,7 @@ const Account = () => {
                 <input
                   type="password"
                   className="full-input"
-                  placeholder="새 비밀번호 (대문자+소문자+숫자+특수문자 10자 이상)"
+                  placeholder="새 비밀번호"
                   value={newPassword}
                   onChange={(e) => handlePwChange(e.target.value)}
                   required
@@ -403,7 +396,6 @@ const Account = () => {
                       color: "#e53935",
                       fontSize: "0.75rem",
                       marginTop: "5px",
-                      paddingLeft: "5px",
                     }}
                   >
                     {pwError}
@@ -425,7 +417,6 @@ const Account = () => {
                       color: "#e53935",
                       fontSize: "0.75rem",
                       marginTop: "5px",
-                      paddingLeft: "5px",
                     }}
                   >
                     {matchError}
@@ -435,14 +426,10 @@ const Account = () => {
               <button
                 type="submit"
                 className="submit-verify-btn"
+                disabled={pwError || matchError || !confirmPassword}
                 style={{
                   opacity: pwError || matchError || !confirmPassword ? 0.5 : 1,
-                  cursor:
-                    pwError || matchError || !confirmPassword
-                      ? "not-allowed"
-                      : "pointer",
                 }}
-                disabled={pwError || matchError || !confirmPassword}
               >
                 비밀번호 변경 완료
               </button>

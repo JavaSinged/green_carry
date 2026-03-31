@@ -237,3 +237,31 @@ input:focus {
   color: var(--text-main);
   margin-top: 10px;
 }
+
+/* ⏱️ 인증번호 입력칸 래퍼 (기준점) */
+.timer-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+/* ⏱️ 타이머 글자 스타일 */
+.timer-text {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+
+  /* ✨ 핵심: 위아래 패딩을 넉넉히 주고 배경을 하얗게 칠해서 글자를 보호합니다 */
+  padding: 10px 8px;
+  background-color: var(--color-bg);
+
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-sub);
+  z-index: 10; /* 입력창 선보다 무조건 위로 올라오게 설정 */
+}
+
+/* ⏱️ 시간이 30초 미만일 때 (빨간색) */
+.timer-text.danger {
+  color: #e53935;
+}
