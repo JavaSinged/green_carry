@@ -41,11 +41,16 @@ export default function Header() {
 
       {/* 3. 버튼 및 유저 상태 영역 */}
       <div className={styles.button_wrap}>
-        {/* 로그인했을 때만 이름 표시 (선택사항) */}
+        {/* 로그인했을 때만 이름 표시 */}
         {isLogin && (
           <span className={styles.user_info}>
             <b>{user.memberName}</b>님 (
-            {user.memberGrade === 1 ? "개인" : "사업자"})
+            {user.memberGrade === 3
+              ? "관리자"
+              : user.memberGrade === 1
+                ? "개인"
+                : "사업자"}
+            )
           </span>
         )}
 
