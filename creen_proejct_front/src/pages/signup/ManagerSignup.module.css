@@ -67,7 +67,6 @@
   font-family: var(--font-sub); /* 라벨은 서브 폰트로 강조 */
   padding-top: 5px; /* 밑줄과 텍스트 수평 정렬용 commit test*/
 }
-
 .inputArea {
   flex: 1;
   display: flex;
@@ -167,4 +166,73 @@
   font-weight: 600; /* 600에서 400으로 얇게 수정됨 */
   font-family: var(--font-body); /* 제출 버튼 서브 폰트 적용 */
   cursor: pointer;
+}
+.dateInputWrapper {
+  position: relative; /* 달력 팝업의 기준점 */
+  width: 350px;
+  display: flex;
+  align-items: center;
+}
+
+.dateInput {
+  cursor: pointer;
+  width: 100%;
+}
+
+.muiCalendarIcon {
+  position: absolute;
+  right: 5px;
+  color: var(--color-brand);
+  cursor: pointer;
+  font-size: 20px !important;
+}
+
+.calendarWrapper {
+  position: absolute;
+  top: -123px; /* 입력창과 높이를 맞추기 위해 약간 위로 조정 */
+  left: 100%; /* 입력창(wrapper)이 끝나는 지점부터 시작 */
+  margin-left: 15px; /* 입력창과 달력 사이의 간격 */
+  z-index: 1000;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15); /* 옆으로 나오니 그림자를 좀 더 부드럽게 */
+  overflow: hidden;
+  border: 1px solid #eee;
+}
+
+/* 아래 스타일들은 기존과 동일하게 유지 */
+.calendarWrapper :global(.react-calendar) {
+  border: none;
+  font-family: var(--font-body);
+  width: 280px;
+}
+
+.calendarWrapper :global(.react-calendar__tile--active) {
+  background: var(--color-brand) !important;
+  color: white;
+}
+
+.calendarWrapper :global(.react-calendar__tile--now) {
+  background: #f0f7f2;
+  color: var(--color-brand);
+  font-weight: bold;
+}
+
+/* --- 달력 주말 색상 최종 수정 (월요일 시작 기준) --- */
+
+/* 1. 모든 주말의 기본 색상을 초기화 */
+.calendarWrapper :global(.react-calendar__month-view__days__day--weekend) {
+  color: var(--text-main);
+}
+
+/* 2. 토요일 (Saturday) - 파란색 (7n - 1 번째 칸) */
+.calendarWrapper
+  :global(.react-calendar__month-view__days__day--weekend:nth-child(7n - 1)) {
+  color: #3d75cc !important; /* 시원한 파란색 */
+}
+
+/* 3. 일요일 (Sunday) - 빨간색 (7n 번째 칸) */
+.calendarWrapper
+  :global(.react-calendar__month-view__days__day--weekend:nth-child(7n)) {
+  color: #e53935 !important; /* 깔끔한 빨간색 */
 }
