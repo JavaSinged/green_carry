@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styles from "./UserSignup.module.css";
 import { useNavigate } from "react-router-dom";
 import { useDaumPostcodePopup } from "react-daum-postcode";
@@ -78,25 +78,78 @@ const UserSignup = () => {
       });
   };
 
-  // 💡 [복구] 이메일 인증 전송 가짜 로직
+  // 1. 이메일 발송 함수
   const handleSendMail = () => {
-    //형식검사
+    // 형식 검사
     if (!emailRegex.test(member.memberEmail)) {
       alert("올바른 이메일 형식을 먼저 입력해주세요.");
       return;
     }
-    alert("인증 메일이 전송되었습니다. (테스트용: 아무 번호나 입력하세요)");
-    setMailAuth(1);
+
+    setTime(180); // 180초 초기화
+    if (timeout) {
+      window.clearInterval(timeout); // 기존 타이머가 있다면 초기화
+    }
+
+    setMailAuth(1); // 로딩 또는 전송 중 상태 (상황에 따라 2로 바로 넘어가도 됨)
+
+    const obj = { memberEmail: member.memberEmail };
+    axios
+      .post(
+        `${import.meta.env.VITE_BACKSERVER}/api/member/email-verification`,
+        obj,
+      )
+      .then((res) => {
+        console.log("인증번호 발송 성공:", res.data);
+        setMailAuthCode(res.data); // 서버에서 보낸 인증번호 저장
+        setMailAuth(2); // 입력창 활성화 상태
+
+        // 타이머 시작
+        const intervalId = window.setInterval(() => {
+          setTime((prev) => prev - 1);
+        }, 100);
+        setTimeout(intervalId); // 타이머 멈추기 위해 ID 저장
+      })
+      .catch((err) => {
+        console.error("메일 발송 에러:", err);
+        alert("메일 발송 중 오류가 발생했습니다.");
+      });
   };
 
-  // 💡 [복구] 이메일 인증번호 확인 가짜 로직
+  // 2. 이메일 인증번호 확인 함수 (실제 비교)
   const handleVerifyMail = () => {
-    if (mailAuth !== 1) {
+    if (mailAuth !== 2) {
       alert("먼저 인증 이메일 전송 버튼을 눌러주세요.");
       return;
     }
-    alert("이메일 인증이 완료되었습니다! (UI 테스트)");
-    setMailAuth(3);
+
+    // 서버에서 받은 번호와 사용자가 입력한 번호 비교
+    if (String(mailAuthCode) === mailAuthInput) {
+      alert("이메일 인증이 완료되었습니다!");
+      setMailAuth(3); // 인증 완료 상태
+      window.clearInterval(timeout); // 타이머 멈춤
+      setTimeout(null);
+    } else {
+      alert("인증번호가 일치하지 않습니다. 다시 확인해주세요.");
+    }
+  };
+
+  // 3. 타이머 종료 감지 (useEffect)
+  useEffect(() => {
+    if (time === 0) {
+      window.clearInterval(timeout);
+      setMailAuthCode(null); // 인증번호 파기
+      setTimeout(null);
+      alert("인증 시간이 만료되었습니다. 다시 시도해주세요.");
+      setMailAuth(0); // 초기 상태로 되돌림
+    }
+  }, [time]);
+
+  // 4. 시간 표시 포맷 함수
+  const showTime = () => {
+    const min = Math.floor(time / 60);
+    const sec = String(time % 60).padStart(2, "0");
+    return `${min}:${sec}`;
   };
 
   // 우편번호 API 설정
@@ -172,9 +225,19 @@ const UserSignup = () => {
       return { text: "올바른 이메일 형식을 입력해주세요.", isError: true };
     if (mailAuth === 0)
       return { text: "인증 이메일을 전송해주세요.", isError: true };
-    if (mailAuth === 1)
-      return { text: "인증번호를 입력하고 확인을 눌러주세요.", isError: true };
-    return { text: "이메일 인증이 완료되었습니다.", isError: false };
+
+    // 💡 인증번호 발송 후 입력 대기 상태(2)일 때 메시지와 시간을 함께 리턴
+    if (mailAuth === 2) {
+      return {
+        text: `인증번호를 입력하세요. (남은 시간: ${showTime()})`,
+        isError: true,
+      };
+    }
+
+    if (mailAuth === 3)
+      return { text: "이메일 인증이 완료되었습니다.", isError: false };
+
+    return { text: "\u00A0", isError: false };
   };
 
   const getNameMessage = () => {
@@ -358,9 +421,9 @@ const UserSignup = () => {
                   type="button"
                   className={styles.buttonOutlined}
                   onClick={handleSendMail}
-                  disabled={mailAuth === 3}
+                  disabled={mailAuth === 1 || mailAuth === 3}
                 >
-                  인증 이메일 전송
+                  {mailAuth === 0 ? "인증 메일 전송" : "재전송"}
                 </button>
               </div>
 
@@ -369,13 +432,18 @@ const UserSignup = () => {
                   type="text"
                   className={styles.inputUnderline}
                   placeholder="인증번호"
-                  disabled={mailAuth === 3}
+                  value={mailAuthInput}
+                  onChange={(e) => {
+                    setMailAuthInput(e.target.value);
+                  }}
+                  disabled={mailAuth !== 2}
                 />
+
                 <button
                   type="button"
                   className={styles.buttonFilled}
                   onClick={handleVerifyMail}
-                  disabled={mailAuth === 3}
+                  disabled={mailAuth !== 2}
                 >
                   인증번호 확인
                 </button>
@@ -383,7 +451,9 @@ const UserSignup = () => {
 
               <p
                 className={`${styles.statusMessage} ${emailStatus.isError ? styles.errorMessage : ""}`}
-                style={!emailStatus.isError ? { color: "#3a8a56" } : {}}
+                style={
+                  !emailStatus.isError ? { color: "var(--color-brand)" } : {}
+                }
               >
                 {emailStatus.text}
               </p>
