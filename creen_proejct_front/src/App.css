@@ -1,7 +1,7 @@
 /* 1. 로컬 폰트 페이스 정의 (Jalnan, YeogiGothic) */
 @font-face {
   font-family: 'Jalnan';
-  src: url('/public/fonts/Jalnan2.otf') format('opentype');
+  src: url('/fonts/Jalnan2.otf') format('opentype');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
@@ -9,7 +9,7 @@
 
 @font-face {
   font-family: 'YeogiGothic';
-  src: url('/public/fonts//JalnanGothic.otf') format('opentype');
+  src: url('/fonts//JalnanGothic.otf') format('opentype');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
