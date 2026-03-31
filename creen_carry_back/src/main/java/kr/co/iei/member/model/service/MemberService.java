@@ -90,6 +90,7 @@ public class MemberService {
         // 3. 메일 발송
         emailSender.sendMail(title, email, content);
         
+        System.out.println("인증번호 :" + authCode);
         return authCode; // 테스트를 위해 리턴하거나 메모리에 저장
     }
  // 🌟 [추가] 컨트롤러에서 호출하는 검증 메서드 구현
