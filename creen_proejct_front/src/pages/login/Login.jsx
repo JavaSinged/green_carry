@@ -1,19 +1,22 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react"; // 🌟 useContext 추가
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import Swal from "sweetalert2";
 import "./Login.css";
+import { AuthContext } from "../../context/AuthContext"; // 🌟 경로 확인 필수!
 
 const Login = () => {
-  // 1. 상태 관리 (memberGrade 기본값 1 추가)
+  // 1. 상태 관리
   const [member, setMember] = useState({
     memberId: "",
     memberPw: "",
-    memberGrade: 1, // 기본값: 개인 이용자(1)
+    memberGrade: 1,
   });
   const [activeTab, setActiveTab] = useState("personal");
   const [rememberId, setRememberId] = useState(false);
 
+  // 🌟 Context에서 전역 상태 변경 함수 가져오기
+  const { setIsLogin, setUser } = useContext(AuthContext);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -29,7 +32,6 @@ const Login = () => {
     setMember({ ...member, [name]: value });
   };
 
-  // 🌟 탭 변경 시 등급(1 또는 2) 자동 업데이트
   const handleTabChange = (tab) => {
     setActiveTab(tab);
     setMember((prev) => ({
@@ -38,11 +40,9 @@ const Login = () => {
     }));
   };
 
-  // 🌟 유효성 검사 및 로그인 로직
   const login = () => {
     const { memberId, memberPw } = member;
 
-    // 1. 빈 칸 검사
     if (!memberId || !memberPw) {
       Swal.fire({
         icon: "warning",
@@ -51,7 +51,7 @@ const Login = () => {
       return;
     }
 
-    // 2. 아이디 유효성 검사 (영문+숫자 8자 이상)
+    // 유효성 검사 로직 (생략 - 기존과 동일)
     const idRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
     if (!idRegex.test(memberId)) {
       Swal.fire({
@@ -61,8 +61,6 @@ const Login = () => {
       });
       return;
     }
-
-    // 3. 비밀번호 유효성 검사 (소문자+대문자+숫자+특수문자 10자 이상)
     const pwRegex =
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{10,}$/;
     if (!pwRegex.test(memberPw)) {
@@ -74,28 +72,30 @@ const Login = () => {
       return;
     }
 
-    // 4. 백엔드 통신
     axios
       .post(`http://localhost:10400/api/member/login`, member)
       .then((res) => {
         console.log("로그인 응답 데이터:", res.data);
 
-        // 🌟 백엔드에서 보낸 Map 구조 분해 할당
-        // res.data = { member: {...}, accessToken: "ey..." }
+        // 🌟 백엔드 Map 구조 분해 할당
         const { member: loginUser, accessToken } = res.data;
 
-        // 회원이 존재하고 토큰이 정상적으로 넘어왔다면 성공
         if (loginUser && accessToken) {
-          // 1. 브라우저 저장소에 중요 정보 보관
-          localStorage.setItem("accessToken", accessToken); // 🔑 모든 API 요청에 쓸 토큰
-          localStorage.setItem("memberName", loginUser.memberName); // 화면 표시용 이름
-          localStorage.setItem("memberGrade", loginUser.memberGrade); // 권한 체크용 등급
+          // 1. 브라우저 저장소 보관 (새로고침 대비)
+          localStorage.setItem("accessToken", accessToken);
+          localStorage.setItem("memberName", loginUser.memberName);
+          localStorage.setItem("memberGrade", loginUser.memberGrade);
 
-          // 2. 등급 텍스트 변환 (1: 개인, 2: 사업자)
+          // 🌟 2. 전역 상태 업데이트 (이걸 해야 Header 등이 즉시 바뀜)
+          setIsLogin(true);
+          setUser({
+            memberName: loginUser.memberName,
+            memberGrade: loginUser.memberGrade,
+          });
+
           const gradeText =
             loginUser.memberGrade === 1 ? "개인 이용자" : "사업자";
 
-          // 3. 성공 알림창
           Swal.fire({
             icon: "success",
             title: "로그인 성공!",
@@ -104,20 +104,17 @@ const Login = () => {
             timer: 2000,
           });
 
-          // 4. 아이디 저장 로직 (로그인 시 입력한 member.memberId 사용)
           if (rememberId) {
             localStorage.setItem("savedUserId", member.memberId);
           } else {
             localStorage.removeItem("savedUserId");
           }
 
-          // 5. 메인으로 이동
           navigate("/");
         }
       })
       .catch((err) => {
         console.error("로그인 에러:", err);
-        // 401 에러(Unauthorized) 등 실패 상황 처리
         Swal.fire({
           title: "로그인 실패",
           text: "아이디, 비밀번호 또는 회원 유형을 확인해주세요.",
@@ -128,7 +125,7 @@ const Login = () => {
 
   return (
     <div className="screen-container">
-      {/* 상단 로고 및 나머지 UI는 기존과 동일 */}
+      {/* UI 코드는 기존과 동일 */}
       <h1
         className="logo"
         style={{
@@ -201,7 +198,7 @@ const Login = () => {
             <input
               type="password"
               name="memberPw"
-              placeholder="비밀번호 (대문자+소문자+숫자+특수문자 10자 이상)"
+              placeholder="비밀번호 (대소문자+숫자+특수문자 10자 이상)"
               value={member.memberPw}
               onChange={inputMember}
             />
@@ -226,7 +223,6 @@ const Login = () => {
           </div>
         </section>
 
-        {/* 우측 일러스트 섹션 */}
         <section className="illustration-section">
           <div className="speech-bubble">
             <p>현재 456명이 환경을 지키고 있어요!</p>

@@ -1,24 +1,34 @@
+/* Header.module.css */
+
 .header {
-  display: flex;
-  justify-content: space-between;
+  /* 🌟 핵심: 3등분 그리드 레이아웃 고정 */
+  /* 왼쪽(1fr) - 중앙(auto) - 오른쪽(1fr) 비율로 공간을 나눕니다 */
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
+
   padding: 0 40px;
   height: 80px;
   background-color: var(--color-brand);
   color: #ffffff;
+  position: sticky; /* 상단 고정 (선택사항) */
+  top: 0;
+  z-index: 1000;
 }
 
+/* 1. 왼쪽 로고 영역 */
 .logo_wrap {
   cursor: pointer;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-self: start; /* 🌟 그리드 칸 내에서 왼쪽 끝으로 정렬 */
 }
 
 .logo_wrap img {
   height: 45px;
   width: auto;
-  filter: brightness(0) invert(1);
+  filter: brightness(0) invert(1); /* 로고를 흰색으로 변경 */
 }
 
 .logo_text {
@@ -29,16 +39,13 @@
   font-weight: 400;
 }
 
+/* 2. 중앙 나무 통계 영역 */
 .center_wrap {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 5px;
-}
-
-.tree_icon {
-  width: 35px;
-  height: auto;
+  justify-self: center; /* 🌟 무조건 화면 정중앙에 고정 */
 }
 
 .center_wrap h5 {
@@ -60,19 +67,48 @@
   font-family: var(--font-body);
 }
 
+/* 3. 오른쪽 버튼 및 유저 상태 영역 */
 .button_wrap {
   display: flex;
   align-items: center;
-  gap: 25px;
+  gap: 20px;
+  justify-self: end; /* 🌟 그리드 칸 내에서 오른쪽 끝으로 정렬 */
+}
+
+/* 🌟 로그인 시 나타나는 유저 정보 스타일 */
+.user_info {
+  font-size: 0.9rem;
+  font-family: var(--font-sub);
+  white-space: nowrap; /* 글자가 길어져도 줄바꿈 방지 */
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.user_info b {
+  color: #f1f8e9; /* 이름만 살짝 연한 연두색으로 포인트 */
+  font-weight: 700;
 }
 
 .button_wrap svg {
   cursor: pointer;
   font-size: 1.8rem;
   color: #ffffff;
-  transition: opacity 0.2s;
+  transition:
+    transform 0.2s,
+    opacity 0.2s;
 }
 
 .button_wrap svg:hover {
   opacity: 0.7;
+  transform: scale(1.1); /* 호버 시 살짝 커지는 효과 */
+}
+
+/* 링크 태그 기본 스타일 제거 (아이콘 감싸는 Link용) */
+.button_wrap a {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: inherit;
 }

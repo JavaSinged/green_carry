@@ -12,12 +12,14 @@ import OrderPage from "./pages/order/OrderPage";
 import Login from "./pages/login/login";
 import Account from "./pages/login/FindAccount";
 
+import { AuthProvider } from "./context/AuthContext";
+
 const BasicLayout = () => {
   return (
     <>
       <Header />
       <main>
-        <Outlet /> {/* 이 자리에 Home, StoreView 등이 쏙쏙 들어갑니다 */}
+        <Outlet />
       </main>
       <Footer />
     </>
@@ -26,21 +28,22 @@ const BasicLayout = () => {
 
 function App() {
   return (
-    <div>
-      <Routes>
-        {/* 1. 헤더/푸터가 필요 없는 단독 화면 */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/account" element={<Account />} />
+    // 🌟 전체를 AuthProvider로 감쌉니다.
+    <AuthProvider>
+      <div>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/account" element={<Account />} />
 
-        {/* 2. 헤더/푸터가 무조건 붙어야 하는 화면들 (BasicLayout 안에 넣기) */}
-        <Route element={<BasicLayout />}>
-          <Route path="/" element={<Home />} />
-          <Route path="/storeView" element={<StoreView />} />
-          <Route path="/storeDetail" element={<StoreDetail />} />
-          <Route path="*" element={<NotFound />} />
-        </Route>
-      </Routes>
-    </div>
+          <Route element={<BasicLayout />}>
+            <Route path="/" element={<Home />} />
+            <Route path="/storeView" element={<StoreView />} />
+            <Route path="/storeDetail" element={<StoreDetail />} />
+            <Route path="*" element={<NotFound />} />
+          </Route>
+        </Routes>
+      </div>
+    </AuthProvider>
   );
 }
 
