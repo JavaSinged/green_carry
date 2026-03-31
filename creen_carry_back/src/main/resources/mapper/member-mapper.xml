@@ -30,4 +30,9 @@
 	        #{openingDate},
 	        #{memberGrade})
 	</insert>
+	<select id="storeDupCheck">
+		SELECT * 
+		FROM MEMBER_TBL
+		WHERE STORE_OWNER_NO=#{storeOwnerNo}
+	</select>
 </mapper>

@@ -13,7 +13,7 @@ const ManagerSignup = () => {
     memberId: "",
     memberPw: "",
     memberName: "",
-    memberPhone: "", // 💡 연락처 추가
+    memberPhone: "",
     memberEmail: "",
     storeOwnerNo: "",
     storeName: "",
@@ -31,8 +31,7 @@ const ManagerSignup = () => {
   const pwRegex =
     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{10,}$/;
   const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
-  const storeOwnerNoRegex = /^\d{3}-\d{2}-\d{5}$/;
-  // 연락처 정규식 검사는 요청에 따라 제외함
+  // 💡 사업자번호 정규식 제거됨
 
   const inputMember = (e) => {
     const { name, value } = e.target;
@@ -70,13 +69,34 @@ const ManagerSignup = () => {
     setMailAuth(3);
   };
 
+  // 💡 사업자번호 중복확인 버튼 핸들러 (정규식 검사 제거, 빈칸만 체크)
   const handleStoreOwnerNoCheck = () => {
-    if (!storeOwnerNoRegex.test(member.storeOwnerNo)) {
-      alert("사업자번호를 000-00-00000 형식으로 입력해주세요.");
+    if (!member.storeOwnerNo.trim()) {
+      alert("사업자번호를 먼저 입력해주세요.");
       return;
     }
-    alert("가입 가능한 사업자번호입니다! (UI 테스트)");
-    setCheckStoreOwnerNo(2);
+    storeDupCheck();
+  };
+
+  const storeDupCheck = () => {
+    // 💡 하이픈 변환 과정 제거 (어차피 숫자만 입력받음)
+    axios
+      .get(
+        `${import.meta.env.VITE_BACKSERVER}/api/member/storeDupCheck?storeOwnerNo=${member.storeOwnerNo}`,
+      )
+      .then((res) => {
+        console.log(res);
+        if (res.data === null || res.data === "") {
+          alert("가입 가능한 사업자번호입니다!");
+          setCheckStoreOwnerNo(2);
+        } else {
+          alert("중복된 사업자 번호 입니다.");
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        alert("사업자 번호 중복 확인 중 서버 오류가 발생했습니다.");
+      });
   };
 
   const getIdMessage = () => {
@@ -132,14 +152,13 @@ const ManagerSignup = () => {
     return { text: "이메일 인증이 완료되었습니다.", isError: false };
   };
 
+  // 💡 사업자번호 상태 메시지 (정규식 제거)
   const getStoreOwnerNoMessage = () => {
-    if (!member.storeOwnerNo)
+    if (!member.storeOwnerNo.trim())
       return {
         text: isSubmitted ? "사업자번호를 입력하세요." : "\u00A0",
         isError: isSubmitted,
       };
-    if (!storeOwnerNoRegex.test(member.storeOwnerNo))
-      return { text: "000-00-00000 형식으로 입력해주세요.", isError: true };
     if (checkStoreOwnerNo !== 2)
       return { text: "사업자번호 중복 확인을 눌러주세요.", isError: true };
     return { text: "가입 가능한 사업자 번호입니다.", isError: false };
@@ -163,7 +182,6 @@ const ManagerSignup = () => {
     return { text: "\u00A0", isError: false };
   };
 
-  // 💡 연락처 메시지 함수 (유효성 검사 없이 빈 칸만 체크)
   const getPhoneMessage = () => {
     if (!member.memberPhone.trim())
       return {
@@ -189,7 +207,7 @@ const ManagerSignup = () => {
   const storeOwnerNoStatus = getStoreOwnerNoMessage();
   const storeNameStatus = getStoreNameMessage();
   const memberNameStatus = getMemberNameMessage();
-  const phoneStatus = getPhoneMessage(); // 💡 연락처 상태 추가
+  const phoneStatus = getPhoneMessage();
   const openingDateStatus = getOpeningDateMessage();
 
   const joinSubmit = (e) => {
@@ -201,8 +219,8 @@ const ManagerSignup = () => {
       !member.memberPw ||
       !memberPwRe ||
       !member.memberEmail ||
-      !member.memberPhone.trim() || // 💡 빈칸 체크 추가
-      !member.storeOwnerNo ||
+      !member.memberPhone.trim() ||
+      !member.storeOwnerNo.trim() ||
       !member.storeName.trim() ||
       !member.memberName.trim() ||
       !member.openingDate.trim();
@@ -213,7 +231,7 @@ const ManagerSignup = () => {
       pwStatus.isError ||
       pwReStatus.isError ||
       emailStatus.isError ||
-      phoneStatus.isError || // 💡 에러 체크 추가
+      phoneStatus.isError ||
       storeOwnerNoStatus.isError ||
       storeNameStatus.isError ||
       memberNameStatus.isError ||
@@ -223,15 +241,12 @@ const ManagerSignup = () => {
       return;
     }
 
-    // 💡 백엔드 전송용 데이터 가공
+    // 💡 백엔드 전송용 데이터 가공 (사업자번호 replace 제거)
     const submitData = {
       ...member,
-      // 백엔드가 Long 타입으로 받으므로 하이픈 제거 "123-45-67890" -> "1234567890"
-      storeOwnerNo: member.storeOwnerNo.replace(/-/g, ""),
       memberGrade: 2,
     };
 
-    // 💡 axios POST 요청
     axios
       .post(
         `${import.meta.env.VITE_BACKSERVER}/api/member/signupManager`,
@@ -397,7 +412,7 @@ const ManagerSignup = () => {
             </div>
           </div>
 
-          {/* 💡 추가된 연락처 입력란 */}
+          {/* 연락처 */}
           <div className={styles.fieldGroup}>
             <label className={styles.label}>연락처 *</label>
             <div className={styles.inputArea}>
@@ -417,7 +432,7 @@ const ManagerSignup = () => {
             </div>
           </div>
 
-          {/* 사업자번호 */}
+          {/* 💡 변경된 사업자번호 입력란 */}
           <div className={styles.fieldGroup}>
             <label className={styles.label}>사업자번호 *</label>
             <div className={styles.inputArea}>
@@ -428,7 +443,7 @@ const ManagerSignup = () => {
                   value={member.storeOwnerNo}
                   onChange={inputMember}
                   className={styles.inputUnderline}
-                  placeholder="000-00-00000"
+                  placeholder="(-)을 제외한 숫자 10자리를 입력하세요"
                   readOnly={checkStoreOwnerNo === 2}
                 />
                 <button

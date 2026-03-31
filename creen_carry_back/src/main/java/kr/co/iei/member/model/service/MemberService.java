@@ -52,6 +52,11 @@ public class MemberService {
 		
 		return 0;
 	}
+
+	public Member storeDupCheck(int storeOwnerNo) {
+		Member member = memberDao.storeDupCheck(storeOwnerNo);
+		return member;
+	}
 }
 
 

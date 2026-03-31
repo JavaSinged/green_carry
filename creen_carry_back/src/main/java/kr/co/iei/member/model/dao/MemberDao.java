@@ -12,4 +12,6 @@ public interface MemberDao {
 
 	int insertManager(Member member);
 
+	Member storeDupCheck(int storeOwnerNo);
+
 }
