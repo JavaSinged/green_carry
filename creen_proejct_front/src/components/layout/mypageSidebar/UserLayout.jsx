@@ -1,9 +1,7 @@
-import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { NavLink, Outlet } from 'react-router-dom';
 import styles from './Layout.module.css';
 
-
 export default function UserLayout() {
-
   return (
     <div className={styles.container}>
       {/* 👈 왼쪽 고정 사이드바 */}
