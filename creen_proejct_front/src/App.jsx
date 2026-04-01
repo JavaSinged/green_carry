@@ -21,6 +21,8 @@ import { AuthProvider } from "./context/AuthContext";
 import UserSignup from "./pages/signup/UserSignup";
 import ManagerSignup from "./pages/signup/ManagerSignup";
 import Signup from "./pages/signup/Signup";
+
+// 🌟 문지기 컴포넌트
 import ProtectedRoute from "./context/ProtectedRoute";
 
 const BasicLayout = () => {
@@ -40,21 +42,23 @@ function App() {
     <AuthProvider>
       <div>
         <Routes>
-          {/* 1. 헤더/푸터가 없는 퍼블릭 화면 */}
+          {/* 🔓 1. 퍼블릭 구역 (누구나 접근 가능) */}
           <Route path="/login" element={<Login />} />
           <Route path="/account" element={<Account />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/userSignup" element={<UserSignup />} />
           <Route path="/managerSignup" element={<ManagerSignup />} />
 
-          {/* 2. 헤더/푸터가 무조건 붙어야 하는 화면들 */}
+          {/* 2. 헤더/푸터가 붙는 구역 */}
           <Route element={<BasicLayout />}>
-            {/* 누구나 볼 수 있는 페이지 */}
+            {/* 🔓 공통 접근 구역 */}
             <Route path="/" element={<Home />} />
             <Route path="/storeView" element={<StoreView />} />
             <Route path="/storeDetail" element={<StoreDetail />} />
 
-            {/* 🛡️ 일반 유저(Grade 1) 전용 마이페이지 구역 */}
+            {/* ==================================================== */}
+            {/* 🛡️ 일반 유저 (Grade: 1) 철통 방어 구역 */}
+            {/* ==================================================== */}
             <Route element={<ProtectedRoute requireUser={true} />}>
               <Route path="/mypage/user" element={<UserLayout />}>
                 <Route index element={<UserProfile />} />
@@ -63,25 +67,35 @@ function App() {
               </Route>
             </Route>
 
-            {/* 🛡️ 사업자(Grade 2) 전용 마이페이지 구역 (주석 풀고 사용하세요) */}
-            {/* <Route element={<ProtectedRoute requireManager={true} />}>
+            {/* ==================================================== */}
+            {/* 🛡️ 사업자 파트너 (Grade: 2) 철통 방어 구역 */}
+            {/* ==================================================== */}
+            <Route element={<ProtectedRoute requireManager={true} />}>
               <Route path="/mypage/manager" element={<ManagerLayout />}>
-                <Route index element={<ManagerDashboard />} />
-                <Route path="menus" element={<ManagerMenus />} />
+                {/* 🚨 실제 존재하는 컴포넌트로 import 해서 교체하세요! */}
+                <Route index element={<div>사업자 대시보드 화면</div>} />
+                <Route
+                  path="menus"
+                  element={<div>사업자 메뉴 관리 화면</div>}
+                />
               </Route>
-            </Route> 
-            */}
+            </Route>
 
-            {/* 🛡️ 관리자(Grade 0) 전용 마이페이지 구역 (주석 풀고 사용하세요) */}
-            {/* <Route element={<ProtectedRoute requireAdmin={true} />}>
+            {/* ==================================================== */}
+            {/* 🛡️ 총괄 관리자 (Grade: 0) 철통 방어 구역 */}
+            {/* ==================================================== */}
+            <Route element={<ProtectedRoute requireAdmin={true} />}>
               <Route path="/mypage/admin" element={<AdminLayout />}>
-                <Route index element={<AdminMembers />} />
-                <Route path="stores" element={<AdminStores />} />
+                {/* 🚨 실제 존재하는 컴포넌트로 import 해서 교체하세요! */}
+                <Route index element={<div>관리자 회원 관리 화면</div>} />
+                <Route
+                  path="stores"
+                  element={<div>관리자 가게 승인 화면</div>}
+                />
               </Route>
-            </Route> 
-            */}
+            </Route>
 
-            {/* 404 에러 페이지는 가장 마지막에! */}
+            {/* 🚫 위에서 안 걸린 이상한 주소는 전부 404 처리 */}
             <Route path="*" element={<NotFound />} />
           </Route>
         </Routes>
