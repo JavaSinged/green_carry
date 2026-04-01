@@ -24,6 +24,7 @@
   color: var(--color-brand);
   margin-bottom: 25px;
   padding-left: 10px;
+  cursor: pointer;
 }
 
 .sidebar ul {
