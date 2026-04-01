@@ -9,8 +9,64 @@ export const AuthProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
 
   const logoutTimerRef = useRef(null);
+  // 🌟 수동 로그아웃 중인지 확인하는 깃발 (이중 방어)
+  const isLoggingOut = useRef(false);
 
-  // 🎨 GreenCarry 전용 Swal 스타일
+  // 🎨 [CSS 직접 주입] 별도 CSS 파일 없이 스타일 적용
+  useEffect(() => {
+    const style = document.createElement("style");
+    style.innerHTML = `
+    /* 팝업 전체 창 */
+    .greencarry-swal-popup {
+      border-radius: 20px !important;
+      padding: 2rem !important;
+      font-family: 'Pretendard', sans-serif;
+    }
+
+    /* 제목 색상 */
+    .greencarry-swal-title {
+      color: #2e7d32 !important;
+      font-size: 1.5rem !important;
+      font-weight: 700 !important;
+    }
+
+    /* [핵심] 느낌표(warning) 아이콘 색상 변경 */
+    .swal2-icon.swal2-warning {
+      border-color: #2e7d32 !important; /* 동그란 테두리를 초록색으로 */
+      color: #2e7d32 !important;        /* 느낌표(!)를 초록색으로 */
+    }
+
+    /* [핵심] 체크(success) 아이콘 색상 변경 (필요 시) */
+    .swal2-icon.swal2-success {
+      border-color: #2e7d32 !important;
+    }
+    .swal2-icon.swal2-success [class^='swal2-success-line'] {
+      background-color: #2e7d32 !important; /* 체크 표시 선을 초록색으로 */
+    }
+    .swal2-icon.swal2-success .swal2-success-ring {
+      border: 4px solid rgba(46, 125, 50, 0.3) !important; /* 바깥 원 연하게 */
+    }
+
+    /* 확인 버튼 */
+    .greencarry-swal-confirm-button {
+      background-color: #2e7d32 !important;
+      color: white !important;
+      border-radius: 12px !important;
+      padding: 12px 35px !important;
+      font-size: 1rem !important;
+      font-weight: 600 !important;
+      margin-top: 1rem !important;
+      border: none !important;
+      cursor: pointer;
+    }
+    .greencarry-swal-confirm-button:hover {
+      background-color: #1b5e20 !important;
+    }
+  `;
+    document.head.appendChild(style);
+  }, []);
+
+  // 🎨 스타일이 적용된 Swal 호출 함수
   const fireStyledSwal = (icon, title, text) => {
     return Swal.fire({
       icon: icon,
@@ -28,17 +84,21 @@ export const AuthProvider = ({ children }) => {
 
   // 🌟 로그아웃 함수
   const logout = (isExpired = false) => {
-    // 1. 타이머 즉시 제거
+    // 1. 수동 로그아웃이라면 즉시 깃발을 올림
+    if (!isExpired) {
+      isLoggingOut.current = true;
+    }
+
+    // 2. 타이머 즉시 제거
     if (logoutTimerRef.current) {
       clearTimeout(logoutTimerRef.current);
       logoutTimerRef.current = null;
     }
 
-    // 2. 만료로 인한 로그아웃일 때
+    // 3. 만료로 인한 로그아웃일 때
     if (isExpired) {
-      // 🚨 [핵심 중의 핵심] 로컬스토리지에 토큰이 없으면 이미 수동 로그아웃된 것임!
-      // 토큰이 있을 때만 팝업을 띄우고 지웁니다.
-      if (localStorage.getItem("accessToken")) {
+      // 🚩 수동 로그아웃 중이 아닐 때만 팝업 실행
+      if (!isLoggingOut.current && localStorage.getItem("accessToken")) {
         localStorage.clear();
         setIsLogin(false);
         setUser(null);
@@ -52,7 +112,7 @@ export const AuthProvider = ({ children }) => {
         });
       }
     } else {
-      // 3. 수동 로그아웃일 때 (즉시 비우고 이동)
+      // 4. 수동 로그아웃일 때 (즉시 비우고 이동)
       localStorage.clear();
       setIsLogin(false);
       setUser(null);
@@ -82,15 +142,21 @@ export const AuthProvider = ({ children }) => {
             memberGrade: Number(grade),
           });
 
-          const remainingTime = (decodedPayload.exp - currentTime) * 1000;
+          // 🌟 남은 시간 계산 (24일 초과 시 타이머 오버플로 방지)
+          const remainingTimeInMs = 5000; //테스트용 시간 5초
+          //const remainingTimeInMs = (decodedPayload.exp - currentTime) * 1000;
 
           if (logoutTimerRef.current) clearTimeout(logoutTimerRef.current);
 
-          // ⏲️ 자동 로그아웃 예약
-          logoutTimerRef.current = setTimeout(() => {
-            // 실행되는 시점에 토큰이 있는지 '한 번 더' 체크하는 logout(true) 호출
-            logout(true);
-          }, remainingTime);
+          // 자바스크립트 setTimeout 한계(약 24.8일) 체크
+          if (remainingTimeInMs > 0 && remainingTimeInMs < 2147483647) {
+            logoutTimerRef.current = setTimeout(() => {
+              // 실행 직전 수동 로그아웃 중인지 최종 확인
+              if (!isLoggingOut.current) {
+                logout(true);
+              }
+            }, remainingTimeInMs);
+          }
         }
       } catch (error) {
         console.error("토큰 검증 에러:", error);
