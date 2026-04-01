@@ -23,6 +23,7 @@ import { AuthProvider } from "./context/AuthContext";
 import UserSignup from "./pages/signup/UserSignup";
 import ManagerSignup from "./pages/signup/ManagerSignup";
 import Signup from "./pages/signup/Signup";
+import UserCS from "./pages/mypage/user/UserCS";
 
 const BasicLayout = () => {
   return (
@@ -65,6 +66,7 @@ function App() {
             <Route path="/mypage/user" element={<UserLayout />}>
               <Route index element={<UserProfile />} />
               <Route path="userInfoEdit" element={<UserInfoEdit />} />
+              <Route path="userCS" element={<UserCS />} />
               {/* 기본 화면: 개인정보 수정 */}
               {/* <Route path="orders" element={<UserOrders />} /> */}
               {/* /mypage/user/orders */}
