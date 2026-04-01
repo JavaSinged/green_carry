@@ -1,13 +1,15 @@
 import styles from "./UserCS.module.css";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../../context/AuthContext";
 
 //icon
 import SearchIcon from "@mui/icons-material/Search";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import axios from "axios";
+import StarsIcon from "@mui/icons-material/Stars";
 
 const UserCS = () => {
-  const { isLogin, user, logout } = useContext(AuthContext);
+  const { user } = useContext(AuthContext);
   const [activeTab, setActiveTab] = useState("faq"); // 기본: faq활성화
   return (
     <section className={styles.cs_container}>
@@ -15,7 +17,8 @@ const UserCS = () => {
         <div className={styles.title_wrap}>
           <h3 className={styles.title}>고객센터</h3>
           <p className={styles.title_sub}>
-            {user?.memberName} 님, 무엇을 도와드릴까요?
+            <span className={styles.user_name}>{user?.memberName}</span> 님,
+            무엇을 도와드릴까요?
           </p>
         </div>
         {/*검색바 */}
@@ -62,7 +65,29 @@ const UserCS = () => {
 };
 const FAQSection = () => {
   const categories = ["결제", "배달", "에코 포인트", "서비스 이용"];
-  const [selectedCategory, setSelectedCategory] = useState(null);
+  //카테고리 상태값
+  const [status, setStatus] = useState(0); // 0:전체조회, 1:결제, 2:배달, 3:에코포인트, 4:서비스이용
+  const [openIndex, setOpenIndex] = useState(null); //아코디언 상태 (null : 모두 닫힘)
+  const [faqList, setFaqList] = useState([]); // 받아올 리스트
+
+  const indexToggle = (index) => {
+    //아코디언 하나만 열리게
+    setOpenIndex(openIndex === index ? null : index);
+  };
+  //전체조회
+  useEffect(() => {
+    axios
+      .get(`${import.meta.env.VITE_BACKSERVER}/cs/inquiries/faq`, {
+        params: { faq_category: status },
+      })
+      .then((res) => {
+        console.log(res);
+        setFaqList(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, [status]);
   return (
     <div className={styles.faq_wrap}>
       <div className={styles.category_group}>
@@ -70,9 +95,9 @@ const FAQSection = () => {
           return (
             <button
               key={`key:${cat}`} // 키값 나중에 수정하기
-              className={`${styles.cat_btn} ${selectedCategory === cat ? styles.cat_active : ""}`}
+              className={`${styles.cat_btn} ${status === cat ? styles.cat_active : ""}`}
               onClick={() => {
-                setSelectedCategory(cat);
+                setStatus(cat);
               }}
             >
               {cat}
@@ -83,21 +108,27 @@ const FAQSection = () => {
 
       <div className={styles.faq_list}>
         {/* 반복될 질문 아이템 (실제로는 데이터를 map 돌리면 됩니다) */}
-        {[1, 2, 3, 4, 5].map((item) => (
-          <details key={item} className={styles.faq_item}>
-            <summary className={styles.faq_header}>
-              <span className={styles.q_no}>{item + ". "}</span>
-              <span className={styles.q_text}>
-                에코포인트는 어떻게 사용하나요?
-              </span>
+
+        {faqList.map((item, i) => (
+          <details
+            key={item.faqNo}
+            className={styles.faq_item}
+            open={openIndex === i}
+          >
+            <summary
+              className={styles.faq_header}
+              onClick={(e) => {
+                e.preventDefault();
+                indexToggle(i);
+              }}
+            >
+              <span className={styles.q_no}>{<StarsIcon />}</span>
+              <span className={styles.q_text}>{item.faqTitle}</span>
               <span className={styles.arrow}>
                 <KeyboardArrowDownIcon />
               </span>
             </summary>
-            <div className={styles.faq_answer}>
-              모아두신 에코포인트는 주문 결제 시 현금처럼 사용하여 할인 혜택을
-              받으실 수 있습니다.
-            </div>
+            <div className={styles.faq_answer}>{item.faqContent}</div>
           </details>
         ))}
       </div>
