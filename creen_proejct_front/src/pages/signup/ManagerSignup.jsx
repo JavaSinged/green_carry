@@ -648,6 +648,7 @@ const ManagerSignup = () => {
                   <div className={styles.calendarWrapper}>
                     <Calendar
                       onChange={handleDateChange}
+                      calendarType="gregory"
                       value={
                         member.openingDate
                           ? new Date(member.openingDate)

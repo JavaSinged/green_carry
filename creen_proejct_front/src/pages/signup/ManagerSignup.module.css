@@ -225,14 +225,14 @@
   color: var(--text-main);
 }
 
-/* 2. 토요일 (Saturday) - 파란색 (7n - 1 번째 칸) */
+/* 일요일: 1번째, 8번째... (7n + 1) */
 .calendarWrapper
-  :global(.react-calendar__month-view__days__day--weekend:nth-child(7n - 1)) {
-  color: #3d75cc !important; /* 시원한 파란색 */
+  :global(.react-calendar__month-view__days__day--weekend:nth-child(7n + 1)) {
+  color: #e53935 !important; /* 빨간색 */
 }
 
-/* 3. 일요일 (Sunday) - 빨간색 (7n 번째 칸) */
+/* 토요일: 7번째, 14번째... (7n) */
 .calendarWrapper
   :global(.react-calendar__month-view__days__day--weekend:nth-child(7n)) {
-  color: #e53935 !important; /* 깔끔한 빨간색 */
+  color: #3d75cc !important; /* 파란색 */
 }
