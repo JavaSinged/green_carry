@@ -3,6 +3,7 @@ import styles from "./Layout.module.css";
 
 export default function UserLayout() {
   const navigate = useNavigate();
+
   return (
     <div className={styles.container}>
       {/* 👈 왼쪽 고정 사이드바 */}

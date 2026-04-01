@@ -25,6 +25,12 @@ import ManagerSignup from "./pages/signup/ManagerSignup";
 import Signup from "./pages/signup/Signup";
 import UserCS from "./pages/mypage/user/UserCS";
 
+import AdminDashboard from "./pages/mypage/admin/AdminDashboard";
+import AdminUserManagement from "./pages/mypage/admin/AdminUserManagement";
+import AdminStoreManagement from "./pages/mypage/admin/AdminStoreManagement";
+import AdminReviewManagement from "./pages/mypage/admin/AdminReviewManagement";
+import AdminContainerManagement from "./pages/mypage/admin/AdminContainerManagement";
+
 const BasicLayout = () => {
   return (
     <>
@@ -81,11 +87,14 @@ function App() {
             {/* </Route> */}
 
             {/* 👮 관리자 마이페이지 */}
-            {/* <Route path="/mypage/admin" element={<AdminLayout />}> */}
-            {/* <Route index element={<AdminMembers />} />{' '} */}
-            {/* 기본 화면: 회원 관리 */}
-            {/* <Route path="stores" element={<AdminStores />} /> */}
-            {/* </Route> */}
+            <Route path="/mypage/admin" element={<AdminLayout />}>
+              <Route index element={<AdminDashboard />} />
+              {/* 기본 화면: 회원 관리 */}
+              <Route path="members" element={<AdminUserManagement />} />
+              <Route path="stores" element={<AdminStoreManagement />} />
+              <Route path="reviews" element={<AdminReviewManagement />} />
+              <Route path="containers" element={<AdminContainerManagement />} />
+            </Route>
 
             <Route path="*" element={<NotFound />} />
           </Route>
@@ -94,7 +103,7 @@ function App() {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </div>
-    </AuthProvider >
+    </AuthProvider>
   );
 }
 

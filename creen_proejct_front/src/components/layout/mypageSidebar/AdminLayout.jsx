@@ -10,7 +10,8 @@ export default function AdminLayout() {
         <ul>
           <li>
             <NavLink
-              to="/mypage/orders"
+              to="/mypage/admin"
+              end
               className={({ isActive }) => (isActive ? styles.activeMenu : '')}
             >
               대시보드
@@ -18,7 +19,7 @@ export default function AdminLayout() {
           </li>
           <li>
             <NavLink
-              to="/mypage/reviews"
+              to="/mypage/admin/members"
               className={({ isActive }) => (isActive ? styles.activeMenu : '')}
             >
               회원 관리
@@ -26,7 +27,7 @@ export default function AdminLayout() {
           </li>
           <li>
             <NavLink
-              to="/mypage/points"
+              to="/mypage/admin/stores"
               className={({ isActive }) => (isActive ? styles.activeMenu : '')}
             >
               상점 관리
@@ -34,7 +35,7 @@ export default function AdminLayout() {
           </li>
           <li>
             <NavLink
-              to="/mypage/profile"
+              to="/mypage/admin/reviews"
               className={({ isActive }) => (isActive ? styles.activeMenu : '')}
             >
               리뷰 관리
@@ -42,7 +43,7 @@ export default function AdminLayout() {
           </li>
           <li>
             <NavLink
-              to="/mypage/profile"
+              to="/mypage/admin/containers"
               className={({ isActive }) => (isActive ? styles.activeMenu : '')}
             >
               용기 정의
