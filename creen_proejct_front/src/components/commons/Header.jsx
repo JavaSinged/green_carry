@@ -23,7 +23,7 @@ export default function Header() {
       <div
         className={styles.logo_wrap}
         onClick={() => {
-          navigate('/');
+          navigate("/");
         }}
       >
         <img src="/image/logo.png" alt="GreenCarry Logo" />
@@ -34,7 +34,7 @@ export default function Header() {
       <div className={styles.center_wrap}>
         <ParkIcon />
         <h5>
-          지금까지 함께 심은 나무, 총 <span className={styles.badge}>41</span>{' '}
+          지금까지 함께 심은 나무, 총 <span className={styles.badge}>41</span>{" "}
           그루
         </h5>
       </div>
@@ -57,7 +57,7 @@ export default function Header() {
         <NotificationsNoneIcon />
 
         {/* 마이페이지 아이콘 */}
-        <Link to={isLogin ? "/mypage" : "/login"}>
+        <Link to={isLogin ? "/mypage/user" : "/login"}>
           <PersonIcon />
         </Link>
 
@@ -77,6 +77,6 @@ export default function Header() {
           </Link>
         )}
       </div>
-    </header >
+    </header>
   );
 }
