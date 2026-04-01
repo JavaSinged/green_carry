@@ -18,7 +18,7 @@ import kr.co.iei.utils.JwtUtil;
 import kr.co.iei.member.model.service.MemberService;
 
 @RestController
-@RequestMapping("/api/member")
+@RequestMapping("/member")
 @CrossOrigin(value="*") // 리액트 접근 허용
 public class MemberController {
 

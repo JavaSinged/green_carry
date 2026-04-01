@@ -1,26 +1,26 @@
-import React, { useState, useEffect } from "react";
-import styles from "./ManagerSignup.module.css";
-import { useNavigate } from "react-router-dom";
-import Calendar from "react-calendar";
-import "react-calendar/dist/Calendar.css";
-import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
-import axios from "axios";
-import Swal from "sweetalert2";
+import React, { useState, useEffect } from 'react';
+import styles from './ManagerSignup.module.css';
+import { useNavigate } from 'react-router-dom';
+import Calendar from 'react-calendar';
+import 'react-calendar/dist/Calendar.css';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import axios from 'axios';
+import Swal from 'sweetalert2';
 
 const ManagerSignup = () => {
   const navigate = useNavigate();
 
   const [member, setMember] = useState({
-    memberId: "",
-    memberPw: "",
-    memberName: "",
-    memberPhone: "",
-    memberEmail: "",
-    storeOwnerNo: "",
-    storeName: "",
-    openingDate: "",
+    memberId: '',
+    memberPw: '',
+    memberName: '',
+    memberPhone: '',
+    memberEmail: '',
+    storeOwnerNo: '',
+    storeName: '',
+    openingDate: '',
   });
-  const [memberPwRe, setMemberPwRe] = useState("");
+  const [memberPwRe, setMemberPwRe] = useState('');
 
   const [isSubmitted, setIsSubmitted] = useState(false);
 
@@ -28,7 +28,7 @@ const ManagerSignup = () => {
   const [mailAuth, setMailAuth] = useState(0);
   const [checkStoreOwnerNo, setCheckStoreOwnerNo] = useState(0);
   const [mailAuthCode, setMailAuthCode] = useState(null);
-  const [mailAuthInput, setMailAuthInput] = useState("");
+  const [mailAuthInput, setMailAuthInput] = useState('');
   const [time, setTime] = useState(180);
   const [timeout, setTimeout] = useState(null);
   const [checkEmail, setCheckEmail] = useState(0);
@@ -41,9 +41,9 @@ const ManagerSignup = () => {
     const { name, value } = e.target;
 
     // 1. 휴대폰 번호 자동 하이픈 (010-1234-5678)
-    if (name === "memberPhone") {
-      const onlyNums = value.replace(/[^0-9]/g, ""); // 숫자만 추출
-      let formattedPhone = "";
+    if (name === 'memberPhone') {
+      const onlyNums = value.replace(/[^0-9]/g, ''); // 숫자만 추출
+      let formattedPhone = '';
 
       if (onlyNums.length < 4) {
         formattedPhone = onlyNums;
@@ -58,9 +58,9 @@ const ManagerSignup = () => {
     }
 
     // 2. 사업자 번호 자동 하이픈 (123-45-67890)
-    if (name === "storeOwnerNo") {
-      const onlyNums = value.replace(/[^0-9]/g, ""); // 숫자만 추출
-      let formattedStoreNo = "";
+    if (name === 'storeOwnerNo') {
+      const onlyNums = value.replace(/[^0-9]/g, ''); // 숫자만 추출
+      let formattedStoreNo = '';
 
       if (onlyNums.length < 4) {
         formattedStoreNo = onlyNums;
@@ -77,13 +77,13 @@ const ManagerSignup = () => {
 
     setMember({ ...member, [name]: value });
 
-    if (name === "memberId") setCheckId(0);
-    if (name === "memberEmail") setMailAuth(0);
+    if (name === 'memberId') setCheckId(0);
+    if (name === 'memberEmail') setMailAuth(0);
   };
 
   const handleIdCheck = () => {
     if (!idRegex.test(member.memberId)) {
-      Swal.fire({ icon: "warning", text: "아이디 형식을 먼저 맞춰주세요." });
+      Swal.fire({ icon: 'warning', text: '아이디 형식을 먼저 맞춰주세요.' });
       return;
     }
     axios
@@ -92,18 +92,18 @@ const ManagerSignup = () => {
       )
       .then((res) => {
         if (res.data) {
-          Swal.fire({ icon: "success", text: "사용 가능한 아이디입니다." });
+          Swal.fire({ icon: 'success', text: '사용 가능한 아이디입니다.' });
           setCheckId(2);
         } else {
-          Swal.fire({ icon: "error", text: "이미 사용중인 아이디입니다!" });
+          Swal.fire({ icon: 'error', text: '이미 사용중인 아이디입니다!' });
           setCheckId(1);
         }
       })
       .catch((err) => {
-        console.error("통신 에러:", err);
+        console.error('통신 에러:', err);
         Swal.fire({
-          icon: "error",
-          text: "서버와 통신 중 오류가 발생했습니다.",
+          icon: 'error',
+          text: '서버와 통신 중 오류가 발생했습니다.',
         });
       });
   };
@@ -111,8 +111,8 @@ const ManagerSignup = () => {
   const handleSendMail = async () => {
     if (!emailRegex.test(member.memberEmail)) {
       Swal.fire({
-        icon: "warning",
-        text: "올바른 이메일 형식을 먼저 입력해주세요.",
+        icon: 'warning',
+        text: '올바른 이메일 형식을 먼저 입력해주세요.',
       });
       return;
     }
@@ -120,13 +120,13 @@ const ManagerSignup = () => {
     if (checkEmail === 0) {
       try {
         const res = await axios.get(
-          `${import.meta.env.VITE_BACKSERVER}/api/member/emailDupCheck?memberEmail=${member.memberEmail}`,
+          `${import.meta.env.VITE_BACKSERVER}/member/emailDupCheck?memberEmail=${member.memberEmail}`,
         );
 
         if (res.data) {
           setCheckEmail(2);
         } else {
-          Swal.fire({ icon: "error", text: "이미 사용중인 이메일입니다." });
+          Swal.fire({ icon: 'error', text: '이미 사용중인 이메일입니다.' });
           setCheckEmail(1);
           return;
         }
@@ -145,10 +145,7 @@ const ManagerSignup = () => {
 
     const obj = { memberEmail: member.memberEmail };
     axios
-      .post(
-        `${import.meta.env.VITE_BACKSERVER}/api/member/email-verification`,
-        obj,
-      )
+      .post(`${import.meta.env.VITE_BACKSERVER}/member/email-verification`, obj)
       .then((res) => {
         setMailAuthCode(res.data);
         setMailAuth(2);
@@ -160,29 +157,29 @@ const ManagerSignup = () => {
         setTimeout(intervalId);
       })
       .catch((err) => {
-        console.error("메일 발송 에러:", err);
-        Swal.fire({ icon: "error", text: "메일 발송 중 오류가 발생했습니다." });
+        console.error('메일 발송 에러:', err);
+        Swal.fire({ icon: 'error', text: '메일 발송 중 오류가 발생했습니다.' });
       });
   };
 
   const handleVerifyMail = () => {
     if (mailAuth !== 2) {
       Swal.fire({
-        icon: "warning",
-        text: "먼저 인증 이메일 전송 버튼을 눌러주세요.",
+        icon: 'warning',
+        text: '먼저 인증 이메일 전송 버튼을 눌러주세요.',
       });
       return;
     }
 
     if (String(mailAuthCode) === mailAuthInput) {
-      Swal.fire({ icon: "success", text: "이메일 인증이 완료되었습니다!" });
+      Swal.fire({ icon: 'success', text: '이메일 인증이 완료되었습니다!' });
       setMailAuth(3);
       window.clearInterval(timeout);
       setTimeout(null);
     } else {
       Swal.fire({
-        icon: "error",
-        text: "인증번호가 일치하지 않습니다. 다시 확인해주세요.",
+        icon: 'error',
+        text: '인증번호가 일치하지 않습니다. 다시 확인해주세요.',
       });
     }
   };
@@ -193,8 +190,8 @@ const ManagerSignup = () => {
       setMailAuthCode(null);
       setTimeout(null);
       Swal.fire({
-        icon: "error",
-        text: "인증 시간이 만료되었습니다. 다시 시도해주세요.",
+        icon: 'error',
+        text: '인증 시간이 만료되었습니다. 다시 시도해주세요.',
       });
       setMailAuth(0);
     }
@@ -202,7 +199,7 @@ const ManagerSignup = () => {
 
   const showTime = () => {
     const min = Math.floor(time / 60);
-    const sec = String(time % 60).padStart(2, "0");
+    const sec = String(time % 60).padStart(2, '0');
     return `${min}:${sec}`;
   };
 
@@ -210,8 +207,8 @@ const ManagerSignup = () => {
     // 💡 길이가 12자(하이픈 포함)인지 검증
     if (member.storeOwnerNo.length < 12) {
       Swal.fire({
-        icon: "warning",
-        text: "사업자번호 10자리를 모두 입력해주세요.",
+        icon: 'warning',
+        text: '사업자번호 10자리를 모두 입력해주세요.',
       });
       return;
     }
@@ -221,21 +218,21 @@ const ManagerSignup = () => {
   const storeDupCheck = () => {
     axios
       .get(
-        `${import.meta.env.VITE_BACKSERVER}/api/member/storeDupCheck?storeOwnerNo=${member.storeOwnerNo}`,
+        `${import.meta.env.VITE_BACKSERVER}/member/storeDupCheck?storeOwnerNo=${member.storeOwnerNo}`,
       )
       .then((res) => {
-        if (res.data === null || res.data === "") {
-          Swal.fire({ icon: "success", text: "가입 가능한 사업자번호입니다!" });
+        if (res.data === null || res.data === '') {
+          Swal.fire({ icon: 'success', text: '가입 가능한 사업자번호입니다!' });
           setCheckStoreOwnerNo(2);
         } else {
-          Swal.fire({ icon: "error", text: "중복된 사업자 번호 입니다." });
+          Swal.fire({ icon: 'error', text: '중복된 사업자 번호 입니다.' });
         }
       })
       .catch((err) => {
         console.log(err);
         Swal.fire({
-          icon: "error",
-          text: "사업자 번호 중복 확인 중 서버 오류가 발생했습니다.",
+          icon: 'error',
+          text: '사업자 번호 중복 확인 중 서버 오류가 발생했습니다.',
         });
       });
   };
@@ -243,51 +240,51 @@ const ManagerSignup = () => {
   const getIdMessage = () => {
     if (!member.memberId)
       return {
-        text: isSubmitted ? "아이디를 입력하세요." : "\u00A0",
+        text: isSubmitted ? '아이디를 입력하세요.' : '\u00A0',
         isError: isSubmitted,
       };
     if (!idRegex.test(member.memberId))
-      return { text: "영문, 숫자 조합 8자 이상 입력해주세요.", isError: true };
+      return { text: '영문, 숫자 조합 8자 이상 입력해주세요.', isError: true };
     if (checkId !== 2)
-      return { text: "중복 확인 버튼을 눌러주세요.", isError: true };
-    return { text: "사용 가능한 아이디입니다.", isError: false };
+      return { text: '중복 확인 버튼을 눌러주세요.', isError: true };
+    return { text: '사용 가능한 아이디입니다.', isError: false };
   };
 
   const getPwMessage = () => {
     if (!member.memberPw)
       return {
-        text: isSubmitted ? "비밀번호를 입력하세요." : "\u00A0",
+        text: isSubmitted ? '비밀번호를 입력하세요.' : '\u00A0',
         isError: isSubmitted,
       };
     if (!pwRegex.test(member.memberPw))
       return {
-        text: "영문 대/소문자, 숫자, 특수기호 포함 10자 이상 입력해주세요.",
+        text: '영문 대/소문자, 숫자, 특수기호 포함 10자 이상 입력해주세요.',
         isError: true,
       };
-    return { text: "사용 가능한 비밀번호입니다.", isError: false };
+    return { text: '사용 가능한 비밀번호입니다.', isError: false };
   };
 
   const getPwReMessage = () => {
     if (!memberPwRe)
       return {
-        text: isSubmitted ? "비밀번호 확인을 입력하세요." : "\u00A0",
+        text: isSubmitted ? '비밀번호 확인을 입력하세요.' : '\u00A0',
         isError: isSubmitted,
       };
     if (member.memberPw !== memberPwRe)
-      return { text: "비밀번호와 일치하지 않습니다.", isError: true };
-    return { text: "비밀번호와 일치합니다.", isError: false };
+      return { text: '비밀번호와 일치하지 않습니다.', isError: true };
+    return { text: '비밀번호와 일치합니다.', isError: false };
   };
 
   const getEmailMessage = () => {
     if (!member.memberEmail)
       return {
-        text: isSubmitted ? "이메일을 입력하세요." : "\u00A0",
+        text: isSubmitted ? '이메일을 입력하세요.' : '\u00A0',
         isError: isSubmitted,
       };
     if (!emailRegex.test(member.memberEmail))
-      return { text: "올바른 이메일 형식을 입력해주세요.", isError: true };
+      return { text: '올바른 이메일 형식을 입력해주세요.', isError: true };
     if (mailAuth === 0)
-      return { text: "인증 이메일을 전송해주세요.", isError: true };
+      return { text: '인증 이메일을 전송해주세요.', isError: true };
     if (mailAuth === 2) {
       return {
         text: `인증번호를 입력하세요. (남은 시간: ${showTime()})`,
@@ -295,60 +292,60 @@ const ManagerSignup = () => {
       };
     }
     if (mailAuth === 3)
-      return { text: "이메일 인증이 완료되었습니다.", isError: false };
-    return { text: "\u00A0", isError: false };
+      return { text: '이메일 인증이 완료되었습니다.', isError: false };
+    return { text: '\u00A0', isError: false };
   };
 
   // 💡 길이 제한 메시지 추가 (하이픈 포함된 길이 검사)
   const getStoreOwnerNoMessage = () => {
     if (!member.storeOwnerNo.trim())
       return {
-        text: isSubmitted ? "사업자번호를 입력하세요." : "\u00A0",
+        text: isSubmitted ? '사업자번호를 입력하세요.' : '\u00A0',
         isError: isSubmitted,
       };
     if (member.storeOwnerNo.length < 12)
-      return { text: "사업자번호 10자리를 모두 입력해주세요.", isError: true };
+      return { text: '사업자번호 10자리를 모두 입력해주세요.', isError: true };
     if (checkStoreOwnerNo !== 2)
-      return { text: "사업자번호 중복 확인을 눌러주세요.", isError: true };
-    return { text: "가입 가능한 사업자 번호입니다.", isError: false };
+      return { text: '사업자번호 중복 확인을 눌러주세요.', isError: true };
+    return { text: '가입 가능한 사업자 번호입니다.', isError: false };
   };
 
   const getPhoneMessage = () => {
     if (!member.memberPhone.trim())
       return {
-        text: isSubmitted ? "휴대폰 번호를 입력하세요." : "\u00A0",
+        text: isSubmitted ? '휴대폰 번호를 입력하세요.' : '\u00A0',
         isError: isSubmitted,
       };
     if (member.memberPhone.length < 13)
-      return { text: "연락처 11자리를 모두 입력해주세요.", isError: true };
-    return { text: "\u00A0", isError: false };
+      return { text: '연락처 11자리를 모두 입력해주세요.', isError: true };
+    return { text: '\u00A0', isError: false };
   };
 
   const getStoreNameMessage = () => {
     if (!member.storeName.trim())
       return {
-        text: isSubmitted ? "상호명을 입력하세요." : "\u00A0",
+        text: isSubmitted ? '상호명을 입력하세요.' : '\u00A0',
         isError: isSubmitted,
       };
-    return { text: "\u00A0", isError: false };
+    return { text: '\u00A0', isError: false };
   };
 
   const getMemberNameMessage = () => {
     if (!member.memberName.trim())
       return {
-        text: isSubmitted ? "대표자성명을 입력하세요." : "\u00A0",
+        text: isSubmitted ? '대표자성명을 입력하세요.' : '\u00A0',
         isError: isSubmitted,
       };
-    return { text: "\u00A0", isError: false };
+    return { text: '\u00A0', isError: false };
   };
 
   const getOpeningDateMessage = () => {
     if (!member.openingDate.trim())
       return {
-        text: isSubmitted ? "개업일자를 선택하세요." : "\u00A0",
+        text: isSubmitted ? '개업일자를 선택하세요.' : '\u00A0',
         isError: isSubmitted,
       };
-    return { text: "\u00A0", isError: false };
+    return { text: '\u00A0', isError: false };
   };
 
   const idStatus = getIdMessage();
@@ -389,8 +386,8 @@ const ManagerSignup = () => {
       openingDateStatus.isError
     ) {
       Swal.fire({
-        icon: "warning",
-        text: "입력하신 정보를 다시 확인해주세요.",
+        icon: 'warning',
+        text: '입력하신 정보를 다시 확인해주세요.',
       });
       return;
     }
@@ -403,22 +400,22 @@ const ManagerSignup = () => {
 
     axios
       .post(
-        `${import.meta.env.VITE_BACKSERVER}/api/member/signupManager`,
+        `${import.meta.env.VITE_BACKSERVER}/member/signupManager`,
         submitData,
       )
       .then((res) => {
         Swal.fire({
-          icon: "success",
-          text: "사업자 회원가입이 완료되었습니다!",
+          icon: 'success',
+          text: '사업자 회원가입이 완료되었습니다!',
         }).then(() => {
-          navigate("/login");
+          navigate('/login');
         });
       })
       .catch((err) => {
-        console.error("회원가입 에러:", err);
+        console.error('회원가입 에러:', err);
         Swal.fire({
-          icon: "error",
-          text: "회원가입 처리 중 오류가 발생했습니다.",
+          icon: 'error',
+          text: '회원가입 처리 중 오류가 발생했습니다.',
         });
       });
   };
@@ -426,8 +423,8 @@ const ManagerSignup = () => {
   const [showCalendar, setShowCalendar] = useState(false);
   const handleDateChange = (date) => {
     const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
     const formattedDate = `${year}-${month}-${day}`;
 
     setMember({ ...member, openingDate: formattedDate });
@@ -438,8 +435,8 @@ const ManagerSignup = () => {
     <div className={styles.signupPage}>
       <h1
         className={styles.mainLogo}
-        onClick={() => navigate("/")}
-        style={{ cursor: "pointer" }}
+        onClick={() => navigate('/')}
+        style={{ cursor: 'pointer' }}
       >
         GreenCarry
       </h1>
@@ -472,8 +469,8 @@ const ManagerSignup = () => {
                 </button>
               </div>
               <p
-                className={`${styles.statusMessage} ${idStatus.isError ? styles.errorMessage : ""}`}
-                style={!idStatus.isError ? { color: "#3a8a56" } : {}}
+                className={`${styles.statusMessage} ${idStatus.isError ? styles.errorMessage : ''}`}
+                style={!idStatus.isError ? { color: '#3a8a56' } : {}}
               >
                 {idStatus.text}
               </p>
@@ -493,8 +490,8 @@ const ManagerSignup = () => {
                 placeholder="영문 대/소문자, 숫자, 특수기호 포함 10자 이상"
               />
               <p
-                className={`${styles.statusMessage} ${pwStatus.isError ? styles.errorMessage : ""}`}
-                style={!pwStatus.isError ? { color: "#3a8a56" } : {}}
+                className={`${styles.statusMessage} ${pwStatus.isError ? styles.errorMessage : ''}`}
+                style={!pwStatus.isError ? { color: '#3a8a56' } : {}}
               >
                 {pwStatus.text}
               </p>
@@ -514,8 +511,8 @@ const ManagerSignup = () => {
                 placeholder="비밀번호 재입력"
               />
               <p
-                className={`${styles.statusMessage} ${pwReStatus.isError ? styles.errorMessage : ""}`}
-                style={!pwReStatus.isError ? { color: "#3a8a56" } : {}}
+                className={`${styles.statusMessage} ${pwReStatus.isError ? styles.errorMessage : ''}`}
+                style={!pwReStatus.isError ? { color: '#3a8a56' } : {}}
               >
                 {pwReStatus.text}
               </p>
@@ -542,7 +539,7 @@ const ManagerSignup = () => {
                   onClick={handleSendMail}
                   disabled={mailAuth === 1 || mailAuth === 3}
                 >
-                  {mailAuth === 0 ? "인증 메일 전송" : "재전송"}
+                  {mailAuth === 0 ? '인증 메일 전송' : '재전송'}
                 </button>
               </div>
 
@@ -568,9 +565,9 @@ const ManagerSignup = () => {
               </div>
 
               <p
-                className={`${styles.statusMessage} ${emailStatus.isError ? styles.errorMessage : ""}`}
+                className={`${styles.statusMessage} ${emailStatus.isError ? styles.errorMessage : ''}`}
                 style={
-                  !emailStatus.isError ? { color: "var(--color-brand)" } : {}
+                  !emailStatus.isError ? { color: 'var(--color-brand)' } : {}
                 }
               >
                 {emailStatus.text}
@@ -591,7 +588,7 @@ const ManagerSignup = () => {
                 placeholder="숫자만 입력하세요"
               />
               <p
-                className={`${styles.statusMessage} ${phoneStatus.isError ? styles.errorMessage : ""}`}
+                className={`${styles.statusMessage} ${phoneStatus.isError ? styles.errorMessage : ''}`}
               >
                 {phoneStatus.text}
               </p>
@@ -622,8 +619,8 @@ const ManagerSignup = () => {
                 </button>
               </div>
               <p
-                className={`${styles.statusMessage} ${storeOwnerNoStatus.isError ? styles.errorMessage : ""}`}
-                style={!storeOwnerNoStatus.isError ? { color: "#3a8a56" } : {}}
+                className={`${styles.statusMessage} ${storeOwnerNoStatus.isError ? styles.errorMessage : ''}`}
+                style={!storeOwnerNoStatus.isError ? { color: '#3a8a56' } : {}}
               >
                 {storeOwnerNoStatus.text}
               </p>
@@ -642,7 +639,7 @@ const ManagerSignup = () => {
                 className={styles.inputUnderline}
               />
               <p
-                className={`${styles.statusMessage} ${storeNameStatus.isError ? styles.errorMessage : ""}`}
+                className={`${styles.statusMessage} ${storeNameStatus.isError ? styles.errorMessage : ''}`}
               >
                 {storeNameStatus.text}
               </p>
@@ -661,7 +658,7 @@ const ManagerSignup = () => {
                 className={styles.inputUnderline}
               />
               <p
-                className={`${styles.statusMessage} ${memberNameStatus.isError ? styles.errorMessage : ""}`}
+                className={`${styles.statusMessage} ${memberNameStatus.isError ? styles.errorMessage : ''}`}
               >
                 {memberNameStatus.text}
               </p>
@@ -699,7 +696,7 @@ const ManagerSignup = () => {
                           : new Date()
                       }
                       formatDay={(locale, date) =>
-                        date.toLocaleString("en", { day: "numeric" })
+                        date.toLocaleString('en', { day: 'numeric' })
                       }
                     />
                   </div>
@@ -707,7 +704,7 @@ const ManagerSignup = () => {
               </div>
 
               <p
-                className={`${styles.statusMessage} ${openingDateStatus.isError ? styles.errorMessage : ""}`}
+                className={`${styles.statusMessage} ${openingDateStatus.isError ? styles.errorMessage : ''}`}
               >
                 {openingDateStatus.text}
               </p>

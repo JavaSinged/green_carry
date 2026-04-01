@@ -1,10 +1,10 @@
-import React, { useEffect } from "react";
-import "./FindAccount.css";
-import { Link, useNavigate } from "react-router-dom";
-import Swal from "sweetalert2";
-import api from "../../utils/accessToken";
+import React, { useEffect } from 'react';
+import './FindAccount.css';
+import { Link, useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2';
+import api from '../../utils/accessToken';
 // 🌟 방금 만든 Store 불러오기
-import useAccountStore from "../../store/accountStore";
+import useAccountStore from '../../store/accountStore';
 
 const Account = () => {
   const navigate = useNavigate();
@@ -50,33 +50,33 @@ const Account = () => {
   const formatTime = (seconds) => {
     const min = Math.floor(seconds / 60);
     const sec = seconds % 60;
-    return `${min}:${sec < 10 ? "0" : ""}${sec}`;
+    return `${min}:${sec < 10 ? '0' : ''}${sec}`;
   };
 
   const sendCode = () => {
     if (!formData.memberEmail) {
-      Swal.fire({ icon: "warning", title: "이메일을 입력해주세요." });
+      Swal.fire({ icon: 'warning', title: '이메일을 입력해주세요.' });
       return;
     }
 
     api
-      .post("/api/member/sendAuthCode", { memberEmail: formData.memberEmail })
+      .post('/member/sendAuthCode', { memberEmail: formData.memberEmail })
       .then(() => {
         setTimeLeft(180);
         setIsTimerActive(true);
-        setInputCode("");
+        setInputCode('');
         Swal.fire({
-          icon: "success",
-          title: isCodeSent ? "인증번호 재전송 완료" : "인증번호 발송 완료",
-          text: "입력하신 이메일로 인증번호가 발송되었습니다. (3분 이내 입력)",
+          icon: 'success',
+          title: isCodeSent ? '인증번호 재전송 완료' : '인증번호 발송 완료',
+          text: '입력하신 이메일로 인증번호가 발송되었습니다. (3분 이내 입력)',
         });
         setIsCodeSent(true);
       })
       .catch(() => {
         Swal.fire({
-          icon: "error",
-          title: "발송 실패",
-          text: "잠시 후 다시 시도해주세요.",
+          icon: 'error',
+          title: '발송 실패',
+          text: '잠시 후 다시 시도해주세요.',
         });
       });
   };
@@ -84,50 +84,50 @@ const Account = () => {
   const handleVerifySubmit = (e) => {
     e.preventDefault();
     if (!inputCode) {
-      Swal.fire({ icon: "warning", title: "인증번호를 입력해주세요." });
+      Swal.fire({ icon: 'warning', title: '인증번호를 입력해주세요.' });
       return;
     }
     if (timeLeft <= 0) {
       Swal.fire({
-        icon: "error",
-        title: "시간 만료",
-        text: "인증 시간이 초과되었습니다.",
+        icon: 'error',
+        title: '시간 만료',
+        text: '인증 시간이 초과되었습니다.',
       });
       return;
     }
 
     api
-      .post("/api/member/verifyCode", {
+      .post('/member/verifyCode', {
         memberEmail: formData.memberEmail,
         inputCode,
       })
       .then((res) => {
-        if (res.data === true || res.data === "true") {
+        if (res.data === true || res.data === 'true') {
           setIsTimerActive(false);
 
-          if (activeTab === "findId") {
+          if (activeTab === 'findId') {
             api
-              .post("/api/member/findId", {
+              .post('/member/findId', {
                 memberName: formData.memberName,
                 memberEmail: formData.memberEmail,
               })
               .then((resId) => {
                 Swal.fire({
-                  icon: "success",
-                  title: "아이디 찾기 성공",
+                  icon: 'success',
+                  title: '아이디 찾기 성공',
                   html: `고객님의 아이디는 <b>${resId.data}</b> 입니다.`,
-                }).then(() => navigate("/login"));
+                }).then(() => navigate('/login'));
               })
               .catch(() =>
                 Swal.fire({
-                  icon: "error",
-                  title: "조회 실패",
-                  text: "일치하는 정보가 없습니다.",
+                  icon: 'error',
+                  title: '조회 실패',
+                  text: '일치하는 정보가 없습니다.',
                 }),
               );
           } else {
             api
-              .post("/api/member/checkMember", {
+              .post('/member/checkMember', {
                 memberId: formData.memberId,
                 memberEmail: formData.memberEmail,
               })
@@ -136,32 +136,32 @@ const Account = () => {
                   setIsVerified(true);
                 else
                   Swal.fire({
-                    icon: "error",
-                    title: "인증 실패",
-                    text: "정보가 일치하는 회원이 없습니다.",
+                    icon: 'error',
+                    title: '인증 실패',
+                    text: '정보가 일치하는 회원이 없습니다.',
                   });
               })
               .catch(() =>
                 Swal.fire({
-                  icon: "error",
-                  title: "오류",
-                  text: "문제가 발생했습니다.",
+                  icon: 'error',
+                  title: '오류',
+                  text: '문제가 발생했습니다.',
                 }),
               );
           }
         } else {
           Swal.fire({
-            icon: "error",
-            title: "인증 실패",
-            text: "인증번호가 일치하지 않습니다.",
+            icon: 'error',
+            title: '인증 실패',
+            text: '인증번호가 일치하지 않습니다.',
           });
         }
       })
       .catch(() =>
         Swal.fire({
-          icon: "error",
-          title: "오류",
-          text: "문제가 발생했습니다.",
+          icon: 'error',
+          title: '오류',
+          text: '문제가 발생했습니다.',
         }),
       );
   };
@@ -171,30 +171,30 @@ const Account = () => {
     if (pwError || matchError || !newPassword || !confirmPassword) return;
 
     api
-      .post("/api/member/resetPw", {
+      .post('/member/resetPw', {
         memberId: formData.memberId,
         memberPw: newPassword,
       })
       .then((res) => {
         if (res.data === -1) {
           Swal.fire({
-            icon: "warning",
-            title: "변경 불가",
-            text: "기존과 동일한 비밀번호입니다. 다른 비밀번호를 입력해주세요.",
+            icon: 'warning',
+            title: '변경 불가',
+            text: '기존과 동일한 비밀번호입니다. 다른 비밀번호를 입력해주세요.',
           });
           return; // 여기서 함수를 끝내서, 아래의 '성공' 팝업이 안 뜨게 막습니다.
         }
         Swal.fire({
-          icon: "success",
-          title: "변경 완료",
-          text: "비밀번호가 성공적으로 변경되었습니다.",
-        }).then(() => navigate("/login"));
+          icon: 'success',
+          title: '변경 완료',
+          text: '비밀번호가 성공적으로 변경되었습니다.',
+        }).then(() => navigate('/login'));
       })
       .catch(() =>
         Swal.fire({
-          icon: "error",
-          title: "변경 실패",
-          text: "비밀번호 변경 중 서버 오류가 발생했습니다.",
+          icon: 'error',
+          title: '변경 실패',
+          text: '비밀번호 변경 중 서버 오류가 발생했습니다.',
         }),
       );
   };
@@ -204,19 +204,19 @@ const Account = () => {
       <h1
         className="logo"
         style={{
-          textAlign: "center",
-          padding: "30px 0",
+          textAlign: 'center',
+          padding: '30px 0',
           margin: 0,
-          fontSize: "2.2rem",
+          fontSize: '2.2rem',
           fontWeight: 700,
         }}
       >
         <Link
           to="/"
           style={{
-            textDecoration: "none",
-            color: "inherit",
-            fontFamily: "var(--font-logo)",
+            textDecoration: 'none',
+            color: 'inherit',
+            fontFamily: 'var(--font-logo)',
           }}
         >
           GreenCarry
@@ -225,10 +225,10 @@ const Account = () => {
 
       <div className="main-content find-content">
         {/* 좌측 정보 섹션 생략 없이 그대로 유지 */}
-        <section className="info-section" style={{ width: "320px" }}>
+        <section className="info-section" style={{ width: '320px' }}>
           <h2
             className="main-title"
-            style={{ fontFamily: "var(--font-title)" }}
+            style={{ fontFamily: 'var(--font-title)' }}
           >
             계정을 잊으셨나요?
             <br />
@@ -244,19 +244,19 @@ const Account = () => {
           </div>
         </section>
 
-        <section className="find-card" style={{ width: "450px" }}>
+        <section className="find-card" style={{ width: '450px' }}>
           <div className="find-tabs">
             <button
               type="button"
-              className={`find-tab-btn ${activeTab === "findId" ? "active" : ""}`}
-              onClick={() => handleTabChange("findId")}
+              className={`find-tab-btn ${activeTab === 'findId' ? 'active' : ''}`}
+              onClick={() => handleTabChange('findId')}
             >
               아이디 찾기
             </button>
             <button
               type="button"
-              className={`find-tab-btn ${activeTab === "resetPw" ? "active" : ""}`}
-              onClick={() => handleTabChange("resetPw")}
+              className={`find-tab-btn ${activeTab === 'resetPw' ? 'active' : ''}`}
+              onClick={() => handleTabChange('resetPw')}
             >
               비밀번호 재설정
             </button>
@@ -264,7 +264,7 @@ const Account = () => {
 
           {!isVerified ? (
             <form className="find-form" onSubmit={handleVerifySubmit}>
-              {activeTab === "findId" ? (
+              {activeTab === 'findId' ? (
                 <input
                   type="text"
                   name="memberName"
@@ -301,7 +301,7 @@ const Account = () => {
                   className="verify-send-btn"
                   onClick={sendCode}
                 >
-                  {isCodeSent ? "재전송" : "인증번호 전송"}
+                  {isCodeSent ? '재전송' : '인증번호 전송'}
                 </button>
               </div>
 
@@ -315,10 +315,10 @@ const Account = () => {
                       value={inputCode}
                       onChange={(e) => setInputCode(e.target.value)}
                       required
-                      style={{ paddingRight: "75px" }}
+                      style={{ paddingRight: '75px' }}
                     />
                     <span
-                      className={`timer-text ${timeLeft < 30 ? "danger" : ""}`}
+                      className={`timer-text ${timeLeft < 30 ? 'danger' : ''}`}
                     >
                       {formatTime(timeLeft)}
                     </span>
@@ -326,9 +326,9 @@ const Account = () => {
                   <button
                     type="submit"
                     className="submit-verify-btn"
-                    style={{ marginTop: "15px" }}
+                    style={{ marginTop: '15px' }}
                   >
-                    {activeTab === "findId" ? "아이디 찾기" : "인증 확인"}
+                    {activeTab === 'findId' ? '아이디 찾기' : '인증 확인'}
                   </button>
                 </>
               )}
@@ -337,28 +337,28 @@ const Account = () => {
             <form className="find-form" onSubmit={handlePasswordChangeSubmit}>
               <h3
                 style={{
-                  textAlign: "center",
-                  color: "#333",
-                  marginBottom: "5px",
-                  marginTop: "0",
-                  fontFamily: "var(--font-sub)",
+                  textAlign: 'center',
+                  color: '#333',
+                  marginBottom: '5px',
+                  marginTop: '0',
+                  fontFamily: 'var(--font-sub)',
                 }}
               >
                 새 비밀번호 설정
               </h3>
               <p
                 style={{
-                  textAlign: "center",
-                  color: "var(--text-sub)",
-                  fontSize: "0.85rem",
-                  marginTop: "0",
-                  marginBottom: "20px",
+                  textAlign: 'center',
+                  color: 'var(--text-sub)',
+                  fontSize: '0.85rem',
+                  marginTop: '0',
+                  marginBottom: '20px',
                 }}
               >
                 새롭게 사용할 비밀번호를 입력해주세요.
               </p>
 
-              <div style={{ marginBottom: "15px" }}>
+              <div style={{ marginBottom: '15px' }}>
                 <input
                   type="password"
                   className="full-input"
@@ -370,9 +370,9 @@ const Account = () => {
                 {pwError && (
                   <div
                     style={{
-                      color: "#e53935",
-                      fontSize: "0.75rem",
-                      marginTop: "5px",
+                      color: '#e53935',
+                      fontSize: '0.75rem',
+                      marginTop: '5px',
                     }}
                   >
                     {pwError}
@@ -380,7 +380,7 @@ const Account = () => {
                 )}
               </div>
 
-              <div style={{ marginBottom: "15px" }}>
+              <div style={{ marginBottom: '15px' }}>
                 <input
                   type="password"
                   className="full-input"
@@ -392,9 +392,9 @@ const Account = () => {
                 {matchError && (
                   <div
                     style={{
-                      color: "#e53935",
-                      fontSize: "0.75rem",
-                      marginTop: "5px",
+                      color: '#e53935',
+                      fontSize: '0.75rem',
+                      marginTop: '5px',
                     }}
                   >
                     {matchError}
@@ -430,7 +430,7 @@ const Account = () => {
         {/* 우측 공백 맞춤 섹션 */}
         <section
           className="illustration-section"
-          style={{ width: "320px", visibility: "hidden" }}
+          style={{ width: '320px', visibility: 'hidden' }}
         ></section>
       </div>
     </div>
