@@ -5,7 +5,6 @@ import CloseIcon from "@mui/icons-material/Close";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import useCartStore from "../../store/useCartStore";
-import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function MenuModal({ isOpen, onClose, menuData }) {
