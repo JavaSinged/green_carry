@@ -7,19 +7,12 @@ export default function UserLayout() {
     <div className={styles.container}>
       {/* 👈 왼쪽 고정 사이드바 */}
       <aside className={styles.sidebar}>
-        <h2
-          className={styles.sidebarTitle}
-          onClick={() => {
-            navigate("/mypage/user");
-          }}
-        >
-          마이페이지
-        </h2>
-
+        <h2 className={styles.sidebarTitle}>마이페이지</h2>
         <ul>
           <li>
             <NavLink
-              to="/mypage/orders"
+              to="/mypage/user"
+              end
               className={({ isActive }) => (isActive ? styles.activeMenu : "")}
             >
               에코포인트
