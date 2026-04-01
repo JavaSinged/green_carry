@@ -99,17 +99,21 @@ export const AuthProvider = ({ children }) => {
 
     // 3. 만료로 인한 로그아웃일 때
     if (isExpired) {
-      // 🚩 수동 로그아웃 중이 아닐 때만 팝업 실행
       if (!isLoggingOut.current && localStorage.getItem("accessToken")) {
-        localStorage.clear();
-        setIsLogin(false);
-        setUser(null);
+        // 🚨 [핵심 보안 패치] 팝업이 뜨기 직전, 가장 중요한 '토큰'만 즉시 파기합니다!
+        // 이렇게 하면 화면(isLogin)은 유지되어 팝업이 예쁘게 뜨지만,
+        // 사용자가 확인을 안 누르고 도망가도(새로고침) 다음 접속 시 무조건 비회원이 됩니다.
+        localStorage.removeItem("accessToken");
 
         fireStyledSwal(
           "warning",
           "세션 만료",
           "로그인 유지 시간이 만료되어 자동 로그아웃 되었습니다.",
         ).then(() => {
+          // 🌟 확인을 누르면 나머지 찌꺼기 정보도 모두 지우고 완벽하게 메인으로 이동
+          localStorage.clear();
+          setIsLogin(false);
+          setUser(null);
           window.location.replace("/");
         });
       }
