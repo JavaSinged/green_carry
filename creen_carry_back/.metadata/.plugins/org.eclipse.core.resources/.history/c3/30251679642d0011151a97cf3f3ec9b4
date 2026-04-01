@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.iei.member.model.dao.MemberDao">
+
+	<select id="loginMember" resultType="member">
+		SELECT *
+		FROM MEMBER_TBL
+		WHERE MEMBER_ID = #{memberId}
+
+		<if test='!memberId.equals("admin1111")'>
+			AND MEMBER_GRADE = #{memberGrade}
+		</if>
+
+
+	</select>
+
+	<select id="findId" resultType="string">
+		SELECT MEMBER_ID
+		FROM MEMBER_TBL
+		WHERE MEMBER_NAME = #{memberName}
+		AND MEMBER_EMAIL = #{memberEmail}
+	</select>
+
+	<update id="resetPassword">
+		UPDATE MEMBER_TBL
+		SET MEMBER_PW = #{memberPw}
+		WHERE
+		MEMBER_ID = #{memberId}
+	</update>
+
+	<select id="checkMember" resultType="int">
+		SELECT COUNT(*)
+		FROM MEMBER_TBL
+		WHERE MEMBER_ID = #{memberId}
+		AND MEMBER_EMAIL = #{memberEmail}
+	</select>
+	
+	<select id="selectOneMember" resultType="member">
+	    select * from member_tbl where member_id = #{memberId}
+	</select>
+	
+	<select id="kdaksdsk"></select>
+
+
+
+
+</mapper>
