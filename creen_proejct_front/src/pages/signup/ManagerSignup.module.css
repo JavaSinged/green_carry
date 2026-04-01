@@ -1,4 +1,4 @@
-/* ManagerSignup.module.css */
+/* NormalUserSignup.module.css (또는 ManagerSignup.module.css) */
 
 .signupPage {
   min-height: 100vh;
@@ -6,9 +6,10 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  /* 배경에 어두운 오버레이 추가 (첫 번째 CSS 기준) */
   background:
     linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)),
-    url('/image/login/loginsign.jpg') no-repeat center center/cover;
+    url("/image/login/loginsign.jpg") no-repeat center center/cover;
   padding: 40px 20px;
   font-family: var(--font-body);
 }
@@ -24,7 +25,7 @@
 
 .card {
   background-color: var(--color-bg);
-  border-radius: 30px;
+  border-radius: 30px; /* 더 부드러운 곡선으로 통일 */
   padding: 50px 60px;
   width: 100%;
   max-width: 600px;
@@ -35,6 +36,7 @@
   font-family: var(--font-title);
   text-align: center;
   font-size: 1.8rem;
+  font-weight: normal;
   margin-bottom: 45px;
   color: var(--text-main);
 }
@@ -42,7 +44,7 @@
 .form {
   display: flex;
   flex-direction: column;
-  gap: 25px;
+  gap: 25px; /* 간격 통일 */
 }
 
 .fieldGroup {
@@ -54,10 +56,11 @@
 .label {
   width: 110px;
   flex-shrink: 0;
+  text-align: left;
   font-family: var(--font-sub);
-  font-size: 0.95rem;
+  font-size: 1rem; /* 폰트 사이즈 키움 */
   color: var(--text-main);
-  padding-top: 8px;
+  padding-top: 8px; /* 밑줄과 수평 맞춤 */
 }
 
 .inputArea {
@@ -77,24 +80,29 @@
 .inputUnderline {
   flex: 1;
   border: none;
-  border-bottom: 2px solid #eeeeee;
+  border-bottom: 2px solid #eeeeee; /* 밑줄 굵기 통일 */
   padding: 8px 0;
   font-size: 0.95rem;
   outline: none;
   background: transparent;
   color: var(--text-main);
-  transition: border-color 0.3s;
+  font-family: var(--font-body);
+  transition: border-color 0.3s ease;
 }
 
 .inputUnderline:focus {
   border-bottom: 2px solid var(--color-brand);
 }
 
+.inputUnderline:read-only {
+  color: var(--text-sub);
+}
+
 .mt10 {
   margin-top: 10px;
 }
 
-/* 버튼 공통 스타일 */
+/* 버튼 스타일 (첫 번째 CSS 기준 통일) */
 .buttonFilled {
   background-color: var(--color-brand);
   color: #ffffff;
@@ -105,6 +113,7 @@
   font-size: 0.85rem;
   cursor: pointer;
   white-space: nowrap;
+  transition: opacity 0.2s;
 }
 
 .buttonOutlined {
@@ -117,47 +126,20 @@
   font-size: 0.85rem;
   cursor: pointer;
   white-space: nowrap;
+  transition: all 0.2s;
 }
 
-/* 📅 달력 관련 스타일 */
-.dateInputWrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
+.buttonFilled:hover,
+.buttonOutlined:hover {
+  opacity: 0.8;
 }
 
-.muiCalendarIcon {
-  position: absolute;
-  right: 5px;
-  color: var(--color-brand);
-  cursor: pointer;
-  font-size: 20px;
-}
-
-.calendarWrapper {
-  position: absolute;
-  top: 45px;
-  left: 0;
-  z-index: 100;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-  border-radius: 10px;
-  overflow: hidden;
-}
-
-/* react-calendar 내부 스타일 오버라이딩 */
-:global(.react-calendar) {
-  border: none !important;
-  font-family: var(--font-body);
-}
-
-:global(.react-calendar__tile--active) {
-  background: var(--color-brand) !important;
-  color: white !important;
-}
-
-:global(.react-calendar__tile--now) {
-  background: var(--color-surface) !important;
-  color: var(--color-brand) !important;
+.buttonFilled:disabled,
+.buttonOutlined:disabled {
+  background-color: #eee;
+  border-color: #eee;
+  color: #aaa;
+  cursor: not-allowed;
 }
 
 /* 상태 메시지 */
@@ -165,12 +147,7 @@
   font-size: 0.75rem;
   color: var(--text-sub);
   margin-top: 6px;
-  min-height: 1rem;
-}
-
-.errorMessage {
-  color: #e53935;
-  font-weight: 500;
+  min-height: 1rem; /* 메시지 영역 고정으로 레이아웃 흔들림 방지 */
 }
 
 .successMessage {
@@ -178,6 +155,12 @@
   font-weight: 500;
 }
 
+.errorMessage {
+  color: #e53935;
+  font-weight: 500;
+}
+
+/* 하단 가입 버튼 */
 .submitContainer {
   display: flex;
   justify-content: center;
@@ -194,10 +177,103 @@
   font-size: 1.2rem;
   cursor: pointer;
   box-shadow: 0 4px 15px rgba(46, 129, 71, 0.3);
-  transition: all 0.2s;
+  transition:
+    transform 0.2s,
+    background-color 0.2s;
 }
 
 .submitButton:hover {
   background-color: #246a3a;
   transform: translateY(-2px);
+}
+
+/* 달력 팝업 관련 (기존 코드 유지) */
+.dateInputWrapper {
+  position: relative; /* 달력 팝업의 기준점 */
+  width: 350px;
+  display: flex;
+  align-items: center;
+}
+
+.dateInput {
+  cursor: pointer;
+  width: 100%;
+}
+
+.muiCalendarIcon {
+  position: absolute;
+  right: 5px;
+  color: var(--color-brand);
+  cursor: pointer;
+  font-size: 20px !important;
+}
+
+.calendarWrapper {
+  position: absolute;
+  top: -123px;
+  left: 100%;
+  margin-left: 15px;
+  z-index: 1000;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  border: 1px solid #eee;
+}
+
+.calendarWrapper :global(.react-calendar) {
+  border: none;
+  font-family: var(--font-body);
+  width: 280px;
+}
+
+.calendarWrapper :global(.react-calendar__tile--active) {
+  background: var(--color-brand) !important;
+  color: white;
+}
+
+.calendarWrapper :global(.react-calendar__tile--now) {
+  background: #f0f7f2;
+  color: var(--color-brand);
+  font-weight: bold;
+}
+
+/* --- 달력 주말 색상 유지 (토요일 파란색) --- */
+.calendarWrapper :global(.react-calendar__month-view__days__day--weekend) {
+  color: var(--text-main);
+}
+
+/* 일요일 */
+.calendarWrapper
+  :global(.react-calendar__month-view__days__day--weekend:nth-child(7n + 1)) {
+  color: #e53935 !important;
+}
+
+/* 토요일 (이전 수정 요청 사항 유지) */
+.calendarWrapper
+  :global(.react-calendar__month-view__days__day--weekend:nth-child(7n)) {
+  color: #3d75cc !important;
+}
+
+/* 반응형 처리 (첫 번째 CSS 기준) */
+@media (max-width: 600px) {
+  .card {
+    padding: 30px 20px;
+  }
+  .fieldGroup {
+    flex-direction: column;
+  }
+  .label {
+    margin-bottom: 5px;
+  }
+  .dateInputWrapper {
+    width: 100%; /* 모바일에서는 너비 100%로 풀기 */
+  }
+  .calendarWrapper {
+    /* 모바일에서는 옆으로 띄우지 않고 아래로 내리도록 조정할 수 있음 */
+    top: 100%;
+    left: 0;
+    margin-left: 0;
+    margin-top: 5px;
+  }
 }

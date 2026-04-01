@@ -68,7 +68,7 @@
 }
 .deleteSet {
   display: flex;
-  justify-content: flex-end; /* right 대신 flex-end가 flexbox 표준입니다 */
+  justify-content: flex-end;
 }
 
 .delete_btn {
@@ -76,20 +76,16 @@
   margin-top: 15px;
   color: var(--color-bg);
   border-radius: 90px;
-  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
   cursor: pointer;
-
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.3);
   position: relative;
   overflow: hidden;
 
-  /* 버튼 크기 고정 */
   width: 200px;
   height: 45px;
   display: flex;
   justify-content: center;
   align-items: center;
-
-  /* 버튼 자체는 크기(scale)만 변하도록 수정 */
   transition: transform 0.2s ease;
 }
 
@@ -97,7 +93,6 @@
   transform: scale(0.95);
 }
 
-/* [추가 3] 두 글자가 버튼 정중앙에 겹쳐 있도록 설정 */
 .delete_btn span {
   position: absolute;
   transition:
@@ -105,27 +100,24 @@
     transform 0.3s ease;
 }
 
-/* 기본 글자 (마우스 올리기 전) */
 .text_default {
   opacity: 1;
   transform: translateY(0);
 }
 
-/* 호버 글자 (마우스 올리기 전에는 아래로 숨겨둠) */
 .text_hover {
   opacity: 0;
   transform: translateY(20px);
 }
 
-/* 마우스를 올렸을 때 동작 */
 .delete_btn:hover .text_default {
   opacity: 0;
-  transform: translateY(-20px); /* 위로 밀려나며 사라짐 */
+  transform: translateY(-20px);
 }
 
 .delete_btn:hover .text_hover {
   opacity: 1;
-  transform: translateY(0); /* 숨겨뒀던 호버 글자가 제자리로 올라옴 */
+  transform: translateY(0);
 }
 .set_icon {
   text-align: right;
@@ -195,7 +187,7 @@
 /* 변경하기 버튼 (사진에는 없지만 필수 요소라 추가해 드렸습니다!) */
 .submit_btn {
   margin-top: 10px;
-  align-self: center;
+  flex: 1;
   background-color: var(--color-brand);
   color: white;
   border: none;
@@ -204,9 +196,104 @@
   font-size: 15px;
   font-weight: bold;
   cursor: pointer;
-  transition: transform 0.2s ease;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.3);
+  transition: all 0.2s ease;
 }
 
 .submit_btn:hover {
-  transform: scale(0.95); /* 아까 배운 hover 효과 적용! */
+  box-shadow: inset 0px 4px 8px rgba(0, 0, 0, 0.2);
+  transform: scale(0.98);
+}
+/* 우편번호 입력창과 버튼을 나란히 두기 위한 박스 */
+.zip_code_wrapper {
+  flex: 1;
+  display: flex;
+  gap: 15px; /* 입력창과 주소찾기 버튼 사이 간격 */
+}
+
+.zip_code_wrapper .input_wrapper {
+  flex: 2;
+}
+
+/* 주소 찾기 버튼 */
+.find_address_btn {
+  flex: 1;
+  background-color: var(--color-brand);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.find_address_btn:active {
+  transform: scale(0.95);
+}
+
+/* --- 현재 주소지 하단 영역 --- */
+.current_address_section {
+  margin-top: 40px;
+  border-top: 1px solid #f0f0f0;
+  padding-top: 25px;
+}
+
+.current_address_title {
+  font-family: var(--font-sub);
+  font-weight: bold;
+  font-size: 16px;
+  color: var(--text-main);
+  margin-bottom: 15px;
+}
+
+.current_address_box {
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+  padding: 20px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.05);
+  border: 1px solid #f0f0f0;
+}
+
+.home_icon {
+  color: #333;
+  font-size: 24px !important;
+  margin-top: 2px;
+}
+
+.address_info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.address_tag_row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.address_name {
+  font-weight: bold;
+  font-size: 15px;
+  color: var(--text-main);
+}
+
+.address_tag {
+  background-color: var(--color-brand);
+  color: white;
+  font-size: 11px;
+  font-weight: bold;
+  padding: 3px 20px;
+  border-radius: 20px;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.address_detail {
+  margin: 0;
+  font-size: 14px;
+  color: var(--text-sub);
 }

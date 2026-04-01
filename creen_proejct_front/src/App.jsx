@@ -1,31 +1,33 @@
-import './App.css';
-import Header from './components/commons/Header';
-import Footer from './components/commons/Footer';
-import { Route, Routes, Outlet } from 'react-router-dom';
-import Home from './pages/main/Home';
-import StoreView from './pages/main/StoreView';
-import StoreDetail from './pages/main/StoreDetail';
-import NotFound from './pages/error/NotFound';
+import "./App.css";
+import Header from "./components/commons/Header";
+import Footer from "./components/commons/Footer";
+import { Route, Routes, Outlet } from "react-router-dom";
+import Home from "./pages/main/Home";
+import StoreView from "./pages/main/StoreView";
+import StoreDetail from "./pages/main/StoreDetail";
+import NotFound from "./pages/error/NotFound";
 
-import OrderPage from './pages/order/OrderPage';
+import OrderPage from "./pages/order/OrderPage";
+import PaymentPage from "./pages/order/PaymentPage";
+import CheckoutPage from "./pages/order/CheckoutPage";
 
-import Login from './pages/login/login';
-import Account from './pages/login/FindAccount';
-import UserLayout from './components/layout/mypageSidebar/UserLayout';
-import ManagerLayout from './components/layout/mypageSidebar/ManagerLayout';
-import AdminLayout from './components/layout/mypageSidebar/AdminLayout';
-import UserProfile from './pages/mypage/user/UserProfile';
-import UserInfoEdit from './pages/mypage/user/UserInfoEdit';
+import Login from "./pages/login/login";
+import Account from "./pages/login/FindAccount";
+import UserLayout from "./components/layout/mypageSidebar/UserLayout";
+import ManagerLayout from "./components/layout/mypageSidebar/ManagerLayout";
+import AdminLayout from "./components/layout/mypageSidebar/AdminLayout";
+import UserProfile from "./pages/mypage/user/UserProfile";
+import UserInfoEdit from "./pages/mypage/user/UserInfoEdit";
 
-import { AuthProvider } from './context/AuthContext';
-import UserSignup from './pages/signup/UserSignup';
-import ManagerSignup from './pages/signup/ManagerSignup';
-import Signup from './pages/signup/Signup';
-import AdminDashboard from './pages/mypage/admin/AdminDashboard';
-import AdminUserManagement from './pages/mypage/admin/AdminUserManagement';
-import AdminStoreManagement from './pages/mypage/admin/AdminStoreManagement';
-import AdminReviewManagement from './pages/mypage/admin/AdminReviewManagement';
-import AdminContainerManagement from './pages/mypage/admin/AdminContainerManagement';
+import { AuthProvider } from "./context/AuthContext";
+import UserSignup from "./pages/signup/UserSignup";
+import ManagerSignup from "./pages/signup/ManagerSignup";
+import Signup from "./pages/signup/Signup";
+import AdminDashboard from "./pages/mypage/admin/AdminDashboard";
+import AdminUserManagement from "./pages/mypage/admin/AdminUserManagement";
+import AdminStoreManagement from "./pages/mypage/admin/AdminStoreManagement";
+import AdminReviewManagement from "./pages/mypage/admin/AdminReviewManagement";
+import AdminContainerManagement from "./pages/mypage/admin/AdminContainerManagement";
 
 const BasicLayout = () => {
   return (
@@ -57,6 +59,13 @@ function App() {
             <Route path="/storeView" element={<StoreView />} />
             <Route path="/storeDetail" element={<StoreDetail />} />
 
+            {/* store */}
+            <Route path="/storeView" element={<StoreView />}></Route>
+            <Route path="/storeDetail" element={<StoreDetail />}></Route>
+            <Route path="/orderPage" element={<OrderPage />}></Route>
+            <Route path="/paymentPage" element={<PaymentPage />}></Route>
+            <Route path="/checkoutPage" element={<CheckoutPage />}></Route>
+
             {/* 🧑 일반 유저 마이페이지 */}
             <Route path="/mypage/user" element={<UserLayout />}>
               <Route index element={<UserProfile />} />
@@ -86,6 +95,9 @@ function App() {
 
             <Route path="*" element={<NotFound />} />
           </Route>
+
+          {/* 없는 페이지 라우트 */}
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </div>
     </AuthProvider>

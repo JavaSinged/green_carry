@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react';
-import axios from 'axios';
-import styles from './MenuModal.module.css';
-import CloseIcon from '@mui/icons-material/Close';
-import AddIcon from '@mui/icons-material/Add';
-import RemoveIcon from '@mui/icons-material/Remove';
-import useCartStore from '../../store/useCartStore';
+import { useState, useEffect } from "react";
+import axios from "axios";
+import styles from "./MenuModal.module.css";
+import CloseIcon from "@mui/icons-material/Close";
+import AddIcon from "@mui/icons-material/Add";
+import RemoveIcon from "@mui/icons-material/Remove";
+import useCartStore from "../../store/useCartStore";
+import { useNavigate } from "react-router-dom";
 
 export default function MenuModal({ isOpen, onClose, menuData }) {
   const addToCart = useCartStore((state) => state.addToCart);
@@ -13,7 +14,9 @@ export default function MenuModal({ isOpen, onClose, menuData }) {
   const [optionList, setOptionList] = useState([]); // 서버에서 받은 전체 옵션
   const [selectedOptions, setSelectedOptions] = useState([]); // 유저가 선택한 옵션 객체 배열
 
-  // ✅ 모달이 열릴 때 옵션 데이터 가져오기
+  const navigate = useNavigate();
+
+  // ✅ 모달이 열릴 때마다 옵션 초기화
   useEffect(() => {
     if (isOpen && menuData?.menuId) {
       setQuantity(1);
@@ -24,7 +27,7 @@ export default function MenuModal({ isOpen, onClose, menuData }) {
           `${import.meta.env.VITE_BACKSERVER}/stores/${menuData.menuId}/options`,
         )
         .then((res) => {
-          console.log('옵션 데이터:', res.data);
+          console.log("옵션 데이터:", res.data);
           const fetchedOptions = res.data;
           setOptionList(fetchedOptions);
 
@@ -34,14 +37,14 @@ export default function MenuModal({ isOpen, onClose, menuData }) {
             setSelectedOptions([defaultSize]);
           }
         })
-        .catch((err) => console.error('옵션 로딩 실패:', err));
+        .catch((err) => console.error("옵션 로딩 실패:", err));
     }
   }, [isOpen, menuData]);
 
   // 스크롤 방지
   useEffect(() => {
-    document.body.style.overflow = isOpen ? 'hidden' : 'auto';
-    return () => (document.body.style.overflow = 'auto');
+    document.body.style.overflow = isOpen ? "hidden" : "auto";
+    return () => (document.body.style.overflow = "auto");
   }, [isOpen]);
 
   if (!isOpen || !menuData) return null;
@@ -76,14 +79,14 @@ export default function MenuModal({ isOpen, onClose, menuData }) {
   const unitPrice = menuData.menuPrice + optionsPriceSum;
   const totalPrice = unitPrice * quantity;
 
-  // 2. 다회용기 옵션(이름에 '다회용' 포함)이 선택되었는지 체크
-  const isReusableSelected = selectedOptions.some((opt) =>
-    opt.optionName.includes('다회용'),
-  );
-  const baseCarbonG = menuData.menuCarbon ?? 100; // DTO 변수명 맞춤
-  const carbonTotal = isReusableSelected
-    ? Math.max(0, baseCarbonG - 15) * quantity
-    : baseCarbonG * quantity;
+  // 탄소 계산 (다회용 용기 사용 시 15g 감소)
+  const baseCarbonG = menuData.carbonPer100g ?? 100;
+  const carbonTotal =
+    (reusable
+      ? Math.max(0, baseCarbonG - 15) * quantity
+      : baseCarbonG * quantity) -
+    (ecoSide ? 10 : 0) -
+    (ecoDisposable ? 10 : 0);
 
   const handleAddToCart = () => {
     const cartItem = {
@@ -92,11 +95,15 @@ export default function MenuModal({ isOpen, onClose, menuData }) {
       name: menuData.menuName,
       quantity,
       totalPrice,
-      carbonSaved: isReusableSelected ? 15 * quantity : 0,
-      // 💡 장바구니에 담을 때 선택된 옵션들의 이름도 같이 저장 (나중에 영수증에 보여주기 위함)
-      selectedOptionNames: selectedOptions.map((o) => o.optionName).join(', '),
+
+      unitPrice,
+      carbonSaved:
+        (reusable ? 15 * quantity : 0) +
+        (ecoSide ? 10 : 0) +
+        (ecoDisposable ? 10 : 0),
     };
     addToCart(cartItem);
+
     onClose();
   };
 
@@ -124,7 +131,7 @@ export default function MenuModal({ isOpen, onClose, menuData }) {
               <img
                 src={menuData.menuImage}
                 alt="메뉴"
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                style={{ width: "100%", height: "100%", objectFit: "cover" }}
               />
             )}
           </div>
@@ -146,7 +153,7 @@ export default function MenuModal({ isOpen, onClose, menuData }) {
               {sizeOptions.map((opt) => (
                 <label
                   key={opt.optionNo}
-                  className={`${styles.option_row} ${selectedOptions.find((o) => o.optionNo === opt.optionNo) ? styles.selected : ''}`}
+                  className={`${styles.option_row} ${selectedOptions.find((o) => o.optionNo === opt.optionNo) ? styles.selected : ""}`}
                 >
                   <input
                     type="radio"
@@ -162,7 +169,7 @@ export default function MenuModal({ isOpen, onClose, menuData }) {
                       ? `+${opt.optionPrice.toLocaleString()}원`
                       : opt.optionPrice < 0
                         ? `${opt.optionPrice.toLocaleString()}원`
-                        : '기본'}
+                        : "기본"}
                   </span>
                 </label>
               ))}
@@ -176,7 +183,7 @@ export default function MenuModal({ isOpen, onClose, menuData }) {
               {addOnOptions.map((opt) => (
                 <label
                   key={opt.optionNo}
-                  className={`${styles.option_row} ${selectedOptions.find((o) => o.optionNo === opt.optionNo) ? styles.selected : ''}`}
+                  className={`${styles.option_row} ${selectedOptions.find((o) => o.optionNo === opt.optionNo) ? styles.selected : ""}`}
                 >
                   <input
                     type="checkbox"
@@ -201,7 +208,7 @@ export default function MenuModal({ isOpen, onClose, menuData }) {
               {ecoOptions.map((opt) => (
                 <label
                   key={opt.optionNo}
-                  className={`${styles.option_row} ${selectedOptions.find((o) => o.optionNo === opt.optionNo) ? styles.selected : ''}`}
+                  className={`${styles.option_row} ${selectedOptions.find((o) => o.optionNo === opt.optionNo) ? styles.selected : ""}`}
                 >
                   <input
                     type="checkbox"
@@ -214,14 +221,14 @@ export default function MenuModal({ isOpen, onClose, menuData }) {
                   {/* 에코 포인트는 임시로 20P 고정, 다회용기는 가격(500원 등) 표시 */}
                   <span
                     className={
-                      opt.optionName.includes('다회용')
+                      opt.optionName.includes("다회용")
                         ? styles.price_diff
                         : styles.eco_point
                     }
                   >
                     {opt.optionPrice > 0
                       ? `+${opt.optionPrice.toLocaleString()}원`
-                      : '+20P'}
+                      : "+20P"}
                   </span>
                 </label>
               ))}

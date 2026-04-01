@@ -1,21 +1,21 @@
-import { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import axios from 'axios';
-import styles from './StoreView.module.css';
-import SearchIcon from '@mui/icons-material/Search';
-import MenuModal from '../../components/layout/MenuModal';
-import CartBar from '../../components/layout/ui/CartBar';
+import { useState, useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
+import axios from "axios";
+import styles from "./StoreView.module.css";
+import SearchIcon from "@mui/icons-material/Search";
+import MenuModal from "../../components/layout/MenuModal";
+import CartBar from "../../components/layout/ui/CartBar";
 
 export default function StoreView() {
   const location = useLocation();
   const storeId = location.state?.storeId || 1;
 
   const [menuList, setMenuList] = useState([]);
-  const [categories, setCategories] = useState(['전체']);
+  const [categories, setCategories] = useState(["전체"]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedMenu, setSelectedMenu] = useState(null);
-  const [selectedCategory, setSelectedCategory] = useState('전체');
-  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState("전체");
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -25,17 +25,74 @@ export default function StoreView() {
       .then((res) => {
         setMenuList(res.data);
         const uniqueCategories = [
-          '전체',
+          "전체",
           ...new Set(res.data.map((item) => item.menuCategory)),
         ];
         setCategories(uniqueCategories);
       })
-      .catch((err) => console.error('메뉴 로딩 실패:', err));
+      .catch((err) => console.error("메뉴 로딩 실패:", err));
   }, [storeId]);
 
   const filteredMenu = menuList.filter((item) => {
+    // import { useState } from "react";
+    // import { Link } from "react-router-dom";
+    // import styles from "./StoreView.module.css";
+    // import SearchIcon from "@mui/icons-material/Search";
+    // import MenuModal from "../../components/layout/MenuModal";
+    // import CartBar from "../../components/layout/ui/CartBar";
+    // import useCartStore from "../../store/useCartStore";
+
+    // // ✅ basePrice, description, carbonPer100g 등 상세 정보를 여기서 관리
+    // const MENU_DATA = [
+    //   {
+    //     id: 1,
+    //     name: "비건 샐러드",
+    //     basePrice: 12400,
+    //     category: "메인",
+    //     description: "제철 채소와 유기농 드레싱으로 만든 건강한 샐러드",
+    //     carbonPer100g: 80,
+    //   },
+    //   {
+    //     id: 2,
+    //     name: "두부 스테이크",
+    //     basePrice: 15000,
+    //     category: "메인",
+    //     description: "국산 두부를 직화로 구운 고단백 비건 스테이크",
+    //     carbonPer100g: 60,
+    //   },
+    //   {
+    //     id: 3,
+    //     name: "감자 튀김",
+    //     basePrice: 5000,
+    //     category: "사이드",
+    //     description: "바삭하게 튀긴 국내산 감자 튀김",
+    //     carbonPer100g: 40,
+    //   },
+    //   {
+    //     id: 4,
+    //     name: "콜라",
+    //     basePrice: 2000,
+    //     category: "음료",
+    //     description: "시원한 탄산음료",
+    //     carbonPer100g: 20,
+    //   },
+    // ];
+
+    // const CATEGORIES = ["전체", "메인", "사이드", "음료"];
+
+    // export default function StoreView() {
+    //   const [isModalOpen, setIsModalOpen] = useState(false);
+    //   const [selectedMenu, setSelectedMenu] = useState(null); // ✅ ID 대신 객체 전체 저장
+    //   const [selectedCategory, setSelectedCategory] = useState("전체");
+    //   const [searchTerm, setSearchTerm] = useState("");
+    //   // const { cart, clearCart } = useCartStore((state) => ({
+    //   //   cart: state.cart,
+    //   //   clearCart: state.clearCart
+    //   // }));
+    //   const filteredMenu = MENU_DATA.filter((item) => {
+
     const isCategoryMatch =
-      selectedCategory === '전체' || item.menuCategory === selectedCategory;
+      selectedCategory === "전체" || item.menuCategory === selectedCategory;
     const isSearchMatch = item.menuName
       .toLowerCase()
       .includes(searchTerm.toLowerCase());
@@ -46,7 +103,8 @@ export default function StoreView() {
     setSelectedMenu(menu);
     setIsModalOpen(true);
   };
-
+  const { cart } = useCartStore();
+  console.log(cart);
   return (
     <div className={styles.page_container}>
       {/* 상점 정보 영역 */}
@@ -86,7 +144,7 @@ export default function StoreView() {
             {categories.map((cat) => (
               <button
                 key={cat}
-                className={`${styles.filter_btn} ${selectedCategory === cat ? styles.active : ''}`}
+                className={`${styles.filter_btn} ${selectedCategory === cat ? styles.active : ""}`}
                 onClick={() => setSelectedCategory(cat)}
               >
                 {cat}
@@ -108,9 +166,9 @@ export default function StoreView() {
                     src={menu.menuImage}
                     alt={menu.menuName}
                     style={{
-                      width: '100%',
-                      height: '100%',
-                      objectFit: 'cover',
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
                     }}
                   />
                 )}
@@ -123,7 +181,7 @@ export default function StoreView() {
                 {menu.menuInfo && (
                   <p
                     className={styles.menu_desc}
-                    style={{ fontSize: '12px', color: '#666', margin: '4px 0' }}
+                    style={{ fontSize: "12px", color: "#666", margin: "4px 0" }}
                   >
                     {menu.menuInfo}
                   </p>
@@ -133,7 +191,7 @@ export default function StoreView() {
           ))}
           {filteredMenu.length === 0 && (
             <p
-              style={{ textAlign: 'center', marginTop: '20px', color: '#888' }}
+              style={{ textAlign: "center", marginTop: "20px", color: "#888" }}
             >
               해당 메뉴가 없습니다.
             </p>

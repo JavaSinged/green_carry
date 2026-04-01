@@ -1,15 +1,17 @@
+import styles from "./UserInfoEdit.module.css";
 import AccountCircleSharpIcon from '@mui/icons-material/AccountCircleSharp';
 import BorderColorIcon from '@mui/icons-material/BorderColor';
-import styles from "./UserInfoEdit.module.css";
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
-import { useState } from 'react';
 import Collapse from '@mui/material/Collapse';
+import HomeIcon from '@mui/icons-material/Home';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export default function UserInfoEdit() {
-
+  const navigate = useNavigate();
   const [openPwSet, setopenPwSet] = useState(false);
   const [openAddSet, setopenAddSet] = useState(false);
   const togglePwSet = () => setopenPwSet(!openPwSet);
@@ -24,16 +26,31 @@ export default function UserInfoEdit() {
     newPw: "",
     confirmPw: ""
   });
-  const handlePwChange = (e) => {
-    const { name, value } = e.target;
-    setPwData({ ...pwData, [name]: value });
-  }
-
+  const [addressData, setAddressDate] = useState({
+    zipCode: "",
+    address: "",
+    detailAddress: ""
+  });
   const userInfo = {
     email: "aaa@gmail.com",
     name: "김이름",
     phoneNumber: "010-0000-0000"
   };
+  const handleAddressChange = (e) => {
+    const { name, value } = e.target;
+    setAddressDate({ ...addressData, [name]: value });
+  }
+  const handlePwChange = (e) => {
+    const { name, value } = e.target;
+    setPwData({ ...pwData, [name]: value });
+  }
+  const handleDeleteClick = () => {
+    const isConfirmed = window.confirm("정말로 탈퇴하시겠습니까? 데이터는 복구할 수 없습니다 ㅜㅜ");
+    if (isConfirmed) {
+      navigate("/nooo");
+    }
+  };
+
   return (
     <div className={styles.right}>
       <section className={styles.right_main}>
@@ -61,7 +78,6 @@ export default function UserInfoEdit() {
           </div>
           <Collapse in={openPwSet} timeout="auto" unmountOnExit>
             <div className={styles.pw_content_box}>
-              {/* 여기에 비밀번호 변경 Input들을 넣으시면 됩니다 */}
               <div className={styles.pw_form_container}>
                 {/* 현재 비밀번호 */}
                 <div className={styles.pw_input_row}>
@@ -75,8 +91,8 @@ export default function UserInfoEdit() {
                       onChange={handlePwChange}
                       placeholder="현재 비밀번호 입력"
                     />
-
                     <div className={styles.eye_icon}
+                      //아이콘
                       onClick={() => setShowCurrentPw(!showCurrentPw)}
                     >
                       {showCurrentPw ? <Visibility /> : <VisibilityOff />}
@@ -117,9 +133,12 @@ export default function UserInfoEdit() {
                     </div>
                   </div>
                 </div>
-
-                {/* [추가 팁] 변경 완료 버튼도 하나 필요하겠죠? */}
-                <button className={styles.submit_btn}>변경하기</button>
+                <div className={styles.pw_input_row}>
+                  <label></label>
+                  <button className={styles.submit_btn}>
+                    변경하기
+                  </button>
+                </div>
               </div>
             </div>
           </Collapse>
@@ -135,14 +154,79 @@ export default function UserInfoEdit() {
           </div>
           <Collapse in={openAddSet} timeout="auto" unmountOnExit>
             <div className={styles.add_content_box}>
-              {/* 여기에 주소 변경 Input들을 넣으시면 됩니다 */}
-              <p>주소 변경 양식이 들어갈 자리입니다.</p>
+              <div className={styles.pw_form_container}> {/* 클래스 재활용! */}
+
+                {/* 1. 우편번호 & 주소 찾기 버튼 */}
+                <div className={styles.pw_input_row}>
+                  <label>우편번호</label>
+                  {/* 우편번호 입력창은 짧아야 하므로 wrapper와 button을 나란히 배치 */}
+                  <div className={styles.zip_code_wrapper}>
+                    <div className={styles.input_wrapper}>
+                      <input
+                        type="text"
+                        name="zipCode"
+                        value={addressData.zipCode}
+                        onChange={handleAddressChange}
+                      />
+                    </div>
+                    <button className={styles.find_address_btn}>주소 찾기</button>
+                  </div>
+                </div>
+
+                {/* 2. 주소 */}
+                <div className={styles.pw_input_row}>
+                  <label>주소</label>
+                  <div className={styles.input_wrapper}>
+                    <input
+                      type="text"
+                      name="address"
+                      value={addressData.address}
+                      onChange={handleAddressChange}
+                    />
+                  </div>
+                </div>
+
+                {/* 3. 상세 주소 */}
+                <div className={styles.pw_input_row}>
+                  <label>상세 주소</label>
+                  <div className={styles.input_wrapper}>
+                    <input
+                      type="text"
+                      name="detailAddress"
+                      value={addressData.detailAddress}
+                      onChange={handleAddressChange}
+                    />
+                  </div>
+                </div>
+
+                {/* 4. 주소 추가 버튼 */}
+                <div className={styles.pw_input_row}>
+                  <label></label>
+                  <button className={styles.submit_btn}>주소 추가</button>
+                </div>
+
+              </div>
+
+              {/* 5. 현재 주소지 표시 영역 */}
+              <div className={styles.current_address_section}>
+                <p className={styles.current_address_title}>현재 주소지</p>
+                <div className={styles.current_address_box}>
+                  <HomeIcon className={styles.home_icon} />
+                  <div className={styles.address_info}>
+                    <div className={styles.address_tag_row}>
+                      <span className={styles.address_name}>집</span>
+                      <span className={styles.address_tag}>현재 주소</span>
+                    </div>
+                    <p className={styles.address_detail}>서울시 종로구 대왕빌딩 301</p>
+                  </div>
+                </div>
+              </div>
             </div>
           </Collapse>
         </div>
       </section>
       <div className={styles.deleteSet}>
-        <div className={styles.delete_btn}>
+        <div className={styles.delete_btn} onClick={handleDeleteClick}>
           <span className={styles.text_hover}>정말 탈퇴하시겠어요? 😢</span>
           <span className={styles.text_default}>회원 탈퇴</span>
         </div>
