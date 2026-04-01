@@ -40,6 +40,41 @@ public class MemberService {
         // ✨ 로그인 실패 시: null 리턴
         return null;
     }
+
+	public int insertManager(Member member) {
+		String memberPw = member.getMemberPw();
+		System.out.println(memberPw);
+		String encPw=passwordEncoder.encode(memberPw);
+		System.out.println(encPw);
+		member.setMemberPw(encPw);
+		int result = memberDao.insertManager(member);
+		System.out.println(member);
+		
+		return result;
+	}
+
+	public Member storeDupCheck(int storeOwnerNo) {
+		Member member = memberDao.storeDupCheck(storeOwnerNo);
+		return member;
+	}
+    //user 아이디 중복체크
+	public Member selectOneMember(String memberId) {
+		Member member = memberDao.selectOneMember(memberId);
+		return member;
+	}
+
+	public int insertUser(Member member) {
+		String memberPw = member.getMemberPw();
+		String encPw=passwordEncoder.encode(memberPw);
+		member.setMemberPw(encPw);
+		int result = memberDao.insertUser(member);
+		return result;
+	}
+
+	public Member emailDupCheck(String memberEmail) {
+		Member member = memberDao.emailDupCheck(memberEmail);
+		return member;
+	}
 }
 
 
