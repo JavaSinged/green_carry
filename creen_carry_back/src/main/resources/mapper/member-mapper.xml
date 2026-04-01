@@ -38,6 +38,12 @@
 	<select id="selectOneMember" resultType="member">
 	    select * from member_tbl where member_id = #{memberId}
 	</select>
+	
+	<update id="updatePassword">
+    UPDATE member_tbl 
+    SET member_pw = #{encodedNewPw} 
+    WHERE member_id = #{memberId}
+</update>
 
 
 

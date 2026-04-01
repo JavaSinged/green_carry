@@ -7,6 +7,8 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,11 +26,17 @@ import kr.co.iei.member.model.service.MemberService;
 @CrossOrigin(value="*") // 리액트 접근 허용
 public class MemberController {
 
+    private final BCryptPasswordEncoder passwordEncoder;
+
 	@Autowired
     private MemberService memberService;
 
     @Autowired
-    private JwtUtil jwtUtil; // ✨ JwtUtil 주입
+    private JwtUtil jwtUtil;
+
+    MemberController(BCryptPasswordEncoder passwordEncoder) {
+        this.passwordEncoder = passwordEncoder;
+    } // ✨ JwtUtil 주입
 
     //1.로그인기능
     @PostMapping("/login")
@@ -133,5 +141,25 @@ public class MemberController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("회원 정보 없음");
         }
     }
+    @PostMapping("/updatePassword")
+    public ResponseEntity<?> updatePassword(@RequestBody Map<String, String> data) {
+        // 프론트에서 보낸 데이터 추출
+        String memberId = data.get("memberId"); 
+        String currentPw = data.get("currentPw");
+        String newPw = data.get("newPw");
+
+        // 서비스 호출 (결과에 따라 메시지 반환)
+        try {
+            boolean result = memberService.updatePassword(memberId, currentPw, newPw);
+            if (result) {
+                return ResponseEntity.ok("SUCCESS");
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("비밀번호 변경 실패");
+            }
+        } catch (IllegalArgumentException e) {
+            // 현재 비밀번호가 틀린 경우 서비스에서 던진 메시지 처리
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
     
+    }
 }

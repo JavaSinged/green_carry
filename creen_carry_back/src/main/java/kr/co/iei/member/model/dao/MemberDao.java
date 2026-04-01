@@ -18,4 +18,6 @@ public interface MemberDao {
 
 	Member selectOneMember(String memberId);
 
+	int updatePassword(String memberId, String encodedNewPw);
+
 }

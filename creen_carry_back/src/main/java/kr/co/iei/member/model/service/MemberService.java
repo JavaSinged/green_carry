@@ -127,6 +127,25 @@ public class MemberService {
 		Member member = memberDao.selectOneMember(memberId);
 		return member;
 	}
+	@Transactional
+	public boolean updatePassword(String memberId, String currentPw, String newPw) {
+	    // 1. DB에서 현재 암호화된 비밀번호 조회 (기존에 만들어둔 selectOneMember 활용)
+	    Member member = memberDao.selectOneMember(memberId);
+	    
+	    // 2. 현재 비밀번호 일치 확인 (BCryptPasswordEncoder 사용)
+	    if (!passwordEncoder.matches(currentPw, member.getMemberPw())) {
+	        throw new IllegalArgumentException("CURRENT_PASSWORD_MISMATCH");
+	    }
+
+	    // 3. 새 비밀번호 암호화
+	    String encodedNewPw = passwordEncoder.encode(newPw);
+	    
+	    // 4. DAO를 통해 업데이트 실행
+	    int result = memberDao.updatePassword(memberId, encodedNewPw);
+	    
+	    return result > 0;
+	}
+
 }
 
 
