@@ -123,6 +123,10 @@ public class MemberService {
         
         return false;
     }
+	public Member selectOneMember(String memberId) {
+		Member member = memberDao.selectOneMember(memberId);
+		return member;
+	}
 }
 
 

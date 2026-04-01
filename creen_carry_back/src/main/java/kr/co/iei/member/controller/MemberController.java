@@ -8,9 +8,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import kr.co.iei.member.model.vo.Member;
@@ -116,6 +118,20 @@ public class MemberController {
         boolean isMatch = memberService.checkAuthCode(email, inputCode);
         
         return ResponseEntity.ok(isMatch);
+    }
+    
+    @GetMapping("/getMemberInfo")
+    public ResponseEntity<?> getMemberInfo(@RequestParam String memberId) {
+        // 🌟 이미 만들어둔 selectOneMember를 서비스에서 호출
+    	System.out.println("현재 정보를 조회할 회원의 아이디 : " + memberId);
+        Member member = memberService.selectOneMember(memberId);
+        
+        if (member != null) {
+            // 보안상 비밀번호는 제거하고 보낼 수도 있습니다.
+            return ResponseEntity.ok(member);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("회원 정보 없음");
+        }
     }
     
 }
