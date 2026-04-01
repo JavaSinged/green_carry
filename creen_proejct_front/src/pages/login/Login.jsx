@@ -78,6 +78,7 @@ const Login = () => {
 
           setIsLogin(true);
           setUser({
+            memberId: loginUser.memberId,
             memberName: loginUser.memberName,
             memberGrade: loginUser.memberGrade,
           });

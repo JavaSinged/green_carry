@@ -14,12 +14,15 @@ export default function UserInfoEdit() {
   const [memberInfo, setMemberInfo] = useState(null); // DB에서 가져올 상세 정보
   const [loading, setLoading] = useState(true);
 
-  // 🌟 컴포넌트 마운트 시 DB 조회
   useEffect(() => {
+    console.log(user);
     if (user && user.memberId) {
       api
-        .get(`/api/member/getMemberInfo`, user.memberId)
+        .get(`/api/member/getMemberInfo`, {
+          params: { memberId: user.memberId }, // 🌟 객체 형태로 params를 담아야 함!
+        })
         .then((res) => {
+          console.log("불러온 데이터:", res.data); // 디버깅용
           setMemberInfo(res.data);
           setLoading(false);
         })
