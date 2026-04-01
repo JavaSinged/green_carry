@@ -1,14 +1,16 @@
+/* 상단 메인 대시보드 영역 */
 .right_main {
   background-color: var(--color-brand);
-  color: white;
+  color: var(--color-bg); /* 가독성을 위해 흰색 유지 */
   padding: 30px;
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-start;
   gap: 15px 100px;
-  border-radius: 12px;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 24px; /* Layout과 통일감을 위해 24px로 조정 */
+  box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.08);
 }
+
 .icon {
   width: 50px;
   height: 50px;
@@ -16,170 +18,50 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #5cb875;
+  /* 브랜드 컬러보다 살짝 밝은 느낌으로 강조 */
+  background-color: rgba(255, 255, 255, 0.2);
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
 }
+
 .icon svg {
-  font-size: 2rem;
-  color: white;
+  font-size: 1.8rem;
+  color: var(--color-bg);
 }
+
 .icon_content {
   display: flex;
-  gap: 10px;
+  gap: 12px;
+  align-items: center;
 }
+
 .dashboard {
   text-align: left;
 }
 
 .dashboard_title {
-  font-size: 12px;
-  margin: 3px;
-}
-
-.dashboard_value {
-  font-size: 20px;
-  margin: 3px;
-}
-
-.dashbboard_subtitle {
-  font-size: 12px;
-  margin: 3px;
-}
-
-/*서브 3줄*/
-
-.my_point {
-  background-color: var(--color-brand);
-  color: white;
-  margin-top: 30px;
-  padding: 20px;
-  border-radius: 12px;
-}
-.my_point > span {
-  font-size: 24px;
-  font-weight: bold;
-  width: auto;
-}
-.my_point > p {
-  font-size: 24px;
-  margin-bottom: 0px;
-  text-align: left;
-}
-.right_sub {
-  margin: auto;
-}
-.my_eco {
-  background-color: white;
-  color: #222222;
-  margin-top: 10px;
-  padding: 23px;
-  border-radius: 12px;
-  font-size: 24px;
-  font-weight: bold;
-  width: auto;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-  display: flex;
-  justify-content: space-between;
-}
-/* --- 하단 서브 메뉴 공통 래퍼 (그림자 처리) --- */
-.collapse_wrapper {
-  background-color: white;
-  margin-top: 15px;
-  border-radius: 12px;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-  overflow: hidden; /* 모서리 둥글게 깎인 거 안 튀어나가게 */
-}
-
-/* --- 클릭하는 헤더 부분 (에코 포인트란?, 적립 내역) --- */
-.collapse_header {
-  padding: 20px 25px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  cursor: pointer;
-  font-size: 18px; /* 글자 크기 약간 조정 */
-  font-weight: bold;
-  color: #222;
-}
-
-.history_sub {
-  font-size: 14px;
-  font-weight: normal;
-  color: #888;
-  margin-left: 10px;
-}
-
-/* --- 1. 에코 포인트 내용 스타일 --- */
-.eco_content_box {
-  padding: 0 25px 30px 25px;
-  font-size: 15px;
-  color: #111;
-  line-height: 1.8;
+  font-family: var(--font-title);
+  font-size: 13px;
+  margin: 0 0 4px 0;
+  opacity: 0.9;
   font-weight: 500;
 }
 
-.eco_content_box p {
-  margin: 15px 0;
+.dashboard_value {
+  font-family: var(--font-title); /* Jalnan 적용 */
+  font-size: 22px;
+  margin: 0;
 }
 
-.eco_slogan {
-  font-weight: bold;
-  color: #222;
-  margin-top: 25px !important;
+.dashbboard_subtitle {
+  font-size: 11px;
+  margin: 4px 0 0 0;
+  opacity: 0.8;
 }
 
-/* --- 2. 적립 내역 리스트 스타일 --- */
-.history_list {
-  padding: 0 25px 20px 25px;
-  display: flex;
-  flex-direction: column;
-  gap: 15px; /* 아이템 사이 간격 */
-}
-
-.history_item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 0;
-  font-size: 16px;
-  font-weight: bold;
-  color: #111;
-}
-
-.history_left {
-  display: flex;
-  align-items: center;
-  gap: 10px; /* 가게 아이콘과 글자 사이 간격 */
-}
-
-.store_icon {
-  color: #333;
-}
-
-.history_date {
-  font-size: 14px;
-  font-weight: normal;
-  color: #888;
-  margin-left: 15px;
-}
-
-.plus_point {
-  color: #5cb875; /* 초록색 플러스 포인트 */
-}
-.point_history span {
-  font-size: 16px;
-  color: #6b6666;
-}
-.my_icon {
-  cursor: pointer;
-}
-.hs_icon {
-  cursor: pointer;
-}
-/* --- 게이지 바 스타일--- */
+/* 게이지 바 스타일 */
 .gauge_container {
   width: 100%;
-  margin-top: 20px;
+  margin-top: 25px;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
@@ -188,21 +70,143 @@
 
 .gauge_bg {
   width: 100%;
-  height: 8px;
-  background-color: rgba(255, 255, 255, 0.4);
+  height: 10px;
+  background-color: rgba(255, 255, 255, 0.3);
   border-radius: 10px;
   overflow: hidden;
 }
 
 .gauge_fill {
   height: 100%;
-  background-color: #ffffff;
+  background-color: var(--color-point); /* 포인트 컬러(노란색) 적용으로 강조 */
   border-radius: 10px;
   transition: width 1s ease-in-out;
 }
 
 .gauge_info {
+  font-family: var(--font-title);
   font-size: 13px;
+  color: var(--color-bg);
+  font-weight: bolder;
+}
+
+/* 하단 에코 포인트 영역 */
+.right_sub {
+  margin-top: 20px;
+}
+
+.my_point {
+  background-color: var(--color-surface); /* 연한 그린 배경 */
+  color: var(--color-brand); /* 진한 그린 텍스트 */
+  margin-top: 30px;
+  padding: 25px;
+  border-radius: 24px;
+}
+
+.my_point > span {
+  font-family: var(--font-sub);
+  font-size: 1.2rem;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.my_point > p {
+  font-family: var(--font-title);
+  font-size: 1.6rem;
   font-weight: bold;
-  color: white;
+  margin: 0;
+  color: var(--text-main);
+}
+
+/* 콜랩스 메뉴 공통 */
+.collapse_wrapper {
+  background-color: var(--color-bg);
+  margin-top: 15px;
+  border-radius: 20px;
+  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.05);
+  border: 1px solid #f0f0f0;
+  overflow: hidden;
+}
+
+.collapse_header {
+  padding: 22px 25px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  font-family: var(--font-sub);
+  font-size: 17px;
+  color: var(--text-main);
+}
+
+.history_sub {
+  font-size: 13px;
+  font-weight: normal;
+  color: var(--text-sub);
+  margin-left: 10px;
+}
+
+/* 에코 포인트 설명 박스 */
+.eco_content_box {
+  padding: 0 25px 30px 25px;
+  font-family: var(--font-title);
+  font-size: 15px;
+  color: var(--text-main);
+  line-height: 1.7;
+  font-weight: bold;
+}
+
+.eco_slogan {
+  font-weight: bold;
+  color: var(--color-brand);
+  margin-top: 20px !important;
+}
+
+/* 적립 내역 리스트 */
+.history_list {
+  padding: 0 25px 25px 25px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  font-family: var(--font-title);
+  font-weight: 800;
+}
+
+.history_item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 15px;
+  background-color: #fafafa;
+  border-radius: 12px;
+}
+
+.history_left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--text-main);
+  font-size: 15px;
+}
+
+.store_icon {
+  color: var(--color-brand);
+}
+
+.history_date {
+  font-size: 13px;
+  color: var(--text-sub);
+}
+
+.plus_point {
+  font-family: var(--font-title);
+  color: var(--color-info); /* 정보성 데이터 컬러 적용 */
+  font-size: 16px;
+}
+
+.my_icon,
+.hs_icon {
+  color: var(--text-sub);
+  display: flex;
+  align-items: center;
 }

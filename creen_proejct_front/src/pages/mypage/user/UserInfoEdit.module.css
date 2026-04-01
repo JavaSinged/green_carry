@@ -1,0 +1,317 @@
+.mini_box {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 15px;
+}
+.icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.icon svg {
+  font-size: 150px;
+}
+.right_main {
+  box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.08);
+  border-radius: 24px;
+  padding: 30px;
+  padding-bottom: 20px;
+  margin-bottom: 20px;
+}
+.icon_content {
+  display: flex;
+  align-items: center;
+  font-weight: 500;
+  gap: 13px;
+}
+.dashboard {
+  font-size: 18px;
+  font-family: var(--font-body);
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+.dashboard_email,
+.dashboard_name,
+.dashboard_phoneNumber {
+  margin: 2px;
+}
+.pwSet {
+  padding: 22px 25px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  font-family: var(--font-sub);
+  font-size: 17px;
+  color: var(--text-main);
+  letter-spacing: 0.03em;
+}
+.addSet {
+  padding: 22px 25px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  font-family: var(--font-sub);
+  font-size: 17px;
+  color: var(--text-main);
+  letter-spacing: 0.03em;
+}
+.Wrapper {
+  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.05);
+  border-radius: 20px;
+  background-color: var(--color-bg);
+  border: 1px solid #f0f0f0;
+  overflow: hidden;
+}
+.pw_content_box,
+.add_content_box {
+  padding: 0 25px 30px 25px;
+}
+.deleteSet {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.delete_btn {
+  background-color: var(--color-brand);
+  margin-top: 15px;
+  color: var(--color-bg);
+  border-radius: 90px;
+  cursor: pointer;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.3);
+  position: relative;
+  overflow: hidden;
+
+  width: 200px;
+  height: 45px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: transform 0.2s ease;
+}
+
+.delete_btn:hover {
+  transform: scale(0.95);
+}
+
+.delete_btn span {
+  position: absolute;
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease;
+}
+
+.text_default {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.text_hover {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.delete_btn:hover .text_default {
+  opacity: 0;
+  transform: translateY(-20px);
+}
+
+.delete_btn:hover .text_hover {
+  opacity: 1;
+  transform: translateY(0);
+}
+.set_icon {
+  text-align: right;
+  cursor: pointer;
+}
+/* 폼 전체 컨테이너 */
+.pw_form_container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px; /* 각 줄 사이의 간격 */
+  margin-top: 10px;
+}
+
+/* 라벨과 입력창이 한 줄에 배치되도록 설정 */
+.pw_input_row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* 라벨 (현재 비밀번호, 새 비밀번호 등) */
+.pw_input_row label {
+  width: 130px; /* 라벨 너비를 고정해야 텍스트 박스들이 일렬로 예쁘게 정렬됩니다 */
+  font-family: var(--font-sub);
+  font-size: 14px;
+  letter-spacing: 0.03em;
+  color: var(--text-main);
+}
+
+/* 입력창을 감싸는 초록색 둥근 테두리 박스 */
+.input_wrapper {
+  flex: 1; /* 남은 공간을 모두 차지하도록 설정 */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid var(--color-brand); /* 브랜드 컬러(초록색) 테두리 */
+  border-radius: 20px;
+  padding: 12px 20px;
+  background-color: var(--color-bg);
+}
+
+/* 실제 글자가 입력되는 input 태그 */
+.input_wrapper input {
+  border: none;
+  outline: none; /* 클릭했을 때 생기는 기본 검은 테두리 제거 */
+  background: transparent;
+  width: 90%;
+  font-family: var(--font-body);
+  font-size: 15px;
+  color: var(--text-main);
+}
+
+/* 눈알 아이콘 */
+.eye_icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #555; /* 아이콘 색상 */
+}
+
+/* 아이콘 크기 살짝 조절 */
+.eye_icon svg {
+  font-size: 20px;
+}
+
+/* 변경하기 버튼 (사진에는 없지만 필수 요소라 추가해 드렸습니다!) */
+.submit_btn {
+  margin-top: 10px;
+  flex: 1;
+  background-color: var(--color-brand);
+  color: white;
+  border: none;
+  border-radius: 90px;
+  padding: 12px 30px;
+  font-size: 15px;
+  font-weight: bold;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.3);
+  transition: all 0.2s ease;
+}
+
+.submit_btn:hover {
+  box-shadow: inset 0px 4px 8px rgba(0, 0, 0, 0.2);
+  transform: scale(0.98);
+}
+/* 우편번호 입력창과 버튼을 나란히 두기 위한 박스 */
+.zip_code_wrapper {
+  flex: 1;
+  display: flex;
+  gap: 15px; /* 입력창과 주소찾기 버튼 사이 간격 */
+}
+
+.zip_code_wrapper .input_wrapper {
+  flex: 2;
+}
+
+/* 주소 찾기 */
+.find_address_btn {
+  flex: 1;
+  background-color: var(--color-brand);
+  color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 12px 0;
+  font-family: var(--font-body);
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+
+  /* 중앙 정렬 */
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  /* 애니메이션 설정 */
+  transition: all 0.2s ease;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.3);
+}
+.find_address_btn:hover {
+  filter: brightness(1.1);
+}
+.find_address_btn:active {
+  transform: scale(0.92);
+  box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.current_address_section {
+  margin-top: 40px;
+  border-top: 1px solid #f0f0f0;
+  padding-top: 25px;
+}
+
+.current_address_title {
+  font-family: var(--font-sub);
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  font-size: 16px;
+  color: var(--text-main);
+  margin-bottom: 15px;
+}
+
+.current_address_box {
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+  padding: 20px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.05);
+  border: 1px solid #f0f0f0;
+}
+
+.home_icon {
+  color: #333;
+  font-size: 24px !important;
+  margin-top: 2px;
+}
+
+.address_info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.address_tag_row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.address_name {
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  font-size: 15px;
+  color: var(--text-main);
+}
+
+.address_tag {
+  background-color: var(--color-brand);
+  color: white;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  padding: 3px 20px;
+  border-radius: 20px;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.address_detail {
+  margin: 0;
+  font-size: 14px;
+  color: var(--text-sub);
+}

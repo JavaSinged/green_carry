@@ -69,30 +69,30 @@ function App() {
               {/* <Route path="orders" element={<UserOrders />} /> */}
               {/* /mypage/user/orders */}
               {/* 필요한 메뉴만큼 Route를 추가하세요 */}
-
-              {/* 👨‍🍳 점주 마이페이지 */}
-              {/* <Route path="/mypage/manager" element={<ManagerLayout />}> */}
-              {/* <Route index element={<ManagerDashboard />} />{' '} */}
-              {/* 기본 화면: 통계 메인 */}
-              {/* <Route path="menus" element={<ManagerMenus />} /> */}
-              {/* </Route> */}
-
-              {/* 👮 관리자 마이페이지 */}
-              {/* <Route path="/mypage/admin" element={<AdminLayout />}> */}
-              {/* <Route index element={<AdminMembers />} />{' '} */}
-              {/* 기본 화면: 회원 관리 */}
-              {/* <Route path="stores" element={<AdminStores />} /> */}
-              {/* </Route> */}
-
-              <Route path="*" element={<NotFound />} />
             </Route>
+
+            {/* 👨‍🍳 점주 마이페이지 */}
+            {/* <Route path="/mypage/manager" element={<ManagerLayout />}> */}
+            {/* <Route index element={<ManagerDashboard />} />{' '} */}
+            {/* 기본 화면: 통계 메인 */}
+            {/* <Route path="menus" element={<ManagerMenus />} /> */}
+            {/* </Route> */}
+
+            {/* 👮 관리자 마이페이지 */}
+            {/* <Route path="/mypage/admin" element={<AdminLayout />}> */}
+            {/* <Route index element={<AdminMembers />} />{' '} */}
+            {/* 기본 화면: 회원 관리 */}
+            {/* <Route path="stores" element={<AdminStores />} /> */}
+            {/* </Route> */}
+
+            <Route path="*" element={<NotFound />} />
           </Route>
 
           {/* 없는 페이지 라우트 */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </div>
-    </AuthProvider>
+    </AuthProvider >
   );
 }
 

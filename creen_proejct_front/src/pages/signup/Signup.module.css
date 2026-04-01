@@ -8,7 +8,7 @@ main {
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  background-color: var(--color-surface); /* 배경을 연한 그린으로 */
+  background: url("/image/login/loginsign.jpg") no-repeat center center/cover;
   padding: 20px;
 }
 
@@ -18,11 +18,12 @@ main {
 }
 
 .logo {
-  font-family: var(--font-logo); /* Gaegu 폰트 적용 */
+  font-family: var(--font-logo);
+  color: #ffffff; /* 배경 이미지 위에서 잘 보이도록 화이트 */
   font-size: 3.5rem;
-  color: var(--color-brand);
-  margin: 0;
+  margin-bottom: 20px;
   cursor: pointer;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
 }
 
 .option_paper {

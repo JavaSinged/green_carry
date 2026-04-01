@@ -1,15 +1,17 @@
-/* 1. 로컬 폰트 페이스 정의 (Jalnan, YeogiGothic) */
+/* 1. 로컬 폰트 페이스 정의 */
+/* 티머니 둥근바람 - CDN 방식 */
 @font-face {
-  font-family: 'Jalnan';
-  src: url('/fonts/Jalnan2.otf') format('opentype');
+  font-family: "TMoneyDungunbaram";
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_20-07@1.0/TmoneyRoundWindRegular.woff")
+    format("woff");
   font-weight: normal;
-  font-style: normal;
   font-display: swap;
 }
 
+/* 여기어때 잘난체 (기존 설정 유지 시 사용) */
 @font-face {
-  font-family: 'YeogiGothic';
-  src: url('/fonts//JalnanGothic.otf') format('opentype');
+  font-family: "YeogiGothic";
+  src: url("/fonts/JalnanGothic.otf") format("opentype");
   font-weight: normal;
   font-style: normal;
   font-display: swap;
@@ -17,11 +19,11 @@
 
 /* 2. 전역 변수 설정 (폰트 + 컬러) */
 :root {
-  /* 폰트 시스템 */
-  --font-logo: 'Gaegu', cursive;
-  --font-title: 'Jalnan', sans-serif;
-  --font-sub: 'YeogiGothic', sans-serif;
-  --font-body: 'Pretendard Variable', 'Pretendard', sans-serif;
+  /* 폰트 시스템 수정 */
+  --font-logo: "Gaegu", cursive;
+  --font-title: "TMoneyDungunbaram", sans-serif; /* Jalnan 대신 티머니 적용 */
+  --font-sub: "YeogiGothic", sans-serif;
+  --font-body: "Pretendard Variable", "Pretendard", sans-serif;
 
   /* 컬러 팔레트 */
   --color-brand: #2e8147; /* 브랜드 메인 그린 */
@@ -42,7 +44,15 @@ body {
   color: var(--text-main);
   font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
-  word-break: keep-all;
+  word-break: keep-all; /* 한글 줄바꿈을 단어 단위로 */
+}
+
+/* 폰트 적용 예시: 제목 요소 등에 변수 사용 */
+h1,
+h2,
+h3,
+.title {
+  font-family: var(--font-title);
 }
 
 #root > div {

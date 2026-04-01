@@ -1,28 +1,23 @@
-import React, { useState } from 'react';
-import styles from './UserSignup.module.css';
-import { useNavigate } from 'react-router-dom';
-import { useDaumPostcodePopup } from 'react-daum-postcode';
+import React, { useEffect, useState } from "react";
+import styles from "./UserSignup.module.css";
+import { useNavigate } from "react-router-dom";
+import { useDaumPostcodePopup } from "react-daum-postcode";
+import axios from "axios";
+import Swal from "sweetalert2"; // SweetAlert2 추가
 
 const UserSignup = () => {
   const navigate = useNavigate();
 
   const [member, setMember] = useState({
-    memberId: '',
-    memberPw: '',
-    memberName: '',
-    memberEmail: '',
-    memberAddrCode: '',
-    memberAddr: '',
-    memberDetailAddr: '',
+    memberId: "",
+    memberPw: "",
+    memberName: "",
+    memberEmail: "",
+    memberPhone: "",
+    memberAddrCode: "",
+    memberAddr: "",
+    memberDetailAddr: "",
   });
-  const [memberPwRe, setMemberPwRe] = useState('');
-
-  // 제출 버튼 클릭 여부 (이 값을 기준으로 빈 칸 에러 표시)
-  const [isSubmitted, setIsSubmitted] = useState(false);
-
-  // UI 흐름 제어용 State (백엔드 없이 가짜 상태 관리)
-  const [checkId, setCheckId] = useState(0); // 0: 확인 전, 2: 사용 가능(확인 완료)
-  const [mailAuth, setMailAuth] = useState(0); // 0: 전송 전, 1: 전송 완료(입력 대기), 3: 인증 완료
 
   // 정규식 모음
   const idRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
@@ -30,58 +25,204 @@ const UserSignup = () => {
     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{10,}$/;
   const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
 
+  //아이디 중복검사용(0:중복검사전, 1:아이디 중복, 2: 사용가능한 아이디)
+  const [checkId, setCheckId] = useState(0);
+  //이메일 중복검사용(0:중복검사전, 1:이메일 중복, 2: 사용 가능한 이메일)
+  const [checkEmail, setCheckEmail] = useState(0);
+  //비번확인용
+  const [memberPwRe, setMemberPwRe] = useState("");
+  //이메일 인증 상태관리용
+  const [mailAuth, setMailAuth] = useState(0); //0:메일전송 누르기 전, 1: 전송완료(코드받기 전), 2: 전송완료(코드받은 후), 3: 인증완료된 상태
+  const [mailAuthCode, setMailAuthCode] = useState(null); //인증번호 저장용
+  const [mailAuthInput, setMailAuthInput] = useState(""); //인증번호 input입력값
+  //인증 유효시간 처리
+  const [time, setTime] = useState(180); // 메일인증 유효시간 3분(180초)
+  const [timeout, setTimeout] = useState(null);
+
+  // 제출 버튼 클릭 여부 (이 값을 기준으로 빈 칸 에러 표시)
+  const [isSubmitted, setIsSubmitted] = useState(false);
+
   const inputMember = (e) => {
     const { name, value } = e.target;
+
+    // 💡 휴대폰 번호 자동 하이픈 (010-1234-5678)
+    if (name === "memberPhone") {
+      const onlyNums = value.replace(/[^0-9]/g, ""); // 숫자만 추출
+      let formattedPhone = "";
+
+      if (onlyNums.length < 4) {
+        formattedPhone = onlyNums;
+      } else if (onlyNums.length < 8) {
+        formattedPhone = `${onlyNums.slice(0, 3)}-${onlyNums.slice(3)}`;
+      } else {
+        formattedPhone = `${onlyNums.slice(0, 3)}-${onlyNums.slice(3, 7)}-${onlyNums.slice(7, 11)}`;
+      }
+
+      setMember({ ...member, [name]: formattedPhone });
+      return;
+    }
+
     setMember({ ...member, [name]: value });
 
     // 입력값이 바뀌면 중복확인 및 이메일 인증 상태 초기화
-    if (name === 'memberId') setCheckId(0);
-    if (name === 'memberEmail') setMailAuth(0);
+    if (name === "memberId") setCheckId(0);
+    if (name === "memberEmail") {
+      setMailAuth(0);
+      setCheckEmail(0);
+    }
   };
 
-  // 💡 [복구] 아이디 중복 확인 가짜 로직
+  // 아이디 중복체크
   const handleIdCheck = () => {
+    // 1. 먼저 정규표현식으로 형식 검사
     if (!idRegex.test(member.memberId)) {
-      alert('아이디 형식을 먼저 맞춰주세요.');
+      Swal.fire({ icon: "warning", text: "아이디 형식을 먼저 맞춰주세요." });
       return;
     }
-    alert('사용 가능한 아이디입니다! (UI 테스트)');
-    setCheckId(2);
+
+    axios
+      .get(
+        `${import.meta.env.VITE_BACKSERVER}/api/member/exists?memberId=${member.memberId}`,
+      )
+      .then((res) => {
+        console.log("중복 체크 결과:", res.data);
+
+        // res.data가 true면 중복(사용 불가), false면 사용 가능으로 가정
+        if (res.data) {
+          Swal.fire({ icon: "success", text: "사용 가능한 아이디입니다." });
+          setCheckId(2); // 사용가능
+        } else {
+          Swal.fire({ icon: "error", text: "이미 사용중인 아이디입니다!" });
+          setCheckId(1); // 아이디 중복
+        }
+      })
+      .catch((err) => {
+        console.error("통신 에러:", err);
+        Swal.fire({
+          icon: "error",
+          text: "서버와 통신 중 오류가 발생했습니다.",
+        });
+      });
   };
 
-  // 💡 [복구] 이메일 인증 전송 가짜 로직
-  const handleSendMail = () => {
+  // 1. 이메일 발송 함수
+  const handleSendMail = async () => {
+    // 형식 검사
     if (!emailRegex.test(member.memberEmail)) {
-      alert('올바른 이메일 형식을 먼저 입력해주세요.');
+      Swal.fire({
+        icon: "warning",
+        text: "올바른 이메일 형식을 먼저 입력해주세요.",
+      });
       return;
     }
-    alert('인증 메일이 전송되었습니다. (테스트용: 아무 번호나 입력하세요)');
-    setMailAuth(1);
+
+    if (checkEmail === 0) {
+      try {
+        const res = await axios.get(
+          `${import.meta.env.VITE_BACKSERVER}/api/member/emailDupCheck?memberEmail=${member.memberEmail}`,
+        );
+
+        if (res.data) {
+          setCheckEmail(2);
+        } else {
+          Swal.fire({ icon: "error", text: "이미 사용중인 이메일입니다." });
+          setCheckEmail(1);
+          return;
+        }
+      } catch (err) {
+        console.log(err);
+        return;
+      }
+    }
+
+    setTime(180); // 180초 초기화
+    if (timeout) {
+      window.clearInterval(timeout); // 기존 타이머가 있다면 초기화
+    }
+
+    setMailAuth(1); // 로딩 또는 전송 중 상태 (상황에 따라 2로 바로 넘어가도 됨)
+
+    const obj = { memberEmail: member.memberEmail };
+    axios
+      .post(
+        `${import.meta.env.VITE_BACKSERVER}/api/member/email-verification`,
+        obj,
+      )
+      .then((res) => {
+        console.log("인증번호 발송 성공:", res.data);
+        setMailAuthCode(res.data); // 서버에서 보낸 인증번호 저장
+        setMailAuth(2); // 입력창 활성화 상태
+
+        // 타이머 시작
+        const intervalId = window.setInterval(() => {
+          setTime((prev) => prev - 1);
+        }, 1000);
+        setTimeout(intervalId); // 타이머 멈추기 위해 ID 저장
+      })
+      .catch((err) => {
+        console.error("메일 발송 에러:", err);
+        Swal.fire({ icon: "error", text: "메일 발송 중 오류가 발생했습니다." });
+      });
   };
 
-  // 💡 [복구] 이메일 인증번호 확인 가짜 로직
+  // 2. 이메일 인증번호 확인 함수 (실제 비교)
   const handleVerifyMail = () => {
-    if (mailAuth !== 1) {
-      alert('먼저 인증 이메일 전송 버튼을 눌러주세요.');
+    if (mailAuth !== 2) {
+      Swal.fire({
+        icon: "warning",
+        text: "먼저 인증 이메일 전송 버튼을 눌러주세요.",
+      });
       return;
     }
-    alert('이메일 인증이 완료되었습니다! (UI 테스트)');
-    setMailAuth(3);
+
+    // 서버에서 받은 번호와 사용자가 입력한 번호 비교
+    if (String(mailAuthCode) === mailAuthInput) {
+      Swal.fire({ icon: "success", text: "이메일 인증이 완료되었습니다!" });
+      setMailAuth(3); // 인증 완료 상태
+      window.clearInterval(timeout); // 타이머 멈춤
+      setTimeout(null);
+    } else {
+      Swal.fire({
+        icon: "error",
+        text: "인증번호가 일치하지 않습니다. 다시 확인해주세요.",
+      });
+    }
+  };
+
+  // 3. 타이머 종료 감지 (useEffect)
+  useEffect(() => {
+    if (time === 0) {
+      window.clearInterval(timeout);
+      setMailAuthCode(null); // 인증번호 파기
+      setTimeout(null);
+      Swal.fire({
+        icon: "error",
+        text: "인증 시간이 만료되었습니다. 다시 시도해주세요.",
+      });
+      setMailAuth(0); // 초기 상태로 되돌림
+    }
+  }, [time]);
+
+  // 4. 시간 표시 포맷 함수
+  const showTime = () => {
+    const min = Math.floor(time / 60);
+    const sec = String(time % 60).padStart(2, "0");
+    return `${min}:${sec}`;
   };
 
   // 우편번호 API 설정
   const openPostcode = useDaumPostcodePopup(
-    'https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js',
+    "https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js",
   );
   const handleCompletePostcode = (data) => {
     let fullAddress = data.address;
-    let extraAddress = '';
-    if (data.addressType === 'R') {
-      if (data.bname !== '') extraAddress += data.bname;
-      if (data.buildingName !== '')
+    let extraAddress = "";
+    if (data.addressType === "R") {
+      if (data.bname !== "") extraAddress += data.bname;
+      if (data.buildingName !== "")
         extraAddress +=
-          extraAddress !== '' ? `, ${data.buildingName}` : data.buildingName;
-      fullAddress += extraAddress !== '' ? ` (${extraAddress})` : '';
+          extraAddress !== "" ? `, ${data.buildingName}` : data.buildingName;
+      fullAddress += extraAddress !== "" ? ` (${extraAddress})` : "";
     }
     setMember((prev) => ({
       ...prev,
@@ -97,72 +238,94 @@ const UserSignup = () => {
   const getIdMessage = () => {
     if (!member.memberId)
       return {
-        text: isSubmitted ? '아이디를 입력하세요.' : '\u00A0',
+        text: isSubmitted ? "아이디를 입력하세요." : "\u00A0",
         isError: isSubmitted,
       };
     if (!idRegex.test(member.memberId))
-      return { text: '영문, 숫자 조합 8자 이상 입력해주세요.', isError: true };
+      return { text: "영문, 숫자 조합 8자 이상 입력해주세요.", isError: true };
     if (checkId !== 2)
-      return { text: '중복 확인 버튼을 눌러주세요.', isError: true };
-    return { text: '사용 가능한 아이디입니다.', isError: false };
+      return { text: "중복 확인 버튼을 눌러주세요.", isError: true };
+    return { text: "사용 가능한 아이디입니다.", isError: false };
   };
 
   const getPwMessage = () => {
     if (!member.memberPw)
       return {
-        text: isSubmitted ? '비밀번호를 입력하세요.' : '\u00A0',
+        text: isSubmitted ? "비밀번호를 입력하세요." : "\u00A0",
         isError: isSubmitted,
       };
     if (!pwRegex.test(member.memberPw))
       return {
-        text: '영문 대/소문자, 숫자, 특수기호 포함 10자 이상 입력해주세요.',
+        text: "영문 대/소문자, 숫자, 특수기호 포함 10자 이상 입력해주세요.",
         isError: true,
       };
-    return { text: '사용 가능한 비밀번호입니다.', isError: false };
+    return { text: "사용 가능한 비밀번호입니다.", isError: false };
   };
 
   const getPwReMessage = () => {
     if (!memberPwRe)
       return {
-        text: isSubmitted ? '비밀번호 확인을 입력하세요.' : '\u00A0',
+        text: isSubmitted ? "비밀번호 확인을 입력하세요." : "\u00A0",
         isError: isSubmitted,
       };
     if (member.memberPw !== memberPwRe)
-      return { text: '비밀번호와 일치하지 않습니다.', isError: true };
-    return { text: '비밀번호와 일치합니다.', isError: false };
+      return { text: "비밀번호와 일치하지 않습니다.", isError: true };
+    return { text: "비밀번호와 일치합니다.", isError: false };
   };
 
   const getEmailMessage = () => {
     if (!member.memberEmail)
       return {
-        text: isSubmitted ? '이메일을 입력하세요.' : '\u00A0',
+        text: isSubmitted ? "이메일을 입력하세요." : "\u00A0",
         isError: isSubmitted,
       };
     if (!emailRegex.test(member.memberEmail))
-      return { text: '올바른 이메일 형식을 입력해주세요.', isError: true };
+      return { text: "올바른 이메일 형식을 입력해주세요.", isError: true };
     if (mailAuth === 0)
-      return { text: '인증 이메일을 전송해주세요.', isError: true };
-    if (mailAuth === 1)
-      return { text: '인증번호를 입력하고 확인을 눌러주세요.', isError: true };
-    return { text: '이메일 인증이 완료되었습니다.', isError: false };
+      return { text: "인증 이메일을 전송해주세요.", isError: true };
+
+    // 💡 인증번호 발송 후 입력 대기 상태(2)일 때 메시지와 시간을 함께 리턴
+    if (mailAuth === 2) {
+      return {
+        text: `인증번호를 입력하세요. (남은 시간: ${showTime()})`,
+        isError: true,
+      };
+    }
+
+    if (mailAuth === 3)
+      return { text: "이메일 인증이 완료되었습니다.", isError: false };
+
+    return { text: "\u00A0", isError: false };
   };
 
   const getNameMessage = () => {
     if (!member.memberName.trim())
       return {
-        text: isSubmitted ? '이름을 입력하세요.' : '\u00A0',
+        text: isSubmitted ? "이름을 입력하세요." : "\u00A0",
         isError: isSubmitted,
       };
-    return { text: '\u00A0', isError: false };
+    return { text: "\u00A0", isError: false };
+  };
+
+  // 💡 길이 체크를 하이픈 포함 길이인 13으로 수정
+  const getPhoneMessage = () => {
+    if (!member.memberPhone.trim())
+      return {
+        text: isSubmitted ? "휴대폰 번호를 입력하세요." : "\u00A0",
+        isError: isSubmitted,
+      };
+    if (member.memberPhone.length < 13)
+      return { text: "연락처 11자리를 모두 입력해주세요.", isError: true };
+    return { text: "\u00A0", isError: false };
   };
 
   const getAddrMessage = () => {
     if (!member.memberAddrCode || !member.memberDetailAddr.trim())
       return {
-        text: isSubmitted ? '주소 및 상세 주소를 모두 입력해주세요.' : '\u00A0',
+        text: isSubmitted ? "주소 및 상세 주소를 모두 입력해주세요." : "\u00A0",
         isError: isSubmitted,
       };
-    return { text: '\u00A0', isError: false };
+    return { text: "\u00A0", isError: false };
   };
 
   const idStatus = getIdMessage();
@@ -171,6 +334,7 @@ const UserSignup = () => {
   const emailStatus = getEmailMessage();
   const nameStatus = getNameMessage();
   const addrStatus = getAddrMessage();
+  const phoneStatus = getPhoneMessage();
 
   const joinSubmit = (e) => {
     e.preventDefault();
@@ -182,6 +346,7 @@ const UserSignup = () => {
       !memberPwRe ||
       !member.memberEmail ||
       !member.memberName.trim() ||
+      !member.memberPhone.trim() ||
       !member.memberAddrCode ||
       !member.memberDetailAddr.trim();
 
@@ -192,23 +357,38 @@ const UserSignup = () => {
       pwReStatus.isError ||
       emailStatus.isError ||
       nameStatus.isError ||
+      phoneStatus.isError ||
       addrStatus.isError
     ) {
-      alert('입력하신 정보를 다시 확인해주세요.');
+      Swal.fire({
+        icon: "warning",
+        text: "입력하신 정보를 다시 확인해주세요.",
+      });
       return;
     }
 
-    console.log('가입 진행 데이터:', member);
-    alert('모든 절차를 통과했습니다! 회원가입 완료! (UI 테스트)');
-    navigate('/member/login');
+    axios
+      .post(`${import.meta.env.VITE_BACKSERVER}/api/member/userSignup`, member)
+      .then((res) => {
+        console.log("가입 진행 데이터:", res.data);
+        Swal.fire({
+          icon: "success",
+          text: "회원가입이 완료됐습니다. 로그인페이지로 이동합니다.",
+        }).then(() => {
+          navigate("/login");
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
 
   return (
     <div className={styles.signupPage}>
       <h1
         className={styles.mainLogo}
-        onClick={() => navigate('/')}
-        style={{ cursor: 'pointer' }}
+        onClick={() => navigate("/")}
+        style={{ cursor: "pointer" }}
       >
         GreenCarry
       </h1>
@@ -219,7 +399,7 @@ const UserSignup = () => {
         <form className={styles.form} onSubmit={joinSubmit}>
           {/* 아이디 */}
           <div className={styles.fieldGroup}>
-            <label className={styles.label}>아이디 *</label>
+            <label className={styles.label}>아이디</label>
             <div className={styles.inputArea}>
               <div className={styles.inputAreaInner}>
                 <input
@@ -241,7 +421,8 @@ const UserSignup = () => {
                 </button>
               </div>
               <p
-                className={`${styles.statusMessage} ${idStatus.isError ? styles.errorMessage : styles.successMessage}`}
+                className={`${styles.statusMessage} ${idStatus.isError ? styles.errorMessage : ""}`}
+                style={!idStatus.isError ? { color: "#3a8a56" } : {}}
               >
                 {idStatus.text}
               </p>
@@ -250,7 +431,7 @@ const UserSignup = () => {
 
           {/* 비밀번호 */}
           <div className={styles.fieldGroup}>
-            <label className={styles.label}>비밀번호 *</label>
+            <label className={styles.label}>비밀번호</label>
             <div className={styles.inputArea}>
               <input
                 type="password"
@@ -261,8 +442,8 @@ const UserSignup = () => {
                 placeholder="영문 대/소문자, 숫자, 특수기호 포함 10자 이상"
               />
               <p
-                className={`${styles.statusMessage} ${pwStatus.isError ? styles.errorMessage : ''}`}
-                style={!pwStatus.isError ? { color: '#3a8a56' } : {}}
+                className={`${styles.statusMessage} ${pwStatus.isError ? styles.errorMessage : ""}`}
+                style={!pwStatus.isError ? { color: "#3a8a56" } : {}}
               >
                 {pwStatus.text}
               </p>
@@ -282,8 +463,8 @@ const UserSignup = () => {
                 placeholder="비밀번호 재입력"
               />
               <p
-                className={`${styles.statusMessage} ${pwReStatus.isError ? styles.errorMessage : ''}`}
-                style={!pwReStatus.isError ? { color: '#3a8a56' } : {}}
+                className={`${styles.statusMessage} ${pwReStatus.isError ? styles.errorMessage : ""}`}
+                style={!pwReStatus.isError ? { color: "#3a8a56" } : {}}
               >
                 {pwReStatus.text}
               </p>
@@ -292,7 +473,7 @@ const UserSignup = () => {
 
           {/* 이름 */}
           <div className={styles.fieldGroup}>
-            <label className={styles.label}>이름 *</label>
+            <label className={styles.label}>이름</label>
             <div className={styles.inputArea}>
               <input
                 type="text"
@@ -302,7 +483,7 @@ const UserSignup = () => {
                 className={styles.inputUnderline}
               />
               <p
-                className={`${styles.statusMessage} ${nameStatus.isError ? styles.errorMessage : ''}`}
+                className={`${styles.statusMessage} ${nameStatus.isError ? styles.errorMessage : ""}`}
               >
                 {nameStatus.text}
               </p>
@@ -311,7 +492,7 @@ const UserSignup = () => {
 
           {/* 이메일 */}
           <div className={styles.fieldGroup}>
-            <label className={styles.label}>이메일 *</label>
+            <label className={styles.label}>이메일</label>
             <div className={styles.inputArea}>
               <div className={styles.inputAreaInner}>
                 <input
@@ -327,9 +508,9 @@ const UserSignup = () => {
                   type="button"
                   className={styles.buttonOutlined}
                   onClick={handleSendMail}
-                  disabled={mailAuth === 3}
+                  disabled={mailAuth === 1 || mailAuth === 3}
                 >
-                  인증 이메일 전송
+                  {mailAuth === 0 ? "인증 메일 전송" : "재전송"}
                 </button>
               </div>
 
@@ -338,23 +519,49 @@ const UserSignup = () => {
                   type="text"
                   className={styles.inputUnderline}
                   placeholder="인증번호"
-                  disabled={mailAuth === 3}
+                  value={mailAuthInput}
+                  onChange={(e) => {
+                    setMailAuthInput(e.target.value);
+                  }}
+                  disabled={mailAuth !== 2}
                 />
+
                 <button
                   type="button"
                   className={styles.buttonFilled}
                   onClick={handleVerifyMail}
-                  disabled={mailAuth === 3}
+                  disabled={mailAuth !== 2}
                 >
                   인증번호 확인
                 </button>
               </div>
 
               <p
-                className={`${styles.statusMessage} ${emailStatus.isError ? styles.errorMessage : ''}`}
-                style={!emailStatus.isError ? { color: '#3a8a56' } : {}}
+                className={`${styles.statusMessage} ${emailStatus.isError ? styles.errorMessage : ""}`}
+                style={
+                  !emailStatus.isError ? { color: "var(--color-brand)" } : {}
+                }
               >
                 {emailStatus.text}
+              </p>
+            </div>
+          </div>
+          {/* 연락처 */}
+          <div className={styles.fieldGroup}>
+            <label className={styles.label}>휴대폰 번호</label>
+            <div className={styles.inputArea}>
+              <input
+                type="text"
+                name="memberPhone"
+                value={member.memberPhone}
+                onChange={inputMember}
+                className={styles.inputUnderline}
+                placeholder="숫자만 입력하세요" // 💡 placeholder 문구 통일
+              />
+              <p
+                className={`${styles.statusMessage} ${phoneStatus.isError ? styles.errorMessage : ""}`}
+              >
+                {phoneStatus.text}
               </p>
             </div>
           </div>
@@ -364,7 +571,6 @@ const UserSignup = () => {
             <label className={styles.label}>주소</label>
             <div className={styles.inputArea}>
               <div className={styles.inputAreaInner}>
-                {/* 🚨 기존 textCenter 제거하여 기본 왼쪽 정렬 유지 */}
                 <input
                   type="text"
                   placeholder="우편번호"
@@ -402,7 +608,7 @@ const UserSignup = () => {
                 />
               </div>
               <p
-                className={`${styles.statusMessage} ${addrStatus.isError ? styles.errorMessage : ''}`}
+                className={`${styles.statusMessage} ${addrStatus.isError ? styles.errorMessage : ""}`}
               >
                 {addrStatus.text}
               </p>

@@ -9,7 +9,7 @@
   /* 배경색을 브랜드 보조색으로 설정하거나 기존 배경 이미지 유지 */
   background:
     linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)),
-    url('/image/login/loginsign.jpg') no-repeat center center/cover;
+    url("/image/login/loginsign.jpg") no-repeat center center/cover;
   padding: 40px 20px;
   font-family: var(--font-body);
 }

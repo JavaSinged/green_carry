@@ -1,0 +1,55 @@
+package kr.co.iei.store.controller;
+
+import kr.co.iei.store.model.service.StoreService;
+import kr.co.iei.store.model.vo.Menu;
+import kr.co.iei.store.model.vo.MenuOption;
+import kr.co.iei.store.model.vo.Store;
+import org.apache.ibatis.type.Alias;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+@RestController
+@RequestMapping("/stores")
+@CrossOrigin("*")
+public class StoreController {
+    @Autowired
+    private StoreService storeService;
+
+    @GetMapping
+    public ResponseEntity<?> getStores() {
+        List<Store> list = storeService.selectAllStore();
+        return ResponseEntity.ok(list);
+    }
+
+    @GetMapping("/{storeId}")
+    public ResponseEntity<Store> getStoreDetail(@PathVariable Integer storeId) {
+        Store store = storeService.getStoreById(storeId);
+
+        if (store == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(store);
+    }
+
+    @GetMapping("/{storeId}/menus")
+    public ResponseEntity<List<Menu>> getMenuList(@PathVariable Long storeId) {
+        // 서비스 호출
+        List<Menu> menuList = storeService.selectAllMenu(storeId);
+
+        // 데이터가 없어도 빈 배열([])을 담아 200 OK 응답 (프론트 에러 방지)
+        return ResponseEntity.ok(menuList);
+    }
+
+    @GetMapping("/{menuId}/options")
+    public ResponseEntity<List<MenuOption>> getOptionsByMenu(@PathVariable Long menuId) {
+        List<MenuOption> options = storeService.getMenuOptions(menuId);
+        return ResponseEntity.ok(options);
+    }
+
+
+}
