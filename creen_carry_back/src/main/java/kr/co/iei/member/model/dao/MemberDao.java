@@ -10,15 +10,12 @@ public interface MemberDao {
 
 	Member loginMember(Member member);
 
-	int insertManager(Member member);
+	String findId(Member member);
 
-	Member storeDupCheck(String storeOwnerNo);
+	int resetPassword(Member member);
+
+	int checkMember(Member member);
+
 	Member selectOneMember(String memberId);
-
-	int insertUser(Member member);
-
-	Member emailDupCheck(String memberEmail);
-
-	
 
 }

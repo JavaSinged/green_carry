@@ -35,7 +35,7 @@ public class Member {
     private String enrollDate;       // ENROLL_DATE (DATE) : 가입일 (화면 출력을 위해 String으로 받음)
 
     // 4. 사업자 전용 정보 (MEMBER_GRADE가 2인 경우 사용)
-    private String storeOwnerNo;       // STORE_OWNER_NO (NUMBER) : 사업자 등록 번호 (10자리 숫자이므로 Long 사용)
+    private Long storeOwnerNo;       // STORE_OWNER_NO (NUMBER) : 사업자 등록 번호 (10자리 숫자이므로 Long 사용)
     private String storeName;        // STORE_NAME (VARCHAR2) : 가게 이름
     private String openingDate;      // OPENING_DATE (DATE) : 개업일 (화면 출력을 위해 String으로 받음)
     

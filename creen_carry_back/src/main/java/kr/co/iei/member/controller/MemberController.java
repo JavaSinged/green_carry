@@ -3,21 +3,17 @@ package kr.co.iei.member.controller;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import kr.co.iei.member.model.vo.Member;
-import kr.co.iei.utils.EmailSender;
 import kr.co.iei.utils.JwtUtil;
 import kr.co.iei.member.model.service.MemberService;
 
@@ -31,10 +27,8 @@ public class MemberController {
 
     @Autowired
     private JwtUtil jwtUtil; // ✨ JwtUtil 주입
-    
-  	@Autowired
-  	private EmailSender sender;
 
+    //1.로그인기능
     @PostMapping("/login")
     public ResponseEntity<?> loginMember(@RequestBody Member member) {
         System.out.println("로그인 요청 데이터: " + member);
@@ -61,70 +55,67 @@ public class MemberController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
     }
-    
-    //user아이디 중복체크
-    @GetMapping(value="/exists")
-    public ResponseEntity<?> handleIdCheck(@RequestParam String memberId){
-    	Member member = memberService.selectOneMember(memberId);
-    	return ResponseEntity.ok(member == null);
-    }
-    
-
-
-   
-  //메일전송요청
-    @PostMapping(value="/email-verification")
-    public ResponseEntity<?> sendMail(@RequestBody Member m){
-       String emailTitle = "Greencarry 회원가입 인증메일";
-       Random r = new Random();
-       StringBuffer sb = new StringBuffer();
-       for(int i=0; i<6; i++) {
-          //숫자 6자리랜덤
-          sb.append(r.nextInt(10));
-       }
-       String authCode = sb.toString();
-       String emailContent = "<h1>안녕하세요 Greencarry입니다.</h1>"
-             +"<h3>인증번호는 </h3>"
-             +"[<b>"+authCode+"</b>] 입니다.";
-       sender.sendMail(emailTitle, m.getMemberEmail(), emailContent);
-
-       return ResponseEntity.ok(authCode); //React로 인증번호를 보내는 것
-    }
-    
-    //user회원가입
-    @PostMapping(value="/userSignup")
-    public ResponseEntity<?> userSignup(@RequestBody Member member){
-    	int result = memberService.insertUser(member);
-    	return ResponseEntity.ok(result);
-    }
- // 1. 사업자 번호 중복 체크 (Service의 파라미터 int 타입에 맞춤)
-    @GetMapping("/storeDupCheck")
-    public ResponseEntity<?> storeDupCheck(@RequestParam String storeOwnerNo) {
-        // Service 메서드 명: storeDupCheck(int)
-        Member member = memberService.storeDupCheck(storeOwnerNo);
+ // 2. 아이디 찾기 (이름 + 이메일)
+    @PostMapping("/findId")
+    public ResponseEntity<?> findId(@RequestBody Member member) {
+        // DB에서 이름과 이메일이 일치하는 사용자의 ID를 가져옴
+        String memberId = memberService.findId(member);
         
-        // 리액트 조건문 (res.data === "" 일 때 성공)에 맞게 처리
-        return ResponseEntity.ok(member == null ? "" : member);
+        if (memberId != null) {
+            return ResponseEntity.ok(memberId);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("일치하는 회원이 없습니다.");
+        }
     }
-    @GetMapping("/emailDupCheck")
-    public ResponseEntity<?> emailDupCheck(@RequestParam String memberEmail){
-    	Member member = memberService.emailDupCheck(memberEmail);
-    	return ResponseEntity.ok(member==null);
+    //비밀번호 재설정 1차 인증
+    @PostMapping("/checkMember")
+    public ResponseEntity<?> checkMember(@RequestBody Member member) {
+        // 아이디와 이메일이 일치하는 행이 있는지 COUNT 조회
+        int result = memberService.checkMember(member);
+        return ResponseEntity.ok(result);
     }
 
-    // 2. 사업자 회원가입 (Service의 메서드 명 insertManager에 맞춤)
-    @PostMapping("/signupManager")
-    public ResponseEntity<?> signupManager(@RequestBody Member member) {
-        // Service 메서드 명: insertManager(Member)
-        // Service 내부에서 이미 passwordEncoder로 비번 암호화를 하고 있으므로 바로 호출
-        int result = memberService.insertManager(member);
+ // 3. 비밀번호 재설정 (아이디 + 새 비밀번호)
+    @PostMapping("/resetPw")
+    public ResponseEntity<?> resetPw(@RequestBody Member member) {
+    	System.out.println("넘어온 아이디: " + member.getMemberId()); // 👈 이거 꼭 확인!
+        System.out.println("넘어온 비번: " + member.getMemberPw());
+        // 서비스에서 암호화 후 업데이트 진행
+        int result = memberService.resetPw(member);
         
-        if (result > 0) {
+        if (result == -1) {
+            // 🌟 기존 비밀번호와 동일할 경우 프론트엔드로 반환
+            return ResponseEntity.ok(-1);
+        } else if (result > 0) {
+            // 성공 시
             return ResponseEntity.ok(result);
         } else {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            // 실패 시
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("변경 실패");
         }
     }
     
+    @PostMapping("/sendAuthCode")
+    public ResponseEntity<?> sendAuthCode(@RequestBody Member member) {
+        // 🌟 실제 메일 발송 실행
+        String authCode = memberService.sendAuthCode(member.getMemberEmail());
+        
+        // 보안상 실제로는 authCode를 리턴하지 않고 서버 세션/Redis에 저장하지만,
+        // 현재 테스트 환경에 맞춰 발송 성공 메시지만 보냅니다.
+        return ResponseEntity.ok(authCode);
+    }
+    
+    @PostMapping("/verifyCode")
+    public ResponseEntity<?> verifyCode(@RequestBody Map<String, String> data) {
+        String email = data.get("memberEmail");
+        String inputCode = data.get("inputCode");
+        System.out.println("프론트에서 온 이메일: " + email);
+        System.out.println("프론트에서 온 입력코드: " + inputCode);
+        
+        // 서비스에서 저장된 인증번호와 비교 
+        boolean isMatch = memberService.checkAuthCode(email, inputCode);
+        
+        return ResponseEntity.ok(isMatch);
+    }
     
 }
