@@ -98,29 +98,30 @@ export const AuthProvider = ({ children }) => {
 
   // 🌟 로그아웃 함수
   const logout = (isExpired = false) => {
-    if (!isExpired) isLoggingOut.current = true;
-
+    // 1. 타이머 무조건 정지
     if (logoutTimerRef.current) {
       clearTimeout(logoutTimerRef.current);
       logoutTimerRef.current = null;
     }
 
-    if (isExpired) {
-      // 자동 로그아웃일 때 (수동 로그아웃 중이 아닐 때만 팝업 띄움)
-      if (!isLoggingOut.current && localStorage.getItem("accessToken")) {
-        clearAuthData(); // 핀셋 삭제 실행
+    // 2. 자동 로그아웃(세션 만료)일 때
+    if (isExpired === true) {
+      console.log("자동 로그아웃 실행됨!"); // 브라우저 콘솔(F12) 확인용
 
-        fireStyledSwal(
-          "warning",
-          "세션 만료",
-          "로그인 유지 시간이 만료되어 자동 로그아웃 되었습니다.",
-        ).then(() => {
-          window.location.replace("/");
-        });
-      }
-    } else {
-      // 수동 로그아웃일 때 즉시 비우고 이동
-      clearAuthData(); // 핀셋 삭제 실행
+      // 💡 조건문 없이 바로 알림창 실행
+      fireStyledSwal(
+        "warning",
+        "세션 만료",
+        "로그인 유지 시간이 만료되어 자동 로그아웃 되었습니다.",
+      ).then(() => {
+        clearAuthData(); // 확인 누르면 그때 데이터 삭제
+        window.location.replace("/");
+      });
+    }
+    // 3. 수동 로그아웃일 때
+    else {
+      isLoggingOut.current = true;
+      clearAuthData();
       window.location.replace("/");
     }
   };
