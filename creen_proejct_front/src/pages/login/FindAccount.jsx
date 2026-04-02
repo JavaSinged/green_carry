@@ -1,17 +1,17 @@
 import React, { useEffect } from "react";
-import "./FindAccount.css";
+import "./Auth.css";
 import { Link, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import api from "../../utils/accessToken";
-// 🌟 방금 만든 Store 불러오기
 import useAccountStore from "../../store/accountStore";
 import useEcoEffects from "../../hooks/useEcoEffects";
 
 const Account = () => {
-  const { containerRef, bubblesRef, selectedBg, bubbleData } = useEcoEffects();
+  // 🌟 반딧불이(fireflyData) 추가
+  const { containerRef, bubblesRef, selectedBg, bubbleData, fireflyData } =
+    useEcoEffects();
   const navigate = useNavigate();
 
-  // 🌟 Store에서 필요한 상태와 함수들을 한 번에 꺼내옵니다! (수많은 useState가 한 줄로 압축됨)
   const {
     activeTab,
     isCodeSent,
@@ -35,7 +35,6 @@ const Account = () => {
     handleConfirmPwChange,
   } = useAccountStore();
 
-  // 타이머 로직 (API 호출이나 Effect는 컴포넌트에 남겨두는 것이 좋습니다)
   useEffect(() => {
     let timer;
     if (isTimerActive && timeLeft > 0) {
@@ -184,7 +183,7 @@ const Account = () => {
             title: "변경 불가",
             text: "기존과 동일한 비밀번호입니다. 다른 비밀번호를 입력해주세요.",
           });
-          return; // 여기서 함수를 끝내서, 아래의 '성공' 팝업이 안 뜨게 막습니다.
+          return;
         }
         Swal.fire({
           icon: "success",
@@ -207,6 +206,21 @@ const Account = () => {
       ref={containerRef}
       style={{ backgroundImage: `url(${selectedBg})` }}
     >
+      {/* 🌟 1. 반딧불이 애니메이션 적용 */}
+      {fireflyData &&
+        fireflyData.map((style, i) => (
+          <div
+            key={`firefly-${i}`}
+            className="firefly"
+            style={{
+              left: style.left,
+              top: style.top,
+              animationDuration: style.animationDuration,
+              animationDelay: style.animationDelay,
+            }}
+          />
+        ))}
+
       {bubbleData.map((style, i) => (
         <div
           key={i}
@@ -221,6 +235,7 @@ const Account = () => {
           }}
         />
       ))}
+
       <h1
         className="logo"
         style={{
@@ -244,8 +259,6 @@ const Account = () => {
       </h1>
 
       <div className="main-content find-content">
-        {/* 좌측 정보 섹션 생략 없이 그대로 유지 */}
-
         <section className="info-section" style={{ width: "320px" }}>
           <h2
             className="main-title"
@@ -265,18 +278,23 @@ const Account = () => {
           </div>
         </section>
 
-        <section className="find-card" style={{ width: "450px" }}>
-          <div className="find-tabs">
+        {/* 🌟 2. 프리미엄 글래스모피즘 클래스(premium-glass) 추가 */}
+        <section className="find-card premium-glass" style={{ width: "450px" }}>
+          {/* 🌟 3. 애플 스타일 슬라이딩 탭 적용 */}
+          <div className="premium-tabs">
+            <div
+              className={`slide-indicator ${activeTab === "resetPw" ? "right" : "left"}`}
+            ></div>
             <button
               type="button"
-              className={`find-tab-btn ${activeTab === "findId" ? "active" : ""}`}
+              className={`tab-button ${activeTab === "findId" ? "active" : ""}`}
               onClick={() => handleTabChange("findId")}
             >
               아이디 찾기
             </button>
             <button
               type="button"
-              className={`find-tab-btn ${activeTab === "resetPw" ? "active" : ""}`}
+              className={`tab-button ${activeTab === "resetPw" ? "active" : ""}`}
               onClick={() => handleTabChange("resetPw")}
             >
               비밀번호 재설정
@@ -344,9 +362,10 @@ const Account = () => {
                       {formatTime(timeLeft)}
                     </span>
                   </div>
+                  {/* 🌟 4. 빛나는 버튼 애니메이션(shimmer-btn) 추가 */}
                   <button
                     type="submit"
-                    className="submit-verify-btn"
+                    className="submit-verify-btn shimmer-btn"
                     style={{ marginTop: "15px" }}
                   >
                     {activeTab === "findId" ? "아이디 찾기" : "인증 확인"}
@@ -423,9 +442,10 @@ const Account = () => {
                 )}
               </div>
 
+              {/* 🌟 4. 빛나는 버튼 애니메이션(shimmer-btn) 추가 */}
               <button
                 type="submit"
-                className="submit-verify-btn"
+                className="submit-verify-btn shimmer-btn"
                 disabled={
                   pwError || matchError || !confirmPassword || !newPassword
                 }
