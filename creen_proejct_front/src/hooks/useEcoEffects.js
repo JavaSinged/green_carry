@@ -26,6 +26,14 @@ const useEcoEffects = () => {
       delay: `${Math.random() * 5}s`,
     }));
   }, []);
+  const fireflyData = useMemo(() => {
+    return [...Array(25)].map(() => ({
+      left: `${Math.random() * 100}%`,
+      top: `${Math.random() * 100}%`,
+      animationDuration: `${Math.random() * 3 + 2}s`,
+      animationDelay: `${Math.random() * 5}s`,
+    }));
+  }, []);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -70,7 +78,7 @@ const useEcoEffects = () => {
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, []);
 
-  return { containerRef, bubblesRef, selectedBg, bubbleData };
+  return { containerRef, bubblesRef, selectedBg, bubbleData, fireflyData };
 };
 
 export default useEcoEffects;

@@ -23,6 +23,7 @@ button {
   left: 0;
   width: 100vw;
   height: 100vh;
+  animation: bg-breathe 12s ease-in-out infinite alternate;
 
   background-position: center;
   background-repeat: no-repeat;
@@ -35,24 +36,6 @@ button {
 
   transition: background-position 0.2s ease-out;
   z-index: 1;
-}
-
-.sun-rays {
-  position: absolute;
-  top: -50%;
-  left: -20%;
-  width: 80%;
-  height: 80%;
-  background: repeating-conic-gradient(
-    from 0deg,
-    transparent 0deg 20deg,
-    rgba(255, 255, 255, 0.05) 25deg 35deg,
-    transparent 40deg 60deg
-  );
-  pointer-events: none;
-  z-index: 2;
-  animation: sun-rotate 60s linear infinite;
-  transform-origin: center;
 }
 
 @keyframes sun-rotate {
@@ -121,13 +104,17 @@ button {
 }
 
 .login-card {
-  background-color: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  border-radius: 20px;
-  padding: 40px;
+  background: rgba(255, 255, 255, 0.75) !important;
+  backdrop-filter: blur(24px) saturate(150%);
+  -webkit-backdrop-filter: blur(24px) saturate(150%);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 24px;
+  padding: 40px 45px;
   color: var(--text-main);
   width: 420px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  box-shadow:
+    0 15px 35px rgba(0, 0, 0, 0.15),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.4);
   z-index: 20;
 }
 
@@ -177,37 +164,75 @@ button {
   font-size: 1rem;
 }
 
-.tabs {
+.premium-tabs {
+  position: relative;
   display: flex;
-  gap: 10px;
+  background: rgba(0, 0, 0, 0.06);
+  border-radius: 30px;
+  padding: 5px;
   margin-bottom: 25px;
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.05);
 }
 
-.tab-button {
+.slide-indicator {
+  position: absolute;
+  top: 5px;
+  bottom: 5px;
+  width: calc(50% - 5px);
+  background: var(--color-brand, #2e7d32);
+  border-radius: 25px;
+  transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+  box-shadow: 0 4px 12px rgba(46, 125, 50, 0.3);
+  z-index: 1;
+}
+
+.slide-indicator.left {
+  transform: translateX(0);
+}
+.slide-indicator.right {
+  transform: translateX(100%);
+}
+
+.premium-tabs .tab-button {
   flex: 1;
-  padding: 15px;
+  padding: 12px 0;
   border: none;
-  border-radius: 12px;
+  background: transparent;
   font-weight: 700;
   font-size: 1rem;
+  color: var(--text-sub, #666);
   cursor: pointer;
-  transition: all 0.3s;
+  position: relative;
+  z-index: 2;
+  transition: color 0.4s ease;
 }
 
-.tab-button.active {
-  background-color: var(--color-brand);
-  color: var(--color-bg);
-}
-
-.tab-button:not(.active) {
-  background-color: var(--color-surface);
-  color: var(--text-sub);
+.premium-tabs .tab-button.active {
+  color: #fff;
 }
 
 .login-form {
   display: flex;
   flex-direction: column;
   gap: 15px;
+}
+
+.caps-warning {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  color: #d32f2f;
+  font-size: 0.85rem;
+  font-weight: bold;
+  padding-left: 5px;
+  transition: all 0.3s ease-out;
+}
+
+.caps-warning.show {
+  max-height: 30px;
+  opacity: 1;
+  margin-top: -5px;
+  margin-bottom: 5px;
 }
 
 .remember-me {
@@ -222,7 +247,9 @@ button {
   accent-color: var(--color-brand);
 }
 
-.login-button {
+.login-button.shimmer-btn {
+  position: relative;
+  overflow: hidden;
   padding: 18px;
   background-color: var(--color-brand);
   color: var(--color-bg);
@@ -232,7 +259,45 @@ button {
   font-weight: 700;
   cursor: pointer;
   margin-top: 10px;
-  transition: background-color 0.3s;
+  box-shadow: 0 4px 15px rgba(46, 125, 50, 0.2);
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s,
+    background-color 0.3s;
+}
+
+.login-button.shimmer-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(46, 125, 50, 0.4);
+}
+
+.login-button.shimmer-btn::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    to right,
+    transparent,
+    rgba(255, 255, 255, 0.4),
+    transparent
+  );
+  transform: skewX(-25deg);
+  animation: shimmer-sweep 3s infinite;
+}
+
+@keyframes shimmer-sweep {
+  0% {
+    left: -100%;
+  }
+  20% {
+    left: 200%;
+  }
+  100% {
+    left: 200%;
+  }
 }
 
 .card-footer {
@@ -271,6 +336,8 @@ button {
   text-align: right;
   position: relative;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
 }
 
 .speech-bubble::after {
@@ -290,7 +357,8 @@ button {
 }
 
 .MuiOutlinedInput-root {
-  border-radius: 20px !important;
+  border-radius: 15px !important;
+  background: rgba(255, 255, 255, 0.6);
 }
 .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
   border-color: var(--color-brand) !important;
@@ -346,5 +414,72 @@ button {
   }
   50% {
     transform: translateY(-20px);
+  }
+}
+
+.firefly {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background-color: #e6ee9c;
+  border-radius: 50%;
+  box-shadow:
+    0 0 10px 2px #cddc39,
+    0 0 20px 5px #8bc34a;
+  pointer-events: none;
+  z-index: 4;
+  opacity: 0;
+  animation: firefly-glow infinite alternate ease-in-out;
+}
+
+@keyframes firefly-glow {
+  0% {
+    opacity: 0;
+    transform: translateY(0) scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-20px) scale(1.3);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-40px) scale(0.8);
+  }
+}
+
+@keyframes bg-breathe {
+  0% {
+    background-size: 120%;
+  }
+  100% {
+    background-size: 125%;
+  }
+}
+
+.screen-container::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 1;
+  mix-blend-mode: overlay;
+  animation: mood-shift 30s infinite alternate ease-in-out;
+}
+
+@keyframes mood-shift {
+  0% {
+    background-color: rgba(0, 150, 255, 0.3);
+  }
+  33% {
+    background-color: rgba(255, 255, 220, 0.1);
+  }
+  66% {
+    background-color: rgba(255, 140, 0, 0.3);
+  }
+  100% {
+    background-color: rgba(20, 0, 80, 0.4);
   }
 }

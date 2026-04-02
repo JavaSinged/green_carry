@@ -288,23 +288,6 @@ input:focus {
     transform: translateY(-20px);
   }
 }
-.sun-rays {
-  position: absolute;
-  top: -50%;
-  left: -20%;
-  width: 80%;
-  height: 80%;
-  background: repeating-conic-gradient(
-    from 0deg,
-    transparent 0deg 20deg,
-    rgba(255, 255, 255, 0.05) 25deg 35deg,
-    transparent 40deg 60deg
-  );
-  pointer-events: none;
-  z-index: 2;
-  animation: sun-rotate 60s linear infinite;
-  transform-origin: center;
-}
 
 @keyframes sun-rotate {
   from {

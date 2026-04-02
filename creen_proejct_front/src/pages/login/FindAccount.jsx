@@ -207,8 +207,6 @@ const Account = () => {
       ref={containerRef}
       style={{ backgroundImage: `url(${selectedBg})` }}
     >
-      <div className="sun-rays"></div>
-
       {bubbleData.map((style, i) => (
         <div
           key={i}

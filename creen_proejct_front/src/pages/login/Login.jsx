@@ -21,13 +21,17 @@ const Login = () => {
   const [activeTab, setActiveTab] = useState("personal");
   const [rememberId, setRememberId] = useState(false);
 
+  // 🌟 Caps Lock 켜짐 감지 상태
+  const [isCapsLockOn, setIsCapsLockOn] = useState(false);
+
   const swalCustomClass = {
     popup: "greencarry-swal-popup",
     title: "greencarry-swal-title",
     confirmButton: "greencarry-swal-confirm-button",
   };
 
-  const { containerRef, bubblesRef, selectedBg, bubbleData } = useEcoEffects();
+  const { containerRef, bubblesRef, selectedBg, bubbleData, fireflyData } =
+    useEcoEffects();
 
   useEffect(() => {
     const savedId = localStorage.getItem("savedUserId");
@@ -40,6 +44,15 @@ const Login = () => {
   const inputMember = (e) => {
     const { name, value } = e.target;
     setMember({ ...member, [name]: value });
+  };
+
+  // 🌟 Caps Lock 감지 핸들러
+  const handleKeyUp = (e) => {
+    if (e.getModifierState("CapsLock")) {
+      setIsCapsLockOn(true);
+    } else {
+      setIsCapsLockOn(false);
+    }
   };
 
   const handleTabChange = (tab) => {
@@ -156,7 +169,21 @@ const Login = () => {
       ref={containerRef}
       style={{ backgroundImage: `url(${selectedBg})` }}
     >
-      <div className="sun-rays"></div>
+      {/*
+      {fireflyData &&
+        fireflyData.map((style, i) => (
+          <div
+            key={`firefly-${i}`}
+            className="firefly"
+            style={{
+              left: style.left,
+              top: style.top,
+              animationDuration: style.animationDuration,
+              animationDelay: style.animationDelay,
+            }}
+          />
+        ))}
+          */}
 
       {bubbleData.map((style, i) => (
         <div
@@ -198,14 +225,17 @@ const Login = () => {
           </div>
         </section>
 
-        <section className="login-card">
+        <section className="login-card premium-glass">
           <h3 className="card-title">반가워요, 에코 히어로!</h3>
           <h2 className="card-info blooming-text">
             로그인하여 <span className="leaf-point">친</span>환경 배달을
             시작하세요
           </h2>
 
-          <div className="tabs">
+          <div className="premium-tabs">
+            <div
+              className={`slide-indicator ${activeTab === "business" ? "right" : "left"}`}
+            ></div>
             <button
               type="button"
               className={`tab-button ${activeTab === "personal" ? "active" : ""}`}
@@ -236,7 +266,6 @@ const Login = () => {
               placeholder="아이디를 입력해주세요."
               value={member.memberId}
               onChange={inputMember}
-              margin="normal"
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
@@ -245,6 +274,7 @@ const Login = () => {
                 ),
               }}
             />
+
             <TextField
               fullWidth
               variant="outlined"
@@ -253,7 +283,7 @@ const Login = () => {
               placeholder="비밀번호를 입력해주세요."
               value={member.memberPw}
               onChange={inputMember}
-              margin="normal"
+              onKeyUp={handleKeyUp}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
@@ -263,7 +293,11 @@ const Login = () => {
               }}
             />
 
-            <div className="remember-me">
+            <div className={`caps-warning ${isCapsLockOn ? "show" : ""}`}>
+              <span>⚠️ Caps Lock이 켜져 있습니다.</span>
+            </div>
+
+            <div className="remember-me" style={{ marginTop: "5px" }}>
               <input
                 type="checkbox"
                 id="remember_check"
@@ -273,7 +307,7 @@ const Login = () => {
               <label htmlFor="remember_check">아이디 저장</label>
             </div>
 
-            <button type="submit" className="login-button">
+            <button type="submit" className="login-button shimmer-btn">
               로그인
             </button>
           </form>
