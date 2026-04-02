@@ -5,17 +5,25 @@ import styles from "./StoreView.module.css";
 import SearchIcon from "@mui/icons-material/Search";
 import MenuModal from "../../components/layout/MenuModal";
 import CartBar from "../../components/layout/ui/CartBar";
+import useCartStore from "../../store/useCartStore";
 
 export default function StoreView() {
   const location = useLocation();
   const storeId = location.state?.storeId || 1;
-
+  //store state
+  const [storeInfo, setStoreInfo] = useState({
+    storeIntro: "",
+    storeName: "",
+  });
+  //menu state
   const [menuList, setMenuList] = useState([]);
   const [categories, setCategories] = useState(["전체"]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedMenu, setSelectedMenu] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState("전체");
   const [searchTerm, setSearchTerm] = useState("");
+  const storeName = useCartStore((state) => state.setStoreName);
+  const [reusable, setReusable] = useState(false);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -23,7 +31,9 @@ export default function StoreView() {
     axios
       .get(`${import.meta.env.VITE_BACKSERVER}/stores/${storeId}/menus`)
       .then((res) => {
+        console.log(res.data);
         setMenuList(res.data);
+
         const uniqueCategories = [
           "전체",
           ...new Set(res.data.map((item) => item.menuCategory)),
@@ -31,6 +41,20 @@ export default function StoreView() {
         setCategories(uniqueCategories);
       })
       .catch((err) => console.error("메뉴 로딩 실패:", err));
+    //상점 정보 호출
+    axios
+      .get(`${import.meta.env.VITE_BACKSERVER}/stores/${storeId}`)
+      .then((res) => {
+        console.log(res.data);
+        storeName(res.data.storeName);
+        setStoreInfo({
+          ...storeInfo,
+          storeIntro: res.data.storeIntro,
+          storeName: res.data.storeName,
+        });
+        console.log(storeInfo);
+      })
+      .catch((err) => console.error("가게 로딩 실패:", err));
   }, [storeId]);
 
   const filteredMenu = menuList.filter((item) => {
@@ -40,7 +64,6 @@ export default function StoreView() {
     // import SearchIcon from "@mui/icons-material/Search";
     // import MenuModal from "../../components/layout/MenuModal";
     // import CartBar from "../../components/layout/ui/CartBar";
-    // import useCartStore from "../../store/useCartStore";
 
     // // ✅ basePrice, description, carbonPer100g 등 상세 정보를 여기서 관리
     // const MENU_DATA = [
@@ -104,7 +127,6 @@ export default function StoreView() {
     setIsModalOpen(true);
   };
   const { cart } = useCartStore();
-  console.log(cart);
   return (
     <div className={styles.page_container}>
       {/* 상점 정보 영역 */}
@@ -113,7 +135,7 @@ export default function StoreView() {
           <div className={styles.image_placeholder}></div>
         </div>
         <div className={styles.store_text_wrap}>
-          <h2 className={styles.store_name}>지웅이네 김치찜</h2>
+          <h2 className={styles.store_name}>{storeInfo.storeName}</h2>
           <Link
             to="/storeDetail"
             state={{ storeId: storeId }}
@@ -121,9 +143,7 @@ export default function StoreView() {
           >
             가게 정보, 원산지 정보
           </Link>
-          <p className={styles.store_desc}>
-            정성을 다해 끓인 김치찜 전문점입니다.
-          </p>
+          <p className={styles.store_desc}>{storeInfo.storeIntro}</p>
         </div>
       </div>
 

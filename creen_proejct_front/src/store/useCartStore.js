@@ -7,6 +7,7 @@ const useCartStore = create((set) => ({
   superTotalPrice: 0, // 최종 결제 금액
   deliveryPrice: 0,
   usingEcoPoint: 0,
+  storeName: "",
   // 장바구니에 아이템 추가하는 함수
   addToCart: (item) =>
     set((state) => ({
@@ -32,6 +33,7 @@ const useCartStore = create((set) => ({
   setSuperTotalPrice: (price) => set({ superTotalPrice: price }),
   setDeilveryPrice: (price) => set({ deliveryPrice: price }),
   setUsingEcoPoint: (price) => set({ UsingEcoPoint: price }),
+  setStoreName: (storeName) => set({ storeName: storeName }),
 }));
 
 export default useCartStore;

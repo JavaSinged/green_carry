@@ -24,6 +24,7 @@
   color: var(--color-brand);
   margin-bottom: 25px;
   padding-left: 10px;
+  font-weight: bold;
 }
 
 .sidebar ul {
@@ -57,7 +58,6 @@
 .activeMenu {
   background-color: var(--color-brand) !important;
   color: #ffffff !important;
-  font-weight: bold;
 }
 
 .content {

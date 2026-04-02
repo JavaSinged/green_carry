@@ -9,19 +9,32 @@ import { useNavigate } from "react-router-dom";
 
 export default function MenuModal({ isOpen, onClose, menuData }) {
   const addToCart = useCartStore((state) => state.addToCart);
+  const storeName = useCartStore((state) => state.setStoreName);
 
   const [quantity, setQuantity] = useState(1);
   const [optionList, setOptionList] = useState([]); // 서버에서 받은 전체 옵션
   const [selectedOptions, setSelectedOptions] = useState([]); // 유저가 선택한 옵션 객체 배열
-
-  const navigate = useNavigate();
-
+  const [reusable, setReusable] = useState(false);
+  const [ecoCheck, setEcoCheck] = useState({
+    5: false, //반찬
+    6: false, //일회용품
+  });
+  const ecoCount = Object.values(ecoCheck).filter(Boolean).length;
+  const carbonSaved = reusable
+    ? quantity * 15 + (ecoCount === 0 ? 0 : ecoCount === 1 ? 20 : 40)
+    : ecoCount === 0
+      ? 0
+      : ecoCount === 1
+        ? 20
+        : 40;
   // ✅ 모달이 열릴 때마다 옵션 초기화
+
   useEffect(() => {
     if (isOpen && menuData?.menuId) {
       setQuantity(1);
       setSelectedOptions([]); // 선택 초기화
-
+      setReusable(false);
+      setEcoCheck({ 5: false, 6: false });
       axios
         .get(
           `${import.meta.env.VITE_BACKSERVER}/stores/${menuData.menuId}/options`,
@@ -40,7 +53,15 @@ export default function MenuModal({ isOpen, onClose, menuData }) {
         .catch((err) => console.error("옵션 로딩 실패:", err));
     }
   }, [isOpen, menuData]);
-
+  // useEffect(() => {
+  //   if (reusable) {
+  //     setCarbonSaved(baseCarbonG - carbonTotal);
+  //   } else {
+  //     setCarbonSaved(
+  //       baseCarbonG - (ecoCount === 0 ? 0 : ecoCount === 1 ? 20 : 40),
+  //     );
+  //   }
+  // }, [reusable]);
   // 스크롤 방지
   useEffect(() => {
     document.body.style.overflow = isOpen ? "hidden" : "auto";
@@ -68,6 +89,7 @@ export default function MenuModal({ isOpen, onClose, menuData }) {
         setSelectedOptions([...selectedOptions, option]);
       }
     }
+    console.log(selectedOptions);
   };
 
   // ✅ 가격 및 탄소 배출량 계산 로직
@@ -85,8 +107,7 @@ export default function MenuModal({ isOpen, onClose, menuData }) {
     (reusable
       ? Math.max(0, baseCarbonG - 15) * quantity
       : baseCarbonG * quantity) -
-    (ecoSide ? 10 : 0) -
-    (ecoDisposable ? 10 : 0);
+    (ecoCount === 0 ? 0 : ecoCount === 1 ? 20 : 40);
 
   const handleAddToCart = () => {
     const cartItem = {
@@ -97,13 +118,14 @@ export default function MenuModal({ isOpen, onClose, menuData }) {
       totalPrice,
 
       unitPrice,
-      carbonSaved:
-        (reusable ? 15 * quantity : 0) +
-        (ecoSide ? 10 : 0) +
-        (ecoDisposable ? 10 : 0),
+      carbonSaved: carbonSaved,
+      options: selectedOptions,
+      // (reusable ? 15 * quantity : 0) +
+      // (ecoSide ? 10 : 0) +
+      // (ecoDisposable ? 10 : 0),
     };
     addToCart(cartItem);
-
+    console.log(cartItem);
     onClose();
   };
 
@@ -215,7 +237,15 @@ export default function MenuModal({ isOpen, onClose, menuData }) {
                     checked={
                       !!selectedOptions.find((o) => o.optionNo === opt.optionNo)
                     }
-                    onChange={() => handleOptionToggle(opt)}
+                    onChange={() => {
+                      handleOptionToggle(opt);
+                      const newEcoCheck = {
+                        ...ecoCheck,
+                        [opt.optionNo]: !ecoCheck[opt.optionNo],
+                      };
+
+                      setEcoCheck(newEcoCheck);
+                    }}
                   />
                   <span>{opt.optionName}</span>
                   {/* 에코 포인트는 임시로 20P 고정, 다회용기는 가격(500원 등) 표시 */}
@@ -234,6 +264,28 @@ export default function MenuModal({ isOpen, onClose, menuData }) {
               ))}
             </div>
           )}
+        </div>
+
+        <div
+          className={`${styles.reusable_card} ${
+            reusable ? styles.reusable_active : ""
+          }`}
+        >
+          <div className={styles.reusable_info}>
+            <div className={styles.reusable_title}>
+              <span>🍃 다회용 용기 사용</span>
+              <span className={styles.badge}>+에코 포인트</span>
+            </div>
+            <p>탄소 배출량 15g 감소</p>
+          </div>
+          <label className={styles.toggle_switch}>
+            <input
+              type="checkbox"
+              checked={reusable}
+              onChange={() => setReusable(!reusable)}
+            />
+            <span className={styles.slider}></span>
+          </label>
         </div>
 
         {/* 푸터 */}

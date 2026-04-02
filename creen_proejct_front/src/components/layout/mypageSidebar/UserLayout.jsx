@@ -1,8 +1,8 @@
-import { NavLink, Outlet, useNavigate } from 'react-router-dom';
-import styles from './Layout.module.css';
-
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import styles from "./Layout.module.css";
 
 export default function UserLayout() {
+  const navigate = useNavigate();
 
   return (
     <div className={styles.container}>
@@ -14,7 +14,7 @@ export default function UserLayout() {
             <NavLink
               to="/mypage/user"
               end
-              className={({ isActive }) => (isActive ? styles.activeMenu : '')}
+              className={({ isActive }) => (isActive ? styles.activeMenu : "")}
             >
               에코포인트
             </NavLink>
@@ -22,15 +22,15 @@ export default function UserLayout() {
           <li>
             <NavLink
               to="/mypage/reviews"
-              className={({ isActive }) => (isActive ? styles.activeMenu : '')}
+              className={({ isActive }) => (isActive ? styles.activeMenu : "")}
             >
               리뷰관리
             </NavLink>
           </li>
           <li>
             <NavLink
-              to="/mypage/orders"
-              className={({ isActive }) => (isActive ? styles.activeMenu : '')}
+              to="/mypage/points"
+              className={({ isActive }) => (isActive ? styles.activeMenu : "")}
             >
               주문내역
             </NavLink>
@@ -38,15 +38,15 @@ export default function UserLayout() {
           <li>
             <NavLink
               to="/mypage/user/userInfoEdit"
-              className={({ isActive }) => (isActive ? styles.activeMenu : '')}
+              className={({ isActive }) => (isActive ? styles.activeMenu : "")}
             >
               개인정보 수정
             </NavLink>
           </li>
           <li>
             <NavLink
-              to="/mypage/user/userInfo"
-              className={({ isActive }) => (isActive ? styles.activeMenu : '')}
+              to="/mypage/user/userCS"
+              className={({ isActive }) => (isActive ? styles.activeMenu : "")}
             >
               고객센터
             </NavLink>

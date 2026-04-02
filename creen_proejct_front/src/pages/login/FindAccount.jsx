@@ -60,7 +60,7 @@ const Account = () => {
     }
 
     api
-      .post("/api/member/sendAuthCode", { memberEmail: formData.memberEmail })
+      .post("/member/sendAuthCode", { memberEmail: formData.memberEmail })
       .then(() => {
         setTimeLeft(180);
         setIsTimerActive(true);
@@ -107,7 +107,7 @@ const Account = () => {
 
           if (activeTab === "findId") {
             api
-              .post("/api/member/findId", {
+              .post("/member/findId", {
                 memberName: formData.memberName,
                 memberEmail: formData.memberEmail,
               })
@@ -127,7 +127,7 @@ const Account = () => {
               );
           } else {
             api
-              .post("/api/member/checkMember", {
+              .post("/member/checkMember", {
                 memberId: formData.memberId,
                 memberEmail: formData.memberEmail,
               })
@@ -171,7 +171,7 @@ const Account = () => {
     if (pwError || matchError || !newPassword || !confirmPassword) return;
 
     api
-      .post("/api/member/resetPw", {
+      .post("/member/resetPw", {
         memberId: formData.memberId,
         memberPw: newPassword,
       })
@@ -225,8 +225,8 @@ const Account = () => {
 
       <div className="main-content find-content">
         {/* 좌측 정보 섹션 생략 없이 그대로 유지 */}
+
         <section className="info-section" style={{ width: "320px" }}>
-          <div className="eco-brand"></div>
           <h2
             className="main-title"
             style={{ fontFamily: "var(--font-title)" }}

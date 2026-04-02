@@ -25,7 +25,22 @@ const PaymentPage = () => {
     deliveryPrice: deliveryPrice,
     reducedCarbon: reducedCarbon,
   });
-
+  const payment = () => {
+    console.log("test");
+  };
+  const { orderTbl, setOrderTbl } = useState({
+    memberId: "",
+    storeId: "",
+    usedPoint: "",
+    getPoint: "",
+  });
+  const { orderDetail, setOrderDetail } = useState({
+    menuId: "",
+    price: "",
+    optionString: "",
+    totalCarbon: "",
+    quantity: "",
+  });
   return (
     <div className={styles["payment-page"]}>
       <main className={styles["payment-main"]}>
@@ -214,9 +229,9 @@ const PaymentPage = () => {
               <button
                 className={styles["pay-btn"]}
                 onClick={() => {
-                  console.log(payInfo);
                   setUsingEcoPoint(ecoPoint);
                   setPayInfo({ ...payInfo, totalPrice: totalPrice });
+
                   navigate("/checkoutPage", {
                     state: { payInfo },
                   });

@@ -11,9 +11,8 @@ const CheckoutPage = () => {
   const STORE_INFO = { lat: 37.497952, lng: 127.027619 };
   const totalPrice = cartList.reduce((sum, item) => sum + item.totalPrice, 0);
   const totalCarbon = cartList.reduce((sum, item) => sum + item.carbonSaved, 0);
-
+  const storeName = useCartStore((state) => state.storeName);
   const payInfo = location.state?.payInfo;
-  console.log(payInfo);
   useEffect(() => {
     const checkNaver = setInterval(() => {
       if (window.naver && window.naver.maps && mapElement.current) {
@@ -124,9 +123,7 @@ const CheckoutPage = () => {
                   <span className={styles.smallIcon}></span>
                   <h3 className={styles.cardTitle}>
                     <span>가게 위치</span> &gt;{" "}
-                    <span className={styles.subtitle}>
-                      처갓집치킨 왕십리점
-                    </span>{" "}
+                    <span className={styles.subtitle}>{storeName}</span>{" "}
                   </h3>
                 </div>
               </div>
@@ -173,7 +170,9 @@ const CheckoutPage = () => {
 
               <div className={styles.totalRow}>
                 <span>총 결제 금액</span>
-                <strong>{totalPrice.toLocaleString()} 원</strong>
+                <strong>
+                  {(totalPrice - payInfo.ecoPoint).toLocaleString()} 원
+                </strong>
               </div>
             </div>
 
@@ -229,7 +228,6 @@ const CheckoutPage = () => {
 export default CheckoutPage;
 
 const OrderListMap = ({ cartList }) => {
-  console.log(cartList);
   return cartList.map((cart, index) => {
     return <OrderItemList key={`cartList-${index}`} cart={cart} />;
   });

@@ -25,6 +25,7 @@ const OrderPage = () => {
   const setSuperTotalPrice = useCartStore((state) => state.setSuperTotalPrice);
   const setDeilveryPrice = useCartStore((state) => state.setDeilveryPrice);
   const totalCarbon = cartList.reduce((sum, item) => sum + item.carbonSaved, 0);
+  const storeName = useCartStore((state) => state.storeName);
   useEffect(() => {
     setNum(deliveryType === 1 ? 0 : deliveryType === 2 ? 1000 : 3000);
   }, [deliveryType]);
@@ -39,7 +40,7 @@ const OrderPage = () => {
                   navigate("/storeView");
                 }}
               >
-                <u>처갓집 양념치킨 왕십리점</u> <NavigateNextIcon />
+                <u>{storeName}</u> <NavigateNextIcon />
               </h2>
               <CloseIcon
                 onClick={() => {
@@ -181,6 +182,7 @@ const CartItem = ({
 }) => {
   const unitPrice = cart.unitPrice;
   const totalPrice = unitPrice * cart.quantity;
+  const options = cart.options;
   useEffect(() => {
     handleTotal(totalPrice);
   }, [totalPrice]);
@@ -189,10 +191,16 @@ const CartItem = ({
       <div className={styles.menuItem}>
         <div className={styles.menuInfo}>
           <p>
-            메뉴 : {cart.name} ({cart.size})
+            메뉴 : {cart.name} * ({cart.quantity})
           </p>
           <p>가격 :{unitPrice.toLocaleString()}원</p>
-          <p>옵션 : 매운소스 추가 (1,000원)</p>
+          <p className={styles.options}>
+            옵션 :
+            {options.map((option) => {
+              const name = option.optionName;
+              return <span>&nbsp;{name},&nbsp;</span>;
+            })}
+          </p>
           <div className={styles.quantityBox}>
             <button onClick={() => decreaseQuantity(cart.id)}>-</button>
             <span>{cart.quantity}</span>
