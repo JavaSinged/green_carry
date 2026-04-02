@@ -11,6 +11,9 @@ import InputAdornment from "@mui/material/InputAdornment";
 import TextField from "@mui/material/TextField";
 
 const Login = () => {
+  // 일반 유저 카운트
+  const [userCount, setUserCount] = useState(0);
+
   const [member, setMember] = useState({
     memberId: "",
     memberPw: "",
@@ -27,6 +30,18 @@ const Login = () => {
     title: "greencarry-swal-title",
     confirmButton: "greencarry-swal-confirm-button",
   };
+
+  useEffect(() => {
+    axios
+      .get(`${import.meta.env.VITE_BACKSERVER}/member`)
+      .then((res) => {
+        // 일단 전체 회원 저장
+        setUserCount(res.data.length);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, []);
 
   // 🌟 2. 화면이 켜질 때(초기 렌더링) 로컬스토리지에서 아이디 꺼내오기
   useEffect(() => {
@@ -288,7 +303,9 @@ const Login = () => {
 
         <section className="illustration-section">
           <div className="speech-bubble">
-            <p>현재 456명이 환경을 지키고 있어요!</p>
+            <p>
+              현재 <span>{userCount}</span>명이 환경을 지키고 있어요!
+            </p>
           </div>
           <div className="character-illustration">
             <img src="/image/logo.png" alt="GreenCarry Logo" />
