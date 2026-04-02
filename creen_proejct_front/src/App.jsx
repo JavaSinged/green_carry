@@ -11,7 +11,7 @@ import OrderPage from "./pages/order/OrderPage";
 import PaymentPage from "./pages/order/PaymentPage";
 import CheckoutPage from "./pages/order/CheckoutPage";
 
-import Login from "./pages/login/login";
+import Login from "./pages/login/Login";
 import Account from "./pages/login/FindAccount";
 import UserLayout from "./components/layout/mypageSidebar/UserLayout";
 import ManagerLayout from "./components/layout/mypageSidebar/ManagerLayout";
@@ -84,7 +84,7 @@ function App() {
                 <Route path="userInfoEdit" element={<UserInfoEdit />} />
                 <Route path="userCS" element={<UserCS />} />
               </Route>
-            </Route>{" "}
+            </Route>
             {/* 👈 누락됐던 User 닫기 태그 추가! */}
             {/* ---------------------------------------------------- */}
             {/* 🛡️ 사업자 파트너 (Grade: 2) 철통 방어 구역 */}
@@ -112,9 +112,9 @@ function App() {
                   element={<AdminContainerManagement />}
                 />
               </Route>
-            </Route>{" "}
+            </Route>
             {/* 👈 누락됐던 Admin 닫기 태그 추가! */}
-          </Route>{" "}
+          </Route>
           {/* 👈 BasicLayout 닫기 태그 정상 위치로 복구! */}
           {/* ==================================================== */}
           {/* 🚫 3. 위에서 매칭되지 않은 모든 이상한 주소는 404 처리 */}
