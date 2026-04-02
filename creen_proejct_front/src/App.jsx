@@ -96,13 +96,13 @@ function App() {
             <Route element={<ProtectedRoute requireManager={true} />}>
               <Route path="/mypage/manager" element={<ManagerLayout />}>
                 <Route index element={<div>사업자 대시보드 화면</div>} />
+                <Route path="profile" element={<ManagerInfoEdit />} />
                 <Route
                   path="menus"
                   element={<div>사업자 메뉴 관리 화면</div>}
 
                 />
               </Route>
-              <Route path="profile" element={<ManagerInfoEdit />} />
             </Route>
             {/* ---------------------------------------------------- */}
             {/* 🛡️ 총괄 관리자 (Grade: 0) 철통 방어 구역 */}
