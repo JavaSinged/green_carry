@@ -1,9 +1,8 @@
-import React, { useContext } from "react";
+import React, { useContext, useRef } from "react";
 import { Navigate, Outlet } from "react-router-dom";
 import Swal from "sweetalert2";
 import { AuthContext } from "./AuthContext";
 
-// 🌟 1. 매개변수에 requireGuest 추가!
 const ProtectedRoute = ({
   requireAdmin,
   requireManager,
@@ -12,27 +11,41 @@ const ProtectedRoute = ({
 }) => {
   const { isLogin, user, isLoading } = useContext(AuthContext);
 
-  // 1. 정보를 가져오는 아주 짧은 찰나에는 화면을 그리지 않음 (번쩍임 방지)
+  // 🌟 마법의 메모장 2개 준비
+  const isInitialCheckDone = useRef(false); // 로딩 검사가 끝났는지 체크
+  const wasLoggedInInitially = useRef(false); // 로딩 끝난 직후 로그인 상태였는지 체크
+
+  // 1. 정보를 가져오는 중에는 화면을 멈춰둡니다.
   if (isLoading) {
     return null;
   }
 
-  // ====================================================
-  // 🌟 2. [비회원 전용 구역] 로그인한 유저가 로그인/회원가입 접속 시 차단
-  // ====================================================
-  if (requireGuest && isLogin) {
-    Swal.fire({
-      icon: "info",
-      title: "이미 로그인되어 있습니다.",
-      showConfirmButton: false,
-      timer: 1500,
-    });
-    return <Navigate to="/" replace />; // 메인으로 쫓아내기
+  // 🌟 2. 로딩이 딱 끝난 그 순간! 원래 로그인되어 있던 사람인지 기록합니다.
+  if (!isInitialCheckDone.current) {
+    wasLoggedInInitially.current = isLogin;
+    isInitialCheckDone.current = true; // 이제 첫 기록 끝!
   }
 
   // ====================================================
-  // 3. [회원 전용 구역] 아예 로그인을 안 한 사람이 주소를 치고 들어왔을 때
-  // (requireGuest가 아닐 때만 튕겨내도록 조건 수정!)
+  // 3. [비회원 전용 구역] 로그인한 유저가 로그인/회원가입 접속 시 차단
+  // ====================================================
+  if (requireGuest && isLogin) {
+    // 과거 메모장 확인: 원래부터 로그인(true) 상태였던 사람이 들어왔을 때만 알림!
+    // (방금 로그인 버튼을 눌러서 들어온 사람은 알림 없이 패스)
+    if (wasLoggedInInitially.current === true) {
+      Swal.fire({
+        icon: "info",
+        title: "이미 로그인되어 있습니다.",
+        showConfirmButton: false,
+        timer: 1500,
+      });
+    }
+
+    return <Navigate to="/" replace />;
+  }
+
+  // ====================================================
+  // 4. [회원 전용 구역] 아예 로그인을 안 한 사람이 주소를 치고 들어왔을 때
   // ====================================================
   if (!requireGuest && (!isLogin || !user)) {
     Swal.fire({
@@ -43,19 +56,13 @@ const ProtectedRoute = ({
     return <Navigate to="/login" replace />;
   }
 
-  // 4. 로컬스토리지나 DB에서 꺼내온 등급을 '무조건' 숫자로 강제 변환
-  // 값이 없으면 에러를 뱉지 않고 -1(알 수 없음)로 처리해서 무조건 차단!
+  // 5. 등급 변환 (알 수 없으면 -1)
   const grade =
     user?.memberGrade !== undefined && user?.memberGrade !== null
       ? Number(user.memberGrade)
       : -1;
 
-  // 🛠️ [디버깅용] 개발자 도구 콘솔(F12)에서 이걸 꼭 확인해보세요!
-  console.log(
-    `[문지기 검사] 접속자 등급: ${grade} | 필요 권한 -> User: ${!!requireUser}, Manager: ${!!requireManager}, Admin: ${!!requireAdmin}, Guest: ${!!requireGuest}`,
-  );
-
-  // 5. 권한별 강제 접속(URL 직접 입력) 차단
+  // 6. 권한별 강제 접속 차단
   if (requireAdmin && grade !== 0) {
     Swal.fire({
       icon: "error",
@@ -83,7 +90,7 @@ const ProtectedRoute = ({
     return <Navigate to="/" replace />;
   }
 
-  // 6. 모든 검문을 통과한 진짜 권한자만 입장!
+  // 7. 모든 검문을 통과한 진짜 권한자만 입장!
   return <Outlet />;
 };
 

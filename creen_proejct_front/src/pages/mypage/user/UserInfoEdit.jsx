@@ -51,7 +51,7 @@ export default function UserInfoEdit() {
   useEffect(() => {
     if (user && user.memberId) {
       api
-        .get(`/api/member/getMemberInfo`, {
+        .get(`/member/getMemberInfo`, {
           params: { memberId: user.memberId },
         })
         .then((res) => {
@@ -108,7 +108,7 @@ export default function UserInfoEdit() {
 
     // --- 통과 시 API 호출 ---
     try {
-      const response = await api.post("/api/member/updatePassword", {
+      const response = await api.post("/member/updatePassword", {
         memberId: user.memberId,
         currentPw: currentPw,
         newPw: newPw,
