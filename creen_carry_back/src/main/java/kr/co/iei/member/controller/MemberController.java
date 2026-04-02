@@ -7,7 +7,6 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,7 +21,7 @@ import kr.co.iei.utils.JwtUtil;
 import kr.co.iei.member.model.service.MemberService;
 
 @RestController
-@RequestMapping("/api/member")
+@RequestMapping("/member")
 @CrossOrigin(value="*") // 리액트 접근 허용
 public class MemberController {
 
