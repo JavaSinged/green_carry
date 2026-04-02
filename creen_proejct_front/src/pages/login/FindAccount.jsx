@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import "./FindAccount.css";
 import { Link, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
@@ -32,6 +32,19 @@ const Account = () => {
     handlePwChange,
     handleConfirmPwChange,
   } = useAccountStore();
+
+  const bgImages = [
+    "/image/login/lo.jpg",
+    "/image/login/lo2.jpg",
+    "/image/login/lo3.jpg",
+    "/image/login/f.jpg",
+    "/image/login/f2.jpg",
+    "/image/login/lo.webp",
+  ];
+  const selectedBg = useMemo(() => {
+    const randomIndex = Math.floor(Math.random() * bgImages.length);
+    return bgImages[randomIndex];
+  }, []);
 
   // 타이머 로직 (API 호출이나 Effect는 컴포넌트에 남겨두는 것이 좋습니다)
   useEffect(() => {
@@ -200,7 +213,10 @@ const Account = () => {
   };
 
   return (
-    <div className="screen-container">
+    <div
+      className="screen-container"
+      style={{ backgroundImage: `url(${selectedBg})` }}
+    >
       <h1
         className="logo"
         style={{

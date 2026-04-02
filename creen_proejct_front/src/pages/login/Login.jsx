@@ -29,7 +29,6 @@ const Login = () => {
   };
 
   const bgImages = [
-    "/image/login/loginsign.jpg",
     "/image/login/lo.jpg",
     "/image/login/lo2.jpg",
     "/image/login/lo3.jpg",
