@@ -46,6 +46,12 @@
 </update>
 
 
+<select id="selectAllMember" resultType="member">
+	SELECT *
+    FROM member_tbl
+</select>
+
+
 
 
 </mapper>

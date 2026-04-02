@@ -2,6 +2,7 @@ package kr.co.iei.member.controller;
 
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +37,12 @@ public class MemberController {
     MemberController(BCryptPasswordEncoder passwordEncoder) {
         this.passwordEncoder = passwordEncoder;
     } // ✨ JwtUtil 주입
+    
+    @GetMapping
+    public ResponseEntity<?> getMembers(){
+    	List<Member> list = memberService.getMembers();
+    	return ResponseEntity.ok(list);
+    }
 
     //1.로그인기능
     @PostMapping("/login")

@@ -2,6 +2,7 @@ package kr.co.iei.member.model.service;
 
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -144,6 +145,9 @@ public class MemberService {
 	    int result = memberDao.updatePassword(memberId, encodedNewPw);
 	    
 	    return result > 0;
+	}
+	public List<Member> getMembers() {
+		return memberDao.selectAllMember();
 	}
 
 }

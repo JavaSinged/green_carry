@@ -1,0 +1,70 @@
+/* 탭 컨테이너 */
+.tabContainer {
+  display: flex;
+  width: 100%;
+  max-width: 600px; /* 적절한 너비 설정 */
+  margin: 0 auto 30px auto; /* 중앙 정렬 및 아래 여백 */
+  border: 1px solid #2e8147;
+  border-radius: 12px;
+  overflow: hidden; /* 자식 버튼의 모서리가 튀어나가지 않게 */
+}
+
+/* 개별 탭 버튼 기본 스타일 */
+.tabButton {
+  flex: 1;
+  padding: 14px 0;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: all 0.3s ease;
+  background-color: #ecf4ef; /* 비활성 상태: 연한 녹색 */
+  color: #555;
+}
+
+/* 활성화된 탭 스타일 */
+.activeTab {
+  background-color: #2e8147; /* 활성 상태: 진한 녹색 */
+  color: white;
+}
+
+/* 버튼 내 사각형 아이콘 스타일 */
+.tabIcon {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  background-color: rgba(255, 255, 255, 0.3); /* 활성 상태일 때 */
+}
+
+.inactiveIcon {
+  background-color: #ccc; /* 비활성 상태일 때 */
+}
+
+.dashboardContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 24px; /* 차트 사이 세로 간격 */
+  padding: 20px;
+}
+
+/* 한 줄 전체를 차지하는 스타일 */
+.fullWidthSection {
+  width: 100%;
+}
+
+.inquiryTitle {
+  margin-top: 40px;
+  font-size: 24px;
+  color: #333;
+}
+
+/* 반응형: 화면이 작아지면 반반 차트도 세로로 나열 */
+@media (max-width: 1024px) {
+  .halfWidthRow {
+    flex-direction: column;
+  }
+}
