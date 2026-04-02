@@ -147,13 +147,10 @@ export const AuthProvider = ({ children }) => {
             memberName: name,
             memberGrade: Number(grade),
           });
-
           // 🌟 남은 시간 계산 (24일 초과 시 타이머 오버플로 방지)
           //const remainingTimeInMs = 10000; //10초 테스트
-          const remainingTimeInMs = (decodedPayload.exp - currentTime) * 1000; //진짜 유효시간(1시간)
-
+          const remainingTimeInMs = (decodedPayload.exp - currentTime) * 100000; //진짜 유효시간(1시간)
           if (logoutTimerRef.current) clearTimeout(logoutTimerRef.current);
-
           // 자바스크립트 setTimeout 한계(약 24.8일) 체크하여 안전할 때만 타이머 실행
           if (remainingTimeInMs > 0 && remainingTimeInMs < 2147483647) {
             logoutTimerRef.current = setTimeout(() => {

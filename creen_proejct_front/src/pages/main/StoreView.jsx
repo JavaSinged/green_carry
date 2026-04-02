@@ -12,6 +12,7 @@ export default function StoreView() {
   const storeId = location.state?.storeId || 1;
   //store state
   const [storeInfo, setStoreInfo] = useState({
+    storeId: "",
     storeIntro: "",
     storeName: "",
   });
@@ -24,6 +25,7 @@ export default function StoreView() {
   const [searchTerm, setSearchTerm] = useState("");
   const storeName = useCartStore((state) => state.setStoreName);
   const [reusable, setReusable] = useState(false);
+  const cartStoreId = useCartStore();
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -52,7 +54,6 @@ export default function StoreView() {
           storeIntro: res.data.storeIntro,
           storeName: res.data.storeName,
         });
-        console.log(storeInfo);
       })
       .catch((err) => console.error("가게 로딩 실패:", err));
   }, [storeId]);
@@ -126,7 +127,7 @@ export default function StoreView() {
     setSelectedMenu(menu);
     setIsModalOpen(true);
   };
-  const { cart } = useCartStore();
+  console.log(cartStoreId);
   return (
     <div className={styles.page_container}>
       {/* 상점 정보 영역 */}

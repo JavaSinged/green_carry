@@ -19,6 +19,7 @@ const OrderPage = () => {
   const navigate = useNavigate();
   const list = useLocation();
   const cartList = useCartStore((state) => state.cart);
+  const storeId = useCartStore((state) => state.storeId);
   const [realTotal, setRealTotal] = useState(0);
   const [deliveryType, setDeliveryType] = useState(1);
   const [num, setNum] = useState(0);
@@ -29,6 +30,9 @@ const OrderPage = () => {
   useEffect(() => {
     setNum(deliveryType === 1 ? 0 : deliveryType === 2 ? 1000 : 3000);
   }, [deliveryType]);
+
+  const addOrder = () => {};
+  console.log(storeId);
   return (
     <div className={styles.pageWrapper}>
       <main className={styles.mainContainer}>
@@ -132,7 +136,8 @@ const OrderPage = () => {
           <div
             className={styles.payButton}
             onClick={() => {
-              (setSuperTotalPrice(realTotal),
+              (addOrder(),
+                setSuperTotalPrice(realTotal),
                 setDeilveryPrice(num),
                 navigate("/paymentPage"));
             }}

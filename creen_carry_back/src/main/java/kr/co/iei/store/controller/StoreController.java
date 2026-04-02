@@ -3,6 +3,7 @@ package kr.co.iei.store.controller;
 import kr.co.iei.store.model.service.StoreService;
 import kr.co.iei.store.model.vo.Menu;
 import kr.co.iei.store.model.vo.MenuOption;
+import kr.co.iei.store.model.vo.Order;
 import kr.co.iei.store.model.vo.Store;
 import org.apache.ibatis.type.Alias;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,5 +52,11 @@ public class StoreController {
         return ResponseEntity.ok(options);
     }
 
+    @PostMapping("/order")
+    public ResponseEntity<?> insertOrder(@RequestBody Order orderData){
+    	System.out.println(orderData);
+    	int orderId = storeService.insertOrder(orderData);
+    	return ResponseEntity.ok(orderId);
+    }
 
 }

@@ -12,8 +12,15 @@ const CheckoutPage = () => {
   const totalPrice = cartList.reduce((sum, item) => sum + item.totalPrice, 0);
   const totalCarbon = cartList.reduce((sum, item) => sum + item.carbonSaved, 0);
   const storeName = useCartStore((state) => state.storeName);
-  const payInfo = location.state?.payInfo;
+  const { usedPoint, deliveryPrice } = useCartStore();
+  const [payInfo, setPayInfo] = useState({
+    totalPrice: totalPrice,
+    ecoPoint: usedPoint,
+    deliveryPrice: deliveryPrice,
+  });
+
   useEffect(() => {
+    console.log(cartList);
     const checkNaver = setInterval(() => {
       if (window.naver && window.naver.maps && mapElement.current) {
         setMapLoaded(true);
@@ -24,6 +31,7 @@ const CheckoutPage = () => {
   }, []);
 
   useEffect(() => {
+    console.log(payInfo.ecoPoint);
     if (!mapLoaded || !mapElement.current) return;
     const { naver } = window;
     const location = new naver.maps.LatLng(STORE_INFO.lat, STORE_INFO.lng);
@@ -162,7 +170,7 @@ const CheckoutPage = () => {
                 </div>
                 <div className={styles.orderRow}>
                   <span>에코포인트 사용</span>
-                  <span>- {payInfo.ecoPoint.toLocaleString()} 원</span>
+                  {/* <span>- {payInfo.ecoPoint.toLocaleString()} 원</span> */}
                 </div>
               </div>
 
@@ -171,7 +179,7 @@ const CheckoutPage = () => {
               <div className={styles.totalRow}>
                 <span>총 결제 금액</span>
                 <strong>
-                  {(totalPrice - payInfo.ecoPoint).toLocaleString()} 원
+                  {/* {(totalPrice - payInfo.ecoPoint).toLocaleString()} 원 */}
                 </strong>
               </div>
             </div>

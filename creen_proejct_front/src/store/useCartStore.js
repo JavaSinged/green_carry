@@ -8,6 +8,7 @@ const useCartStore = create((set) => ({
   deliveryPrice: 0,
   usingEcoPoint: 0,
   storeName: "",
+  storeId: 0,
   // 장바구니에 아이템 추가하는 함수
   addToCart: (item) =>
     set((state) => ({
@@ -34,6 +35,11 @@ const useCartStore = create((set) => ({
   setDeilveryPrice: (price) => set({ deliveryPrice: price }),
   setUsingEcoPoint: (price) => set({ UsingEcoPoint: price }),
   setStoreName: (storeName) => set({ storeName: storeName }),
+  setStoreId: (storeId) => set({ storeId: storeId }),
+  getTotalSavedCarbon: () =>
+    Math.round(
+      get().cart.reduce((sum, item) => sum + (item.savedCarbon || 0), 0),
+    ),
 }));
 
 export default useCartStore;

@@ -1,47 +1,48 @@
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import styles from './Home.module.css';
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import styles from "./Home.module.css";
 
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Autoplay, Pagination, Navigation } from 'swiper/modules';
-import 'swiper/css';
-import 'swiper/css/pagination';
-import 'swiper/css/navigation';
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Autoplay, Pagination, Navigation } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/pagination";
+import "swiper/css/navigation";
 
-import SearchIcon from '@mui/icons-material/Search';
-import StarIcon from '@mui/icons-material/Star';
-import StarHalfIcon from '@mui/icons-material/StarHalf';
-import StarOutlineIcon from '@mui/icons-material/StarOutline';
+import SearchIcon from "@mui/icons-material/Search";
+import StarIcon from "@mui/icons-material/Star";
+import StarHalfIcon from "@mui/icons-material/StarHalf";
+import StarOutlineIcon from "@mui/icons-material/StarOutline";
+import useCartStore from "../../store/useCartStore";
 
 const banners = [
   {
-    title: '같이 효율적으로 소비하는 플랫폼',
-    img: '/image/banner/banner1.png',
+    title: "같이 효율적으로 소비하는 플랫폼",
+    img: "/image/banner/banner1.png",
   },
   {
-    title: '오늘도 그린하게, 지구를 구하는 한 끼',
-    img: '/image/banner/banner2.png',
+    title: "오늘도 그린하게, 지구를 구하는 한 끼",
+    img: "/image/banner/banner2.png",
   },
 ];
 
 const categories = [
-  { name: '인기맛집', img: '/image/category/bestFood.png' },
-  { name: '한식', img: '/image/category/Kfood.png' },
-  { name: '양식', img: '/image/category/wsFood.png' },
-  { name: '중식', img: '/image/category/chFood.png' },
-  { name: '일식', img: '/image/category/susi.png' },
-  { name: '피자', img: '/image/category/pizza.png' },
-  { name: '치킨', img: '/image/category/chicken.png' },
-  { name: '샐러드', img: '/image/category/salad.png' },
-  { name: '커피/디저트', img: '/image/category/dessert.png' },
+  { name: "인기맛집", img: "/image/category/bestFood.png" },
+  { name: "한식", img: "/image/category/Kfood.png" },
+  { name: "양식", img: "/image/category/wsFood.png" },
+  { name: "중식", img: "/image/category/chFood.png" },
+  { name: "일식", img: "/image/category/susi.png" },
+  { name: "피자", img: "/image/category/pizza.png" },
+  { name: "치킨", img: "/image/category/chicken.png" },
+  { name: "샐러드", img: "/image/category/salad.png" },
+  { name: "커피/디저트", img: "/image/category/dessert.png" },
 ];
 
 export default function Home() {
   const navigate = useNavigate();
-
-  const [selectedCategory, setSelectedCategory] = useState('인기맛집');
-  const [searchTerm, setSearchTerm] = useState('');
+  const { storeId, setStoreId } = useCartStore();
+  const [selectedCategory, setSelectedCategory] = useState("인기맛집");
+  const [searchTerm, setSearchTerm] = useState("");
 
   // 1. 서버에서 받아온 원본 리스트를 저장할 State
   const [storeList, setStoreList] = useState([]);
@@ -51,12 +52,12 @@ export default function Home() {
     axios
       .get(`${import.meta.env.VITE_BACKSERVER}/stores`)
       .then((res) => {
-        console.log('서버 데이터 확인:', res.data);
+        console.log("서버 데이터 확인:", res.data);
         // 서버에서 넘어온 배열 데이터를 상태에 저장
         setStoreList(res.data);
       })
       .catch((err) => {
-        console.error('데이터 로딩 에러:', err);
+        console.error("데이터 로딩 에러:", err);
       });
   }, []);
 
@@ -64,7 +65,7 @@ export default function Home() {
   // 서버 데이터 필드명에 맞춰 수정 (storeName, storeCategory 등)
   const filteredStores = storeList.filter((store) => {
     const isCategoryMatch =
-      selectedCategory === '인기맛집' ||
+      selectedCategory === "인기맛집" ||
       store.storeCategory === selectedCategory;
 
     const isSearchMatch = store.storeName
@@ -81,14 +82,14 @@ export default function Home() {
       if (i <= Math.floor(rating)) {
         // 꽉 찬 별
         stars.push(
-          <StarIcon key={i} sx={{ color: '#ffb300', fontSize: '1.2rem' }} />,
+          <StarIcon key={i} sx={{ color: "#ffb300", fontSize: "1.2rem" }} />,
         );
       } else if (i === Math.ceil(rating) && rating % 1 !== 0) {
         // 반 개 별 (소수점이 있는 경우)
         stars.push(
           <StarHalfIcon
             key={i}
-            sx={{ color: '#ffb300', fontSize: '1.2rem' }}
+            sx={{ color: "#ffb300", fontSize: "1.2rem" }}
           />,
         );
       } else {
@@ -96,7 +97,7 @@ export default function Home() {
         stars.push(
           <StarOutlineIcon
             key={i}
-            sx={{ color: '#ccc', fontSize: '1.2rem' }}
+            sx={{ color: "#ccc", fontSize: "1.2rem" }}
           />,
         );
       }
@@ -138,7 +139,7 @@ export default function Home() {
             <div
               key={item.name}
               className={`${styles.category_item} ${
-                selectedCategory === item.name ? styles.active : ''
+                selectedCategory === item.name ? styles.active : ""
               }`}
               onClick={() => setSelectedCategory(item.name)}
             >
@@ -175,14 +176,17 @@ export default function Home() {
                 key={store.storeId} // storeId 사용
                 className={styles.card_item}
                 // 클릭 시 해당 상점 ID를 가지고 이동하거나 상세 페이지 로직 처리
-                onClick={() =>
-                  navigate('/storeView', { state: { storeId: store.storeId } })
-                }
+                onClick={() => {
+                  (setStoreId(store.storeId),
+                    navigate("/storeView", {
+                      state: { storeId: store.storeId },
+                    }));
+                }}
               >
                 <div className={styles.image_wrap}>
                   {/* storeThumb가 null일 경우 기본 이미지 처리 */}
                   <img
-                    src={store.storeThumb || '/image/default_store.png'}
+                    src={store.storeThumb || "/image/default_store.png"}
                     alt={store.storeName}
                   />
                   {/* 서버 데이터에 거리가 없다면 임시값이나 위치 계산값 사용 */}
