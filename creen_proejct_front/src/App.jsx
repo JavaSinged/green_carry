@@ -25,14 +25,18 @@ import ManagerSignup from "./pages/signup/ManagerSignup";
 import Signup from "./pages/signup/Signup";
 import UserCS from "./pages/mypage/user/UserCS";
 
+import ManagerInfoEdit from "./pages/mypage/manager/ManagerInfoEdit"
+
 import AdminDashboard from "./pages/mypage/admin/AdminDashboard";
 import AdminUserManagement from "./pages/mypage/admin/AdminUserManagement";
 import AdminStoreManagement from "./pages/mypage/admin/AdminStoreManagement";
 import AdminReviewManagement from "./pages/mypage/admin/AdminReviewManagement";
 import AdminContainerManagement from "./pages/mypage/admin/AdminContainerManagement";
 
+
 // 🌟 문지기 컴포넌트
 import ProtectedRoute from "./context/ProtectedRoute";
+
 
 const BasicLayout = () => {
   return (
@@ -81,10 +85,10 @@ function App() {
               {/* 마이페이지 사이드바(UserLayout)가 적용되는 페이지 */}
               <Route path="/mypage/user" element={<UserLayout />}>
                 <Route index element={<UserProfile />} />
-                <Route path="userInfoEdit" element={<UserInfoEdit />} />
+                <Route path="profile" element={<UserInfoEdit />} />
                 <Route path="userCS" element={<UserCS />} />
               </Route>
-            </Route>
+            </Route > {" "}
             {/* 👈 누락됐던 User 닫기 태그 추가! */}
             {/* ---------------------------------------------------- */}
             {/* 🛡️ 사업자 파트너 (Grade: 2) 철통 방어 구역 */}
@@ -92,9 +96,11 @@ function App() {
             <Route element={<ProtectedRoute requireManager={true} />}>
               <Route path="/mypage/manager" element={<ManagerLayout />}>
                 <Route index element={<div>사업자 대시보드 화면</div>} />
+                <Route path="profile" element={<ManagerInfoEdit />} />
                 <Route
                   path="menus"
                   element={<div>사업자 메뉴 관리 화면</div>}
+
                 />
               </Route>
             </Route>
@@ -112,17 +118,13 @@ function App() {
                   element={<AdminContainerManagement />}
                 />
               </Route>
-            </Route>
-            {/* 👈 누락됐던 Admin 닫기 태그 추가! */}
-          </Route>
-          {/* 👈 BasicLayout 닫기 태그 정상 위치로 복구! */}
-          {/* ==================================================== */}
-          {/* 🚫 3. 위에서 매칭되지 않은 모든 이상한 주소는 404 처리 */}
-          {/* ==================================================== */}
+            </Route>{" "}
+          </Route > {" "}
+
           <Route path="*" element={<NotFound />} />
-        </Routes>
-      </div>
-    </AuthProvider>
+        </Routes >
+      </div >
+    </AuthProvider >
   );
 }
 

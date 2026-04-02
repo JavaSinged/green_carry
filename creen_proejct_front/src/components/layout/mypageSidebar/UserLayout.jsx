@@ -37,7 +37,7 @@ export default function UserLayout() {
           </li>
           <li>
             <NavLink
-              to="/mypage/user/userInfoEdit"
+              to="/mypage/user/profile"
               className={({ isActive }) => (isActive ? styles.activeMenu : "")}
             >
               개인정보 수정

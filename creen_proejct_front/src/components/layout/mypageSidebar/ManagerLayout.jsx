@@ -34,7 +34,7 @@ export default function ManagerLayout() {
           </li>
           <li>
             <NavLink
-              to="/mypage/profile"
+              to="/mypage/manager/profile"
               className={({ isActive }) => (isActive ? styles.activeMenu : '')}
             >
               개인정보 수정
