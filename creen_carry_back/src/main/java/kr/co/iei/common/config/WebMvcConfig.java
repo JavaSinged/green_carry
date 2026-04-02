@@ -10,8 +10,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
     	//회원 프로필용
-        registry.addResourceHandler("/uploads/member/**")
-                .addResourceLocations("file:////192.168.31.26/project/upload/web/member/");
+        registry.addResourceHandler("/uploads/member/**") //DB에 저장될 값
+                .addResourceLocations("file:////192.168.31.26/project/upload/web/member/"); //실제 경로
 
 
     }

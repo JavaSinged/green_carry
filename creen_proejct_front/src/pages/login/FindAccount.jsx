@@ -1,12 +1,14 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect } from "react";
 import "./FindAccount.css";
 import { Link, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import api from "../../utils/accessToken";
 // 🌟 방금 만든 Store 불러오기
 import useAccountStore from "../../store/accountStore";
+import useEcoEffects from "../../hooks/useEcoEffects";
 
 const Account = () => {
+  const { containerRef, bubblesRef, selectedBg, bubbleData } = useEcoEffects();
   const navigate = useNavigate();
 
   // 🌟 Store에서 필요한 상태와 함수들을 한 번에 꺼내옵니다! (수많은 useState가 한 줄로 압축됨)
@@ -32,19 +34,6 @@ const Account = () => {
     handlePwChange,
     handleConfirmPwChange,
   } = useAccountStore();
-
-  const bgImages = [
-    "/image/login/lo.jpg",
-    "/image/login/lo2.jpg",
-    "/image/login/lo3.jpg",
-    "/image/login/f.jpg",
-    "/image/login/f2.jpg",
-    "/image/login/lo.webp",
-  ];
-  const selectedBg = useMemo(() => {
-    const randomIndex = Math.floor(Math.random() * bgImages.length);
-    return bgImages[randomIndex];
-  }, []);
 
   // 타이머 로직 (API 호출이나 Effect는 컴포넌트에 남겨두는 것이 좋습니다)
   useEffect(() => {
@@ -215,8 +204,25 @@ const Account = () => {
   return (
     <div
       className="screen-container"
+      ref={containerRef}
       style={{ backgroundImage: `url(${selectedBg})` }}
     >
+      <div className="sun-rays"></div>
+
+      {bubbleData.map((style, i) => (
+        <div
+          key={i}
+          className="eco-bubble"
+          ref={(el) => (bubblesRef.current[i] = el)}
+          style={{
+            left: style.left,
+            top: style.top,
+            width: style.size,
+            height: style.size,
+            animationDelay: style.delay,
+          }}
+        />
+      ))}
       <h1
         className="logo"
         style={{

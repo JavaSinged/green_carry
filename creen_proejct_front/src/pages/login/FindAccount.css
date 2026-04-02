@@ -247,3 +247,70 @@ input:focus {
 .timer-text.danger {
   color: #e53935;
 }
+
+.particle-leaf {
+  position: fixed;
+  background-color: var(--color-brand);
+  border-radius: 80% 0 80% 0;
+  pointer-events: none;
+  opacity: 0.7;
+  z-index: 100;
+  animation: leaf-fade-out 1.5s ease-out forwards;
+}
+
+@keyframes leaf-fade-out {
+  0% {
+    transform: translate(0, 0) rotate(0deg) scale(1);
+    opacity: 0.7;
+  }
+  100% {
+    transform: translate(-20px, 60px) rotate(180deg) scale(0);
+    opacity: 0;
+  }
+}
+
+.eco-bubble {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 50%;
+  filter: blur(2px);
+  z-index: 3;
+  pointer-events: none;
+  animation: float-around 6s infinite ease-in-out;
+}
+
+@keyframes float-around {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+.sun-rays {
+  position: absolute;
+  top: -50%;
+  left: -20%;
+  width: 80%;
+  height: 80%;
+  background: repeating-conic-gradient(
+    from 0deg,
+    transparent 0deg 20deg,
+    rgba(255, 255, 255, 0.05) 25deg 35deg,
+    transparent 40deg 60deg
+  );
+  pointer-events: none;
+  z-index: 2;
+  animation: sun-rotate 60s linear infinite;
+  transform-origin: center;
+}
+
+@keyframes sun-rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
