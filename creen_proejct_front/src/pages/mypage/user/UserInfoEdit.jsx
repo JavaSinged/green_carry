@@ -17,11 +17,10 @@ import Collapse from "@mui/material/Collapse";
 import PhotoCameraIcon from "@mui/icons-material/PhotoCamera";
 
 export default function UserInfoEdit() {
-  const { user } = useContext(AuthContext);
+  const { user, setUser } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  // 🌟 1. 백엔드 서버 주소 변수 추가 (포트 번호가 다르다면 본인 환경에 맞게 수정하세요!)
-  const backHost = "http://localhost:10400";
+  const backHost = import.meta.env.VITE_BACKSERVER;
 
   const [memberInfo, setMemberInfo] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -110,26 +109,28 @@ export default function UserInfoEdit() {
     }
 
     try {
-      const token = localStorage.getItem("accessToken");
+      const response = await api.post("/member/updateProfile", formData);
 
-      const response = await api.post("/member/updateProfile", formData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (response.data === 1) {
+      if (response.data !== "UPDATE_FAIL") {
         Swal.fire("성공", "기본 정보가 수정되었습니다.", "success");
+
+        const serverPath = response.data;
+
+        const finalPath =
+          serverPath === "SUCCESS_NO_IMAGE" ? previewImg : serverPath;
+
+        localStorage.setItem("memberThumb", finalPath);
+
+        setUser({
+          ...user,
+          memberThumb: finalPath,
+        });
+
+        setPreviewImg(finalPath);
         setIsEditingProfile(false);
-        setMemberInfo((prev) => ({
-          ...prev,
-          memberName: profileData.memberName,
-          memberPhone: profileData.memberPhone,
-          memberThumb: previewImg,
-        }));
       }
     } catch (error) {
-      Swal.fire("에러", "프로필 수정 중 오류가 발생했습니다.", "error");
+      Swal.fire("에러", "수정 중 오류 발생", "error");
     }
   };
 

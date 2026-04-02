@@ -91,6 +91,7 @@ const Login = () => {
           localStorage.setItem("memberId", loginUser.memberId);
           localStorage.setItem("memberName", loginUser.memberName);
           localStorage.setItem("memberGrade", loginUser.memberGrade);
+          localStorage.setItem("memberThumb", loginUser.memberThumb);
 
           // 🌟 2️⃣ [아이디 저장 로직 실행]
           if (rememberId) {

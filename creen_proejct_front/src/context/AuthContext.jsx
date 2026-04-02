@@ -92,6 +92,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("memberId");
     localStorage.removeItem("memberName");
     localStorage.removeItem("memberGrade");
+    localStorage.removeItem("memberThumb");
     setIsLogin(false);
     setUser(null);
   };
@@ -131,6 +132,7 @@ export const AuthProvider = ({ children }) => {
     const name = localStorage.getItem("memberName");
     const grade = localStorage.getItem("memberGrade");
     const id = localStorage.getItem("memberId");
+    const thumb = localStorage.getItem("memberThumb");
 
     if (token) {
       try {
@@ -146,6 +148,7 @@ export const AuthProvider = ({ children }) => {
             memberId: id,
             memberName: name,
             memberGrade: Number(grade),
+            memberThumb: thumb,
           });
 
           // 🌟 남은 시간 계산 (24일 초과 시 타이머 오버플로 방지)
@@ -170,6 +173,7 @@ export const AuthProvider = ({ children }) => {
         localStorage.removeItem("memberId");
         localStorage.removeItem("memberName");
         localStorage.removeItem("memberGrade");
+        localStorage.removeItem("memberThumb");
       }
     }
 

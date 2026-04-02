@@ -16,6 +16,9 @@ export default function Header() {
   const navigate = useNavigate();
   const { isLogin, user, logout, isLoading } = useContext(AuthContext);
 
+  const backHost = import.meta.env.VITE_BACKSERVER;
+  console.log("현재 헤더에 들어온 유저 정보:", user);
+
   // 🎨 GreenCarry 전용 Swal 스타일 함수
   const fireStyledSwal = (icon, title, text) => {
     return Swal.fire({
@@ -34,7 +37,7 @@ export default function Header() {
     });
   };
 
-  // 🌟 [수정] 클릭 시 즉시 안내 문구 노출 후 로그아웃
+  // [수정] 클릭 시 즉시 안내 문구 노출 후 로그아웃
   const handleLogoutClick = () => {
     fireStyledSwal(
       "success",
@@ -113,12 +116,27 @@ export default function Header() {
 
             <div
               onClick={handleMyPageClick}
-              style={{ cursor: "pointer", display: "flex" }}
+              style={{
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+              }}
             >
-              <PersonIcon titleAccess="마이페이지" />
+              {/* 로그인 상태이고 사진이 있으면 img, 없으면 기본 아이콘 노출 */}
+              {isLogin && user?.memberThumb ? (
+                <div className={styles.profile_circle}>
+                  <img
+                    src={`${backHost}${user.memberThumb}`}
+                    alt="profile"
+                    className={styles.profile_img}
+                  />
+                </div>
+              ) : (
+                <PersonIcon titleAccess="마이페이지" />
+              )}
             </div>
 
-            {/* 🌟 로그아웃 버튼: 클릭 시 바로 문구 -> 로그아웃 */}
+            {/* 로그아웃 버튼: 클릭 시 바로 문구 -> 로그아웃 */}
             {isLogin ? (
               <div
                 onClick={handleLogoutClick}

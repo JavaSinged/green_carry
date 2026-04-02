@@ -163,47 +163,37 @@ public class MemberController {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("비밀번호 변경 실패");
             }
         } catch (IllegalArgumentException e) {
-            // 현재 비밀번호가 틀린 경우 서비스에서 던진 메시지 처리
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     
     }
     @PostMapping("/updateProfile")
     public ResponseEntity<?> updateProfile(
-    		@RequestParam String memberId, // 현재 접속중인 회원의 Id
+            @RequestParam String memberId,
             @RequestParam String memberName,
             @RequestParam String memberPhone,
             @RequestParam(value = "uploadFile", required = false) MultipartFile uploadFile) {
 
-        // 1. 업데이트할 정보를 담을 Member 객체 생성
         Member member = new Member();
         member.setMemberId(memberId);
         member.setMemberName(memberName);
         member.setMemberPhone(memberPhone);
-        System.out.println(member);
 
-        // 2. 프로필 사진이 전송되었는지 확인 및 저장 로직
         if (uploadFile != null && !uploadFile.isEmpty()) {
             try {
-                // 🌟 이미지를 저장할 서버 경로 설정 
-            	String savePath = "\\\\192.168.31.26\\project\\upload\\web\\member\\";
-                
+                String savePath = "\\\\192.168.31.26\\project\\upload\\web\\member\\";
                 File folder = new File(savePath);
-                if (!folder.exists()) {
-                    folder.mkdirs(); // 폴더가 없으면 생성
-                }
+                if (!folder.exists()) folder.mkdirs();
 
-                // 파일명 충돌을 막기 위해 UUID(난수) + 원본 확장자로 새 파일명 생성
                 String originalFileName = uploadFile.getOriginalFilename();
                 String extension = originalFileName.substring(originalFileName.lastIndexOf("."));
                 String saveFileName = UUID.randomUUID().toString() + extension;
 
-                // 실제 서버 경로에 파일 저장
                 File dest = new File(savePath + saveFileName);
                 uploadFile.transferTo(dest);
 
-                // DB에 저장할 웹 접근 경로 세팅 (프론트에서 이 경로로 이미지를 부름)
-                member.setMemberThumb("/uploads/member/" + saveFileName);
+                String memberThumb = "/uploads/member/" + saveFileName;
+                member.setMemberThumb(memberThumb);
 
             } catch (IOException e) {
                 e.printStackTrace();
@@ -211,11 +201,11 @@ public class MemberController {
             }
         }
 
-        // 3. 서비스 호출하여 DB 업데이트
         int result = memberService.updateProfile(member);
 
         if (result > 0) {
-            return ResponseEntity.ok(result);
+
+            return ResponseEntity.ok(member.getMemberThumb() != null ? member.getMemberThumb() : "SUCCESS_NO_IMAGE");
         } else {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("UPDATE_FAIL");
         }
