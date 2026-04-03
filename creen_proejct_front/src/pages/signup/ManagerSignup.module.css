@@ -277,3 +277,14 @@
     margin-top: 5px;
   }
 }
+:global(.signup-input-underline)::placeholder {
+  color: #555555 !important; /* 배경에 묻히지 않는 진한 회색 */
+  opacity: 1 !important; /* 브라우저 기본 투명도 강제 해제 */
+  font-weight: 500; /* 살짝 도톰하게 해서 가독성 업! */
+}
+
+/* 포커스(클릭) 했을 때 placeholder 살짝 연하게 처리 (선택 사항) */
+:global(.signup-input-underline):focus::placeholder {
+  opacity: 0.5 !important;
+  transition: opacity 0.3s ease;
+}
