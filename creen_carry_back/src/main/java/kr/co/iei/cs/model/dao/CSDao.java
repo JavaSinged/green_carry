@@ -16,4 +16,8 @@ public interface CSDao {
 
 	int insertQna(Qna qna);
 
+	int deleteInquiry(Integer qnaNo);
+
+	int putInquiry(Qna qna);
+
 }

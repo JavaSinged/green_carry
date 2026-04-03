@@ -34,6 +34,18 @@
 			sysdate)
 </insert>
 
+<delete id="deleteInquiry">
+	delete from qna_tbl where qna_no = #{qnaNo} 
+</delete>
+
+<update id="putInquiry">
+	update qna_tbl 
+	set
+		qna_title=#{qnaTitle},
+		qna_content=#{qnaContent},
+		qna_date = sysdate
+	where qna_no = #{qnaNo}
+</update>
 
 
 </mapper>

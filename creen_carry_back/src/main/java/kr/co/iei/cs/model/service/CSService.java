@@ -30,6 +30,16 @@ public class CSService {
 		return result;
 	}
 
+	public int deleteInquiry(Integer qnaNo) {
+		int result = csDao.deleteInquiry(qnaNo);
+		return result;
+	}
+
+	public int putInquiry(Qna qna) {
+		int result = csDao.putInquiry(qna);
+		return result;
+	}
+
 
 	
 }
