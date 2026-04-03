@@ -13,6 +13,74 @@ import InputAdornment from "@mui/material/InputAdornment";
 import TextField from "@mui/material/TextField";
 
 const Login = () => {
+  // 🌟 1번 이스터에그 상태 (로고 클릭)
+  const [clickCount, setClickCount] = useState(0);
+
+  const handleLogoEasterEgg = () => {
+    setClickCount((prev) => prev + 1);
+    if (clickCount + 1 === 5) {
+      Swal.fire({
+        title: "당신은 진정한 에코 히어로!",
+        text: "그린캐리와 함께 지구를 구해주셔서 감사합니다!",
+        iconHtml: "🌿",
+        showConfirmButton: false,
+        timer: 2000,
+        customClass: swalCustomClass,
+      });
+      setClickCount(0);
+    }
+  };
+
+  useEffect(() => {
+    let inputKeys = [];
+    const konamiCode = "ArrowUpArrowUpArrowDownArrowDown";
+
+    const triggerLeafRain = () => {
+      for (let i = 0; i < 1000; i++) {
+        const leaf = document.createElement("div");
+        leaf.className = "easter-egg-leaf";
+        leaf.innerHTML = "🍃"; // 나뭇잎 이모지
+        leaf.style.left = Math.random() * 100 + "vw";
+
+        // 🌟 세로 시작 위치 랜덤 (0 ~ -100vh 사이의 깊이로 배치)
+        // 이렇게 하면 어떤 나뭇잎은 한참 뒤에 화면에 나타나서 자연스럽습니다.
+        leaf.style.top = -(Math.random() * 100) + "vh";
+        leaf.style.animationDuration = Math.random() * 2 + 3 + "s"; // 3~5초 사이 랜덤 속도
+        leaf.style.opacity = Math.random();
+        leaf.style.fontSize = Math.random() * 20 + 10 + "px";
+
+        document.body.appendChild(leaf);
+
+        // 애니메이션이 끝나면 요소 삭제 (메모리 관리)
+        setTimeout(() => {
+          leaf.remove();
+        }, 5500);
+      }
+    };
+
+    const handleKeyDown = (e) => {
+      inputKeys.push(e.key);
+      inputKeys = inputKeys.slice(-4);
+
+      if (inputKeys.join("") === konamiCode) {
+        triggerLeafRain(); // 🌟 나뭇잎 비 실행!
+
+        Swal.fire({
+          title: "🍃 Nature Power!",
+          text: "에코 에너지가 쏟아집니다!",
+          icon: "success",
+          showConfirmButton: false,
+          timer: 2000,
+          customClass: swalCustomClass,
+        });
+        inputKeys = [];
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
   // 유저 카운트
   const [userCount, setUserCount] = useState(0);
 
@@ -23,10 +91,8 @@ const Login = () => {
   });
   const [activeTab, setActiveTab] = useState("personal");
 
-  // 🌟 아이디 저장 & 자동 로그인 상태
   const [rememberId, setRememberId] = useState(false);
   const [autoLogin, setAutoLogin] = useState(false);
-
   const [isCapsLockOn, setIsCapsLockOn] = useState(false);
 
   const swalCustomClass = {
@@ -111,7 +177,6 @@ const Login = () => {
       return;
     }
 
-    // 🌟 백엔드로 자동 로그인 여부(autoLogin)도 함께 전송합니다!
     const loginPayload = {
       ...member,
       autoLogin: autoLogin,
@@ -133,7 +198,6 @@ const Login = () => {
         }
 
         if (loginUser && accessToken) {
-          // 토큰 및 유저 정보 저장
           if (refreshToken) {
             localStorage.setItem("refreshToken", refreshToken);
           }
@@ -143,14 +207,12 @@ const Login = () => {
           localStorage.setItem("memberGrade", loginUser.memberGrade);
           localStorage.setItem("memberThumb", loginUser.memberThumb);
 
-          // 🌟 아이디 저장 로직
           if (rememberId) {
             localStorage.setItem("savedUserId", memberId);
           } else {
             localStorage.removeItem("savedUserId");
           }
 
-          // 🌟 자동 로그인 플래그 저장 (AuthContext 등에서 활용 가능)
           if (autoLogin) {
             localStorage.setItem("isAutoLogin", "true");
           } else {
@@ -331,7 +393,6 @@ const Login = () => {
               <span>⚠️ Caps Lock이 켜져 있습니다.</span>
             </div>
 
-            {/* 🌟 아이디 저장 & 자동 로그인 체크박스 그룹 */}
             <div
               className="remember-me"
               style={{
@@ -386,8 +447,17 @@ const Login = () => {
               현재 <span>{userCount}</span>명이 환경을 지키고 있어요!
             </p>
           </div>
-          <div className="character-illustration">
-            <img src="/image/logo.png" alt="Logo" />
+          <div className="character-illustration" onClick={handleLogoEasterEgg}>
+            <img
+              src="/image/logo.png"
+              alt="Logo"
+              style={{
+                cursor: "pointer",
+                transition: "transform 0.5s",
+                transform:
+                  clickCount > 0 ? `rotate(${clickCount * 72}deg)` : "none",
+              }}
+            />
           </div>
         </section>
       </div>

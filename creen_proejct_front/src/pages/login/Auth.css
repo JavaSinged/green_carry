@@ -584,3 +584,28 @@ button {
   opacity: 0;
   animation: firefly-glow infinite alternate ease-in-out;
 }
+.easter-egg-leaf {
+  position: fixed;
+  top: -50px;
+  z-index: 9999;
+  pointer-events: none; /* 클릭 방해 금지 */
+  animation: fall linear forwards;
+}
+
+@keyframes fall {
+  0% {
+    transform: translateY(0) rotate(0deg) translateX(0);
+  }
+  25% {
+    transform: translateY(25vh) rotate(90deg) translateX(50px);
+  }
+  50% {
+    transform: translateY(50vh) rotate(180deg) translateX(-50px);
+  }
+  75% {
+    transform: translateY(75vh) rotate(270deg) translateX(50px);
+  }
+  100% {
+    transform: translateY(110vh) rotate(360deg) translateX(0);
+  }
+}
