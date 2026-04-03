@@ -4,14 +4,15 @@ import "./EcoFlood.css";
 
 const EcoFlood = () => {
   const [isActive, setIsActive] = useState(false);
-  const [waterHeight, setWaterHeight] = useState(0); // 0% ~ 100%
-  const floatingElementsRef = useRef([]); // 물 위에 떠 있는 요소들의 데이터 저장
+  const [waterLevel, setWaterLevel] = useState(0);
+  const waterRef = useRef(null);
+  const targetsDataRef = useRef([]);
+  const animationFrameId = useRef(null);
 
   // 1. 'flood' 타이핑 감지
   useEffect(() => {
     let keys = [];
     const secretWord = "flood";
-
     const handleKeyDown = (e) => {
       keys.push(e.key.toLowerCase());
       keys = keys.slice(-5);
@@ -27,135 +28,132 @@ const EcoFlood = () => {
   const startFlood = () => {
     if (isActive) return;
     setIsActive(true);
-    setWaterHeight(0);
-    floatingElementsRef.current = [];
+    setWaterLevel(0);
 
     Swal.fire({
-      title: "🌍 경고: 지구 온난화 진행 중",
-      text: "해수면이 상승하기 시작합니다.",
-      icon: "warning",
-      timer: 2000,
-      showConfirmButton: false,
-      background: "#fff3cd",
-      color: "#856404",
+      title: "🌊 해수면 상승 경보",
+      text: "지구 온난화로 인해 모든 매장이 수몰 위기에 처했습니다!",
+      icon: "info",
+      confirmButtonColor: "#0277bd",
     });
   };
 
-  // 2. 물이 차오르는 애니메이션 및 부력 효과 적용
+  // 배경 스크롤 잠금
+  useEffect(() => {
+    if (isActive) document.body.style.overflow = "hidden";
+    else document.body.style.overflow = "auto";
+  }, [isActive]);
+
   useEffect(() => {
     if (!isActive) return;
 
-    // 타겟 요소들: 이미지, 제목, 본문, 버튼, 카드 등
-    const targets = document.querySelectorAll(
-      "img, button, h2, h3, p, span, .card-item",
+    // 🌟 화면의 거의 모든 요소를 휩쓸기 대상으로 선정
+    const allElements = document.querySelectorAll(
+      "header, nav, section, .card_item, img, h1, h2, h3, p, button, .banner_slide, .category_item",
     );
-    const targetData = Array.from(targets).map((el) => ({
-      el,
-      rect: el.getBoundingClientRect(),
-      isFloating: false,
-      initialTop: el.getBoundingClientRect().top + window.scrollY,
-      originalStyle: {
-        position: el.style.position,
-        top: el.style.top,
-        left: el.style.left,
-        transition: el.style.transition,
-        zIndex: el.style.zIndex,
-        width: el.style.width,
-        pointerEvents: el.style.pointerEvents,
-      },
-    }));
 
-    let currentHeight = 0;
-    const floodInterval = setInterval(() => {
-      currentHeight += 0.5; // 물 차오르는 속도
-      setWaterHeight(currentHeight);
+    const validTargets = Array.from(allElements).filter((el) => {
+      if (el.closest(".swal2-container") || el.closest(".eco-flood-overlay"))
+        return false;
+      const rect = el.getBoundingClientRect();
+      return rect.width > 5 && rect.height > 5;
+    });
+
+    targetsDataRef.current = validTargets.map((el) => {
+      const rect = el.getBoundingClientRect();
+      return {
+        el,
+        rect,
+        isSwept: false,
+        originalStyle: {
+          filter: el.style.filter || "none",
+          transform: el.style.transform || "none",
+          position: el.style.position || "static",
+        },
+        // 🌟 휩쓸려갈 때의 물리 값
+        vx: (Math.random() - 0.5) * 15, // 좌우로 밀리는 속도
+        vRot: (Math.random() - 0.5) * 30, // 회전 속도
+        phase: Math.random() * Math.PI * 2, // 파도 타는 타이밍
+      };
+    });
+
+    let h = 0;
+    const updateFlood = () => {
+      h += 0.15; // 물이 차오르는 속도
+      setWaterLevel(h);
+
+      if (waterRef.current) waterRef.current.style.height = `${h}vh`;
 
       const viewH = window.innerHeight;
-      const waterTopViewportY = viewH * (1 - currentHeight / 100); // 현재 물의 상단 좌표
+      const waterTopY = viewH * (1 - h / 100);
 
-      targetData.forEach((data, i) => {
-        if (data.isFloating) return;
-
-        // 요소의 바닥 좌표가 물에 닿았는지 확인
-        const targetBottomViewportY = data.rect.bottom;
-
-        if (waterTopViewportY <= targetBottomViewportY) {
-          // 🌟 부력 발생: 요소를 제자리에서 뜯어내어 물 위에 띄움
-          data.isFloating = true;
+      targetsDataRef.current.forEach((data) => {
+        // 물이 요소의 하단에 닿았을 때 "휩쓸림" 시작
+        if (!data.isSwept && waterTopY <= data.rect.bottom) {
+          data.isSwept = true;
           const el = data.el;
+          el.style.setProperty("position", "fixed", "important");
+          el.style.setProperty("left", `${data.rect.left}px`, "important");
+          el.style.setProperty("top", `${data.rect.top}px`, "important");
+          el.style.setProperty("width", `${data.rect.width}px`, "important");
+          el.style.setProperty("z-index", "10000", "important");
+          el.style.setProperty("pointer-events", "none", "important");
+          el.classList.add("eco-swept");
+        }
 
-          // 레이아웃이 무너지지 않도록 원본 크기 고정 후 absolute로 변경
-          el.style.width = `${data.rect.width}px`;
-          el.style.position = "absolute";
-          el.style.left = `${data.rect.left + window.scrollX}px`;
-          el.style.top = `${data.initialTop}px`;
-          el.style.zIndex = "1000";
-          el.style.pointerEvents = "none"; // 클릭 방지
-          el.classList.add("eco-floating-element"); // 둥둥 떠다니는 애니메이션 추가
+        if (data.isSwept) {
+          const depth = Math.max(0, data.rect.top - waterTopY);
 
-          // 물 위에 떠 있는 데이터 배열에 추가
-          floatingElementsRef.current.push({
-            el,
-            initialTop: data.initialTop,
-            buoyancyOffset: Math.random() * 20 - 10, // 요소마다 약간 다른 높이
-            rotOffset: (Math.random() - 0.5) * 10, // 약간 기운 각도
-          });
+          // 🌟 물리 시뮬레이션: 물의 흐름에 따라 옆으로 밀리고 둥둥 뜸
+          const driftX = data.vx * (h / 20); // 수위가 높을수록 더 멀리 밀림
+          const floatY = Math.sin(h * 0.1 + data.phase) * 10 - depth; // 물 위로 뜨려는 힘
+          const rot = data.vRot * (h / 50);
+
+          data.el.style.transform = `translate3d(${driftX}px, ${floatY}px, 0) rotate(${rot}deg)`;
+
+          // 수심에 따른 시각 효과 (푸른 필터 적용)
+          const blueFilter = Math.min(depth / 5, 50);
+          data.el.style.filter = `hue-rotate(${blueFilter}deg) brightness(${1 - depth / 800}) blur(${Math.min(depth / 100, 2)}px)`;
         }
       });
 
-      // 3. 물 위에 떠 있는 요소들을 물 높이에 맞춰 같이 상승시키기
-      floatingElementsRef.current.forEach((data) => {
-        const el = data.el;
-        // 물 높이에 따른 목표 Y 좌표 계산
-        const targetY =
-          waterTopViewportY -
-          el.offsetHeight / 2 +
-          window.scrollY +
-          data.buoyancyOffset;
-
-        // 자연스럽게 물 위로 떠오르도록 Y좌표 업데이트
-        el.style.top = `${targetY}px`;
-        el.style.transform = `rotate(${data.rotOffset}deg)`;
-      });
-
-      // 4. 홍수 완료 및 종료 메시지
-      if (currentHeight >= 100) {
-        clearInterval(floodInterval);
-        setTimeout(() => {
-          Swal.fire({
-            title: "지구 온도가 1.5도 상승하면<br/>일어날 일입니다.",
-            html: "<b style='color:#2e7d32;'>그린캐리</b>와 함께 이 비극을 막아주세요.",
-            icon: "info",
-            confirmButtonText: "현실로 돌아가기",
-            confirmButtonColor: "#2e7d32",
-            allowOutsideClick: false,
-          }).then(() => {
-            resetFlood(targetData);
-          });
-        }, 1500);
+      if (h >= 105) {
+        cancelAnimationFrame(animationFrameId.current);
+        setTimeout(finishFlood, 1000);
+      } else {
+        animationFrameId.current = requestAnimationFrame(updateFlood);
       }
-    }, 50); // 50ms마다 업데이트
+    };
 
-    return () => clearInterval(floodInterval);
+    animationFrameId.current = requestAnimationFrame(updateFlood);
+    return () => cancelAnimationFrame(animationFrameId.current);
   }, [isActive]);
 
-  const resetFlood = (targetData) => {
-    setIsActive(false);
-    setWaterHeight(0);
-    floatingElementsRef.current = [];
+  const finishFlood = () => {
+    Swal.fire({
+      title: "도시 수몰 완료",
+      html: `기후 위기로 인해 사이트의 모든 데이터가 유실되었습니다.<br/><b>우리는 지금 당장 행동해야 합니다.</b>`,
+      icon: "warning",
+      confirmButtonText: "복구하기",
+      confirmButtonColor: "#0277bd",
+    }).then(() => {
+      setIsActive(false);
+      resetStyles();
+    });
+  };
 
-    // 🌟 모든 요소 원상복구
-    targetData.forEach((data) => {
+  const resetStyles = () => {
+    targetsDataRef.current.forEach((data) => {
       const el = data.el;
-      el.classList.remove("eco-floating-element");
-      el.style.position = data.originalStyle.position;
-      el.style.top = data.originalStyle.top;
-      el.style.left = data.originalStyle.left;
-      el.style.transition = data.originalStyle.transition;
-      el.style.zIndex = data.originalStyle.zIndex;
-      el.style.width = data.originalStyle.width;
-      el.style.pointerEvents = data.originalStyle.pointerEvents;
-      el.style.transform = "none";
+      el.style.removeProperty("position");
+      el.style.removeProperty("left");
+      el.style.removeProperty("top");
+      el.style.removeProperty("width");
+      el.style.removeProperty("z-index");
+      el.style.removeProperty("pointer-events");
+      el.style.transform = data.originalStyle.transform;
+      el.style.filter = data.originalStyle.filter;
+      el.classList.remove("eco-swept");
     });
   };
 
@@ -163,10 +161,14 @@ const EcoFlood = () => {
 
   return (
     <div className="eco-flood-overlay">
-      {/* 🌊 차오르는 바닷물 (CSS 파도 효과) */}
-      <div className="eco-water-level" style={{ height: `${waterHeight}vh` }}>
+      <div className="flood-status">
+        <span className="status-label">SEA LEVEL RISING</span>
+        <span className="status-value">+{(waterLevel * 0.5).toFixed(1)}m</span>
+      </div>
+      <div ref={waterRef} className="eco-water-level">
         <div className="eco-wave eco-wave1"></div>
         <div className="eco-wave eco-wave2"></div>
+        <div className="eco-wave eco-wave3"></div>
       </div>
     </div>
   );
