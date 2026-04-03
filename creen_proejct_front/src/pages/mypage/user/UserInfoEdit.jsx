@@ -221,7 +221,7 @@ export default function UserInfoEdit() {
     openPostcode({ onComplete: handleCompletePostcode });
   };
 
-  // 🌟 주소 저장 핸들러
+  // 🌟 주소 저장 핸들러 (수정된 부분)
   const updateAddress = async () => {
     if (!newAddress.memberAddrCode || !newAddress.memberDetailAddr.trim()) {
       Swal.fire({
@@ -235,17 +235,19 @@ export default function UserInfoEdit() {
       // API 경로와 파라미터는 실제 백엔드에 맞게 수정하세요
       const response = await api.post("/member/updateAddress", {
         memberId: user.memberId,
-        memberAddrCode: newAddress.memberAddrCode,
+        memberAddrcode: newAddress.memberAddrCode,
         memberAddr: newAddress.memberAddr,
         memberDetailAddr: newAddress.memberDetailAddr,
       });
 
       Swal.fire("성공", "주소지가 성공적으로 변경되었습니다!", "success");
 
-      // 화면의 현재 주소를 즉시 업데이트
+      // 🌟 새로고침 전에도 날아가지 않도록, 백엔드 변수명에 맞게 업데이트!
       setMemberInfo((prev) => ({
         ...prev,
-        memberAddress: `${newAddress.memberAddr} ${newAddress.memberDetailAddr}`,
+        memberAddrcode: newAddress.memberAddrCode,
+        memberAddr: newAddress.memberAddr,
+        memberDetailAddr: newAddress.memberDetailAddr,
       }));
 
       // 폼 초기화 및 아코디언 닫기
@@ -461,8 +463,11 @@ export default function UserInfoEdit() {
                       <span className={styles.address_name}>기본 배송지</span>
                       <span className={styles.address_tag}>현재 주소</span>
                     </div>
+                    {/* 🌟 새로고침해도 데이터를 정확히 조합해서 출력하도록 수정 */}
                     <p className={styles.address_detail}>
-                      {memberInfo?.memberAddress || "주소 정보 없음"}
+                      {memberInfo?.memberAddr
+                        ? `[${memberInfo.memberAddrcode || ""}] ${memberInfo.memberAddr} ${memberInfo.memberDetailAddr || ""}`
+                        : "주소 정보 없음"}
                     </p>
                   </div>
                 </div>

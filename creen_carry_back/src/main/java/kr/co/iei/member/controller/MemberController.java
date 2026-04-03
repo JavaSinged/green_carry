@@ -275,4 +275,19 @@ public class MemberController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+    @PostMapping("/updateAddress")
+    public ResponseEntity<String> updateAddress(@RequestBody Member member) {
+    	System.out.println(member);
+        System.out.println("주소 변경 요청 ID: " + member.getMemberId());
+        
+        int result = memberService.updateAddress(member);
+        
+        if (result > 0) {
+            // 업데이트 성공 시
+            return ResponseEntity.ok("SUCCESS");
+        } else {
+            // 업데이트 실패 시 (500 에러 반환)
+            return ResponseEntity.internalServerError().body("FAIL");
+        }
+    }
 }

@@ -86,21 +86,33 @@
 
 	<select id="storeDupCheck" parameterType="String"
 		resultType="member">
-		SELECT * FROM MEMBER_TBL WHERE STORE_OWNER_NO = #{storeOwnerNo}
+		SELECT * FROM MEMBER_TBL WHERE STORE_OWNER_NO =
+		#{storeOwnerNo}
 	</select>
 	<insert id="insertManager" parameterType="member">
-		INSERT INTO MEMBER_TBL (
+		INSERT INTO MEMBER_TBL
+		(
 		MEMBER_ID, MEMBER_PW, MEMBER_NAME, MEMBER_PHONE,
-		MEMBER_EMAIL, STORE_OWNER_NO, STORE_NAME, OPENING_DATE, MEMBER_GRADE
+		MEMBER_EMAIL,
+		STORE_OWNER_NO, STORE_NAME, OPENING_DATE, MEMBER_GRADE
 		) VALUES (
 		#{memberId}, #{memberPw}, #{memberName}, #{memberPhone},
-		#{memberEmail}, #{storeOwnerNo}, #{storeName}, #{openingDate}, #{memberGrade}
+		#{memberEmail}, #{storeOwnerNo}, #{storeName}, #{openingDate},
+		#{memberGrade}
 		)
 	</insert>
 	<select id="emailDupCheck" resultType="member">
 		select * from member_tbl
 		where member_email=#{memberEmail}
 	</select>
+
+	<update id="updateAddress" parameterType="member">
+		UPDATE MEMBER_TBL
+		SET MEMBER_ADDRCODE = #{memberAddrcode},
+		MEMBER_ADDR = #{memberAddr},
+		MEMBER_DETAIL_ADDR = #{memberDetailAddr}
+		WHERE MEMBER_ID = #{memberId}
+	</update>
 
 
 
