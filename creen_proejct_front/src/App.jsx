@@ -27,6 +27,8 @@ import Signup from "./pages/signup/Signup";
 import UserCS from "./pages/mypage/user/UserCS";
 
 import ManagerInfoEdit from "./pages/mypage/manager/ManagerInfoEdit";
+import ManagerMenuList from "./pages/mypage/manager/ManagerMenuList";
+import ManagerMenuEdit from "./pages/mypage/manager/ManagerMenuEdit";
 
 import AdminDashboard from "./pages/mypage/admin/AdminDashboard";
 import AdminUserManagement from "./pages/mypage/admin/AdminUserManagement";
@@ -95,11 +97,8 @@ function App() {
               <Route path="/mypage/manager" element={<ManagerLayout />}>
                 <Route index element={<div>사업자 대시보드 화면</div>} />
                 <Route path="profile" element={<ManagerInfoEdit />} />
-
-                <Route
-                  path="menus"
-                  element={<div>사업자 메뉴 관리 화면</div>}
-                />
+                <Route path="menus" element={<ManagerMenuList />} />
+                <Route path="menuEdit" element={<ManagerMenuEdit />} />
                 <Route path="deleteMember" element={<ManagerDelAccount />} />
               </Route>
             </Route>
