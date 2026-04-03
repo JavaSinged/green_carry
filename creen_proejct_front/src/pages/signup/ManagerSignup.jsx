@@ -1,15 +1,24 @@
-import React, { useState, useEffect } from "react";
-import styles from "./ManagerSignup.module.css";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useDaumPostcodePopup } from "react-daum-postcode";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import axios from "axios";
 import Swal from "sweetalert2";
 import useEcoEffects from "../../hooks/useEcoEffects";
+import "./ManagerSignup.module.css";
 
 const ManagerSignup = () => {
-  const { containerRef, bubblesRef, selectedBg, bubbleData } = useEcoEffects();
+  // 🌟 leafData(나뭇잎 효과) 추가
+  const {
+    containerRef,
+    bubblesRef,
+    selectedBg,
+    bubbleData,
+    leafData,
+    fireflyData,
+  } = useEcoEffects();
   const navigate = useNavigate();
 
   const [member, setMember] = useState({
@@ -25,7 +34,6 @@ const ManagerSignup = () => {
   const [memberPwRe, setMemberPwRe] = useState("");
 
   const [isSubmitted, setIsSubmitted] = useState(false);
-
   const [checkId, setCheckId] = useState(0);
   const [mailAuth, setMailAuth] = useState(0);
   const [checkStoreOwnerNo, setCheckStoreOwnerNo] = useState(0);
@@ -34,6 +42,7 @@ const ManagerSignup = () => {
   const [time, setTime] = useState(180);
   const [timeout, setTimeout] = useState(null);
   const [checkEmail, setCheckEmail] = useState(0);
+
   const idRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
   const pwRegex =
     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{10,}$/;
@@ -41,44 +50,34 @@ const ManagerSignup = () => {
 
   const inputMember = (e) => {
     const { name, value } = e.target;
-
-    // 1. 휴대폰 번호 자동 하이픈 (010-1234-5678)
+    // 1. 휴대폰 번호 자동 하이픈
     if (name === "memberPhone") {
-      const onlyNums = value.replace(/[^0-9]/g, ""); // 숫자만 추출
+      const onlyNums = value.replace(/[^0-9]/g, "");
       let formattedPhone = "";
-
-      if (onlyNums.length < 4) {
-        formattedPhone = onlyNums;
-      } else if (onlyNums.length < 8) {
+      if (onlyNums.length < 4) formattedPhone = onlyNums;
+      else if (onlyNums.length < 8)
         formattedPhone = `${onlyNums.slice(0, 3)}-${onlyNums.slice(3)}`;
-      } else {
+      else
         formattedPhone = `${onlyNums.slice(0, 3)}-${onlyNums.slice(3, 7)}-${onlyNums.slice(7, 11)}`;
-      }
-
       setMember({ ...member, [name]: formattedPhone });
       return;
     }
 
-    // 2. 사업자 번호 자동 하이픈 (123-45-67890)
+    // 2. 사업자 번호 자동 하이픈
     if (name === "storeOwnerNo") {
-      const onlyNums = value.replace(/[^0-9]/g, ""); // 숫자만 추출
+      const onlyNums = value.replace(/[^0-9]/g, "");
       let formattedStoreNo = "";
-
-      if (onlyNums.length < 4) {
-        formattedStoreNo = onlyNums;
-      } else if (onlyNums.length < 6) {
+      if (onlyNums.length < 4) formattedStoreNo = onlyNums;
+      else if (onlyNums.length < 6)
         formattedStoreNo = `${onlyNums.slice(0, 3)}-${onlyNums.slice(3)}`;
-      } else {
+      else
         formattedStoreNo = `${onlyNums.slice(0, 3)}-${onlyNums.slice(3, 5)}-${onlyNums.slice(5, 10)}`;
-      }
-
       setMember({ ...member, [name]: formattedStoreNo });
-      setCheckStoreOwnerNo(0); // 사업자번호가 수정되면 중복확인 초기화
+      setCheckStoreOwnerNo(0);
       return;
     }
 
     setMember({ ...member, [name]: value });
-
     if (name === "memberId") setCheckId(0);
     if (name === "memberEmail") setMailAuth(0);
   };
@@ -102,7 +101,6 @@ const ManagerSignup = () => {
         }
       })
       .catch((err) => {
-        console.error("통신 에러:", err);
         Swal.fire({
           icon: "error",
           text: "서버와 통신 중 오류가 발생했습니다.",
@@ -118,48 +116,37 @@ const ManagerSignup = () => {
       });
       return;
     }
-
     if (checkEmail === 0) {
       try {
         const res = await axios.get(
           `${import.meta.env.VITE_BACKSERVER}/member/emailDupCheck?memberEmail=${member.memberEmail}`,
         );
-
-        if (res.data) {
-          setCheckEmail(2);
-        } else {
+        if (res.data) setCheckEmail(2);
+        else {
           Swal.fire({ icon: "error", text: "이미 사용중인 이메일입니다." });
           setCheckEmail(1);
           return;
         }
       } catch (err) {
-        console.log(err);
         return;
       }
     }
-
     setTime(180);
-    if (timeout) {
-      window.clearInterval(timeout);
-    }
-
+    if (timeout) window.clearInterval(timeout);
     setMailAuth(1);
-
-    const obj = { memberEmail: member.memberEmail };
     axios
-      .post(`${import.meta.env.VITE_BACKSERVER}/member/email-verification`, obj)
+      .post(`${import.meta.env.VITE_BACKSERVER}/member/email-verification`, {
+        memberEmail: member.memberEmail,
+      })
       .then((res) => {
         setMailAuthCode(res.data);
         setMailAuth(2);
-        console.log(res.data);
-
         const intervalId = window.setInterval(() => {
           setTime((prev) => prev - 1);
         }, 1000);
         setTimeout(intervalId);
       })
       .catch((err) => {
-        console.error("메일 발송 에러:", err);
         Swal.fire({ icon: "error", text: "메일 발송 중 오류가 발생했습니다." });
       });
   };
@@ -172,7 +159,6 @@ const ManagerSignup = () => {
       });
       return;
     }
-
     if (String(mailAuthCode) === mailAuthInput) {
       Swal.fire({ icon: "success", text: "이메일 인증이 완료되었습니다!" });
       setMailAuth(3);
@@ -206,7 +192,6 @@ const ManagerSignup = () => {
   };
 
   const handleStoreOwnerNoCheck = () => {
-    // 💡 길이가 12자(하이픈 포함)인지 검증
     if (member.storeOwnerNo.length < 12) {
       Swal.fire({
         icon: "warning",
@@ -231,7 +216,6 @@ const ManagerSignup = () => {
         }
       })
       .catch((err) => {
-        console.log(err);
         Swal.fire({
           icon: "error",
           text: "사업자 번호 중복 확인 중 서버 오류가 발생했습니다.",
@@ -251,7 +235,6 @@ const ManagerSignup = () => {
       return { text: "중복 확인 버튼을 눌러주세요.", isError: true };
     return { text: "사용 가능한 아이디입니다.", isError: false };
   };
-
   const getPwMessage = () => {
     if (!member.memberPw)
       return {
@@ -265,7 +248,6 @@ const ManagerSignup = () => {
       };
     return { text: "사용 가능한 비밀번호입니다.", isError: false };
   };
-
   const getPwReMessage = () => {
     if (!memberPwRe)
       return {
@@ -276,7 +258,6 @@ const ManagerSignup = () => {
       return { text: "비밀번호와 일치하지 않습니다.", isError: true };
     return { text: "비밀번호와 일치합니다.", isError: false };
   };
-
   const getEmailMessage = () => {
     if (!member.memberEmail)
       return {
@@ -287,18 +268,15 @@ const ManagerSignup = () => {
       return { text: "올바른 이메일 형식을 입력해주세요.", isError: true };
     if (mailAuth === 0)
       return { text: "인증 이메일을 전송해주세요.", isError: true };
-    if (mailAuth === 2) {
+    if (mailAuth === 2)
       return {
         text: `인증번호를 입력하세요. (남은 시간: ${showTime()})`,
         isError: true,
       };
-    }
     if (mailAuth === 3)
       return { text: "이메일 인증이 완료되었습니다.", isError: false };
     return { text: "\u00A0", isError: false };
   };
-
-  // 💡 길이 제한 메시지 추가 (하이픈 포함된 길이 검사)
   const getStoreOwnerNoMessage = () => {
     if (!member.storeOwnerNo.trim())
       return {
@@ -311,7 +289,6 @@ const ManagerSignup = () => {
       return { text: "사업자번호 중복 확인을 눌러주세요.", isError: true };
     return { text: "가입 가능한 사업자 번호입니다.", isError: false };
   };
-
   const getPhoneMessage = () => {
     if (!member.memberPhone.trim())
       return {
@@ -322,7 +299,6 @@ const ManagerSignup = () => {
       return { text: "연락처 11자리를 모두 입력해주세요.", isError: true };
     return { text: "\u00A0", isError: false };
   };
-
   const getStoreNameMessage = () => {
     if (!member.storeName.trim())
       return {
@@ -331,7 +307,6 @@ const ManagerSignup = () => {
       };
     return { text: "\u00A0", isError: false };
   };
-
   const getMemberNameMessage = () => {
     if (!member.memberName.trim())
       return {
@@ -340,7 +315,6 @@ const ManagerSignup = () => {
       };
     return { text: "\u00A0", isError: false };
   };
-
   const getOpeningDateMessage = () => {
     if (!member.openingDate.trim())
       return {
@@ -363,7 +337,6 @@ const ManagerSignup = () => {
   const joinSubmit = (e) => {
     e.preventDefault();
     setIsSubmitted(true);
-
     const hasEmpty =
       !member.memberId ||
       !member.memberPw ||
@@ -374,7 +347,6 @@ const ManagerSignup = () => {
       !member.storeName.trim() ||
       !member.memberName.trim() ||
       !member.openingDate.trim();
-
     if (
       hasEmpty ||
       idStatus.isError ||
@@ -393,13 +365,7 @@ const ManagerSignup = () => {
       });
       return;
     }
-
-    // 상태에 이미 하이픈이 포함되어 있으므로 그대로 전송됩니다.
-    const submitData = {
-      ...member,
-      memberGrade: 2,
-    };
-
+    const submitData = { ...member, memberGrade: 2 };
     axios
       .post(
         `${import.meta.env.VITE_BACKSERVER}/member/signupManager`,
@@ -414,7 +380,6 @@ const ManagerSignup = () => {
         });
       })
       .catch((err) => {
-        console.error("회원가입 에러:", err);
         Swal.fire({
           icon: "error",
           text: "회원가입 처리 중 오류가 발생했습니다.",
@@ -427,18 +392,40 @@ const ManagerSignup = () => {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, "0");
     const day = String(date.getDate()).padStart(2, "0");
-    const formattedDate = `${year}-${month}-${day}`;
-
-    setMember({ ...member, openingDate: formattedDate });
+    setMember({ ...member, openingDate: `${year}-${month}-${day}` });
     setShowCalendar(false);
   };
 
   return (
     <div
-      className={styles.signupPage}
+      className="signup-screen-container"
       ref={containerRef}
       style={{ backgroundImage: `url(${selectedBg})` }}
     >
+      {/* 🍃 마우스 나뭇잎 효과 */}
+      {leafData &&
+        leafData.map((leaf) => (
+          <div
+            key={leaf.id}
+            className="particle-leaf"
+            style={{ left: leaf.x, top: leaf.y }}
+          />
+        ))}
+      {fireflyData &&
+        fireflyData.map((style, i) => (
+          <div
+            key={`firefly-${i}`}
+            className="firefly"
+            style={{
+              left: style.left,
+              top: style.top,
+              animationDuration: style.animationDuration,
+              animationDelay: style.animationDelay,
+            }}
+          />
+        ))}
+
+      {/* 🫧 에코 버블 */}
       {bubbleData.map((style, i) => (
         <div
           key={i}
@@ -453,291 +440,305 @@ const ManagerSignup = () => {
           }}
         />
       ))}
-      <h1
-        className={styles.mainLogo}
-        onClick={() => navigate("/")}
-        style={{ cursor: "pointer" }}
-      >
-        GreenCarry
-      </h1>
 
-      <div className={styles.card}>
-        <h1 className={styles.title}>사업자 회원가입</h1>
+      <div className="signup-main-content">
+        <header>
+          <h1 className="signup-logo" onClick={() => navigate("/")}>
+            GreenCarry
+          </h1>
+        </header>
 
-        <form className={styles.form} onSubmit={joinSubmit}>
-          {/* 아이디 */}
-          <div className={styles.fieldGroup}>
-            <label className={styles.label}>아이디</label>
-            <div className={styles.inputArea}>
-              <div className={styles.inputAreaInner}>
+        {/* 🌟 상세폼이므로 스크롤 지원 카드 적용 */}
+        <div className="signup-card signup-card-scroll">
+          <h2 className="signup-title">사업자 회원가입</h2>
+
+          <form className="signup-form" onSubmit={joinSubmit}>
+            {/* 아이디 */}
+            <div className="signup-field-group">
+              <label className="signup-label">아이디</label>
+              <div className="signup-input-area">
+                <div className="signup-input-inner">
+                  <input
+                    type="text"
+                    name="memberId"
+                    value={member.memberId}
+                    onChange={inputMember}
+                    className="signup-input-underline"
+                    placeholder="영문, 숫자 조합 8자 이상"
+                    readOnly={checkId === 2}
+                  />
+                  <button
+                    type="button"
+                    className="signup-btn-outlined"
+                    onClick={handleIdCheck}
+                    disabled={checkId === 2}
+                  >
+                    중복 확인
+                  </button>
+                </div>
+                <p
+                  className={`signup-status-msg ${idStatus.isError ? "signup-error-msg" : ""}`}
+                >
+                  {idStatus.text}
+                </p>
+              </div>
+            </div>
+
+            {/* 비밀번호 */}
+            <div className="signup-field-group">
+              <label className="signup-label">비밀번호</label>
+              <div className="signup-input-area">
+                <input
+                  type="password"
+                  name="memberPw"
+                  value={member.memberPw}
+                  onChange={inputMember}
+                  className="signup-input-underline"
+                  placeholder="영문 대/소문자, 숫자, 특수기호 포함 10자 이상"
+                />
+                <p
+                  className={`signup-status-msg ${pwStatus.isError ? "signup-error-msg" : ""}`}
+                >
+                  {pwStatus.text}
+                </p>
+              </div>
+            </div>
+
+            {/* 비밀번호 확인 */}
+            <div className="signup-field-group">
+              <label className="signup-label">비밀번호 확인</label>
+              <div className="signup-input-area">
+                <input
+                  type="password"
+                  name="memberPwRe"
+                  value={memberPwRe}
+                  onChange={(e) => setMemberPwRe(e.target.value)}
+                  className="signup-input-underline"
+                  placeholder="비밀번호 재입력"
+                />
+                <p
+                  className={`signup-status-msg ${pwReStatus.isError ? "signup-error-msg" : ""}`}
+                >
+                  {pwReStatus.text}
+                </p>
+              </div>
+            </div>
+
+            {/* 이메일 */}
+            <div className="signup-field-group">
+              <label className="signup-label">이메일</label>
+              <div className="signup-input-area">
+                <div className="signup-input-inner">
+                  <input
+                    type="email"
+                    name="memberEmail"
+                    value={member.memberEmail}
+                    onChange={inputMember}
+                    className="signup-input-underline"
+                    placeholder="example@greencarry.com"
+                    readOnly={mailAuth === 3}
+                  />
+                  <button
+                    type="button"
+                    className="signup-btn-outlined"
+                    onClick={handleSendMail}
+                    disabled={mailAuth === 1 || mailAuth === 3}
+                  >
+                    {mailAuth === 0 ? "인증 메일 전송" : "재전송"}
+                  </button>
+                </div>
+                <div className="signup-input-inner signup-mt-10">
+                  <input
+                    type="text"
+                    className="signup-input-underline"
+                    placeholder="인증번호"
+                    value={mailAuthInput}
+                    onChange={(e) => setMailAuthInput(e.target.value)}
+                    disabled={mailAuth !== 2}
+                  />
+                  <button
+                    type="button"
+                    className="signup-btn-filled"
+                    onClick={handleVerifyMail}
+                    disabled={mailAuth !== 2}
+                  >
+                    인증번호 확인
+                  </button>
+                </div>
+                <p
+                  className={`signup-status-msg ${emailStatus.isError ? "signup-error-msg" : ""}`}
+                >
+                  {emailStatus.text}
+                </p>
+              </div>
+            </div>
+
+            {/* 휴대폰 번호 */}
+            <div className="signup-field-group">
+              <label className="signup-label">휴대폰 번호</label>
+              <div className="signup-input-area">
                 <input
                   type="text"
-                  name="memberId"
-                  value={member.memberId}
+                  name="memberPhone"
+                  value={member.memberPhone}
                   onChange={inputMember}
-                  className={styles.inputUnderline}
-                  placeholder="영문, 숫자 조합 8자 이상"
-                  readOnly={checkId === 2}
-                />
-                <button
-                  type="button"
-                  className={styles.buttonOutlined}
-                  onClick={handleIdCheck}
-                  disabled={checkId === 2}
-                >
-                  중복 확인
-                </button>
-              </div>
-              <p
-                className={`${styles.statusMessage} ${idStatus.isError ? styles.errorMessage : ""}`}
-                style={!idStatus.isError ? { color: "#3a8a56" } : {}}
-              >
-                {idStatus.text}
-              </p>
-            </div>
-          </div>
-
-          {/* 비밀번호 */}
-          <div className={styles.fieldGroup}>
-            <label className={styles.label}>비밀번호</label>
-            <div className={styles.inputArea}>
-              <input
-                type="password"
-                name="memberPw"
-                value={member.memberPw}
-                onChange={inputMember}
-                className={styles.inputUnderline}
-                placeholder="영문 대/소문자, 숫자, 특수기호 포함 10자 이상"
-              />
-              <p
-                className={`${styles.statusMessage} ${pwStatus.isError ? styles.errorMessage : ""}`}
-                style={!pwStatus.isError ? { color: "#3a8a56" } : {}}
-              >
-                {pwStatus.text}
-              </p>
-            </div>
-          </div>
-
-          {/* 비밀번호 확인 */}
-          <div className={styles.fieldGroup}>
-            <label className={styles.label}>비밀번호확인</label>
-            <div className={styles.inputArea}>
-              <input
-                type="password"
-                name="memberPwRe"
-                value={memberPwRe}
-                onChange={(e) => setMemberPwRe(e.target.value)}
-                className={styles.inputUnderline}
-                placeholder="비밀번호 재입력"
-              />
-              <p
-                className={`${styles.statusMessage} ${pwReStatus.isError ? styles.errorMessage : ""}`}
-                style={!pwReStatus.isError ? { color: "#3a8a56" } : {}}
-              >
-                {pwReStatus.text}
-              </p>
-            </div>
-          </div>
-
-          {/* 이메일 */}
-          <div className={styles.fieldGroup}>
-            <label className={styles.label}>이메일</label>
-            <div className={styles.inputArea}>
-              <div className={styles.inputAreaInner}>
-                <input
-                  type="email"
-                  name="memberEmail"
-                  value={member.memberEmail}
-                  onChange={inputMember}
-                  className={styles.inputUnderline}
-                  placeholder="example@greencarry.com"
-                  readOnly={mailAuth === 3}
-                />
-                <button
-                  type="button"
-                  className={styles.buttonOutlined}
-                  onClick={handleSendMail}
-                  disabled={mailAuth === 1 || mailAuth === 3}
-                >
-                  {mailAuth === 0 ? "인증 메일 전송" : "재전송"}
-                </button>
-              </div>
-
-              <div className={`${styles.inputAreaInner} ${styles.mt10}`}>
-                <input
-                  type="text"
-                  className={styles.inputUnderline}
-                  placeholder="인증번호"
-                  value={mailAuthInput}
-                  onChange={(e) => {
-                    setMailAuthInput(e.target.value);
-                  }}
-                  disabled={mailAuth !== 2}
-                />
-                <button
-                  type="button"
-                  className={styles.buttonFilled}
-                  onClick={handleVerifyMail}
-                  disabled={mailAuth !== 2}
-                >
-                  인증번호 확인
-                </button>
-              </div>
-
-              <p
-                className={`${styles.statusMessage} ${emailStatus.isError ? styles.errorMessage : ""}`}
-                style={
-                  !emailStatus.isError ? { color: "var(--color-brand)" } : {}
-                }
-              >
-                {emailStatus.text}
-              </p>
-            </div>
-          </div>
-
-          {/* 연락처 */}
-          <div className={styles.fieldGroup}>
-            <label className={styles.label}>휴대폰 번호</label>
-            <div className={styles.inputArea}>
-              <input
-                type="text"
-                name="memberPhone"
-                value={member.memberPhone}
-                onChange={inputMember}
-                className={styles.inputUnderline}
-                placeholder="숫자만 입력하세요"
-              />
-              <p
-                className={`${styles.statusMessage} ${phoneStatus.isError ? styles.errorMessage : ""}`}
-              >
-                {phoneStatus.text}
-              </p>
-            </div>
-          </div>
-
-          {/* 사업자 번호 */}
-          <div className={styles.fieldGroup}>
-            <label className={styles.label}>사업자 번호</label>
-            <div className={styles.inputArea}>
-              <div className={styles.inputAreaInner}>
-                <input
-                  type="text"
-                  name="storeOwnerNo"
-                  value={member.storeOwnerNo}
-                  onChange={inputMember}
-                  className={styles.inputUnderline}
+                  className="signup-input-underline"
                   placeholder="숫자만 입력하세요"
-                  readOnly={checkStoreOwnerNo === 2}
                 />
-                <button
-                  type="button"
-                  className={styles.buttonOutlined}
-                  onClick={handleStoreOwnerNoCheck}
-                  disabled={checkStoreOwnerNo === 2}
+                <p
+                  className={`signup-status-msg ${phoneStatus.isError ? "signup-error-msg" : ""}`}
                 >
-                  중복 확인
-                </button>
+                  {phoneStatus.text}
+                </p>
               </div>
-              <p
-                className={`${styles.statusMessage} ${storeOwnerNoStatus.isError ? styles.errorMessage : ""}`}
-                style={!storeOwnerNoStatus.isError ? { color: "#3a8a56" } : {}}
-              >
-                {storeOwnerNoStatus.text}
-              </p>
             </div>
-          </div>
 
-          {/* 상호명 */}
-          <div className={styles.fieldGroup}>
-            <label className={styles.label}>상호명</label>
-            <div className={styles.inputArea}>
-              <input
-                type="text"
-                name="storeName"
-                value={member.storeName}
-                onChange={inputMember}
-                className={styles.inputUnderline}
-              />
-              <p
-                className={`${styles.statusMessage} ${storeNameStatus.isError ? styles.errorMessage : ""}`}
-              >
-                {storeNameStatus.text}
-              </p>
+            {/* 사업자 번호 */}
+            <div className="signup-field-group">
+              <label className="signup-label">사업자 번호</label>
+              <div className="signup-input-area">
+                <div className="signup-input-inner">
+                  <input
+                    type="text"
+                    name="storeOwnerNo"
+                    value={member.storeOwnerNo}
+                    onChange={inputMember}
+                    className="signup-input-underline"
+                    placeholder="숫자만 입력하세요"
+                    readOnly={checkStoreOwnerNo === 2}
+                  />
+                  <button
+                    type="button"
+                    className="signup-btn-outlined"
+                    onClick={handleStoreOwnerNoCheck}
+                    disabled={checkStoreOwnerNo === 2}
+                  >
+                    중복 확인
+                  </button>
+                </div>
+                <p
+                  className={`signup-status-msg ${storeOwnerNoStatus.isError ? "signup-error-msg" : ""}`}
+                >
+                  {storeOwnerNoStatus.text}
+                </p>
+              </div>
             </div>
-          </div>
 
-          {/* 대표자성명 */}
-          <div className={styles.fieldGroup}>
-            <label className={styles.label}>대표자성명</label>
-            <div className={styles.inputArea}>
-              <input
-                type="text"
-                name="memberName"
-                value={member.memberName}
-                onChange={inputMember}
-                className={styles.inputUnderline}
-              />
-              <p
-                className={`${styles.statusMessage} ${memberNameStatus.isError ? styles.errorMessage : ""}`}
-              >
-                {memberNameStatus.text}
-              </p>
-            </div>
-          </div>
-
-          {/* 개업일자 */}
-          <div className={styles.fieldGroup}>
-            <label className={styles.label}>개업일자</label>
-            <div className={styles.inputArea} id="openingDataArea">
-              <div className={styles.dateInputWrapper}>
+            {/* 상호명 */}
+            <div className="signup-field-group">
+              <label className="signup-label">상호명</label>
+              <div className="signup-input-area">
                 <input
                   type="text"
-                  name="openingDate"
-                  value={member.openingDate}
-                  className={`${styles.inputUnderline} ${styles.dateInput}`}
-                  placeholder="YYYY-MM-DD"
-                  readOnly
-                  onClick={() => setShowCalendar(!showCalendar)}
+                  name="storeName"
+                  value={member.storeName}
+                  onChange={inputMember}
+                  className="signup-input-underline"
+                  placeholder="상호명을 입력하세요"
                 />
-
-                <CalendarMonthIcon
-                  className={styles.muiCalendarIcon}
-                  onClick={() => setShowCalendar(!showCalendar)}
-                />
-
-                {showCalendar && (
-                  <div className={styles.calendarWrapper}>
-                    <Calendar
-                      onChange={handleDateChange}
-                      calendarType="gregory"
-                      value={
-                        member.openingDate
-                          ? new Date(member.openingDate)
-                          : new Date()
-                      }
-                      formatDay={(locale, date) =>
-                        date.toLocaleString("en", { day: "numeric" })
-                      }
-                    />
-                  </div>
-                )}
+                <p
+                  className={`signup-status-msg ${storeNameStatus.isError ? "signup-error-msg" : ""}`}
+                >
+                  {storeNameStatus.text}
+                </p>
               </div>
-
-              <p
-                className={`${styles.statusMessage} ${openingDateStatus.isError ? styles.errorMessage : ""}`}
-              >
-                {openingDateStatus.text}
-              </p>
             </div>
-          </div>
 
-          {/* 가입 버튼 */}
-          <div className={styles.submitContainer}>
-            <button type="submit" className={styles.submitButton}>
-              가입
+            {/* 대표자성명 */}
+            <div className="signup-field-group">
+              <label className="signup-label">대표자성명</label>
+              <div className="signup-input-area">
+                <input
+                  type="text"
+                  name="memberName"
+                  value={member.memberName}
+                  onChange={inputMember}
+                  className="signup-input-underline"
+                  placeholder="이름을 입력하세요"
+                />
+                <p
+                  className={`signup-status-msg ${memberNameStatus.isError ? "signup-error-msg" : ""}`}
+                >
+                  {memberNameStatus.text}
+                </p>
+              </div>
+            </div>
+
+            {/* 🌟 개업일자 (달력이 폼을 깨지 않도록 position 설정) */}
+            <div className="signup-field-group">
+              <label className="signup-label">개업일자</label>
+              <div className="signup-input-area">
+                <div
+                  style={{
+                    position: "relative",
+                    display: "flex",
+                    alignItems: "center",
+                    width: "100%",
+                  }}
+                >
+                  <input
+                    type="text"
+                    name="openingDate"
+                    value={member.openingDate}
+                    className="signup-input-underline"
+                    placeholder="YYYY-MM-DD"
+                    readOnly
+                    onClick={() => setShowCalendar(!showCalendar)}
+                    style={{ cursor: "pointer", paddingRight: "35px" }}
+                  />
+                  <CalendarMonthIcon
+                    onClick={() => setShowCalendar(!showCalendar)}
+                    style={{
+                      position: "absolute",
+                      right: "10px",
+                      cursor: "pointer",
+                      color: "var(--color-brand)",
+                    }}
+                  />
+
+                  {/* 달력 팝업 */}
+                  {showCalendar && (
+                    <div
+                      style={{
+                        position: "absolute",
+                        top: "100%",
+                        right: "0",
+                        zIndex: 50,
+                        marginTop: "5px",
+                        borderRadius: "15px",
+                        overflow: "hidden",
+                        boxShadow: "0 10px 25px rgba(0,0,0,0.2)",
+                      }}
+                    >
+                      <Calendar
+                        onChange={handleDateChange}
+                        calendarType="gregory"
+                        value={
+                          member.openingDate
+                            ? new Date(member.openingDate)
+                            : new Date()
+                        }
+                        formatDay={(locale, date) =>
+                          date.toLocaleString("en", { day: "numeric" })
+                        }
+                      />
+                    </div>
+                  )}
+                </div>
+                <p
+                  className={`signup-status-msg ${openingDateStatus.isError ? "signup-error-msg" : ""}`}
+                >
+                  {openingDateStatus.text}
+                </p>
+              </div>
+            </div>
+
+            {/* 가입 버튼 */}
+            <button type="submit" className="signup-btn">
+              사업자 회원가입
             </button>
-          </div>
-        </form>
+          </form>
+        </div>
       </div>
     </div>
   );
