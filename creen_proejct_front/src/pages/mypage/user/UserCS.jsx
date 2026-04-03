@@ -107,7 +107,6 @@ const FAQSection = ({ searchKeyword, setSearchKeyword }) => {
   const [openIndex, setOpenIndex] = useState(null); //아코디언 상태 (null : 모두 닫힘)
 
   const indexToggle = (index) => {
-    //아코디언 하나만 열리게
     setOpenIndex(openIndex === index ? null : index);
   };
 
@@ -296,16 +295,119 @@ const QnASection = ({ setSearchKeyword, user, setActiveTab }) => {
     </div>
   );
 };
-
+//1:1문의내역
 const AnswerSection = ({ user }) => {
   const [inquiryList, setInquiryList] = useState([]);
   const [openIndex, setOpenIndex] = useState(null); //아코디언 상태 (null : 모두 닫힘)
   const indexToggle = (index) => {
-    //아코디언 하나만 열리게
+    if (editingNo !== null) {
+      alert("수정 중인 내용을 먼저 저장하거나 취소해주세요.");
+      return;
+    }
     setOpenIndex(openIndex === index ? null : index);
   };
+  //글자수제한
+  const handleChange = (e) => {
+    const maxLength = {
+      qnaTitle: 25,
+      qnaContent: 400,
+    };
 
-  useEffect(() => {
+    const { name, value } = e.target;
+    if (value.length >= maxLength[name]) {
+      if (value.length === maxLength[name]) {
+        alert(
+          `${name === "qnaTitle" ? "제목" : "내용"}은 최대 ${maxLength[name]}자까지 입력 가능합니다.`,
+        );
+      }
+      setUpdateData({ ...updateData, [name]: value.slice(0, maxLength[name]) });
+      return;
+    }
+    setUpdateData({ ...updateData, [name]: value });
+  };
+  const [status, setStatus] = useState(0); // 0: 답변대기중, 1:답변완료
+
+  //현재 수정중인 qnaNo 저장용
+  const [editingNo, setEditingNo] = useState(null);
+
+  //수정내용 임시저장용
+  const [updateData, setUpdateData] = useState({
+    qnaTitle: "",
+    qnaContent: "",
+  });
+
+  //수정취소
+  const cancelEdit = () => {
+    setEditingNo(null);
+    setUpdateData({
+      qnaTitle: "",
+      qnaContent: "",
+    });
+  };
+
+  //삭제
+  const deleteInquiry = (qnaNo) => {
+    if (!window.confirm("정말삭제하시겠습니까? ")) {
+      return;
+    }
+    if (status === 0) {
+      axios
+        .delete(`${import.meta.env.VITE_BACKSERVER}/cs/inquiries/delete`, {
+          params: { qnaNo: qnaNo },
+        })
+        .then((res) => {
+          console.log(res);
+          alert("작성하신 문의가 삭제되었습니다.");
+          setOpenIndex(null);
+          fetchInquiryList();
+        })
+        .catch((err) => {
+          console.log(err);
+          alert("삭제 중 오류가 발생했습니다. 고객센터에 문의 하세요");
+        });
+    }
+  };
+
+  //수정
+  const updateInquiry = (item, index) => {
+    if (status === 0) {
+      if (!updateData.qnaTitle || !updateData.qnaContent) {
+        alert("제목과 내용을 모두 입력해주세요.");
+        return;
+      }
+      if (
+        updateData.qnaTitle === item.qnaTitle &&
+        updateData.qnaContent === item.qnaContent
+      ) {
+        alert("수정된 내용이 없습니다.");
+      } else {
+        const dataSend = {
+          qnaNo: item.qnaNo,
+          qnaTitle: updateData.qnaTitle || item.qnaTitle,
+          qnaContent: updateData.qnaContent || item.qnaContent,
+        };
+        axios
+          .put(
+            `${import.meta.env.VITE_BACKSERVER}/cs/inquiries/update`,
+            dataSend,
+          )
+          .then((res) => {
+            console.log(res);
+            alert("작성하신 문의가 수정되었습니다.");
+            setEditingNo(null); //수정중인 문의번호 삭제 > 인풋이 다시 텍스트로바뀌게
+            setOpenIndex(index);
+            fetchInquiryList();
+          })
+          .catch((err) => {
+            console.log(err);
+            alert("수정 중 오류가 발생했습니다. 고객센터에 문의 하세요");
+          });
+      }
+    }
+  };
+
+  //수정 및 삭제 후 리스트 출력 분리
+  const fetchInquiryList = () => {
     if (!user || !user.memberId) return;
     axios
       .get(`${import.meta.env.VITE_BACKSERVER}/cs/inquiries/list`, {
@@ -318,6 +420,10 @@ const AnswerSection = ({ user }) => {
       .catch((err) => {
         console.log(err);
       });
+  };
+
+  useEffect(() => {
+    fetchInquiryList();
   }, [user?.memberId]);
   return (
     <div className={styles.answer_wrap}>
@@ -334,14 +440,43 @@ const AnswerSection = ({ user }) => {
               open={openIndex === i}
             >
               <summary
-                className={styles.faq_header}
+                className={`${styles.faq_header} ${
+                  editingNo !== null && editingNo !== item.qnaNo
+                    ? styles.disabled
+                    : ""
+                }`}
                 onClick={(e) => {
-                  e.preventDefault();
+                  e.preventDefault(); // 브라우저 기본 토글 동작 중지
+
+                  // 1. 현재 이 항목(item)이 '수정 중'인 상태라면?
+                  if (editingNo === item.qnaNo) {
+                    // 닫히지 않도록 그냥 리턴 (이미 열려있는 상태 유지)
+                    return;
+                  }
+
+                  // 2. 내가 아닌 '다른 항목'이 수정 중인데, 이 항목을 클릭했다면?
+                  if (editingNo !== null) {
+                    alert("수정 중인 내용을 먼저 저장하거나 취소해주세요.");
+                    return; // indexToggle(i)가 실행되지 않도록 여기서 끊어줌
+                  }
+
+                  // 3. 아무것도 수정 중이 아닐 때만 정상적으로 토글 실행
                   indexToggle(i);
                 }}
               >
                 <div className={styles.inquiry_info}>
-                  <p className={styles.inquiry_subject}>{item.qnaTitle}</p>
+                  {editingNo === item.qnaNo ? (
+                    <input
+                      type="text"
+                      name="qnaTitle"
+                      className={styles.edit_update_title}
+                      value={updateData.qnaTitle}
+                      onChange={handleChange}
+                    />
+                  ) : (
+                    <p className={styles.inquiry_subject}>{item.qnaTitle}</p>
+                  )}
+
                   <p className={styles.inquiry_preview_one_line}>
                     {item.qnaContent}
                   </p>
@@ -355,10 +490,78 @@ const AnswerSection = ({ user }) => {
               </summary>
 
               <div className={styles.faq_answer}>
-                {/* 1. 문의 내용 영역 */}
+                {/*답변이 없을때만 수정 및 삭제 버튼 표시 */}
+                {!item.qnaAnswer && (
+                  <div className={styles.action_buttons}>
+                    {editingNo === item.qnaNo ? (
+                      <>
+                        <button
+                          className={styles.edit_btn}
+                          onClick={() => {
+                            updateInquiry(item, i);
+                          }}
+                        >
+                          저장
+                        </button>
+                        <button
+                          className={styles.delete_btn}
+                          onClick={() => {
+                            cancelEdit();
+                          }}
+                        >
+                          취소
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <button
+                          className={styles.edit_btn}
+                          onClick={() => {
+                            setEditingNo(item.qnaNo);
+                            setUpdateData({
+                              qnaTitle: item.qnaTitle,
+                              qnaContent: item.qnaContent,
+                            });
+                          }}
+                        >
+                          수정
+                        </button>
+                        <button
+                          className={styles.delete_btn}
+                          onClick={() => {
+                            deleteInquiry(item.qnaNo);
+                          }}
+                        >
+                          삭제
+                        </button>
+                      </>
+                    )}
+                  </div>
+                )}
+
                 <div className={styles.qna_content_box}>
                   <p className={styles.answer_label}>[문의 내용]</p>
-                  <div className={styles.content_text}>{item.qnaContent}</div>
+
+                  {editingNo === item.qnaNo ? (
+                    <>
+                      <textarea
+                        type="text"
+                        className={styles.edit_update_textarea}
+                        name="qnaContent"
+                        value={updateData.qnaContent}
+                        onChange={handleChange}
+                      />
+                      <div className={styles.char_count_wrapper}>
+                        <span
+                          className={`${styles.char_count} ${updateData.qnaContent.length >= 400 ? styles.limit_reached : ""}`}
+                        >
+                          {updateData.qnaContent.length} / 400자
+                        </span>
+                      </div>
+                    </>
+                  ) : (
+                    <div className={styles.content_text}>{item.qnaContent}</div>
+                  )}
                 </div>
 
                 {/* 2. 구분선 (HR 태그 또는 CSS 처리) */}
