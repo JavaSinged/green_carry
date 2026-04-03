@@ -29,7 +29,7 @@ export default function UserLayout() {
           </li>
           <li>
             <NavLink
-              to="/mypage/points"
+              to="/mypage/user/orderList"
               className={({ isActive }) => (isActive ? styles.activeMenu : "")}
             >
               주문내역

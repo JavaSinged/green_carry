@@ -5,6 +5,8 @@ import kr.co.iei.store.model.vo.Menu;
 import kr.co.iei.store.model.vo.MenuOption;
 import kr.co.iei.store.model.vo.Order;
 import kr.co.iei.store.model.vo.OrderItem;
+import kr.co.iei.store.model.vo.OrderListResponse;
+import kr.co.iei.store.model.vo.OrderResponse;
 import kr.co.iei.store.model.vo.Store;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,21 +35,53 @@ public class StoreService {
     }
 
     @Transactional
-	public int insertOrder(Order order) {
-    	int orderId = 0;
-		int result = storeDao.insertOrder(order);
-		if(result == 1) {
-			orderId = order.getOrderId();
-			System.out.println(orderId);
-			List<OrderItem> list = order.getItems();
-			System.out.println(list);
-			for (OrderItem orderItem : list) {
-				int menuResult = storeDao.insertOrderDetail(orderItem, orderId);
-				System.out.println(menuResult);
-			}
-			
-		}
-		return orderId;
+    public int insertOrder(Order order) {
+        int result = storeDao.insertOrder(order);
+
+        if (result != 1) {
+            return 0;
+        }
+
+        int orderId = order.getOrderId();
+        String memberId = order.getMemberId();
+
+        List<OrderItem> list = order.getItems();
+
+        // 1. 주문 상세
+        if (list != null && !list.isEmpty()) {
+            for (OrderItem orderItem : list) {
+                int detailResult = storeDao.insertOrderDetail(orderItem, orderId);
+                if (detailResult != 1) {
+                    throw new RuntimeException("주문 상세 실패");
+                }
+            }
+        }
+
+        // 2. 주문 이력
+        int historyResult = storeDao.insertOrderHistory(orderId, memberId);
+        if (historyResult != 1) {
+            throw new RuntimeException("주문 이력 저장 실패");
+        }
+
+        return orderId;
+    }
+
+    public OrderResponse searchOrder(Integer orderId) {
+        OrderResponse orderResponse = storeDao.searchOrderInfo(orderId);
+        List<OrderItem> items = storeDao.searchOrderItems(orderId);
+
+        orderResponse.setItems(items);
+
+        return orderResponse;
+    }
+
+	public List<OrderListResponse> searchOrdersByMemberId(String memberId) {
+		List<OrderListResponse> list = storeDao.searchOrdersByMemberId(memberId);
+		return list;
+	}
+
+	public List<OrderResponse> searchOrderList(String memberId){
+	    return storeDao.searchOrderList(memberId);
 	}
 
 }

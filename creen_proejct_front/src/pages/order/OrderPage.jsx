@@ -32,7 +32,6 @@ const OrderPage = () => {
   }, [deliveryType]);
 
   const addOrder = () => {};
-  console.log(storeId);
   return (
     <div className={styles.pageWrapper}>
       <main className={styles.mainContainer}>

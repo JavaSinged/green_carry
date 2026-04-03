@@ -52,10 +52,10 @@ const PaymentPage = () => {
     usedPoint: ecoPoint,
     deliveryType: deliveryPrice === 0 ? 1 : deliveryPrice === 1000 ? 2 : 3,
     items: cartList.map((item) => ({
-      menuId: item.id,
+      menuId: Number(item.menuId),
       quantity: item.quantity,
       price: item.unitPrice,
-      options: item.options.map((o) => o.optionName).join(","),
+      optionString: item.options.map((o) => o.optionName).join(",") || "",
     })),
     totalPrice: totalPrice,
     getPoint: totalCarbon,
@@ -90,6 +90,7 @@ const PaymentPage = () => {
   // };
 
   const handlePayment = async () => {
+    console.log(JSON.stringify(payInfo, null, 2));
     try {
       const response = await axios.post(
         `${import.meta.env.VITE_BACKSERVER}/stores/order`,
@@ -113,13 +114,16 @@ const PaymentPage = () => {
           value: totalPrice,
         },
         orderId: `ORDER_${savedOrderId}_${Date.now()}`,
-        orderName: `${cartList[0].menuName} 외 ${cartList.length - 1}건`,
+        orderName: `${cartList[0].name} 외 ${cartList.length - 1}건`,
         successUrl: `${window.location.origin}/checkoutPage`,
         failUrl: `${window.location.origin}/payment/fail`,
         customerName: memberId,
       });
     } catch (error) {
       console.error("결제 준비 중 에러 발생:", error);
+      console.log(error);
+      console.log(error.response);
+      console.log(error.response?.data);
       alert("주문 처리 중 오류가 발생했습니다.");
     }
   };
@@ -228,32 +232,29 @@ const PaymentPage = () => {
                 <div className={styles["point-row"]}>
                   <input
                     type="text"
-                    value={ecoPoint}
+                    value={ecoPoint === 0 ? "" : ecoPoint}
                     onChange={(e) => {
                       const value = e.target.value;
 
                       // 숫자만 허용
                       if (!/^[0-9]*$/.test(value)) return;
 
-                      // 빈값 처리
-                      if (value === "") {
-                        setEcoPoint("");
-                        setPayInfo({
-                          ...payInfo,
-                          ecoPoint: 0,
-                        });
-                        return;
-                      }
+                      // 최대 사용 가능 포인트
+                      const maxPoint = Math.min(
+                        availableEcoPoint ?? 0,
+                        itemPrice ?? 0,
+                      );
 
-                      const maxPoint = Math.min(availableEcoPoint, itemPrice);
-                      const num = Math.min(Number(value), maxPoint);
+                      // 빈값이면 0 처리
+                      const num =
+                        value === "" ? 0 : Math.min(Number(value), maxPoint);
 
                       setEcoPoint(num);
-                      setPayInfo({
-                        ...payInfo,
-                        totalPrice: totalPrice,
+                      setPayInfo((prev) => ({
+                        ...prev,
+                        totalPrice: totalPrice ?? 0,
                         ecoPoint: num,
-                      });
+                      }));
                     }}
                   />
                   <button
