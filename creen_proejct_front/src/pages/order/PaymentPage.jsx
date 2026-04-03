@@ -55,7 +55,7 @@ const PaymentPage = () => {
       menuId: Number(item.menuId),
       quantity: item.quantity,
       price: item.unitPrice,
-      options: item.options.map((o) => o.optionName).join(","),
+      optionString: item.options.map((o) => o.optionName).join(",") || "",
     })),
     totalPrice: totalPrice,
     getPoint: totalCarbon,
@@ -114,7 +114,7 @@ const PaymentPage = () => {
           value: totalPrice,
         },
         orderId: `ORDER_${savedOrderId}_${Date.now()}`,
-        orderName: `${cartList[0].menuName} 외 ${cartList.length - 1}건`,
+        orderName: `${cartList[0].name} 외 ${cartList.length - 1}건`,
         successUrl: `${window.location.origin}/checkoutPage`,
         failUrl: `${window.location.origin}/payment/fail`,
         customerName: memberId,
@@ -232,32 +232,29 @@ const PaymentPage = () => {
                 <div className={styles["point-row"]}>
                   <input
                     type="text"
-                    value={ecoPoint}
+                    value={ecoPoint === 0 ? "" : ecoPoint}
                     onChange={(e) => {
                       const value = e.target.value;
 
                       // 숫자만 허용
                       if (!/^[0-9]*$/.test(value)) return;
 
-                      // 빈값 처리
-                      if (value === "") {
-                        setEcoPoint("");
-                        setPayInfo({
-                          ...payInfo,
-                          ecoPoint: 0,
-                        });
-                        return;
-                      }
+                      // 최대 사용 가능 포인트
+                      const maxPoint = Math.min(
+                        availableEcoPoint ?? 0,
+                        itemPrice ?? 0,
+                      );
 
-                      const maxPoint = Math.min(availableEcoPoint, itemPrice);
-                      const num = Math.min(Number(value), maxPoint);
+                      // 빈값이면 0 처리
+                      const num =
+                        value === "" ? 0 : Math.min(Number(value), maxPoint);
 
                       setEcoPoint(num);
-                      setPayInfo({
-                        ...payInfo,
-                        totalPrice: totalPrice,
+                      setPayInfo((prev) => ({
+                        ...prev,
+                        totalPrice: totalPrice ?? 0,
                         ecoPoint: num,
-                      });
+                      }));
                     }}
                   />
                   <button

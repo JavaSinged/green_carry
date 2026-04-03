@@ -37,6 +37,7 @@ import AdminContainerManagement from "./pages/mypage/admin/AdminContainerManagem
 // 🌟 문지기 컴포넌트
 import ProtectedRoute from "./context/ProtectedRoute";
 import ManagerDelAccount from "./pages/mypage/deleteMember/ManagerDelAccount";
+import UserOrderList from "./pages/mypage/user/UserOrderList";
 
 const BasicLayout = () => {
   return (
@@ -86,6 +87,7 @@ function App() {
                 <Route index element={<UserProfile />} />
                 <Route path="profile" element={<UserInfoEdit />} />
                 <Route path="userCS" element={<UserCS />} />
+                <Route path="orderList" element={<UserOrderList />} />
                 <Route path="deleteMember" element={<UserDelAccount />} />
               </Route>
             </Route>{" "}

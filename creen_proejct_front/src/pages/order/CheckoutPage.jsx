@@ -2,6 +2,8 @@ import React, { useEffect, useRef, useState } from "react";
 import styles from "./CheckoutPage.module.css";
 import { useLocation, useNavigate } from "react-router-dom";
 import useCartStore from "../../store/useCartStore";
+import axios from "axios";
+
 const CheckoutPage = () => {
   const cartList = useCartStore((state) => state.cart);
   const navigate = useNavigate();
@@ -9,18 +11,57 @@ const CheckoutPage = () => {
   const mapElement = useRef(null);
   const [mapLoaded, setMapLoaded] = useState(false);
   const STORE_INFO = { lat: 37.497952, lng: 127.027619 };
-  const totalPrice = cartList.reduce((sum, item) => sum + item.totalPrice, 0);
-  const totalCarbon = cartList.reduce((sum, item) => sum + item.carbonSaved, 0);
-  const storeName = useCartStore((state) => state.storeName);
-  const { usedPoint, deliveryPrice } = useCartStore();
-  const [payInfo, setPayInfo] = useState({
-    totalPrice: totalPrice,
-    ecoPoint: usedPoint,
-    deliveryPrice: deliveryPrice,
-  });
+  const [orderList, setOrderList] = useState([]);
+  const [usedPoint, setUsedPoint] = useState(0);
+  const [getPoint, setGetPoint] = useState(0);
+  const [deliveryPrice, setDeliveryPrice] = useState(0);
+  const [orderAmount, setOrderAmount] = useState(0);
+  const [finalPrice, setFinalPrice] = useState(0);
+  const params = new URLSearchParams(location.search);
+  const paymentOrderId = params.get("orderId");
+  const orderId = paymentOrderId ? Number(paymentOrderId.split("_")[1]) : null;
+  const [storeName, setStoreName] = useState("");
+  const [orderState, setOrderState] = useState(2);
 
   useEffect(() => {
     console.log(cartList);
+    if (!orderId) return;
+
+    axios
+      .get(`${import.meta.env.VITE_BACKSERVER}/stores/order/${orderId}`)
+      .then((res) => {
+        console.log(res.data);
+
+        setOrderList(res.data.items ?? []);
+        setUsedPoint(Number(res.data.usedPoint ?? 0));
+        setGetPoint(Number(res.data.getPoint ?? 0));
+        setDeliveryPrice(Number(res.data.deliveryPrice ?? 0));
+        setStoreName(res.data.storeName);
+        // setOrderState(res.data.orderStatus ?? 0);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, [orderId, cartList]);
+  useEffect(() => {
+    const total = orderList.reduce((sum, item) => {
+      return sum + Number(item.price ?? 0) * Number(item.quantity ?? 0);
+    }, 0);
+
+    setOrderAmount(total);
+  }, [orderList]);
+  useEffect(() => {
+    const paymentAmount = Math.max(
+      0,
+      Number(orderAmount ?? 0) +
+        Number(deliveryPrice ?? 0) -
+        Number(usedPoint ?? 0),
+    );
+
+    setFinalPrice(paymentAmount);
+  }, [orderAmount, deliveryPrice, usedPoint]);
+
+  useEffect(() => {
     const checkNaver = setInterval(() => {
       if (window.naver && window.naver.maps && mapElement.current) {
         setMapLoaded(true);
@@ -31,10 +72,11 @@ const CheckoutPage = () => {
   }, []);
 
   useEffect(() => {
-    console.log(payInfo.ecoPoint);
     if (!mapLoaded || !mapElement.current) return;
+
     const { naver } = window;
     const location = new naver.maps.LatLng(STORE_INFO.lat, STORE_INFO.lng);
+
     try {
       const map = new naver.maps.Map(mapElement.current, {
         center: location,
@@ -42,6 +84,7 @@ const CheckoutPage = () => {
         zoomControl: true,
         minZoom: 10,
       });
+
       new naver.maps.Marker({
         position: location,
         map,
@@ -63,10 +106,10 @@ const CheckoutPage = () => {
       console.error("지도 생성 중 에러:", e);
     }
   }, [mapLoaded]);
+
   return (
     <div className={styles.page}>
       <main className={styles.main}>
-        {/* 완료 카드 */}
         <section className={styles.completeCard}>
           <div className={styles.completeIcon}>✓</div>
           <h1 className={styles.completeTitle}>주문이 완료되었습니다!</h1>
@@ -78,41 +121,40 @@ const CheckoutPage = () => {
           <p className={styles.orderNumber}>ECO-2026-032501</p>
         </section>
 
-        {/* 주문 현황 */}
         <section className={styles.statusCard}>
           <h2 className={styles.sectionTitle}>실시간 주문 현황</h2>
 
-          <div className={styles.timeline}>
-            <div className={styles.timelineLine}></div>
-
-            <div className={styles.timelineItem}>
-              <div className={`${styles.timelineCircle} ${styles.active}`}>
-                <span className={styles.timelineIcon}></span>
+          <div className={styles.progressWrapper}>
+            <div className={styles.progressBar}>
+              <div
+                className={styles.progressFill}
+                style={{ width: `${(orderState / 3) * 100}%` }}
+              >
+                <span className={styles.seed}>🌱</span>
               </div>
-              <p className={styles.timelineLabelActive}>주문 접수</p>
-              <span className={styles.timelineTime}>18:45</span>
+
+              <div className={styles.progressWrapper}></div>
             </div>
 
-            <div className={styles.timelineItem}>
-              <div className={`${styles.timelineCircle} ${styles.active}`}>
-                <span className={styles.timelineIcon}></span>
-              </div>
-              <p className={styles.timelineLabelActive}>조리중</p>
-              <span className={styles.timelineTime}>18:46</span>
-            </div>
-
-            <div className={styles.timelineItem}>
-              <div className={styles.timelineCircle}>
-                <span className={styles.timelineIcon}></span>
-              </div>
-              <p className={styles.timelineLabel}>배달중</p>
-            </div>
-
-            <div className={styles.timelineItem}>
-              <div className={styles.timelineCircle}>
-                <span className={styles.timelineIcon}></span>
-              </div>
-              <p className={styles.timelineLabel}>배달 완료</p>
+            <div className={styles.progressSteps}>
+              {["주문 접수", "조리중", "배달중", "배달 완료"].map(
+                (label, index) => (
+                  <div key={index} className={styles.step}>
+                    <div
+                      className={`${styles.circle} ${
+                        orderState >= index ? styles.active : ""
+                      }`}
+                    />
+                    <p
+                      className={
+                        orderState >= index ? styles.labelActive : styles.label
+                      }
+                    >
+                      {label}
+                    </p>
+                  </div>
+                ),
+              )}
             </div>
           </div>
 
@@ -121,9 +163,7 @@ const CheckoutPage = () => {
           </p>
         </section>
 
-        {/* 하단 영역 */}
         <div className={styles.bottomSection}>
-          {/* 왼쪽 */}
           <section className={styles.leftColumn}>
             <div className={styles.mapCard}>
               <div className={styles.cardHeader}>
@@ -131,7 +171,7 @@ const CheckoutPage = () => {
                   <span className={styles.smallIcon}></span>
                   <h3 className={styles.cardTitle}>
                     <span>가게 위치</span> &gt;{" "}
-                    <span className={styles.subtitle}>{storeName}</span>{" "}
+                    <span className={styles.subtitle}>{storeName}</span>
                   </h3>
                 </div>
               </div>
@@ -157,20 +197,26 @@ const CheckoutPage = () => {
             </div>
           </section>
 
-          {/* 오른쪽 */}
           <aside className={styles.rightColumn}>
             <div className={styles.orderInfoCard}>
               <h3 className={styles.rightTitle}>주문 내역</h3>
 
               <div className={styles.orderList}>
-                <OrderListMap cartList={cartList} />
+                <OrderListMap orderList={orderList} />
+
+                <div className={styles.orderRow}>
+                  <span>상품 금액</span>
+                  <span>{orderAmount.toLocaleString()} 원</span>
+                </div>
+
                 <div className={styles.orderRow}>
                   <span>에코 딜리버리</span>
-                  <span>{payInfo.deliveryPrice.toLocaleString()} 원</span>
+                  <span>{deliveryPrice.toLocaleString()} 원</span>
                 </div>
+
                 <div className={styles.orderRow}>
                   <span>에코포인트 사용</span>
-                  {/* <span>- {payInfo.ecoPoint.toLocaleString()} 원</span> */}
+                  <span>- {usedPoint.toLocaleString()} 원</span>
                 </div>
               </div>
 
@@ -178,9 +224,7 @@ const CheckoutPage = () => {
 
               <div className={styles.totalRow}>
                 <span>총 결제 금액</span>
-                <strong>
-                  {/* {(totalPrice - payInfo.ecoPoint).toLocaleString()} 원 */}
-                </strong>
+                <strong>{finalPrice.toLocaleString()} 원</strong>
               </div>
             </div>
 
@@ -194,7 +238,7 @@ const CheckoutPage = () => {
                 <p className={styles.ecoInnerTitle}>
                   이번 주문으로 절감한 탄소
                 </p>
-                <strong className={styles.ecoValue}>{totalCarbon}g</strong>
+                <strong className={styles.ecoValue}>{getPoint}g</strong>
                 <p className={styles.ecoInnerDesc}>
                   이번 주문으로 나무 가지 하나를 피웠습니다!
                 </p>
@@ -202,8 +246,9 @@ const CheckoutPage = () => {
 
               <div className={styles.ecoInfoRow}>
                 <span>에코 포인트 적립</span>
-                <strong>+{totalCarbon.toLocaleString()}p</strong>
+                <strong>+{getPoint.toLocaleString()}p</strong>
               </div>
+
               <div className={styles.ecoInfoRow}>
                 <span>누적 탄소 절감량</span>
                 <strong>24.6kg</strong>
@@ -218,6 +263,7 @@ const CheckoutPage = () => {
             >
               주문 내역보기
             </button>
+
             <button
               className={styles.secondaryBtn}
               onClick={() => {
@@ -235,18 +281,27 @@ const CheckoutPage = () => {
 
 export default CheckoutPage;
 
-const OrderListMap = ({ cartList }) => {
-  return cartList.map((cart, index) => {
-    return <OrderItemList key={`cartList-${index}`} cart={cart} />;
+const OrderListMap = ({ orderList }) => {
+  return orderList.map((cart, index) => {
+    return <OrderItemList key={`orderList-${index}`} cart={cart} />;
   });
 };
+
 const OrderItemList = ({ cart }) => {
   return (
     <div>
-      <div className={styles.orderRow}>
-        <span>{cart.name}</span>
-        <span>{(cart.unitPrice * cart.quantity).toLocaleString()}원</span>
+      <div className={`${styles.orderRow} ${styles.order_price}`}>
+        <span>
+          {cart.menuName} * {cart.quantity}
+        </span>
+        <span>{(cart.price * cart.quantity).toLocaleString()}원</span>
       </div>
+
+      {cart.optionString && cart.optionString !== "" ? (
+        <p className={styles.option_list}>{cart.optionString}</p>
+      ) : (
+        ""
+      )}
     </div>
   );
 };

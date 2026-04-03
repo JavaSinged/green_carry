@@ -5,6 +5,8 @@ import kr.co.iei.store.model.vo.Menu;
 import kr.co.iei.store.model.vo.MenuOption;
 import kr.co.iei.store.model.vo.Order;
 import kr.co.iei.store.model.vo.OrderItem;
+import kr.co.iei.store.model.vo.OrderListResponse;
+import kr.co.iei.store.model.vo.OrderResponse;
 import kr.co.iei.store.model.vo.Store;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -63,5 +65,23 @@ public class StoreService {
 
         return orderId;
     }
+
+    public OrderResponse searchOrder(Integer orderId) {
+        OrderResponse orderResponse = storeDao.searchOrderInfo(orderId);
+        List<OrderItem> items = storeDao.searchOrderItems(orderId);
+
+        orderResponse.setItems(items);
+
+        return orderResponse;
+    }
+
+	public List<OrderListResponse> searchOrdersByMemberId(String memberId) {
+		List<OrderListResponse> list = storeDao.searchOrdersByMemberId(memberId);
+		return list;
+	}
+
+	public List<OrderResponse> searchOrderList(String memberId){
+	    return storeDao.searchOrderList(memberId);
+	}
 
 }

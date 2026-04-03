@@ -10,7 +10,6 @@ export default function CartBar() {
   const totalPrice = cart.reduce((sum, item) => sum + item.totalPrice, 0);
   const totalCarbon = cart.reduce((sum, item) => sum + item.carbonSaved, 0);
   const navigate = useNavigate();
-  const cartList = useCartStore((state) => state.cart);
 
   if (cart.length === 0) return null;
   return (

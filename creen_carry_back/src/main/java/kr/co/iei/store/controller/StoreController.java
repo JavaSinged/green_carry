@@ -4,6 +4,9 @@ import kr.co.iei.store.model.service.StoreService;
 import kr.co.iei.store.model.vo.Menu;
 import kr.co.iei.store.model.vo.MenuOption;
 import kr.co.iei.store.model.vo.Order;
+import kr.co.iei.store.model.vo.OrderItem;
+import kr.co.iei.store.model.vo.OrderListResponse;
+import kr.co.iei.store.model.vo.OrderResponse;
 import kr.co.iei.store.model.vo.Store;
 import org.apache.ibatis.type.Alias;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,4 +62,15 @@ public class StoreController {
     	return ResponseEntity.ok(orderId);
     }
 
+    @GetMapping("/order/{orderId}")
+    public ResponseEntity<?> searchOrder(@PathVariable Integer orderId){
+        OrderResponse orderResponse = storeService.searchOrder(orderId);
+        return ResponseEntity.ok(orderResponse);
+    }
+    
+    @GetMapping("/orders/{memberId}")
+    public ResponseEntity<?> searchOrderList(@PathVariable String memberId){
+        List<OrderResponse> list = storeService.searchOrderList(memberId);
+        return ResponseEntity.ok(list);
+    }
 }

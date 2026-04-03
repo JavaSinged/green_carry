@@ -11,21 +11,25 @@
 		SELECT
 		store_id AS storeId,
 		member_id AS memberId,
-		store_name AS storeName,
+		store_name
+		AS storeName,
 		store_address AS storeAddress,
 		store_phone AS storePhone,
 		store_intro AS storeIntro,
 		store_owner AS storeOwner,
 		store_owner_address AS storeOwnerAddress,
-		store_origin_info AS storeOriginInfo,
+		store_origin_info AS
+		storeOriginInfo,
 		store_owner_no AS storeOwnerNo,
-		store_category AS storeCategory,
+		store_category AS
+		storeCategory,
 		store_rating AS storeRating,
 		latitude AS LATITUDE,
 		longitude AS LONGITUDE,
 		store_thumb AS storeThumb
 		FROM STORE_TBL
-		WHERE store_id = #{storeId}
+		WHERE
+		store_id = #{storeId}
 	</select>
 
 
@@ -42,7 +46,8 @@
 		FROM MENU_TBL
 		WHERE store_id = #{storeId}
 		AND menu_status = 1
-		ORDER BY menu_category ASC, menu_id ASC
+		ORDER BY
+		menu_category ASC, menu_id ASC
 	</select>
 
 	<select id="getMenuOptions" parameterType="long"
@@ -53,9 +58,11 @@
 		o.option_name,
 		o.option_price
 		FROM OPTION_TBL o
-		JOIN MENU_OPTION_MAP mom ON o.option_no = mom.option_no
+		JOIN MENU_OPTION_MAP mom ON o.option_no
+		= mom.option_no
 		WHERE mom.menu_id = #{menuId}
-		ORDER BY o.option_type ASC, o.option_no ASC
+		ORDER BY o.option_type
+		ASC, o.option_no ASC
 	</select>
 
 	<insert id="insertOrder" parameterType="order">
@@ -71,7 +78,7 @@
 		store_id,
 		used_point,
 		get_point,
-		order_state,
+		order_status,
 		delivery_type
 		) VALUES (
 		#{orderId},
@@ -84,33 +91,139 @@
 		)
 	</insert>
 	<insert id="insertOrderDetail">
-  INSERT INTO order_detail (
-    order_detail_id,
-    order_id,
-    menu_id,
-    price,
-    option_string,
-    total_carbon,
-    quantity
-  )
-  SELECT
-    ORDER_DETAIL_SEQ.NEXTVAL,
-    #{orderId},
-    m.menu_id,
-    #{orderItem.price},
-    #{orderItem.options},
-    m.menu_carbon,
-    #{orderItem.quantity}
-  FROM menu_tbl m
-  WHERE m.menu_id = #{orderItem.menuId}
-</insert>
-<insert id="insertOrderHistory">
-    INSERT INTO order_list_map (
-        order_id,
-        member_id
-    ) VALUES (
-        #{orderId},
-        #{memberId}
-    )
-</insert>
+		INSERT INTO order_detail (
+		order_detail_id,
+		order_id,
+		menu_id,
+		price,
+		option_string,
+		total_carbon,
+		quantity
+		)
+		SELECT
+		ORDER_DETAIL_SEQ.NEXTVAL,
+		#{orderId},
+		m.menu_id,
+		#{orderItem.price},
+		#{orderItem.optionString, jdbcType=VARCHAR},
+		m.menu_carbon,
+		#{orderItem.quantity}
+		FROM menu_tbl m
+		WHERE m.menu_id =
+		#{orderItem.menuId}
+	</insert>
+	<insert id="insertOrderHistory">
+		INSERT INTO order_list_map (
+		order_id,
+		member_id
+		)
+		VALUES (
+		#{orderId},
+		#{memberId}
+		)
+	</insert>
+	<select id="searchOrderItems" parameterType="int"
+		resultType="orderItem">
+		SELECT
+		od.menu_id AS menuId,
+		m.menu_name AS menuName,
+		od.quantity,
+		od.price,
+		od.option_string AS optionString
+		FROM order_detail
+		od
+		JOIN menu_tbl m
+		ON od.menu_id = m.menu_id
+		WHERE od.order_id =
+		#{orderId}
+		ORDER BY od.order_detail_id
+	</select>
+	<select id="searchOrderInfo" parameterType="int"
+		resultType="orderResponse">
+		SELECT
+		s.store_name AS storeName,
+		o.order_id AS orderId,
+		o.used_point AS usedPoint,
+		o.get_point AS getPoint,
+		CASE
+		WHEN
+		o.delivery_type = 1 THEN 0
+		WHEN o.delivery_type = 2 THEN 1000
+		ELSE 2000
+		END AS deliveryPrice,
+		o.delivery_type AS deliveryType,
+		o.order_status AS
+		orderStatus
+		FROM order_tbl o
+		JOIN store_tbl s
+		ON o.store_id = s.store_id
+		WHERE o.order_id = #{orderId}
+	</select>
+	<select id="searchOrdersByMemberId"
+		resultType="OrderListResponse">
+		select * from order_tbl where member_id = #{memberId}
+	</select>
+	<select id="searchOrderList" parameterType="string"
+		resultType="orderResponse">
+		SELECT
+		s.store_name AS storeName,
+		o.order_id AS orderId,
+		o.used_point AS usedPoint,
+		o.get_point AS getPoint,
+		CASE
+		WHEN o.delivery_type = 1 THEN 0
+		WHEN o.delivery_type = 2 THEN 1000
+		ELSE 2000
+		END AS deliveryPrice,
+		o.delivery_type AS deliveryType,
+		o.order_status AS orderStatus,
+		TO_CHAR(olm.reg_date, 'YYYY-MM-DD') AS orderDate,
+
+		od_sum.totalCount AS totalCount,
+		md.menu_name AS menuName,
+		md.menu_image AS menuImage,
+		od_first.option_string AS optionString,
+
+		s.store_address AS storeAddress,
+		m.member_addr AS deliveryAddress
+
+		FROM order_tbl o
+
+		JOIN store_tbl s
+		ON o.store_id = s.store_id
+
+		JOIN order_list_map olm
+		ON o.order_id = olm.order_id
+
+		JOIN member_tbl m
+		ON o.member_id = m.member_id
+
+		JOIN (
+		SELECT
+		order_id,
+		SUM(quantity) AS totalCount
+		FROM order_detail
+		GROUP BY order_id
+		) od_sum
+		ON o.order_id = od_sum.order_id
+
+		JOIN (
+		SELECT od1.*
+		FROM order_detail od1
+		JOIN (
+		SELECT order_id, MIN(order_detail_id) AS min_detail_id
+		FROM order_detail
+		GROUP BY order_id
+		) x
+		ON od1.order_id = x.order_id
+		AND od1.order_detail_id = x.min_detail_id
+		) od_first
+		ON o.order_id = od_first.order_id
+
+		JOIN menu_tbl md
+		ON od_first.menu_id = md.menu_id
+
+		WHERE o.member_id = #{memberId}
+		ORDER BY o.order_id DESC
+	</select>
 </mapper>
