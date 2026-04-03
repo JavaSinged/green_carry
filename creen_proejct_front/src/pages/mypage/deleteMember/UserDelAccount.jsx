@@ -4,10 +4,52 @@ import { useContext, useEffect, useState } from "react";
 import WarningIcon from '@mui/icons-material/Warning';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const UserDelAccount = () => {
-    const { user } = useContext(AuthContext); // 현재 로그인한 유저 정보
+    const { user, logout } = useContext(AuthContext); // 현재 로그인한 유저 정보
     const [showPassword, setShowPassword] = useState(false);
+    const navigate = useNavigate();
+
+    const [password, setPassword] = useState(""); // 입력한 비밀번호
+    const [isAgreed, setIsAgreed] = useState(false); // 마지막 체크박스 동의
+
+    const handleDeleteAccount = async () => {
+        // 체크박스 동의 여부
+        if (!isAgreed) {
+            alert("안내 사항을 모두 확인하셨으면 탈퇴에 동의해 주세요.");
+            return;
+        }
+        // 비밀번호 입력 여부
+        if (!password) {
+            alert("비밀번호를 입력해 주세요.");
+            return;
+        }
+        //서버로 탈퇴 요청 보내기(비밀번호 검증 및 DB 삭제)
+        try {
+            const token = localStorage.getItem("accessToken");
+
+            const response = await axios.post(
+                `${import.meta.env.VITE_BACKSERVER}/member/delete`,
+                { password: password },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                }
+            );
+            //탈퇴 성공시
+
+            alert("그동안 이용해 주셔서 감사합니다. 회원 탈퇴가 완료되었습니다.");
+            logout()
+            //비밀번호 틀렸을 시
+        } catch (err) {
+            console.log(err)("탈퇴 요청 중 에러 발생:", err);
+            alert("서버와 통신 중 문제가 발생했습니다.");
+        }
+    };
+
     const togglePassword = () => {
         setShowPassword(!showPassword);
     }
@@ -72,7 +114,7 @@ const UserDelAccount = () => {
                         <section className={styles.text_input}>
                             <div className={styles.reason_input}>
                                 <p>구체적인 사유를 작성해 주세요 <span>(선택)</span></p>
-                                <input type="text"></input>
+                                <input type="text" autoComplete="off" />
                             </div>
                             <div className={styles.reason_pwInput}>
                                 <p>비밀번호</p>
@@ -89,8 +131,8 @@ const UserDelAccount = () => {
                         <div className={styles.last_check_box}>
                             <label>
                                 <input type="checkbox" />
+                                <p>안내 사항을 모두 확인 하였으며 탈퇴에 동의 합니다.</p>
                             </label>
-                            <p>안내 사항을 모두 확인 하였으며 탈퇴에 동의 합니다.</p>
                         </div>
                     </section>
                 </section>

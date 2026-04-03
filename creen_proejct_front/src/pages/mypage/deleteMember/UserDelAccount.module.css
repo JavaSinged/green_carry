@@ -29,7 +29,7 @@
   flex-direction: column;
   background-color: #f1f2f6;
   width: 550px;
-  height: 130px;
+  height: 160px;
   border-radius: 20px;
   text-align: left;
   padding-bottom: 155px;
@@ -54,13 +54,17 @@
   font-size: 15px;
 }
 .bold_text {
-  text-align: left;
+  text-align: center;
   padding-left: 20px;
-  font-size: 15px;
+  margin-top: 10px;
+  font-size: 13px;
   font-weight: bold;
 }
 .reasonSection {
-  margin-top: 20px;
+  margin-top: 30px;
+  margin-bottom: 40px;
+  width: 550px;
+  text-align: center;
 }
 .reasonSection p {
   font-size: 13px;
@@ -75,8 +79,9 @@
   text-align: left;
   padding-left: 30px;
   grid-template-columns: 1fr 1fr;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
+  gap: 7px;
 }
 .reason_check label {
   display: flex;
@@ -180,20 +185,63 @@
 }
 .last_check_box {
   display: flex;
-  align-items: center;
-  text-align: left;
+  text-align: center;
+  justify-content: center;
   font-weight: bold;
   font-size: 15px;
   width: 550px;
+  margin-top: 11px;
+  align-items: center;
+  text-align: left;
+}
+.last_check_box p {
+  margin: 2px;
+  line-height: 1;
+}
+.last_check_box input[type="checkbox"] {
+  appearance: none;
+  width: 15px;
+  height: 15px;
+  border: 1px solid var(--color-brand);
+  border-radius: 3px;
+  background-color: var(--colog-bg);
+  cursor: pointer;
+  position: relative;
+}
+.last_check_box input[type="checkbox"]:checked {
+  background-color: var(--color-brand);
+}
+/*체크박스 안에 ✓ 관한 것*/
+.last_check_box input[type="checkbox"]:checked::before {
+  content: "✓";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
 }
 .two_btn {
   display: flex;
   justify-content: center;
-  gap: 150px;
+  gap: 50px;
+  margin-top: 30px;
 }
-.cancel_btn {
+.cancel_btn p {
   cursor: pointer;
+  background-color: var(--text-sub);
+  color: white;
+  padding: 10px 53px;
+  border-radius: 30px;
 }
-.goodbye_btn {
+.goodbye_btn p {
+  cursor: pointer;
+  background-color: #fb2c36;
+  color: white;
+  padding: 10px 40px;
+  border-radius: 30px;
+}
+.last_check_box label {
+  display: flex;
+  align-items: center;
   cursor: pointer;
 }

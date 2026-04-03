@@ -7,6 +7,7 @@ import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -185,6 +186,20 @@ public class MemberService {
 	public Member emailDupCheck(String memberEmail) {
 		Member member = memberDao.emailDupCheck(memberEmail);
 		return member;
+	}
+	@Transactional
+	public void deleteMember(String memberId, String rawPassword) {
+		// DB에서 내 정보 찾기
+		Member member = memberDao.selectOneMember(memberId);
+
+		if (member == null) {
+			throw new IllegalArgumentException("존재하지 않는 회원입니다.");
+		}
+		
+		if(!passwordEncoder.matches(rawPassword, member.getMemberPw())) {
+			throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+		}
+		memberDao.deleteMember(memberId);
 	}
 
 }

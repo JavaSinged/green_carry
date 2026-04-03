@@ -23,6 +23,7 @@ public interface MemberDao {
 	int updatePassword(String memberId, String encodedNewPw);
 
 
+
 	List<Member> selectAllMember();
 
 	int updateProfile(Member member);
@@ -34,6 +35,9 @@ public interface MemberDao {
 	Member storeDupCheck(String storeOwnerNo);
 
 	Member emailDupCheck(String memberEmail);
+
+
+	void deleteMember(String memberId);
 
 
 }
