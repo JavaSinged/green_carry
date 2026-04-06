@@ -2,6 +2,7 @@ package kr.co.iei.store.model.dao;
 
 import kr.co.iei.store.model.vo.Menu;
 import kr.co.iei.store.model.vo.MenuOption;
+import kr.co.iei.store.model.vo.MenuSaveRequestDto;
 import kr.co.iei.store.model.vo.Order;
 import kr.co.iei.store.model.vo.OrderItem;
 import kr.co.iei.store.model.vo.OrderListResponse;
@@ -44,6 +45,22 @@ public interface StoreDao {
 	Integer getStoreId(String memberId);
 
 	List<MenuOption> getAllMenuOptions();
+
+	int updateMenu(MenuSaveRequestDto dto);
+
+	int deleteMenuOptions(Long menuId);
+
+	void insertNewOption(MenuOption newOpt);
+
+	int insertMenuOptions(
+		    @Param("menuId") Long menuId, 
+		    @Param("optionIds") List<Long> optionIds
+		);
+
+	Menu getMenuById(Long menuId);
+
+	int insertMenu(MenuSaveRequestDto dto);
+	
 
 
 }

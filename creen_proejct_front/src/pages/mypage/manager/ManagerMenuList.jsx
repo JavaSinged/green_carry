@@ -72,26 +72,29 @@ const ManagerMenuList = () => {
     <div className={styles.menu_list_container}>
       <div className={styles.menu_header}>
         <h3 className={styles.store_name}>{storeName}</h3>
-        <div className={styles.search_wrap}>
-          <input
-            type="search"
-            className={styles.search_input}
-            placeholder="메뉴이름"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-          <SearchIcon className={styles.search_icon} />
-        </div>
-        <div>
-          <button
-            onClick={() => {
-              navigate("/mypage/manager/menuEdit", {
-                state: { storeId: storeId },
-              });
-            }}
-          >
-            메뉴 추가
-          </button>
+        <div className={styles.header_right}>
+          <div className={styles.search_wrap}>
+            <input
+              type="search"
+              className={styles.search_input}
+              placeholder="메뉴이름"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            <SearchIcon className={styles.search_icon} />
+          </div>
+          <div>
+            <button
+              className={styles.add_btn}
+              onClick={() => {
+                navigate("/mypage/manager/menuEdit", {
+                  state: { storeId: storeId },
+                });
+              }}
+            >
+              메뉴 추가
+            </button>
+          </div>
         </div>
       </div>
 
@@ -101,10 +104,14 @@ const ManagerMenuList = () => {
             key={menu.menuId}
             className={styles.menu_card}
             onClick={() => {
-              (setMenuId(menu.menuId),
-                navigate("/mypage/manager/menuEdit", {
-                  state: { menuId: menu.menuId },
-                }));
+              setMenuId(menu.menuId);
+              navigate("/mypage/manager/menuEdit", {
+                state: {
+                  menuId: menu.menuId,
+                  storeId: storeId,
+                  menuData: menu,
+                },
+              });
             }}
           >
             <div className={styles.menu_image}>
