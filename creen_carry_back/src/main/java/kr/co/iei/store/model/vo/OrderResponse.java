@@ -19,5 +19,7 @@ public class OrderResponse {
     private Integer deliveryType;
     private List<OrderItem> items;
     private Integer orderStatus;
+    private Integer storeId;
+    private int hasReview;
     
 }

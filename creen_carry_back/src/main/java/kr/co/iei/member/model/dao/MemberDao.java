@@ -3,8 +3,10 @@ package kr.co.iei.member.model.dao;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import kr.co.iei.member.model.vo.Member;
+import kr.co.iei.member.model.vo.Review;
 
 @Mapper
 public interface MemberDao {
@@ -45,5 +47,10 @@ public interface MemberDao {
 
 	int getCommunityTotalCarbon();
 
+	int checkOrderOwner(@Param("orderId") int orderId, @Param("memberId") String memberId);
+
+    int isAlreadyReviewed(int orderId);
+
+    int insertReview(Review review);
 
 }

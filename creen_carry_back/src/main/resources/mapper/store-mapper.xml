@@ -159,7 +159,9 @@
             resultType="orderResponse">
         SELECT s.store_name                        AS storeName,
                o.order_id                          AS orderId,
+               o.store_id                          AS storeId,
                o.used_point                        AS usedPoint,
+               (SELECT COUNT(*) FROM review_tbl r WHERE r.order_id = o.order_id) AS hasReview,
                o.get_point                         AS getPoint,
                CASE
                    WHEN o.delivery_type = 1 THEN 0

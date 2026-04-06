@@ -79,7 +79,8 @@
 		) VALUES (
 		#{memberId}, #{memberPw},
 		#{memberName}, #{memberPhone}, NULL,
-		#{memberEmail}, #{memberAddrcode}, #{memberAddr}, #{memberDetailAddr},
+		#{memberEmail}, #{memberAddrcode},
+		#{memberAddr}, #{memberDetailAddr},
 		1, 0, SYSDATE, 1
 		)
 	</insert>
@@ -109,26 +110,57 @@
 	<update id="deleteMember">
 		update member_tbl
 		set member_status = 2
-		WHERE MEMBER_ID = #{memberId}
+		WHERE MEMBER_ID
+		= #{memberId}
 	</update>
-	<select id="getTotalCarbonPoint" parameterType="string" resultType="int">
-    	SELECT 
-        NVL(SUM(get_point), 0) 
-    	FROM order_tbl 
-    	WHERE member_id = #{memberId}
+	<select id="getTotalCarbonPoint" parameterType="string"
+		resultType="int">
+		SELECT
+		NVL(SUM(get_point), 0)
+		FROM order_tbl
+		WHERE member_id = #{memberId}
 	</select>
 	<select id="getCommunityTotalCarbon" resultType="int">
-    SELECT NVL(SUM(get_point), 0) FROM order_tbl
+		SELECT NVL(SUM(get_point), 0) FROM order_tbl
 	</select>
 
 
 	<update id="updateAddress" parameterType="member">
 		UPDATE MEMBER_TBL
-		SET MEMBER_ADDRCODE = #{memberAddrcode},
+		SET
+		MEMBER_ADDRCODE = #{memberAddrcode},
 		MEMBER_ADDR = #{memberAddr},
 		MEMBER_DETAIL_ADDR = #{memberDetailAddr}
 		WHERE MEMBER_ID = #{memberId}
 	</update>
+
+	<select id="checkOrderOwner" resultType="int">
+		SELECT COUNT(*)
+		FROM order_tbl
+		WHERE order_id = #{orderId} AND member_id = #{memberId}
+	</select>
+
+	<select id="isAlreadyReviewed" resultType="int">
+		SELECT COUNT(*)
+		FROM review_tbl
+		WHERE order_id = #{orderId}
+	</select>
+
+	<insert id="insertReview" parameterType="kr.co.iei.member.model.vo.Review">
+    INSERT INTO review_tbl (
+        order_id,          member_id,
+        review_thumb,      review_content,
+        review_rating,
+        review_date,
+        store_id           ) VALUES (
+        #{orderId},
+        #{memberId},
+        #{reviewThumb, jdbcType=VARCHAR}, #{reviewContent},
+        #{reviewRating},
+        SYSDATE,
+        #{storeId}
+    )
+</insert>
 
 
 

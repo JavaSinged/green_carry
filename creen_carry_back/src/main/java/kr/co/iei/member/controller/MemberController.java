@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import kr.co.iei.member.model.vo.Member;
+import kr.co.iei.member.model.vo.Review;
 import kr.co.iei.utils.EmailSender;
 import kr.co.iei.utils.JwtUtil;
 import kr.co.iei.member.model.service.MemberService;
@@ -339,5 +340,25 @@ public class MemberController {
 
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("REFRESH_TOKEN_EXPIRED");
 
+    }
+    
+    @PostMapping("/insertReview")
+    public ResponseEntity<String> insertReview(
+            Review review, // FormData로 보낸 orderId, reviewContent, reviewRating이 자동으로 매핑됨
+            @RequestParam(value = "uploadFile", required = false) MultipartFile uploadFile
+    ) {
+        try {
+
+
+            memberService.insertReview(review, uploadFile);
+
+            return ResponseEntity.ok("SUCCESS");
+        } catch (RuntimeException e) {
+            // 예외 발생 시 프론트의 catch(err) 부분으로 메시지 전달
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body("리뷰 등록 중 서버 오류가 발생했습니다.");
+        }
     }
 }

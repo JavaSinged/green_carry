@@ -1,19 +1,22 @@
 package kr.co.iei.member.model.service;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import kr.co.iei.member.model.dao.MemberDao;
-
 import kr.co.iei.member.model.vo.Member;
+import kr.co.iei.member.model.vo.Review;
 import kr.co.iei.utils.EmailSender;
 
 @Service
@@ -55,7 +58,7 @@ public class MemberService {
 		return memberDao.findId(member);
 	}
 
-	@Transactional 
+	@Transactional
 	public int resetPw(Member member) {
 
 		// 1. DB에서 현재 회원의 정보(암호화된 기존 비밀번호)를 먼저 불러옵니다.
@@ -161,28 +164,29 @@ public class MemberService {
 		return result;
 
 	}
+
 	@Transactional
 	public int insertUser(Member member) {
 		String rawPw = member.getMemberPw();
-		
+
 		String encPw = passwordEncoder.encode(rawPw);
-		
+
 		member.setMemberPw(encPw);
-		
+
 		int result = memberDao.insertUser(member);
 		return result;
 	}
-	
+
 	@Transactional
 	public int insertManager(Member member) {
 		String memberPw = member.getMemberPw();
 		System.out.println(memberPw);
-		String encPw=passwordEncoder.encode(memberPw);
+		String encPw = passwordEncoder.encode(memberPw);
 		System.out.println(encPw);
 		member.setMemberPw(encPw);
 		int result = memberDao.insertManager(member);
 		System.out.println(member);
-		
+
 		return result;
 	}
 
@@ -190,10 +194,12 @@ public class MemberService {
 		Member member = memberDao.storeDupCheck(storeOwnerNo);
 		return member;
 	}
+
 	public Member emailDupCheck(String memberEmail) {
 		Member member = memberDao.emailDupCheck(memberEmail);
 		return member;
 	}
+
 	@Transactional
 
 	public void deleteMember(String memberId, String rawPassword) {
@@ -203,22 +209,82 @@ public class MemberService {
 		if (member == null) {
 			throw new IllegalArgumentException("존재하지 않는 회원입니다.");
 		}
-		
-		if(!passwordEncoder.matches(rawPassword, member.getMemberPw())) {
+
+		if (!passwordEncoder.matches(rawPassword, member.getMemberPw())) {
 			throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
 		}
 		memberDao.deleteMember(memberId);
 	}
+
 	public int getTotalCarbonPoint(String memberId) {
-	    return memberDao.getTotalCarbonPoint(memberId);
+		return memberDao.getTotalCarbonPoint(memberId);
 	}
+
 	public int getCommunityTotalCarbon() {
-	    return memberDao.getCommunityTotalCarbon();
+		return memberDao.getCommunityTotalCarbon();
 	}
 
-    public int updateAddress(Member member) {
-        return memberDao.updateAddress(member);
-    }
+	public int updateAddress(Member member) {
+		return memberDao.updateAddress(member);
+	}
 
+	@Transactional
+	public void insertReview(Review review, MultipartFile uploadFile) {
+		// 1. 보안 검증: 본인의 주문 내역인지 확인
+		int isOwner = memberDao.checkOrderOwner(review.getOrderId(), review.getMemberId());
+		if (isOwner == 0) {
+			throw new RuntimeException("본인의 주문 내역에만 리뷰를 작성할 수 있습니다.");
+		}
+
+		// 2. 중복 검증: 이미 리뷰를 작성한 주문인지 확인
+		int hasReview = memberDao.isAlreadyReviewed(review.getOrderId());
+		if (hasReview > 0) {
+			throw new RuntimeException("이미 리뷰를 작성한 주문입니다.");
+		}
+
+		// 🌟 3. 유틸 클래스 없이 여기서 직접 파일 업로드 처리
+		if (uploadFile != null && !uploadFile.isEmpty()) {
+			// NAS 외부 서버 경로 지정
+			String savePath = "//192.168.31.26/project/upload/web/review/";
+
+			// 폴더가 없으면 생성
+			File directory = new File(savePath);
+			if (!directory.exists()) {
+				directory.mkdirs();
+			}
+
+			// 원본 파일명 및 확장자 추출
+			String originalFileName = uploadFile.getOriginalFilename();
+			String extension = "";
+			if (originalFileName != null && originalFileName.contains(".")) {
+				extension = originalFileName.substring(originalFileName.lastIndexOf("."));
+			}
+
+			// 중복 방지용 UUID 파일명 생성
+			String savedFileName = UUID.randomUUID().toString() + extension;
+
+			try {
+				// 물리적 파일 저장
+				File destFile = new File(savePath + savedFileName);
+				uploadFile.transferTo(destFile);
+
+				// DB에 들어갈 파일명 세팅
+				review.setReviewThumb(savedFileName);
+			} catch (IOException e) {
+				e.printStackTrace();
+				throw new RuntimeException("리뷰 사진 업로드 중 서버 오류가 발생했습니다.");
+			}
+		}
+
+		// 4. 리뷰 DB 저장
+		int result = memberDao.insertReview(review);
+
+		if (result > 0) {
+			// (선택) 에코 포인트 지급 로직 추가
+			// memberDao.addEcoPoint(review.getMemberId(), 100);
+		} else {
+			throw new RuntimeException("리뷰 등록에 실패했습니다.");
+		}
+	}
 
 }
