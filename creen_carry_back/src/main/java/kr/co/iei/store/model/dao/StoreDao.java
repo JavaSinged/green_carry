@@ -43,5 +43,7 @@ public interface StoreDao {
 
 	Integer getStoreId(String memberId);
 
+	List<MenuOption> getAllMenuOptions();
+
 
 }

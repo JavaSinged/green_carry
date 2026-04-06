@@ -89,4 +89,9 @@ public class StoreService {
 		return storeId;
 	}
 
+	public List<MenuOption> getAllMenuOptions() {
+		List<MenuOption> options = storeDao.getAllMenuOptions();
+		return options;
+	}
+
 }

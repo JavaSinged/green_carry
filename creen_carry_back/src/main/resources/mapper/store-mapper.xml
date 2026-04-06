@@ -213,6 +213,8 @@
     <select id="getStoreId" parameterType="String">
     	select store_id from store_tbl where member_id= #{memberId}
     </select>
-    
+    <select id="getAllMenuOptions" resultType="menuOption">
+    	select * from option_tbl ORDER BY option_type, option_no
+    </select>
     
 </mapper>

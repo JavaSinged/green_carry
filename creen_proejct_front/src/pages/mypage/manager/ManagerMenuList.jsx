@@ -12,7 +12,22 @@ const ManagerMenuList = () => {
   const [menuList, setMenuList] = useState([]);
   const [menuId, setMenuId] = useState("");
   const [storeId, setStoreId] = useState("");
+  const [storeName, setStoreName] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 6;
 
+  const searchMenus = menuList.filter((menu) =>
+    menu.menuName.toLowerCase().includes(searchTerm.toLowerCase()),
+  );
+  // 2. 페이지네이션을 위한 계산 (여기를 추가!)
+  const indexOfLastItem = currentPage * itemsPerPage; // 현재 페이지의 마지막 인덱스
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage; // 현재 페이지의 첫 인덱스
+  const currentItems = searchMenus.slice(indexOfFirstItem, indexOfLastItem); // 화면에 그릴 진짜 데이터
+  const totalPages = Math.ceil(searchMenus.length / itemsPerPage); // 총 페이지 수
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
   useEffect(() => {
     const memberId = localStorage.getItem("memberId");
 
@@ -26,17 +41,19 @@ const ManagerMenuList = () => {
         `${import.meta.env.VITE_BACKSERVER}/stores/myStore?memberId=${memberId}`,
       )
       .then((Res) => {
-        const fetchedStoreId = Res.data.storeId;
-        setStoreId(fetchedStoreId);
+        const store = Res.data;
 
-        if (!fetchedStoreId) {
+        if (!store) {
           console.warn("해당 유저의 상점 정보가 없습니다.");
           return;
         }
 
+        setStoreId(store.storeId);
+        setStoreName(store.storeName);
+
         axios
           .get(
-            `${import.meta.env.VITE_BACKSERVER}/stores/${fetchedStoreId}/menus`,
+            `${import.meta.env.VITE_BACKSERVER}/stores/${store.storeId}/menus`,
           )
           .then((res) => {
             console.log("메뉴 확인", res.data);
@@ -51,14 +68,10 @@ const ManagerMenuList = () => {
       });
   }, []);
 
-  const searchMenus = menuList.filter((menu) =>
-    menu.menuName.toLowerCase().includes(searchTerm.toLowerCase()),
-  );
-
   return (
     <div className={styles.menu_list_container}>
       <div className={styles.menu_header}>
-        <h3 className={styles.store_name}>지웅이네 김치찜</h3>
+        <h3 className={styles.store_name}>{storeName}</h3>
         <div className={styles.search_wrap}>
           <input
             type="search"
@@ -83,7 +96,7 @@ const ManagerMenuList = () => {
       </div>
 
       <div className={styles.menu_grid}>
-        {searchMenus.map((menu) => (
+        {currentItems.map((menu) => (
           <div
             key={menu.menuId}
             className={styles.menu_card}
@@ -131,13 +144,32 @@ const ManagerMenuList = () => {
       </div>
 
       <div className={styles.pagination}>
-        <button className={styles.page_btn_nav}>
+        <button
+          className={styles.page_btn_nav}
+          onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+          disabled={currentPage === 1}
+        >
           <ChevronLeftIcon fontSize="small" /> Previous
         </button>
         <div className={styles.page_numbers}>
-          <button className={`${styles.page_num} ${styles.active}`}>01</button>
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map((number) => (
+            <button
+              key={number}
+              // 현재 페이지면 active 클래스 추가
+              className={`${styles.page_num} ${currentPage === number ? styles.active : ""}`}
+              onClick={() => setCurrentPage(number)}
+            >
+              {number < 10 ? `0${number}` : number}
+            </button>
+          ))}
         </div>
-        <button className={styles.page_btn_nav}>
+        <button
+          className={styles.page_btn_nav}
+          onClick={() =>
+            setCurrentPage((prev) => Math.min(totalPages, prev + 1))
+          }
+          disabled={currentPage === totalPages}
+        >
           Next <ChevronRightIcon fontSize="small" />
         </button>
       </div>

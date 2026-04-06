@@ -49,7 +49,12 @@ public class StoreController {
         // 데이터가 없어도 빈 배열([])을 담아 200 OK 응답 (프론트 에러 방지)
         return ResponseEntity.ok(menuList);
     }
-
+    @GetMapping("/options/all")
+    public ResponseEntity<?> getAllOptions(){
+    	List<MenuOption> options = storeService.getAllMenuOptions();
+    	return ResponseEntity.ok(options);
+    }
+    
     @GetMapping("/{menuId}/options")
     public ResponseEntity<List<MenuOption>> getOptionsByMenu(@PathVariable Long menuId) {
         List<MenuOption> options = storeService.getMenuOptions(menuId);
@@ -78,6 +83,11 @@ public class StoreController {
     public ResponseEntity<?> getStoreId(@RequestParam("memberId") String memberId){
     	Integer storeId = storeService.getStoreId(memberId);
     	System.out.println(storeId);
-    	return ResponseEntity.ok(storeId);
+    	if (storeId == null) {
+            return ResponseEntity.ok(null); 
+        }
+    	Store store = storeService.getStoreById(storeId);
+    	return ResponseEntity.ok(store);
     }
+   
 }
