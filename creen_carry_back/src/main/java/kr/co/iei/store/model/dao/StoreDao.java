@@ -2,6 +2,7 @@ package kr.co.iei.store.model.dao;
 
 import kr.co.iei.store.model.vo.Menu;
 import kr.co.iei.store.model.vo.MenuOption;
+import kr.co.iei.store.model.vo.MenuSaveRequestDto;
 import kr.co.iei.store.model.vo.Order;
 import kr.co.iei.store.model.vo.OrderItem;
 import kr.co.iei.store.model.vo.OrderListResponse;
@@ -41,17 +42,26 @@ public interface StoreDao {
 		);
 	int getTotalCarbonPoint(String memberId);
 
-	Integer selectMemberPoint(String memberId);
+	Integer getStoreId(String memberId);
 
-	int updatePoint(Order order);
+	List<MenuOption> getAllMenuOptions();
 
-	int updateOrderStatus(Integer orderId);
+	int updateMenu(MenuSaveRequestDto dto);
 
-	int addReduceCarbon(Integer orderId);
+	
+	int deleteMenuOptions(@Param("menuId") Long menuId); 
 
-	Menu selectAllMenu(Integer menuId);
+	void insertNewOption(MenuOption newOpt);
 
-	Menu selectMenu(Integer menuId);
+	int insertMenuOptions(
+		    @Param("menuId") Long menuId, 
+		    @Param("optionIds") List<Long> optionIds
+		);
+
+	Menu getMenuById(Long menuId);
+
+	int insertMenu(MenuSaveRequestDto dto);
+	
 
 
 }

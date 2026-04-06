@@ -1,0 +1,273 @@
+.page_container {
+  padding: 40px;
+  background-color: #f8f9fa;
+  min-height: 100vh;
+}
+
+.edit_box {
+  max-width: 1000px;
+  margin: 0 auto;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  padding: 40px;
+  background-color: white;
+}
+
+/* 상단 폼 영역 (절대 깨지지 않는 Flex 설정) */
+.top_content {
+  display: flex;
+  gap: 40px;
+  margin-bottom: 40px;
+  align-items: flex-start;
+}
+
+.form_section {
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 20px; /* 라벨-인풋 줄 사이의 간격 */
+}
+
+.image_section {
+  flex: 1;
+}
+
+/* 💡 핵심: 라벨과 인풋을 무조건 한 줄로 만듦 */
+.input_row {
+  display: flex;
+  align-items: center;
+  gap: 15px; /* 라벨과 인풋 사이 간격 */
+}
+
+.input_row label {
+  width: 90px; /* 라벨 넓이 고정 (줄맞춤용) */
+  flex-shrink: 0; /* 라벨이 찌그러지지 않게 방지 */
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.input_field,
+.select_field {
+  flex: 1;
+  padding: 10px 15px;
+  border: 1px solid #2d6a4f;
+  border-radius: 8px;
+  font-size: 15px;
+  outline: none;
+}
+
+/* 용기 검색창 스타일 */
+.search_container {
+  flex: 1;
+  position: relative;
+}
+
+.search_bar {
+  display: flex;
+  align-items: center;
+  border: 1px solid #ccc;
+  border-radius: 30px;
+  padding: 5px 15px;
+  background: white;
+}
+
+.search_bar input {
+  border: none;
+  flex: 1;
+  outline: none;
+  font-size: 14px;
+}
+
+.dropdown {
+  position: absolute;
+  top: 110%;
+  left: 0;
+  width: 100%;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  z-index: 1000;
+  list-style: none;
+  padding: 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.dropdown li {
+  padding: 10px 15px;
+  cursor: pointer;
+}
+.dropdown li:hover {
+  background: #f0fdf4;
+  color: #2d6a4f;
+}
+
+.badge_list {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+.badge_item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: #e8f5e9;
+  padding: 5px 12px;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+/* 이미지 박스 */
+.upload_card {
+  border: 1px solid #eee;
+  border-radius: 12px;
+  padding: 40px 20px;
+  text-align: center;
+  background: #fff;
+}
+.up_text {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+.up_hint {
+  font-size: 12px;
+  color: #999;
+  margin-bottom: 20px;
+}
+.browse_button {
+  background: #2d6a4f;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* 아코디언 스타일 */
+.sub_title {
+  font-size: 20px;
+  margin-bottom: 15px;
+}
+
+.accordion_group {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  overflow: hidden;
+}
+
+.group_header {
+  padding: 15px 20px;
+  background: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+}
+
+.group_label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 16px;
+  font-weight: bold;
+}
+.acc_icon {
+  background: #eee;
+  padding: 2px;
+  border-radius: 4px;
+}
+
+.group_body {
+  padding: 20px;
+  background: #fafafa;
+  border-top: 1px solid #ddd;
+}
+
+/* 💡 새로 추가하는 인풋 폼 스타일 (이미지 완벽 반영) */
+.add_form {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 10px;
+  font-size: 15px;
+  font-weight: bold;
+}
+
+.small_input {
+  border: 1px solid #2d6a4f;
+  border-radius: 20px;
+  padding: 8px 15px;
+  width: 160px;
+  outline: none;
+}
+
+.add_item_btn {
+  background: white;
+  color: #333;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 8px 20px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.add_item_btn:hover {
+  background: #f0f0f0;
+}
+
+.opt_desc {
+  font-size: 12px;
+  color: #888;
+  margin-bottom: 15px;
+}
+
+.badge_wrap {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.new_opt_badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid #ddd;
+  background: white;
+  padding: 8px 15px;
+  border-radius: 8px;
+  font-size: 14px;
+}
+.badge_x {
+  background: #ccc;
+  color: white;
+  border-radius: 50%;
+  padding: 2px;
+  cursor: pointer;
+}
+
+/* 하단 버튼 */
+.btn_area {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 40px;
+}
+.btn_area button {
+  padding: 12px 40px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 16px;
+}
+.green_btn,
+.cancel_btn,
+.delete_btn {
+  background: #2d6a4f;
+  color: white;
+  border: none;
+}
+.badge_wrap {
+  padding: 8px;
+}
