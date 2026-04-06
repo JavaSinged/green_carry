@@ -1,12 +1,10 @@
 package kr.co.iei.store.controller;
 
-import kr.co.iei.common.config.SecurityConfig;
 import kr.co.iei.store.model.service.StoreService;
 import kr.co.iei.store.model.vo.Menu;
 import kr.co.iei.store.model.vo.MenuOption;
 import kr.co.iei.store.model.vo.Order;
 import kr.co.iei.store.model.vo.OrderItem;
-import kr.co.iei.store.model.vo.OrderListObject;
 import kr.co.iei.store.model.vo.OrderListResponse;
 import kr.co.iei.store.model.vo.OrderResponse;
 import kr.co.iei.store.model.vo.Store;
@@ -15,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,14 +21,8 @@ import java.util.Map;
 @RequestMapping("/stores")
 @CrossOrigin("*")
 public class StoreController {
-
-    private final SecurityConfig securityConfig;
     @Autowired
     private StoreService storeService;
-
-    StoreController(SecurityConfig securityConfig) {
-        this.securityConfig = securityConfig;
-    }
 
     @GetMapping
     public ResponseEntity<?> getStores() {
@@ -79,25 +70,7 @@ public class StoreController {
     
     @GetMapping("/orders/{memberId}")
     public ResponseEntity<?> searchOrderList(@PathVariable String memberId){
-    	int[] arr = storeService.selectOrderList(memberId);
-    	return ResponseEntity.ok(arr);
+        List<OrderResponse> list = storeService.searchOrderList(memberId);
+        return ResponseEntity.ok(list);
     }
-    
-    @GetMapping("/point/{memberId}")
-    public ResponseEntity<?> selectMemberPoint(@PathVariable String memberId){
-    	Integer point  = storeService.selectMemberPoint(memberId);
-    	return ResponseEntity.ok(point);
-    }
-    
-    @GetMapping("/orders/itemImg/{menuId}")
-    public ResponseEntity<?> selectMenu(@PathVariable Integer menuId){
-    	Menu m = storeService.selectMenu(menuId);
-    	return ResponseEntity.ok(m);
-    }
-    @PatchMapping("/order/{orderId}")
-    public ResponseEntity<?> cancelOrder(@PathVariable Integer orderId){
-    	int result = storeService.cancleOrder(orderId);
-    	return ResponseEntity.ok(result);
-    }
-    
 }
