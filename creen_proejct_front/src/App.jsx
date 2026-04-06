@@ -40,6 +40,7 @@ import AdminContainerManagement from "./pages/mypage/admin/AdminContainerManagem
 import ProtectedRoute from "./context/ProtectedRoute";
 import ManagerDelAccount from "./pages/mypage/deleteMember/ManagerDelAccount";
 import UserOrderList from "./pages/mypage/user/UserOrderList";
+import ManagerDashboard from "./pages/mypage/manager/ManagerDashBoard";
 
 const BasicLayout = () => {
   return (
@@ -97,7 +98,7 @@ function App() {
             {/* 사업자 파트너 (Grade: 2) 구역 */}
             <Route element={<ProtectedRoute requireManager={true} />}>
               <Route path="/mypage/manager" element={<ManagerLayout />}>
-                <Route index element={<div>사업자 대시보드 화면</div>} />
+                <Route index element={<ManagerDashboard />} />
                 <Route path="profile" element={<ManagerInfoEdit />} />
                 <Route path="menus" element={<ManagerMenuList />} />
                 <Route path="menuEdit" element={<ManagerMenuEdit />} />
