@@ -58,8 +58,8 @@ public class StoreService {
                 }
             }
             // 임시 주석
-//            int setPoint = storeDao.updatePoint(order);
-//            int addReduceCarbon = storeDao.addReduceCarbon(orderId);
+            int setPoint = storeDao.updatePoint(order);
+            int addReduceCarbon = storeDao.addReduceCarbon(orderId);
         }
 
         // 2. 주문 이력

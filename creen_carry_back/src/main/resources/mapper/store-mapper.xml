@@ -89,6 +89,30 @@
 		)
 	</insert>
 
+	<update id="updatePoint">
+		UPDATE member_tbl
+		SET member_point = member_point +
+						   #{getPoint} - #{usedPoint}
+		WHERE member_id = #{memberId}
+	</update>
+
+	<update id="addReduceCarbon">
+		UPDATE member_tbl
+		SET total_carbon_reduce =
+				NVL(total_carbon_reduce, 0) + (
+					SELECT NVL(SUM(total_carbon), 0)
+					FROM
+						order_detail
+					WHERE order_id = #{orderId}
+				)
+		WHERE member_id = (
+			SELECT
+				member_id
+			FROM order_tbl
+			WHERE order_id = #{orderId}
+		)
+	</update>
+
 	<insert id="insertOrderDetail">
 		INSERT INTO order_detail (order_detail_id,
 		order_id,
