@@ -53,5 +53,7 @@ public interface StoreDao {
 
 	Menu selectMenu(Integer menuId);
 
+	int cancelOrder(Integer orderId);
+
 
 }

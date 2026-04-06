@@ -265,4 +265,7 @@
 	<select id="selectMenu" resultType="Menu">
 		select * from menu_tbl where menu_id = #{menuId}
 	</select>
+	<update id="cancelOrder">
+		update order_tbl set order_status = 9 where order_id = #{orderId} and order_status in (2, 3, 4)
+	</update>
 </mapper>

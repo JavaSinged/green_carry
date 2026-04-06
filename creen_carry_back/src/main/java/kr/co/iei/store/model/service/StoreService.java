@@ -96,5 +96,10 @@ public class StoreService {
 		Menu m = storeDao.selectMenu(menuId);
 		return m;
 	}
+	@Transactional
+	public int cancleOrder(Integer orderId) {
+		int result = storeDao.cancelOrder(orderId);
+		return result;
+	}
 
 }

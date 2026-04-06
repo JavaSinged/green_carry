@@ -85,4 +85,9 @@ public class StoreController {
     	Menu m = storeService.selectMenu(menuId);
     	return ResponseEntity.ok(m);
     }
+    @PatchMapping("/order/{orderId}")
+    public ResponseEntity<?> cancelOrder(@PathVariable Integer orderId){
+    	int result = storeService.cancleOrder(orderId);
+    	return ResponseEntity.ok(result);
+    }
 }
