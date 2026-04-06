@@ -74,21 +74,41 @@ export default function ReviewModal({ order, onClose }) {
         {/* 상단 주문 정보 카드 */}
         <div className={styles.order_card}>
           <img
-            src={order.menuImage || order.menuImg}
+            src={
+              order.menuImage
+                ? `${import.meta.env.VITE_BACKSERVER}${order.menuImage}`
+                : "/img/no-image.png"
+            }
             alt="menu"
             className={styles.order_img}
+            onError={(e) => {
+              e.target.src = "/img/no-image.png";
+            }}
           />
           <div className={styles.order_info}>
             <p className={styles.store_name_title}>{order.storeName}</p>
+
+            {/* 🌟 메뉴명 + 외 N건 표시 */}
             <p
               className={styles.menu_name_text}
-              style={{ fontWeight: "600", color: "#333", marginTop: "4px" }}
+              style={{ fontWeight: "700", color: "#222", marginTop: "4px" }}
             >
-              {order.menuName}{" "}
-              {order.quantity || order.totalCount
-                ? `${order.quantity || order.totalCount}개`
-                : ""}
+              {order.menuName}
+              {order.extraCount > 0 && (
+                <span style={{ color: "#246337", marginLeft: "4px" }}>
+                  외 {order.extraCount}건
+                </span>
+              )}
             </p>
+
+            {/* 🌟 결제 금액 표시 추가 */}
+            <p style={{ color: "#555", fontSize: "0.9rem", marginTop: "2px" }}>
+              결제금액:{" "}
+              <span style={{ fontWeight: "600" }}>
+                {order.totalPrice?.toLocaleString() || 0}원
+              </span>
+            </p>
+
             {order.optionString && (
               <p
                 style={{
@@ -101,8 +121,9 @@ export default function ReviewModal({ order, onClose }) {
                 옵션: {order.optionString}
               </p>
             )}
+
             <p className={styles.order_date_text} style={{ marginTop: "6px" }}>
-              주문일자: {order.orderDate || order.regDate}
+              주문일자: {order.orderDate || "날짜 정보 없음"}
             </p>
           </div>
         </div>
