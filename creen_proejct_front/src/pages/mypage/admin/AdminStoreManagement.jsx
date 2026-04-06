@@ -1,20 +1,20 @@
-import React, { useEffect, useState } from 'react';
-import styles from './AdminStoreManagement.module.css';
-import SearchIcon from '@mui/icons-material/Search';
-import StarIcon from '@mui/icons-material/Star';
-import StarHalfIcon from '@mui/icons-material/StarHalf';
-import StarOutlineIcon from '@mui/icons-material/StarOutline';
-import UnfoldMoreIcon from '@mui/icons-material/UnfoldMore';
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import axios from 'axios';
+import React, { useEffect, useState } from "react";
+import styles from "./AdminStoreManagement.module.css";
+import SearchIcon from "@mui/icons-material/Search";
+import StarIcon from "@mui/icons-material/Star";
+import StarHalfIcon from "@mui/icons-material/StarHalf";
+import StarOutlineIcon from "@mui/icons-material/StarOutline";
+import UnfoldMoreIcon from "@mui/icons-material/UnfoldMore";
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import axios from "axios";
 
 export default function AdminStoreManagement() {
   const [stores, setStores] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
 
   // 1. 정렬 상태 관리 (key: 기준컬럼, direction: 'asc' 또는 'desc')
-  const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
 
   useEffect(() => {
     axios
@@ -33,9 +33,9 @@ export default function AdminStoreManagement() {
 
   // 2. 정렬 실행 함수
   const handleSort = (key) => {
-    let direction = 'asc';
-    if (sortConfig.key === key && sortConfig.direction === 'asc') {
-      direction = 'desc';
+    let direction = "asc";
+    if (sortConfig.key === key && sortConfig.direction === "asc") {
+      direction = "desc";
     }
     setSortConfig({ key, direction });
   };
@@ -44,17 +44,17 @@ export default function AdminStoreManagement() {
   const getSortedStores = () => {
     // 먼저 검색어로 필터링
     let items = stores.filter((store) =>
-      store.storeName.toLowerCase().includes(searchTerm.toLowerCase()),
+      store.storeName.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     // 그 다음 정렬 적용
     if (sortConfig.key !== null) {
       items.sort((a, b) => {
         if (a[sortConfig.key] < b[sortConfig.key]) {
-          return sortConfig.direction === 'asc' ? -1 : 1;
+          return sortConfig.direction === "asc" ? -1 : 1;
         }
         if (a[sortConfig.key] > b[sortConfig.key]) {
-          return sortConfig.direction === 'asc' ? 1 : -1;
+          return sortConfig.direction === "asc" ? 1 : -1;
         }
         return 0;
       });
@@ -68,10 +68,10 @@ export default function AdminStoreManagement() {
     const stars = [];
     for (let i = 1; i <= 5; i++) {
       if (rating >= i)
-        stars.push(<StarIcon key={i} style={{ color: '#ffb300' }} />);
+        stars.push(<StarIcon key={i} style={{ color: "#ffb300" }} />);
       else if (rating >= i - 0.5)
-        stars.push(<StarHalfIcon key={i} style={{ color: '#ffb300' }} />);
-      else stars.push(<StarOutlineIcon key={i} style={{ color: '#ccc' }} />);
+        stars.push(<StarHalfIcon key={i} style={{ color: "#ffb300" }} />);
+      else stars.push(<StarOutlineIcon key={i} style={{ color: "#ccc" }} />);
     }
     return stars;
   };
@@ -99,19 +99,19 @@ export default function AdminStoreManagement() {
               {/* 클릭 시 각 컬럼 키값을 넘겨줌 */}
               <th
                 className={styles.col_left}
-                onClick={() => handleSort('storeName')}
+                onClick={() => handleSort("storeName")}
               >
                 상점이름 <UnfoldMoreIcon className={styles.sort_icon} />
               </th>
               <th>전화번호</th>
               <th>카테고리</th>
-              <th onClick={() => handleSort('currentSales')}>
+              <th onClick={() => handleSort("currentSales")}>
                 당월 매출 <UnfoldMoreIcon className={styles.sort_icon} />
               </th>
-              <th onClick={() => handleSort('prevSales')}>
+              <th onClick={() => handleSort("prevSales")}>
                 전월 매출 <UnfoldMoreIcon className={styles.sort_icon} />
               </th>
-              <th onClick={() => handleSort('storeRating')}>
+              <th onClick={() => handleSort("storeRating")}>
                 상점 평점 <UnfoldMoreIcon className={styles.sort_icon} />
               </th>
             </tr>
