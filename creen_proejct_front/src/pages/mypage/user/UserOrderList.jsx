@@ -35,7 +35,7 @@ const UserOrderListPage = () => {
   const totalRecentCarbon = useMemo(() => {
     return sortedOrders
       .slice(0, 5)
-      .reduce((sum, order) => sum + Number(order.orderCarbon ?? 0), 0);
+      .reduce((sum, order) => sum + Number(order.getPoint ?? 0), 0);
   }, [sortedOrders]);
 
   // 🌟 3. 리뷰 작성 조건 정교화 (배달완료 + 3일이내 + 리뷰 미작성)
@@ -74,7 +74,7 @@ const UserOrderListPage = () => {
       <div className={styles.topSummary}>
         <p className={styles.summaryLabel}>총 탄소 절감량</p>
         <h2 className={styles.summaryValue}>
-          {(totalRecentCarbon / 1000).toFixed(3)} kg CO2
+          {totalRecentCarbon.toFixed(1)} g CO2
         </h2>
         <p className={styles.summaryDesc}>
           지난 5건의 주문으로 절감한 탄소량 입니다
