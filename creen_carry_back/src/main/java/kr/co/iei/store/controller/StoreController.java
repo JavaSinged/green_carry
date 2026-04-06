@@ -1,10 +1,12 @@
 package kr.co.iei.store.controller;
 
+import kr.co.iei.common.config.SecurityConfig;
 import kr.co.iei.store.model.service.StoreService;
 import kr.co.iei.store.model.vo.Menu;
 import kr.co.iei.store.model.vo.MenuOption;
 import kr.co.iei.store.model.vo.Order;
 import kr.co.iei.store.model.vo.OrderItem;
+import kr.co.iei.store.model.vo.OrderListObject;
 import kr.co.iei.store.model.vo.OrderListResponse;
 import kr.co.iei.store.model.vo.OrderResponse;
 import kr.co.iei.store.model.vo.Store;
@@ -13,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,8 +24,14 @@ import java.util.Map;
 @RequestMapping("/stores")
 @CrossOrigin("*")
 public class StoreController {
+
+    private final SecurityConfig securityConfig;
     @Autowired
     private StoreService storeService;
+
+    StoreController(SecurityConfig securityConfig) {
+        this.securityConfig = securityConfig;
+    }
 
     @GetMapping
     public ResponseEntity<?> getStores() {
@@ -70,8 +79,8 @@ public class StoreController {
     
     @GetMapping("/orders/{memberId}")
     public ResponseEntity<?> searchOrderList(@PathVariable String memberId){
-        List<OrderResponse> list = storeService.searchOrderList(memberId);
-        return ResponseEntity.ok(list);
+    	int[] arr = storeService.selectOrderList(memberId);
+    	return ResponseEntity.ok(arr);
     }
     
     @GetMapping("/point/{memberId}")
@@ -90,4 +99,5 @@ public class StoreController {
     	int result = storeService.cancleOrder(orderId);
     	return ResponseEntity.ok(result);
     }
+    
 }

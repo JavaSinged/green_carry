@@ -16,7 +16,7 @@ const UserOrderListPage = () => {
       .get(`${import.meta.env.VITE_BACKSERVER}/stores/orders/${memberId}`)
       .then((res) => {
         console.log(res.data);
-        setOrderList(res.data ?? []);
+        setOrderList(res.data);
       })
       .catch((err) => {
         console.log(err);
@@ -40,7 +40,7 @@ const UserOrderListPage = () => {
 
   // 🌟 3. 리뷰 작성 조건 정교화 (배달완료 + 3일이내 + 리뷰 미작성)
   const canWriteReview = (order) => {
-    console.log(`주문번호 ${order.orderId}의 데이터:`, order);
+    // console.log(`주문번호 ${order.orderId}의 데이터:`, order);
 
     // 1. 배달완료(5)가 아니면 불가
     if (order.orderStatus !== 5) return false;
@@ -68,7 +68,6 @@ const UserOrderListPage = () => {
     setSelectedOrder(order);
     setIsModalOpen(true);
   };
-
   return (
     <div className={styles.page}>
       <div className={styles.topSummary}>

@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 public class OrderListObject {
 	private String storeName;
 	private List<Menu> menuList;
-	private Date orderDate;
+	private String orderDate;
 	private String storeAddr;
 	private String memberAddr;
 	private Double totalCarbonReduce;

@@ -5,6 +5,7 @@ import kr.co.iei.store.model.vo.Menu;
 import kr.co.iei.store.model.vo.MenuOption;
 import kr.co.iei.store.model.vo.Order;
 import kr.co.iei.store.model.vo.OrderItem;
+import kr.co.iei.store.model.vo.OrderListObject;
 import kr.co.iei.store.model.vo.OrderListResponse;
 import kr.co.iei.store.model.vo.OrderResponse;
 import kr.co.iei.store.model.vo.Store;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -83,9 +85,14 @@ public class StoreService {
 		return list;
 	}
 
-	public List<OrderResponse> searchOrderList(String memberId){
-	    return storeDao.searchOrderList(memberId);
+	public List<OrderListObject> searchOrderList(String memberId){
+		List<OrderListObject> obl = new ArrayList<OrderListObject>();
+
+		OrderListObject ob = storeDao.selectOrderListObject(memberId);
+	    return obl;
 	}
+
+
 
 	public Integer selectMemberPoint(String memberId) {
 		Integer point = storeDao.selectMemberPoint(memberId);
@@ -100,6 +107,11 @@ public class StoreService {
 	public int cancleOrder(Integer orderId) {
 		int result = storeDao.cancelOrder(orderId);
 		return result;
+	}
+
+	public int[] selectOrderList(String memberId) {
+		int[] arr = storeDao.selectOrderList(memberId);
+		return arr;
 	}
 
 }

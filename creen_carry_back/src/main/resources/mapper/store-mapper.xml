@@ -15,7 +15,8 @@
 		AS storeName,
 		store_address AS storeAddress,
 
-		store_phone AS storePhone,
+		store_phone AS
+		storePhone,
 		store_phone AS
 		storePhone,
 		store_intro AS storeIntro,
@@ -27,10 +28,12 @@
 		store_category AS
 		storeCategory,
 		store_rating AS storeRating,
-		latitude AS LATITUDE,
+		latitude AS
+		LATITUDE,
 		longitude AS LONGITUDE,
 		store_thumb AS storeThumb
-		FROM STORE_TBL
+		FROM
+		STORE_TBL
 
 		WHERE
 		store_id = #{storeId}
@@ -149,22 +152,27 @@
 		o.used_point AS usedPoint,
 		o.get_point AS getPoint,
 		mb.total_carbon_reduce AS totalReduceCarbon,
-		TO_CHAR(m.reg_date, 'YYYYMM-DD') AS orderDate,
+		TO_CHAR(m.reg_date,
+		'YYYYMM-DD') AS orderDate,
 		CASE
 		WHEN o.delivery_type = 1 THEN 0
-		WHEN o.delivery_type = 2 THEN 1000
+		WHEN
+		o.delivery_type = 2 THEN 1000
 		ELSE 2000
 		END AS deliveryPrice,
 		o.delivery_type AS deliveryType,
 
 		o.order_status AS orderStatus
-		FROM order_tbl o
+		FROM
+		order_tbl o
 		JOIN order_list_map m
 		ON o.order_id = m.order_id
-		JOIN store_tbl s
+		JOIN
+		store_tbl s
 		ON o.store_id = s.store_id
 		JOIN member_tbl mb
-		ON o.member_id = mb.member_id
+		ON o.member_id
+		= mb.member_id
 
 		WHERE o.order_id = #{orderId}
 	</select>
@@ -181,7 +189,8 @@
 		SELECT s.store_name AS storeName,
 		o.order_id AS orderId,
 		o.order_status AS orderStatus,
-		TO_CHAR(olm.reg_date, 'YYYY-MM-DD') AS orderDate,
+		TO_CHAR(olm.reg_date, 'YYYY-MM-DD') AS
+		orderDate,
 
 		-- 🌟 합계 정보 (금액, 수량, 탄소)
 		od_sum.totalPrice AS totalPrice,
@@ -190,36 +199,49 @@
 		(od_sum.totalCount - 1) AS extraCount,
 
 		-- 🌟 대표 메뉴명 및 이미지
-		md.menu_name AS menuName,
+		md.menu_name
+		AS menuName,
 		md.menu_image AS menuImage,
 
 		-- 🌟 기타 정보
-		o.delivery_type AS deliveryType,
-		CASE WHEN o.delivery_type = 1 THEN 0 WHEN o.delivery_type = 2 THEN 1000
+		o.delivery_type AS
+		deliveryType,
+		CASE WHEN o.delivery_type = 1 THEN 0 WHEN o.delivery_type
+		= 2 THEN 1000
 		ELSE 2000 END AS deliveryPrice,
-		s.store_address AS storeAddress,
+		s.store_address AS
+		storeAddress,
 		m.member_addr AS deliveryAddress,
-		(SELECT COUNT(*) FROM review_tbl r WHERE r.order_id = o.order_id) AS
+		(SELECT COUNT(*) FROM
+		review_tbl r WHERE r.order_id = o.order_id) AS
 		hasReview
 
-		FROM order_tbl o
+		FROM order_tbl
+		o
 		JOIN store_tbl s ON o.store_id = s.store_id
-		JOIN order_list_map olm ON o.order_id = olm.order_id
-		JOIN member_tbl m ON o.member_id = m.member_id
+		JOIN order_list_map olm ON
+		o.order_id = olm.order_id
+		JOIN member_tbl m ON o.member_id =
+		m.member_id
 		JOIN (SELECT order_id,
 		SUM(quantity) AS totalCount,
 		SUM(price * quantity) AS totalPrice,
-		SUM(total_carbon * quantity) AS orderCarbon -- 🌟 탄소 합계
+		SUM(total_carbon * quantity) AS
+		orderCarbon -- 🌟 탄소 합계
 		FROM order_detail
-		GROUP BY order_id) od_sum ON o.order_id = od_sum.order_id
+		GROUP BY order_id) od_sum ON
+		o.order_id = od_sum.order_id
 		JOIN (SELECT od1.*
 		FROM order_detail od1
 		JOIN (SELECT order_id, MIN(order_detail_id) AS min_detail_id
-		FROM order_detail
+		FROM
+		order_detail
 		GROUP BY order_id) x
 		ON od1.order_id = x.order_id
-		AND od1.order_detail_id = x.min_detail_id) od_first
-		ON o.order_id = od_first.order_id
+		AND
+		od1.order_detail_id = x.min_detail_id) od_first
+		ON o.order_id =
+		od_first.order_id
 		JOIN menu_tbl md ON od_first.menu_id = md.menu_id
 		WHERE o.member_id = #{memberId}
 		ORDER BY o.order_id DESC
@@ -257,9 +279,30 @@
 		)
 	</update>
 	<select id="selectMenu" resultType="Menu">
-		select * from menu_tbl where menu_id = #{menuId}
+		select * from menu_tbl where
+		menu_id = #{menuId}
 	</select>
 	<update id="cancelOrder">
-		update order_tbl set order_status = 9 where order_id = #{orderId} and order_status in (2, 3, 4)
+		update order_tbl set order_status = 9 where order_id
+		= #{orderId} and order_status in (2, 3, 4)
 	</update>
+	<select id="selectOrderListObject" resultType="OrderListObject">
+		SELECT
+		s.store_name,
+		TO_CHAR(o.reg_date, 'YYYY-MM-DD') AS orderDate,
+		s.store_address,
+		m.member_addr,
+		m.total_carbon_reduce
+		FROM member_tbl m
+		JOIN order_list_map o
+		ON m.member_id = o.member_id
+		JOIN order_tbl ot
+		ON o.order_id = ot.order_id
+		JOIN store_tbl s
+		ON ot.store_id = s.store_id
+		WHERE m.member_id = #{memberId}
+	</select>
+	<select id="selectOrderList" resultType="int">
+		select order_id from order_list_map where member_id = #{memberId} order by reg_date desc
+	</select>
 </mapper>

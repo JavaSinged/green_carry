@@ -4,6 +4,7 @@ import kr.co.iei.store.model.vo.Menu;
 import kr.co.iei.store.model.vo.MenuOption;
 import kr.co.iei.store.model.vo.Order;
 import kr.co.iei.store.model.vo.OrderItem;
+import kr.co.iei.store.model.vo.OrderListObject;
 import kr.co.iei.store.model.vo.OrderListResponse;
 import kr.co.iei.store.model.vo.OrderResponse;
 import kr.co.iei.store.model.vo.Store;
@@ -54,6 +55,10 @@ public interface StoreDao {
 	Menu selectMenu(Integer menuId);
 
 	int cancelOrder(Integer orderId);
+
+	OrderListObject selectOrderListObject(String memberId);
+
+	int[] selectOrderList(String memberId);
 
 
 }
