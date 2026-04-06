@@ -79,7 +79,7 @@
 		) VALUES (
 		#{memberId}, #{memberPw},
 		#{memberName}, #{memberPhone}, NULL,
-		#{memberEmail}, NULL, NULL, NULL,
+		#{memberEmail}, #{memberAddrcode}, #{memberAddr}, #{memberDetailAddr},
 		1, 0, SYSDATE, 1
 		)
 	</insert>

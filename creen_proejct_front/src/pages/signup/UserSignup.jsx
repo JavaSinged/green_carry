@@ -23,7 +23,7 @@ const UserSignup = () => {
     memberName: "",
     memberEmail: "",
     memberPhone: "",
-    memberAddrCode: "",
+    memberAddrcode: "",
     memberAddr: "",
     memberDetailAddr: "",
   });
@@ -188,7 +188,7 @@ const UserSignup = () => {
     }
     setMember((prev) => ({
       ...prev,
-      memberAddrCode: data.zonecode,
+      memberAddrcode: data.zonecode,
       memberAddr: fullAddress,
     }));
   };
@@ -269,7 +269,7 @@ const UserSignup = () => {
     return { text: "\u00A0", isError: false };
   };
   const getAddrMessage = () => {
-    if (!member.memberAddrCode || !member.memberDetailAddr.trim())
+    if (!member.memberAddrcode || !member.memberDetailAddr.trim())
       return {
         text: isSubmitted ? "주소 및 상세 주소를 모두 입력해주세요." : "\u00A0",
         isError: isSubmitted,
@@ -295,7 +295,7 @@ const UserSignup = () => {
       !member.memberEmail ||
       !member.memberName.trim() ||
       !member.memberPhone.trim() ||
-      !member.memberAddrCode ||
+      !member.memberAddrcode ||
       !member.memberDetailAddr.trim();
     if (
       hasEmpty ||
@@ -543,8 +543,8 @@ const UserSignup = () => {
                   <input
                     type="text"
                     placeholder="우편번호"
-                    name="memberAddrCode"
-                    value={member.memberAddrCode}
+                    name="memberAddrcode"
+                    value={member.memberAddrcode}
                     className="signup-input-underline"
                     readOnly
                   />
