@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import styles from "./PaymentPage.module.css";
 import RoomIcon from "@mui/icons-material/Room";
 import ChatBubbleIcon from "@mui/icons-material/ChatBubble";
@@ -19,7 +19,7 @@ const PaymentPage = () => {
   const [itemPrice, setItemPrice] = useState(superTotalPrice);
   const totalPrice = itemPrice + deliveryPrice - ecoPoint;
   const phone = /^010-\d{4}-\d{4}$/;
-  const [availableEcoPoint, setAvailableEcoPoint] = useState(0);
+  const [availableEcoPoint, setAvailableEcoPoint] = useState(3000);
   const cartList = useCartStore((state) => state.cart);
   const deliveryType = deliveryPrice === 0 ? 1 : deliveryPrice === 1000 ? 2 : 3;
   const deliveryCarbon = deliveryType === 3 ? 0 : 300;
@@ -34,15 +34,21 @@ const PaymentPage = () => {
     deliveryPrice: deliveryPrice,
     reducedCarbon: reducedCarbon,
   });
-  useEffect(() => {
-    axios
-      .get(`${import.meta.env.VITE_BACKSERVER}/stores/point/${memberId}`)
-      .then((res) => {
-        console.log(res);
-        setAvailableEcoPoint(res.data);
-      })
-      .catch((err) => {});
-  }, []);
+
+  // const { orderTbl, setOrderTbl } = useState({
+  //   memberId: "",
+  //   storeId: "",
+  //   usedPoint: "",
+  //   getPoint: "",
+  // });
+  // const { orderDetail, setOrderDetail } = useState({
+  //   menuId: "",
+  //   price: "",
+  //   optionString: "",
+  //   totalCarbon: "",
+  //   quantity: "",
+  // });
+  // OrderPage.jsx 의 결제하기 버튼 클릭 핸들러 수정
   const orderData = {
     memberId: memberId, // 로그인 정보에서 가져오기
     storeId: storeId, // 현재 상점 ID
@@ -57,6 +63,34 @@ const PaymentPage = () => {
     totalPrice: totalPrice,
     getPoint: totalCarbon,
   };
+
+  // const handlePayment = async () => { // 1
+  //   try {
+  //     // 1. 주문 데이터 생성 (우리 서버 전송용)
+  //     // cartList는 useCartStore에서 가져온 배열이라고 가정
+  //     // 2. 우리 백엔드에 주문 정보 임시 저장 요청 (POST)
+  //     const response = await axios.post(
+  //       `${import.meta.env.VITE_BACKSERVER}/stores/order`,
+  //       orderData,
+  //     );
+  //     console.log(response);
+  //     const savedOrderId = response.data; // 서버에서 생성된 ORDER_ID
+  //     // 3. 토스페이먼츠 객체 초기화 및 결제창 호출
+  //     const tossPayments = await loadTossPayments(
+  //       `${import.meta.env.VITE_TOSS_CLIENT_KEY}`,
+  //     );
+  //     await tossPayments.requestPayment("카드", {
+  //       amount: totalPrice,
+  //       orderId: `ORDER_${savedOrderId}_${new Date().getTime()}`, // 고유 orderId 생성
+  //       orderName: `${cartList[0].menuName} 외 ${cartList.length - 1}건`,
+  //       successUrl: `${window.location.origin}/payment/success?orderId=${savedOrderId}`,
+  //       failUrl: `${window.location.origin}/payment/fail`,
+  //     });
+  //   } catch (error) {
+  //     console.error("결제 준비 중 에러 발생:", error);
+  //     alert("주문 처리 중 오류가 발생했습니다.");
+  //   }
+  // };
 
   const handlePayment = async () => {
     console.log(JSON.stringify(payInfo, null, 2));
@@ -80,7 +114,7 @@ const PaymentPage = () => {
         method: "CARD",
         amount: {
           currency: "KRW",
-          value: totalPrice - payInfo.ecoPoint,
+          value: totalPrice,
         },
         orderId: `ORDER_${savedOrderId}_${Date.now()}`,
         orderName: `${cartList[0].name} 외 ${cartList.length - 1}건`,
@@ -93,11 +127,17 @@ const PaymentPage = () => {
       console.log(error);
       console.log(error.response);
       console.log(error.response?.data);
-
       alert("주문 처리 중 오류가 발생했습니다.");
     }
   };
-
+  // const callAxios = () => {
+  //   axios
+  //     .post(`${import.meta.env.VITE_BACKSERVER}/stores/order`, orderData)
+  //     .then((res) => {
+  //       console.log(orderData);
+  //     })
+  //     .catch((err) => {});
+  // };
   return (
     <div className={styles["payment-page"]}>
       <main className={styles["payment-main"]}>
@@ -205,13 +245,13 @@ const PaymentPage = () => {
                       // 최대 사용 가능 포인트
                       const maxPoint = Math.min(
                         availableEcoPoint ?? 0,
-                        itemPrice * 0.5 ?? 0,
+                        itemPrice ?? 0,
                       );
 
                       // 빈값이면 0 처리
                       const num =
                         value === "" ? 0 : Math.min(Number(value), maxPoint);
-                      // num = Math.floor(num / 10) * 10;
+
                       setEcoPoint(num);
                       setPayInfo((prev) => ({
                         ...prev,
@@ -261,13 +301,13 @@ const PaymentPage = () => {
                 </div>
                 <div className={styles["price-row"]}>
                   <span>에코포인트 사용</span>
-                  <span>-{ecoPoint.toLocaleString()}P</span>
+                  <span>-{ecoPoint}P</span>
                 </div>
               </div>
 
               <div className={styles["total-row"]}>
                 <span>최종 결제 금액</span>
-                <strong>{totalPrice.toLocaleString()}원</strong>
+                <strong>{totalPrice}원</strong>
               </div>
 
               <div className={styles["carbon-card"]}>

@@ -14,11 +14,6 @@
 		store_name
 		AS storeName,
 		store_address AS storeAddress,
-
-
-
-		store_phone AS
-		storePhone,
 		store_phone AS
 		storePhone,
 		store_intro AS storeIntro,
@@ -30,15 +25,12 @@
 		store_category AS
 		storeCategory,
 		store_rating AS storeRating,
-		latitude AS
-		LATITUDE,
+		latitude AS LATITUDE,
 		longitude AS LONGITUDE,
 		store_thumb AS storeThumb
-
 		FROM STORE_TBL
 		WHERE
 		store_id = #{storeId}
-
 	</select>
 
 	<select id="selectAllMenu" resultType="menu">
@@ -71,7 +63,7 @@
 		ASC, o.option_no ASC
 	</select>
 
-	<insert id="insertOrder" parameterType="order">
+<insert id="insertOrder" parameterType="order">
 
 		<selectKey keyProperty="orderId" resultType="int"
 			order="BEFORE">
@@ -124,6 +116,7 @@
 		#{memberId})
 	</insert>
 
+
 	<select id="searchOrderItems" parameterType="int"
 		resultType="orderItem">
 		SELECT od.menu_id AS menuId,
@@ -146,29 +139,18 @@
 		o.order_id AS orderId,
 		o.used_point AS usedPoint,
 		o.get_point AS getPoint,
-		mb.total_carbon_reduce AS totalReduceCarbon,
-		TO_CHAR(m.reg_date,
-		'YYYYMM-DD') AS orderDate,
 		CASE
-		WHEN o.delivery_type = 1 THEN 0
 		WHEN
-		o.delivery_type = 2 THEN 1000
+		o.delivery_type = 1 THEN 0
+		WHEN o.delivery_type = 2 THEN 1000
 		ELSE 2000
 		END AS deliveryPrice,
 		o.delivery_type AS deliveryType,
-
-		o.order_status AS orderStatus
-		FROM
-		order_tbl o
-		JOIN order_list_map m
-		ON o.order_id = m.order_id
-		JOIN
-		store_tbl s
+		o.order_status AS
+		orderStatus
+		FROM order_tbl o
+		JOIN store_tbl s
 		ON o.store_id = s.store_id
-		JOIN member_tbl mb
-		ON o.member_id
-		= mb.member_id
-
 		WHERE o.order_id = #{orderId}
 	</select>
 
@@ -212,8 +194,7 @@
 		(SELECT COUNT(*) FROM review_tbl r WHERE r.order_id = o.order_id) AS
 		hasReview
 
-		FROM order_tbl
-		o
+		FROM order_tbl o
 		JOIN store_tbl s ON o.store_id = s.store_id
 		JOIN order_list_map olm ON o.order_id = olm.order_id
 		JOIN member_tbl m ON o.member_id = m.member_id
@@ -245,64 +226,5 @@
 
 		WHERE o.member_id = #{memberId}
 		ORDER BY o.order_id DESC
-	</select>
-
-
-	<select id="selectMemberPoint" resultType="int">
-		select member_point
-		from member_tbl where member_id = #{memberId}
-	</select>
-	<update id="updatePoint">
-		UPDATE member_tbl
-		SET member_point = member_point +
-		#{getPoint} - #{usedPoint}
-		WHERE member_id = #{memberId}
-	</update>
-	<update id="updateOrderStatus">
-		update order_tbl set order_status = 1 where order_id
-		= #{orderId}
-	</update>
-	<update id="addReduceCarbon">
-		UPDATE member_tbl
-		SET total_carbon_reduce =
-		NVL(total_carbon_reduce, 0) + (
-		SELECT NVL(SUM(total_carbon), 0)
-		FROM
-		order_detail
-		WHERE order_id = #{orderId}
-		)
-		WHERE member_id = (
-		SELECT
-		member_id
-		FROM order_tbl
-		WHERE order_id = #{orderId}
-		)
-	</update>
-	<select id="selectMenu" resultType="Menu">
-		select * from menu_tbl where
-		menu_id = #{menuId}
-	</select>
-	<update id="cancelOrder">
-		update order_tbl set order_status = 9 where order_id
-		= #{orderId} and order_status in (1, 2, 3, 4)
-	</update>
-	<select id="selectOrderListObject" resultType="OrderListObject">
-		SELECT
-		s.store_name,
-		TO_CHAR(o.reg_date, 'YYYY-MM-DD') AS orderDate,
-		s.store_address,
-		m.member_addr,
-		m.total_carbon_reduce
-		FROM member_tbl m
-		JOIN order_list_map o
-		ON m.member_id = o.member_id
-		JOIN order_tbl ot
-		ON o.order_id = ot.order_id
-		JOIN store_tbl s
-		ON ot.store_id = s.store_id
-		WHERE m.member_id = #{memberId}
-	</select>
-	<select id="selectOrderList" resultType="int">
-		select order_id from order_list_map where member_id = #{memberId} order by reg_date desc
 	</select>
 </mapper>
