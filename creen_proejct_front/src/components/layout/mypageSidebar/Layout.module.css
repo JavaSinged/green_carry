@@ -10,6 +10,7 @@
 
 .sidebar {
   width: 260px;
+  min-width: 260px;
   height: fit-content;
   background-color: var(--color-surface);
   border-radius: 24px; /* 이미지처럼 둥근 모서리 */

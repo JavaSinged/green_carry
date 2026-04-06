@@ -43,7 +43,7 @@ export default function Header() {
     fireStyledSwal(
       "success",
       "로그아웃 완료",
-      "안전하게 로그아웃 되었습니다. 메인으로 이동합니다.",
+      "안전하게 로그아웃 되었습니다. 메인으로 이동합니다."
     ).then(() => {
       // 팝업이 닫히거나 시간이 다 되면 즉시 로그아웃 실행
       logout();
@@ -68,13 +68,13 @@ export default function Header() {
       fireStyledSwal(
         "success",
         "이동 중",
-        `${roleText}님의 공간으로 이동합니다.`,
+        `${roleText}님의 공간으로 이동합니다.`
       ).then(() => navigate(targetPath));
     } else {
       fireStyledSwal(
         "warning",
         "로그인 필요",
-        "로그인 페이지로 이동합니다.",
+        "로그인 페이지로 이동합니다."
       ).then(() => navigate("/login"));
     }
   };
@@ -107,8 +107,8 @@ export default function Header() {
                 {Number(user.memberGrade) === 0
                   ? "관리자"
                   : Number(user.memberGrade) === 1
-                    ? "개인"
-                    : "사업자"}
+                  ? "개인"
+                  : "사업자"}
                 )
               </span>
             )}

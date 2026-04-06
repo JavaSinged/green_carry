@@ -80,7 +80,7 @@
 		#{memberId}, #{memberPw},
 		#{memberName}, #{memberPhone}, NULL,
 		#{memberEmail}, #{memberAddrcode}, #{memberAddr}, #{memberDetailAddr},
-		1, 0, SYSDATE, 1
+		1, null, SYSDATE, 1
 		)
 	</insert>
 

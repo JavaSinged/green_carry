@@ -2,50 +2,65 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="kr.co.iei.cs.model.dao.CSDao">
 
-<select id="selectAllList" resultType="faq">
-    SELECT * FROM faq_tbl
-    <where>
-        <if test="faqCategory != null and faqCategory != 0">
-            AND faq_category = #{faqCategory}
-        </if>
-        
-        <if test="searchKeyword != null and searchKeyword != ''">
-            AND (
-                faq_title LIKE '%' || #{searchKeyword} || '%' 
+    <select id="selectAllList" resultType="faq">
+        SELECT * FROM faq_tbl
+        <where>
+            <if test="faqCategory != null and faqCategory != 0">
+                AND faq_category = #{faqCategory}
+            </if>
+
+            <if test="searchKeyword != null and searchKeyword != ''">
+                AND (
+                faq_title LIKE '%' || #{searchKeyword} || '%'
                 OR faq_content LIKE '%' || #{searchKeyword} || '%'
-            )
-        </if>
-    </where>
-    ORDER BY faq_no ASC
-</select>
+                )
+            </if>
+        </where>
+        ORDER BY faq_no ASC
+    </select>
 
-<select id="selectMyInquiry" resultType="qna">
-	select * from qna_tbl where member_id=#{memberId} order by qna_no desc
-</select>
+    <select id="selectMyInquiry" resultType="qna">
+        SELECT * FROM qna_tbl
+        <where>
+            <if test="memberId != null and memberId != ''">
+                member_id = #{memberId}
+            </if>
+        </where>
+        ORDER BY qna_no DESC
+    </select>
 
-<insert id="insertQna">
-	insert into qna_tbl values
-			(qna_tbl_seq.nextval, 
-			#{memberId}, 
-			#{qnaTitle},
-			#{qnaContent},
-			null,
-			0,
-			sysdate)
-</insert>
+    <insert id="insertQna">
+        insert into qna_tbl
+        values (qna_tbl_seq.nextval,
+                #{memberId},
+                #{qnaTitle},
+                #{qnaContent},
+                null,
+                0,
+                sysdate)
+    </insert>
 
-<delete id="deleteInquiry">
-	delete from qna_tbl where qna_no = #{qnaNo} 
-</delete>
+    <delete id="deleteInquiry">
+        delete
+        from qna_tbl
+        where qna_no = #{qnaNo}
+    </delete>
 
-<update id="putInquiry">
-	update qna_tbl 
-	set
-		qna_title=#{qnaTitle},
-		qna_content=#{qnaContent},
-		qna_date = sysdate
-	where qna_no = #{qnaNo}
-</update>
+    <update id="putInquiry">
+        update qna_tbl
+        set qna_title=#{qnaTitle},
+            qna_content=#{qnaContent},
+            qna_date = sysdate
+        where qna_no = #{qnaNo}
+    </update>
+
+    <update id="updateAnswer">
+        update qna_tbl
+        set qna_answer = #{qnaAnswer},
+            qna_status = 1
+        where qna_no = #{qnaNo}
+
+    </update>
 
 
 </mapper>

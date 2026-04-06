@@ -4,15 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import kr.co.iei.cs.model.service.CSService;
 import kr.co.iei.cs.model.vo.Faq;
@@ -40,7 +32,7 @@ public class CSController {
 	
 	//1:1문의내역 전체조회
 	@GetMapping(value="/list")
-	public ResponseEntity<?> selectMyInquiry(@RequestParam("memberId") String memberId){
+	public ResponseEntity<?> selectMyInquiry(@RequestParam(value = "memberId", required = false) String memberId){
 		List<Qna> list =   csService.selectMyInquiry(memberId);
 		return ResponseEntity.ok(list);
 	}
@@ -65,6 +57,12 @@ public class CSController {
 		int result = csService.putInquiry(qna);
 		return ResponseEntity.ok(result);
 				
+	}
+
+	@PatchMapping("/adminAnswer")
+	public ResponseEntity<?> adminAnswer(@RequestBody Qna qna){
+		int result = csService.updateAnswer(qna);
+		return ResponseEntity.ok(result);
 	}
 	
 	

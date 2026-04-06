@@ -42,7 +42,9 @@ const UserCS = () => {
         <div className={styles.tabs_nav}>
           <div className={styles.tabs_nav_faq}>
             <button
-              className={`${styles.tab_item} ${activeTab === "faq" ? styles.active : ""}`}
+              className={`${styles.tab_item} ${
+                activeTab === "faq" ? styles.active : ""
+              }`}
               onClick={() => {
                 setActiveTab("faq");
               }}
@@ -52,7 +54,9 @@ const UserCS = () => {
           </div>
           <div className={styles.tabs_nav_qna}>
             <button
-              className={`${styles.tab_item} ${activeTab === "qna" ? styles.active : ""}`}
+              className={`${styles.tab_item} ${
+                activeTab === "qna" ? styles.active : ""
+              }`}
               onClick={() => {
                 setActiveTab("qna");
               }}
@@ -62,7 +66,9 @@ const UserCS = () => {
           </div>
           <div className={styles.tabs_nav_answer}>
             <button
-              className={`${styles.tab_item} ${activeTab === "answer" ? styles.active : ""}`}
+              className={`${styles.tab_item} ${
+                activeTab === "answer" ? styles.active : ""
+              }`}
               onClick={() => {
                 setActiveTab("answer");
               }}
@@ -135,7 +141,9 @@ const FAQSection = ({ searchKeyword, setSearchKeyword }) => {
           return (
             <button
               key={`key:${cat.id}`}
-              className={`${styles.cat_btn} ${status === cat.id ? styles.cat_active : ""}`}
+              className={`${styles.cat_btn} ${
+                status === cat.id ? styles.cat_active : ""
+              }`}
               onClick={() => {
                 setStatus(cat.id);
                 //setSearchKeyword("");
@@ -207,7 +215,9 @@ const QnASection = ({ setSearchKeyword, user, setActiveTab }) => {
     if (value.length >= maxLength[name]) {
       if (value.length === maxLength[name]) {
         alert(
-          `${name === "qnaTitle" ? "제목" : "내용"}은 최대 ${maxLength[name]}자까지 입력 가능합니다.`,
+          `${name === "qnaTitle" ? "제목" : "내용"}은 최대 ${
+            maxLength[name]
+          }자까지 입력 가능합니다.`
         );
       }
       setInquiry({ ...inquiry, [name]: value.slice(0, maxLength[name]) });
@@ -242,7 +252,7 @@ const QnASection = ({ setSearchKeyword, user, setActiveTab }) => {
       .catch((err) => {
         console.log(err);
         alert(
-          "글자 수가 너무 길거나 서버 오류가 발생했습니다. 내용을 줄여주세요.",
+          "글자 수가 너무 길거나 서버 오류가 발생했습니다. 내용을 줄여주세요."
         );
       });
   };
@@ -282,7 +292,9 @@ const QnASection = ({ setSearchKeyword, user, setActiveTab }) => {
 
           <div className={styles.char_count_wrapper}>
             <span
-              className={`${styles.char_count} ${inquiry.qnaContent.length >= 400 ? styles.limit_reached : ""}`}
+              className={`${styles.char_count} ${
+                inquiry.qnaContent.length >= 400 ? styles.limit_reached : ""
+              }`}
             >
               {inquiry.qnaContent.length} / 400자
             </span>
@@ -317,7 +329,9 @@ const AnswerSection = ({ user }) => {
     if (value.length >= maxLength[name]) {
       if (value.length === maxLength[name]) {
         alert(
-          `${name === "qnaTitle" ? "제목" : "내용"}은 최대 ${maxLength[name]}자까지 입력 가능합니다.`,
+          `${name === "qnaTitle" ? "제목" : "내용"}은 최대 ${
+            maxLength[name]
+          }자까지 입력 가능합니다.`
         );
       }
       setUpdateData({ ...updateData, [name]: value.slice(0, maxLength[name]) });
@@ -389,7 +403,7 @@ const AnswerSection = ({ user }) => {
         axios
           .put(
             `${import.meta.env.VITE_BACKSERVER}/cs/inquiries/update`,
-            dataSend,
+            dataSend
           )
           .then((res) => {
             console.log(res);
@@ -425,6 +439,7 @@ const AnswerSection = ({ user }) => {
   useEffect(() => {
     fetchInquiryList();
   }, [user?.memberId]);
+
   return (
     <div className={styles.answer_wrap}>
       <h4 className={styles.answer_title}>1 : 1 문의내역</h4>
@@ -553,7 +568,11 @@ const AnswerSection = ({ user }) => {
                       />
                       <div className={styles.char_count_wrapper}>
                         <span
-                          className={`${styles.char_count} ${updateData.qnaContent.length >= 400 ? styles.limit_reached : ""}`}
+                          className={`${styles.char_count} ${
+                            updateData.qnaContent.length >= 400
+                              ? styles.limit_reached
+                              : ""
+                          }`}
                         >
                           {updateData.qnaContent.length} / 400자
                         </span>

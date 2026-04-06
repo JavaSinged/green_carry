@@ -20,4 +20,5 @@ public interface CSDao {
 
 	int putInquiry(Qna qna);
 
+    int updateAnswer(Qna qna);
 }
