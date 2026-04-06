@@ -237,3 +237,61 @@
   color: var(--text-main);
   margin-left: 2px;
 }
+
+/* 스켈레톤 ui */
+/* --- 스켈레톤 UI 애니메이션 (반짝이는 효과) --- */
+@keyframes skeleton-shimmer {
+  0% {
+    background-color: #f2f2f2;
+  }
+  50% {
+    background-color: #e0e0e0;
+  }
+  100% {
+    background-color: #f2f2f2;
+  }
+}
+
+/* 스켈레톤 카드는 마우스 효과 제거 */
+.skeleton_card {
+  pointer-events: none;
+  background-color: #fff !important; /* 배경색을 흰색으로 고정하거나 기존색 유지 */
+  border: 1px solid #eee;
+}
+
+/* 스켈레톤 공통 애니메이션 적용 */
+.skeleton_img,
+.skeleton_title,
+.skeleton_tags,
+.skeleton_rating {
+  animation: skeleton-shimmer 1.5s infinite ease-in-out;
+  background-color: #eee;
+  border-radius: 8px;
+}
+
+/* 이미지 영역 스켈레톤 (기존 image_wrap과 높이 동일하게) */
+.skeleton_img {
+  width: 100%;
+  height: 200px; /* .image_wrap의 height와 동일 */
+  border-radius: 16px 16px 0 0; /* 카드 상단 곡률 맞춤 */
+}
+
+/* 제목 영역 스켈레톤 */
+.skeleton_title {
+  width: 60%;
+  height: 24px;
+  margin-bottom: 12px;
+}
+
+/* 태그 영역 스켈레톤 */
+.skeleton_tags {
+  width: 40%;
+  height: 18px;
+  margin-bottom: 12px;
+}
+
+/* 별점 영역 스켈레톤 */
+.skeleton_rating {
+  width: 30%;
+  height: 18px;
+}

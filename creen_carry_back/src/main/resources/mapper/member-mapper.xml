@@ -129,10 +129,12 @@
 
 	<update id="updateAddress" parameterType="member">
 		UPDATE MEMBER_TBL
-		SET
-		MEMBER_ADDRCODE = #{memberAddrcode},
-		MEMBER_ADDR = #{memberAddr},
-		MEMBER_DETAIL_ADDR = #{memberDetailAddr}
+
+		SET MEMBER_ADDRCODE = #{memberAddrcode},
+			MEMBER_ADDR = #{memberAddr},
+			MEMBER_DETAIL_ADDR = #{memberDetailAddr},
+			LATITUDE = #{latitude},
+			LONGITUDE = #{longitude}
 		WHERE MEMBER_ID = #{memberId}
 	</update>
 

@@ -47,6 +47,8 @@ const categories = [
 
 export default function Home() {
   const navigate = useNavigate();
+
+  const [isLoading, setLoading] = useState(true); // 로딩 상태 추가
   const { storeId, setStoreId } = useCartStore();
   const [selectedCategory, setSelectedCategory] = useState("인기맛집");
   const [searchTerm, setSearchTerm] = useState("");
@@ -56,15 +58,18 @@ export default function Home() {
 
   // 2. 서버 데이터를 가져오는 useEffect
   useEffect(() => {
+    setLoading(true); // 데이터 로딩 시작
     axios
       .get(`${import.meta.env.VITE_BACKSERVER}/stores`)
       .then((res) => {
         //console.log("서버 데이터 확인:", res.data);
         // 서버에서 넘어온 배열 데이터를 상태에 저장
         setStoreList(res.data);
+        setLoading(false); // 데이터 로딩 완료
       })
       .catch((err) => {
         console.error("데이터 로딩 에러:", err);
+        setLoading(false); // 에러 발생해도 로딩 상태 해제
       });
   }, []);
 
@@ -89,23 +94,17 @@ export default function Home() {
       if (i <= Math.floor(rating)) {
         // 꽉 찬 별
         stars.push(
-          <StarIcon key={i} sx={{ color: "#ffb300", fontSize: "1.2rem" }} />,
+          <StarIcon key={i} sx={{ color: "#ffb300", fontSize: "1.2rem" }} />
         );
       } else if (i === Math.ceil(rating) && rating % 1 !== 0) {
         // 반 개 별 (소수점이 있는 경우)
         stars.push(
-          <StarHalfIcon
-            key={i}
-            sx={{ color: "#ffb300", fontSize: "1.2rem" }}
-          />,
+          <StarHalfIcon key={i} sx={{ color: "#ffb300", fontSize: "1.2rem" }} />
         );
       } else {
         // 빈 별
         stars.push(
-          <StarOutlineIcon
-            key={i}
-            sx={{ color: "#ccc", fontSize: "1.2rem" }}
-          />,
+          <StarOutlineIcon key={i} sx={{ color: "#ccc", fontSize: "1.2rem" }} />
         );
       }
     }
@@ -152,8 +151,9 @@ export default function Home() {
           {categories.map((item) => (
             <div
               key={item.name}
-              className={`${styles.category_item} ${selectedCategory === item.name ? styles.active : ""
-                }`}
+              className={`${styles.category_item} ${
+                selectedCategory === item.name ? styles.active : ""
+              }`}
               onClick={() => setSelectedCategory(item.name)}
             >
               <div className={styles.category_img_circle}>
@@ -183,17 +183,34 @@ export default function Home() {
 
         {/* 4. 카드 목록 (서버에서 받아온 실제 필드값 바인딩) */}
         <div className={styles.card_wrap}>
-          {filteredStores.length > 0 ? (
+          {isLoading ? (
+            // 로딩 중일 때 보여줄 UI
+            [1, 2, 3].map((n) => (
+              <div
+                key={n}
+                className={`${styles.card_item} ${styles.skeleton_card}`}
+              >
+                <div
+                  className={`${styles.image_wrap} ${styles.skeleton_img}`}
+                ></div>
+                <div className={styles.card_info}>
+                  <div className={styles.skeleton_title}></div>
+                  <div className={styles.skeleton_tags}></div>
+                  <div className={styles.skeleton_rating}></div>
+                </div>
+              </div>
+            ))
+          ) : filteredStores.length > 0 ? (
             filteredStores.map((store) => (
               <div
                 key={store.storeId} // storeId 사용
                 className={styles.card_item}
                 // 클릭 시 해당 상점 ID를 가지고 이동하거나 상세 페이지 로직 처리
                 onClick={() => {
-                  (setStoreId(store.storeId),
+                  setStoreId(store.storeId),
                     navigate("/storeView", {
                       state: { storeId: store.storeId },
-                    }));
+                    });
                 }}
               >
                 <div className={styles.image_wrap}>

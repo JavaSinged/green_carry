@@ -1,5 +1,6 @@
 package kr.co.iei.store.model.vo;
 
+import java.sql.Date;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
@@ -13,6 +14,7 @@ public class OrderResponse {
 	
 	private String storeName;
 	private Integer orderId;
+
     private Integer totalPrice;
     private Integer usedPoint;
     private Integer getPoint;
@@ -22,5 +24,5 @@ public class OrderResponse {
     private Integer orderStatus;
     private String orderDate;
     private Double totalReduceCarbon;
-    
+
 }

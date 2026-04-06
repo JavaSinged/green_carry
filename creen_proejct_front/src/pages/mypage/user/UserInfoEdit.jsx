@@ -100,7 +100,7 @@ export default function UserInfoEdit() {
       return Swal.fire(
         "알림",
         "이름과 전화번호를 모두 입력해주세요.",
-        "warning",
+        "warning"
       );
     }
 
@@ -162,7 +162,7 @@ export default function UserInfoEdit() {
       return Swal.fire(
         "알림",
         "현재 비밀번호와 다른 새 비밀번호를 사용해주세요.",
-        "info",
+        "info"
       );
     if (newPw !== confirmPw)
       return Swal.fire("오류", "새 비밀번호가 일치하지 않습니다.", "error");
@@ -177,7 +177,7 @@ export default function UserInfoEdit() {
         await Swal.fire(
           "성공",
           "비밀번호가 안전하게 변경되었습니다.",
-          "success",
+          "success"
         );
         setPwData({ currentPw: "", newPw: "", confirmPw: "" });
         setopenPwSet(false);
@@ -198,7 +198,7 @@ export default function UserInfoEdit() {
 
   // 다음 우편번호 API 핸들러
   const openPostcode = useDaumPostcodePopup(
-    "https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js",
+    "https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"
   );
 
   const handleCompletePostcode = (data) => {
@@ -224,7 +224,6 @@ export default function UserInfoEdit() {
 
   // 주소 저장 핸들러
   const updateAddress = async () => {
-    // 1. 유효성 검사
     if (!newAddress.memberAddrCode || !newAddress.memberDetailAddr.trim()) {
       Swal.fire({
         icon: "warning",
@@ -234,7 +233,25 @@ export default function UserInfoEdit() {
     }
 
     try {
-      // 2. axios를 사용한 데이터 전송
+      // 1. 네이버 지도 Geocoding으로 위경도 가져오기
+      const coords = await new Promise((resolve, reject) => {
+        naver.maps.Service.geocode(
+          { query: newAddress.memberAddr },
+          (status, response) => {
+            if (status !== naver.maps.Service.Status.OK) {
+              reject(new Error("주소 변환 실패"));
+              return;
+            }
+            const result = response.v2.addresses[0];
+            resolve({
+              latitude: parseFloat(result.y),
+              longitude: parseFloat(result.x),
+            });
+          }
+        );
+      });
+
+      // 2. 위경도 포함해서 백엔드로 전송
       const response = await axios.patch(
         `${import.meta.env.VITE_BACKSERVER}/member/updateAddress`,
         {
@@ -242,10 +259,11 @@ export default function UserInfoEdit() {
           memberAddrcode: newAddress.memberAddrCode,
           memberAddr: newAddress.memberAddr,
           memberDetailAddr: newAddress.memberDetailAddr,
-        },
+          latitude: coords.latitude,
+          longitude: coords.longitude,
+        }
       );
 
-      // 3. 성공 처리
       if (response.status === 200) {
         // 서버 응답이 성공(200)일 때
         Swal.fire("성공", "주소지가 성공적으로 변경되었습니다!", "success");
@@ -256,13 +274,11 @@ export default function UserInfoEdit() {
           memberAddr: newAddress.memberAddr,
           memberDetailAddr: newAddress.memberDetailAddr,
         }));
-
         setNewAddress({
           memberAddrCode: "",
           memberAddr: "",
           memberDetailAddr: "",
         });
-
         setopenAddSet(false);
       }
     } catch (error) {
@@ -304,13 +320,23 @@ export default function UserInfoEdit() {
   return (
     <div className={styles.right}>
       <section
-        className={`${styles.right_main} ${isEditingProfile ? styles.right_main_editing : styles.right_main_default}`}
+        className={`${styles.right_main} ${
+          isEditingProfile
+            ? styles.right_main_editing
+            : styles.right_main_default
+        }`}
       >
         <div
-          className={`${styles.icon_content} ${isEditingProfile ? styles.icon_content_editing : styles.icon_content_default}`}
+          className={`${styles.icon_content} ${
+            isEditingProfile
+              ? styles.icon_content_editing
+              : styles.icon_content_default
+          }`}
         >
           <div
-            className={`${styles.icon_wrapper} ${isEditingProfile ? styles.icon_wrapper_editable : ""}`}
+            className={`${styles.icon_wrapper} ${
+              isEditingProfile ? styles.icon_wrapper_editable : ""
+            }`}
             onClick={() => isEditingProfile && fileInputRef.current.click()}
           >
             {previewImg ? (
@@ -489,7 +515,9 @@ export default function UserInfoEdit() {
                     </div>
                     <p className={styles.address_detail}>
                       {memberInfo?.memberAddr
-                        ? `[${memberInfo.memberAddrcode || ""}] ${memberInfo.memberAddr} ${memberInfo.memberDetailAddr || ""}`
+                        ? `[${memberInfo.memberAddrcode || ""}] ${
+                            memberInfo.memberAddr
+                          } ${memberInfo.memberDetailAddr || ""}`
                         : "주소 정보 없음"}
                     </p>
                   </div>

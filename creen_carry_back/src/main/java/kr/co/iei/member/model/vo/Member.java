@@ -38,4 +38,7 @@ public class Member {
 	private String storeName; // STORE_NAME (VARCHAR2) : 가게 이름
 	private String openingDate; // OPENING_DATE (DATE) : 개업일 (화면 출력을 위해 String으로 받음)
 
+	// 위 경도 저장
+	private Double latitude;
+	private Double longitude;
 }

@@ -11,7 +11,7 @@ public class JwtUtil {
     // ⚠️ 실제 서비스 시에는 아주 길고 복잡한 문자열을 사용해야 합니다.
     private String secret = "your-very-secure-and-long-secret-key-for-greencarry-project";
     private SecretKey key = Keys.hmacShaKeyFor(secret.getBytes());
-    private long expire = 1000L * 60 * 60; // 유효시간 1시간
+    private long expire = 1000L * 60L * 60L; // 유효시간 1시간
     
     private long refreshExpire = 1000L * 60 * 60 * 24 * 14;// 자동 로그인 유효시간 14일
 

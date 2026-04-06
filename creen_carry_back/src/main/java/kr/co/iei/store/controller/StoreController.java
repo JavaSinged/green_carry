@@ -73,4 +73,21 @@ public class StoreController {
         List<OrderResponse> list = storeService.searchOrderList(memberId);
         return ResponseEntity.ok(list);
     }
+    
+    @GetMapping("/point/{memberId}")
+    public ResponseEntity<?> selectMemberPoint(@PathVariable String memberId){
+    	Integer point  = storeService.selectMemberPoint(memberId);
+    	return ResponseEntity.ok(point);
+    }
+    
+    @GetMapping("/orders/itemImg/{menuId}")
+    public ResponseEntity<?> selectMenu(@PathVariable Integer menuId){
+    	Menu m = storeService.selectMenu(menuId);
+    	return ResponseEntity.ok(m);
+    }
+    @PatchMapping("/order/{orderId}")
+    public ResponseEntity<?> cancelOrder(@PathVariable Integer orderId){
+    	int result = storeService.cancleOrder(orderId);
+    	return ResponseEntity.ok(result);
+    }
 }

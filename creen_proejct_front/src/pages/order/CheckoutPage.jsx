@@ -3,6 +3,7 @@ import styles from "./CheckoutPage.module.css";
 import { useLocation, useNavigate } from "react-router-dom";
 import useCartStore from "../../store/useCartStore";
 import axios from "axios";
+import Swal from "sweetalert2";
 
 const CheckoutPage = () => {
   const cartList = useCartStore((state) => state.cart);
@@ -21,8 +22,21 @@ const CheckoutPage = () => {
   const paymentOrderId = params.get("orderId");
   const orderId = paymentOrderId ? Number(paymentOrderId.split("_")[1]) : null;
   const [storeName, setStoreName] = useState("");
-  const [orderState, setOrderState] = useState(2);
-
+  const [orderState, setOrderState] = useState(0);
+  const [orderDate, setOrderDate] = useState("");
+  const [totalCarbon, setTotalCarbon] = useState(0);
+  const [cancel, setCancel] = useState(0);
+  const cancleOrder = () => {
+    axios
+      .patch(`${import.meta.env.VITE_BACKSERVER}/stores/order/${orderId}`)
+      .then((res) => {
+        console.log(res);
+        setCancel(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
   useEffect(() => {
     console.log(cartList);
     if (!orderId) return;
@@ -37,7 +51,9 @@ const CheckoutPage = () => {
         setGetPoint(Number(res.data.getPoint ?? 0));
         setDeliveryPrice(Number(res.data.deliveryPrice ?? 0));
         setStoreName(res.data.storeName);
-        // setOrderState(res.data.orderStatus ?? 0);
+        setOrderState(res.data.orderStatus - 2 ?? 0);
+        setOrderDate(res.data.orderDate);
+        setTotalCarbon(res.data.totalReduceCarbon);
       })
       .catch((err) => {
         console.log(err);
@@ -118,7 +134,10 @@ const CheckoutPage = () => {
           </p>
 
           <button className={styles.orderCheckBtn}>주문내역 확인</button>
-          <p className={styles.orderNumber}>ECO-2026-032501</p>
+          <p className={styles.orderNumber}>
+            ECO-{orderDate}
+            {orderId}
+          </p>
         </section>
 
         <section className={styles.statusCard}>
@@ -251,7 +270,7 @@ const CheckoutPage = () => {
 
               <div className={styles.ecoInfoRow}>
                 <span>누적 탄소 절감량</span>
-                <strong>24.6kg</strong>
+                <strong>{totalCarbon}kg</strong>
               </div>
             </div>
 
@@ -267,7 +286,14 @@ const CheckoutPage = () => {
             <button
               className={styles.secondaryBtn}
               onClick={() => {
-                navigate("/");
+                cancleOrder();
+                if (cancel == 1) {
+                  Swal.fire("완료", "주문이 취소 되었습니다.", "success");
+                  navigate("/");
+                } else {
+                  Swal.fire("실패", "주문을 취소 할 수 없습니다.", "error");
+                }
+                // navigate("/");
               }}
             >
               주문 취소

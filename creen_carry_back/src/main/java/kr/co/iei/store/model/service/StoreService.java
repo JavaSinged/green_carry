@@ -55,6 +55,8 @@ public class StoreService {
                     throw new RuntimeException("주문 상세 실패");
                 }
             }
+            int setPoint = storeDao.updatePoint(order);
+            int addReduceCarbon = storeDao.addReduceCarbon(orderId);
         }
 
         // 2. 주문 이력
@@ -69,9 +71,10 @@ public class StoreService {
     public OrderResponse searchOrder(Integer orderId) {
         OrderResponse orderResponse = storeDao.searchOrderInfo(orderId);
         List<OrderItem> items = storeDao.searchOrderItems(orderId);
-
+        if(orderResponse.getOrderStatus() == 0) {
+        	int result = storeDao.updateOrderStatus(orderId);
+        }
         orderResponse.setItems(items);
-
         return orderResponse;
     }
 
@@ -82,6 +85,21 @@ public class StoreService {
 
 	public List<OrderResponse> searchOrderList(String memberId){
 	    return storeDao.searchOrderList(memberId);
+	}
+
+	public Integer selectMemberPoint(String memberId) {
+		Integer point = storeDao.selectMemberPoint(memberId);
+		return point;
+	}
+
+	public Menu selectMenu(Integer menuId) {
+		Menu m = storeDao.selectMenu(menuId);
+		return m;
+	}
+	@Transactional
+	public int cancleOrder(Integer orderId) {
+		int result = storeDao.cancelOrder(orderId);
+		return result;
 	}
 
 }
