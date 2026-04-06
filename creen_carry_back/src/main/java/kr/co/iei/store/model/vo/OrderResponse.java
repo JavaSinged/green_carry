@@ -11,35 +11,35 @@ import lombok.NoArgsConstructor;
 @Data
 public class OrderResponse {
 	// 1. 기본 주문 정보
-    private Integer orderId;
-    private String orderDate;
-    private Integer orderStatus;
-    private Integer storeId;
-    private String storeName;
+	private Integer orderId;
+	private String orderDate;
+	private Integer orderStatus;
+	private Integer storeId;
+	private String storeName;
 
-    // 2. 🌟 금액 및 수량 정보 (이게 있어야 0원이 안 나옵니다)
-    private Integer totalPrice;    // 총 결제 금액
-    private Integer totalCount;    // 총 주문 상품 개수
-    private Integer extraCount;    // "메뉴명 외 N건"의 N
-    
-    // 3. 🌟 포인트 및 배달 정보
-    private Integer usedPoint;
-    private Integer getPoint;
-    private Integer deliveryPrice;
-    private Integer deliveryType;
+	// 2. 🌟 금액 및 수량 정보 (이게 있어야 0원이 안 나옵니다)
+	private Integer totalPrice; // 총 결제 금액
+	private Integer totalCount; // 총 주문 상품 개수
+	private Integer extraCount; // "메뉴명 외 N건"의 N
 
-    // 4. 🌟 메뉴 상세 정보 (리뷰 모달 및 목록용)
-    private String menuName;       // 대표 메뉴 이름
-    private String menuImage;      // 대표 메뉴 이미지 경로
-    private String optionString;   // 선택한 옵션 문자열
-    private List<OrderItem> items; // 전체 아이템 리스트 (필요 시)
+	// 3. 🌟 포인트 및 배달 정보
+	private Integer usedPoint;
+	private Integer getPoint;
+	private Integer deliveryPrice;
+	private Integer deliveryType;
 
-    // 5. 🌟 탄소 및 주소 정보
-    private Integer orderCarbon;    // 탄소 절감량 (0.000kg 방지)
-    private String storeAddress;   // 매장 주소
-    private String deliveryAddress;// 배달 주소
-    
-    // 6. 리뷰 정보
-    private int hasReview;         // 리뷰 작성 여부 (0 또는 1)
-    
+	// 4. 🌟 메뉴 상세 정보 (리뷰 모달 및 목록용)
+	private String menuName; // 대표 메뉴 이름
+	private String menuImage; // 대표 메뉴 이미지 경로
+	private String optionString; // 선택한 옵션 문자열
+	private List<OrderItem> items; // 전체 아이템 리스트 (필요 시)
+
+	// 5. 🌟 탄소 및 주소 정보
+	private Integer orderCarbon; // 탄소 절감량 (0.000kg 방지)
+	private String storeAddress; // 매장 주소
+	private String deliveryAddress;// 배달 주소
+
+	// 6. 리뷰 정보
+	private int hasReview; // 리뷰 작성 여부 (0 또는 1)
+
 }
