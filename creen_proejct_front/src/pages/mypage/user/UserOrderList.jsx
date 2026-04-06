@@ -135,8 +135,8 @@ const UserOrderListPage = () => {
                 <div className={styles.infoBlock}>
                   <p className={styles.infoTitle}>주문 정보</p>
                   <p>
-                    {order.quantity}개{" "}
-                    {Number(order.price ?? 0).toLocaleString()}원
+                    {order.totalCount}개{" "}
+                    {Number(order.totalPrice ?? 0).toLocaleString()}원
                   </p>
                 </div>
 
