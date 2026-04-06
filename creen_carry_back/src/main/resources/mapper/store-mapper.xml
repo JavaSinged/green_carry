@@ -61,6 +61,15 @@
             ASC, o.option_no ASC
     </select>
 
+    
+
+    <update id="updateOrderStatus">
+        update order_tbl
+        set order_status = 1
+        where order_id
+                  = #{orderId}
+    </update>
+
     <insert id="insertOrder" parameterType="order">
 
         <selectKey keyProperty="orderId" resultType="int"
@@ -242,62 +251,68 @@
         ORDER BY o.order_id DESC
     </select>
     <select id="getStoreId" parameterType="String">
-    	select store_id from store_tbl where member_id= #{memberId}
+        select store_id
+        from store_tbl
+        where member_id = #{memberId}
     </select>
     <select id="getAllMenuOptions" resultType="menuOption">
-    	select * from option_tbl ORDER BY option_type, option_no
+        select *
+        from option_tbl
+        ORDER BY option_type, option_no
     </select>
-    
-   <update id="updateMenu" parameterType="MenuSaveRequestDto">
-    UPDATE menu_tbl
-    SET 
-        menu_name = #{menuName},
-        menu_info = #{menuInfo},
-        menu_price = #{menuPrice},
-        menu_category = #{menuCategory}
-        WHERE menu_id = #{menuId} AND store_id = #{storeId}
-</update>
 
-<delete id="deleteMenuOptions">
-    DELETE FROM menu_option_map WHERE menu_id = #{menuId}
-</delete>
+    <update id="updateMenu" parameterType="MenuSaveRequestDto">
+        UPDATE menu_tbl
+        SET menu_name     = #{menuName},
+            menu_info     = #{menuInfo},
+            menu_price    = #{menuPrice},
+            menu_category = #{menuCategory}
+        WHERE menu_id = #{menuId}
+          AND store_id = #{storeId}
+    </update>
 
-<insert id="insertMenuOptions">
-    INSERT ALL
-    <foreach collection="optionIds" item="optionId">
-        INTO menu_option_map (menu_id, option_no) 
-        VALUES (#{menuId}, #{optionId})
-    </foreach>
-    SELECT * FROM DUAL
-</insert>
+    <delete id="deleteMenuOptions">
+        DELETE
+        FROM menu_option_map
+        WHERE menu_id = #{menuId}
+    </delete>
 
-<insert id="insertNewOption" parameterType="menuOption">
-    <selectKey keyProperty="optionNo" resultType="long" order="BEFORE">
-        SELECT option_seq.NEXTVAL FROM DUAL
-    </selectKey>
-    
-    INSERT INTO option_tbl (option_no, option_type, option_name, option_price)
-    VALUES (#{optionNo}, #{optionType}, #{optionName}, #{optionPrice})
-</insert>
-    
-<select id="getMenuById" parameterType="long" resultType="menu">
-    SELECT menu_id,
-           store_id,
-           menu_name,
-           menu_carbon,
-           menu_price,
-           menu_category,
-           menu_image,
-           menu_info
-    FROM MENU_TBL
-    WHERE menu_id = #{menuId}
-</select>
+    <insert id="insertMenuOptions">
+        INSERT ALL
+        <foreach collection="optionIds" item="optionId">
+            INTO menu_option_map (menu_id, option_no)
+            VALUES (#{menuId}, #{optionId})
+        </foreach>
+        SELECT * FROM DUAL
+    </insert>
 
-<insert id="insertMenu" parameterType="MenuSaveRequestDto">
-    <selectKey keyProperty="menuId" resultType="long" order="BEFORE">
-        SELECT menu_seq.NEXTVAL FROM DUAL
-    </selectKey>
-    INSERT INTO menu_tbl (
+    <insert id="insertNewOption" parameterType="menuOption">
+        <selectKey keyProperty="optionNo" resultType="long" order="BEFORE">
+            SELECT option_seq.NEXTVAL FROM DUAL
+        </selectKey>
+
+        INSERT INTO option_tbl (option_no, option_type, option_name, option_price)
+        VALUES (#{optionNo}, #{optionType}, #{optionName}, #{optionPrice})
+    </insert>
+
+    <select id="getMenuById" parameterType="long" resultType="menu">
+        SELECT menu_id,
+               store_id,
+               menu_name,
+               menu_carbon,
+               menu_price,
+               menu_category,
+               menu_image,
+               menu_info
+        FROM MENU_TBL
+        WHERE menu_id = #{menuId}
+    </select>
+
+    <insert id="insertMenu" parameterType="MenuSaveRequestDto">
+        <selectKey keyProperty="menuId" resultType="long" order="BEFORE">
+            SELECT menu_seq.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO menu_tbl (
         menu_id,
         store_id,
         menu_name,
@@ -306,13 +321,13 @@
         menu_category,
         menu_status,
         menu_carbon
-    ) VALUES (
+        ) VALUES (
         #{menuId},
         #{storeId},
         #{menuName},
         #{menuInfo},
         #{menuPrice},
         #{menuCategory},
-        1,          0           )
-</insert>
+        1, 0 )
+    </insert>
 </mapper>
