@@ -21,7 +21,7 @@ export default function UserLayout() {
           </li>
           <li>
             <NavLink
-              to="/mypage/reviews"
+              to="/mypage/user/reviews"
               className={({ isActive }) => (isActive ? styles.activeMenu : "")}
             >
               리뷰관리

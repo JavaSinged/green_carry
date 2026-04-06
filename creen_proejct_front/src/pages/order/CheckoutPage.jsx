@@ -3,6 +3,7 @@ import styles from "./CheckoutPage.module.css";
 import { useLocation, useNavigate } from "react-router-dom";
 import useCartStore from "../../store/useCartStore";
 import axios from "axios";
+import Swal from "sweetalert2";
 
 const CheckoutPage = () => {
   const cartList = useCartStore((state) => state.cart);
@@ -24,7 +25,18 @@ const CheckoutPage = () => {
   const [orderState, setOrderState] = useState(0);
   const [orderDate, setOrderDate] = useState("");
   const [totalCarbon, setTotalCarbon] = useState(0);
-
+  const [cancel, setCancel] = useState(0);
+  const cancleOrder = () => {
+    axios
+      .patch(`${import.meta.env.VITE_BACKSERVER}/stores/order/${orderId}`)
+      .then((res) => {
+        console.log(res);
+        setCancel(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
   useEffect(() => {
     console.log(cartList);
     if (!orderId) return;
@@ -274,7 +286,14 @@ const CheckoutPage = () => {
             <button
               className={styles.secondaryBtn}
               onClick={() => {
-                navigate("/");
+                cancleOrder();
+                if (cancel == 1) {
+                  Swal.fire("완료", "주문이 취소 되었습니다.", "success");
+                  navigate("/");
+                } else {
+                  Swal.fire("실패", "주문을 취소 할 수 없습니다.", "error");
+                }
+                // navigate("/");
               }}
             >
               주문 취소

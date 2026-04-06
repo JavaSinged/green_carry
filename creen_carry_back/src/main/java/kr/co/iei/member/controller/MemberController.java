@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import kr.co.iei.member.model.vo.Member;
+import kr.co.iei.member.model.vo.Review;
 import kr.co.iei.utils.EmailSender;
 import kr.co.iei.utils.JwtUtil;
 import kr.co.iei.member.model.service.MemberService;
@@ -344,5 +345,43 @@ public class MemberController {
     public ResponseEntity<Integer> checkActiveOrder(@RequestParam("memberId") String memberId){
     	int activeOrderCount = memberService.checkActiveOrder(memberId);
     	return ResponseEntity.ok(activeOrderCount);
+    
+    @PostMapping("/insertReview")
+    public ResponseEntity<String> insertReview(
+            Review review, // FormData로 보낸 orderId, reviewContent, reviewRating이 자동으로 매핑됨
+            @RequestParam(value = "uploadFile", required = false) MultipartFile uploadFile
+    ) {
+        try {
+
+
+            memberService.insertReview(review, uploadFile);
+
+            return ResponseEntity.ok("SUCCESS");
+        } catch (RuntimeException e) {
+            // 예외 발생 시 프론트의 catch(err) 부분으로 메시지 전달
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body("리뷰 등록 중 서버 오류가 발생했습니다.");
+        }
+    }
+    @GetMapping("/myReviewList/{memberId}")
+    public ResponseEntity<?> getMyReviewList(@PathVariable String memberId) {
+        List<Review> list = memberService.selectReviewList(memberId);
+        return ResponseEntity.ok(list);
+    }
+    @DeleteMapping("/deleteReview/{orderId}")
+    public ResponseEntity<?> deleteReview(@PathVariable int orderId) {
+        try {
+            boolean result = memberService.deleteReview(orderId);
+            if (result) {
+                return ResponseEntity.ok("SUCCESS");
+            } else {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("DELETE_FAIL");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("SERVER_ERROR");
+        }
     }
 }

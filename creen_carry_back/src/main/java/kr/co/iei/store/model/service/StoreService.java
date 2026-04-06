@@ -6,6 +6,7 @@ import kr.co.iei.store.model.vo.MenuOption;
 import kr.co.iei.store.model.vo.MenuSaveRequestDto;
 import kr.co.iei.store.model.vo.Order;
 import kr.co.iei.store.model.vo.OrderItem;
+import kr.co.iei.store.model.vo.OrderListObject;
 import kr.co.iei.store.model.vo.OrderListResponse;
 import kr.co.iei.store.model.vo.OrderResponse;
 import kr.co.iei.store.model.vo.Store;
@@ -57,6 +58,7 @@ public class StoreService {
                     throw new RuntimeException("주문 상세 실패");
                 }
             }
+            // 임시 주석
             int setPoint = storeDao.updatePoint(order);
             int addReduceCarbon = storeDao.addReduceCarbon(orderId);
         }
@@ -85,9 +87,12 @@ public class StoreService {
 		return list;
 	}
 
+
 	public List<OrderResponse> searchOrderList(String memberId){
 	    return storeDao.searchOrderList(memberId);
 	}
+
+
 
 	public Integer getStoreId(String memberId) {
 		Integer storeId = storeDao.getStoreId(memberId);
@@ -172,6 +177,28 @@ public class StoreService {
 	    }
 
 	    return 1;
+	}
+	@Transactional
+	public int cancleOrder(Integer orderId) {
+		int result = storeDao.cancelOrder(orderId);
+		return result;
+	}
+
+	public int[] selectOrderList(String memberId) {
+		int[] arr = storeDao.selectOrderList(memberId);
+		return arr;
+
+	}
+	@Transactional
+	public int cancleOrder(Integer orderId) {
+		int result = storeDao.cancelOrder(orderId);
+		return result;
+	}
+
+	public int[] selectOrderList(String memberId) {
+		int[] arr = storeDao.selectOrderList(memberId);
+		return arr;
+
 	}
 
 }
