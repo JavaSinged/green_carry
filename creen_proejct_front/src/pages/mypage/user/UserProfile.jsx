@@ -8,6 +8,7 @@ import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import StorefrontIcon from '@mui/icons-material/Storefront'; // 가게 아이콘
 import Collapse from '@mui/material/Collapse';
+import WorkspacePremiumIcon from '@mui/icons-material/WorkspacePremium';
 import axios from "axios";
 
 const UserProfile = () => {
@@ -26,19 +27,23 @@ const UserProfile = () => {
         unit: "g",
         subText: "나의 총 실천 기록"
     };
-    const FromLastMonth = {
-        title: "지난 달 대비",
-        value: "+23",
-        unit: "%",
-        subText: "증가"
-    };
-
     const [openEco, setOpenEco] = useState(false);
     const [openHistory, setOpenHistory] = useState(false);
     const [progress, setProgress] = useState(0);
 
     const toggleEco = () => setOpenEco(!openEco);
     const toggleHistory = () => setOpenHistory(!openHistory);
+
+    // 현재 포인트를 넣으면 등급 정보를 반환
+    const getEcoGrade = (currentPoint) => {
+        if (currentPoint < 1000) return { name: "꼬마 씨앗 🌰", next: 1000 };
+        if (currentPoint < 3000) return { name: "파릇파릇 새싹 🌱", next: 3000 };
+        if (currentPoint < 6600) return { name: "무럭무럭 묘목 🌿", next: 6600 };
+        if (currentPoint < 10000) return { name: "든든한 나무 🌳", next: 10000 };
+        return { name: "울창한 숲 🌲", next: null, color: '##2ECC71' }; // 만렙
+    };
+    const myGradeInfo = getEcoGrade(point);
+
 
     /* [ 게이지 바 계산 로직 안내 ]
         1. 현재 탄소 절감량 (current)과 목표량 (target)을 정의합니다.
@@ -83,52 +88,63 @@ const UserProfile = () => {
         return () => clearTimeout(timer);
     }, [point]);
 
+
     return (
         <div className={styles.right}>
-            <section className={styles.right_main}>
-                <div className={styles.icon_content}>
-                    <div className={styles.icon}><Diversity1Icon /></div>
-                    <div className={styles.dashboard}>
-                        <p className={styles.dashboard_title}>{carbonSt.title}</p>
-                        <p className={styles.dashboard_value}>{carbonSt.value}{carbonSt.unit}</p>
-                        <p className={styles.dashbboard_subtitle}>{carbonSt.subText}</p>
+            <div className={styles.user_grade}>
+                <div className={styles.ecoGrade}>
+                    <div className={styles.grade_header}>
+                        <WorkspacePremiumIcon />
+                        <span className={styles.grade_title}>나의 에코 등급</span>
                     </div>
-                </div>
-                <div className={styles.icon_content}>
-                    <div className={styles.icon}><EnergySavingsLeafIcon /></div>
-                    <div className={styles.dashboard}>
-                        <p className={styles.dashboard_title}>{myCarbonSt.title}</p>
-                        <p className={styles.dashboard_value}>{myCarbonSt.value}{myCarbonSt.unit}</p>
-                        <p className={styles.dashbboard_subtitle}>{myCarbonSt.subText}</p>
-                    </div>
-                </div>
-                <div className={styles.icon_content}>
-                    <div className={styles.icon}><TrendingUpIcon /></div>
-                    <div className={styles.dashboard}>
-                        <p className={styles.dashboard_title}>{FromLastMonth.title}</p>
-                        <p className={styles.dashboard_value}>{FromLastMonth.value}{FromLastMonth.unit}</p>
-                        <p className={styles.dashbboard_subtitle}>{FromLastMonth.subText}</p>
-                    </div>
-                </div>
-                <div className={styles.gauge_container}>
-                    <div className={styles.gauge_bg}>
-                        {/* 게이지 채워지는 비율 (style width로 조절) */}
-                        <div className={styles.gauge_fill} style={{ width: `${progress}%` }}></div>
-                    </div>
-                    <div className={styles.gauge_info}>
-                        {/* 실제 포인트에 따른 나무 그루 수 계산 적용 */}
-                        <span>🌳 나무 {(point / 6600).toFixed(2)} 그루 상당</span>
-                    </div>
-                </div>
-            </section>
 
+                    <div className={styles.grade_body}>
+                        <h2 className={styles.grade_name}>
+                            {myGradeInfo.name}
+                        </h2>
+                        <p className={styles.grade_subtitle}>
+                            {myGradeInfo.next
+                                ? `다음 레벨까지 ${(myGradeInfo.next - point).toLocaleString()}g`
+                                : "🎉 최고 등급 달성!"}
+                        </p>
+                    </div>
+                </div>
+
+                <section className={styles.right_main}>
+                    <div className={styles.icon_content}>
+                        <div className={styles.icon}><EnergySavingsLeafIcon /></div>
+                        <div className={styles.dashboard}>
+                            <p className={styles.dashboard_title}>{myCarbonSt.title}</p>
+                            <p className={styles.dashboard_value}>{myCarbonSt.value}{myCarbonSt.unit}</p>
+                            <p className={styles.dashbboard_subtitle}>{myCarbonSt.subText}</p>
+                        </div>
+                    </div>
+                    <div className={styles.icon_content}>
+                        <div className={styles.icon}><Diversity1Icon /></div>
+                        <div className={styles.dashboard}>
+                            <p className={styles.dashboard_title}>{carbonSt.title}</p>
+                            <p className={styles.dashboard_value}>{carbonSt.value}{carbonSt.unit}</p>
+                            <p className={styles.dashbboard_subtitle}>{carbonSt.subText}</p>
+                        </div>
+                    </div>
+                    <div className={styles.gauge_container}>
+                        <div className={styles.gauge_bg}>
+                            {/* 게이지 채워지는 비율 (style width로 조절) */}
+                            <div className={styles.gauge_fill} style={{ width: `${progress}%` }}></div>
+                        </div>
+                        <div className={styles.gauge_info}>
+                            {/* 실제 포인트에 따른 나무 그루 수 계산 적용 */}
+                            <span>🌳 나무 {(point / 6600).toFixed(2)} 그루 상당</span>
+                        </div>
+                    </div>
+                </section>
+            </div>
             {/* 하단 에코 */}
             <section className={styles.right_sub}>
                 <div className={styles.my_point}>
                     <span>에코 포인트</span>
                     <p>보유 포인트 : {point.toLocaleString()}P</p>
                 </div>
-
                 <div className={styles.collapse_wrapper}>
                     <div className={styles.collapse_header} onClick={toggleEco}>
                         <p>에코 포인트란?</p>

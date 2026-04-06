@@ -289,7 +289,7 @@ public class MemberController {
     }
 
     @GetMapping("/total-carbon")
-    @CrossOrigin(origins = "http://localhost:5173")
+    //@CrossOrigin(origins = "http://localhost:5173")
     public ResponseEntity<Integer> getTotalCarbon(@RequestParam String memberId) {
         int totalPoint = memberService.getTotalCarbonPoint(memberId);
         return ResponseEntity.ok(totalPoint);
@@ -339,5 +339,10 @@ public class MemberController {
 
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("REFRESH_TOKEN_EXPIRED");
 
+    }
+    @GetMapping("/check-active-order")
+    public ResponseEntity<Integer> checkActiveOrder(@RequestParam("memberId") String memberId){
+    	int activeOrderCount = memberService.checkActiveOrder(memberId);
+    	return ResponseEntity.ok(activeOrderCount);
     }
 }

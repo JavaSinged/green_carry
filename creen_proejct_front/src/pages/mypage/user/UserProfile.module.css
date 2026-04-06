@@ -2,15 +2,74 @@
 .right_main {
   background-color: var(--color-brand);
   color: var(--color-bg); /* 가독성을 위해 흰색 유지 */
-  padding: 30px;
+  padding: 30px 24px;
   display: flex;
+  flex: 2.5;
+  flex-direction: row;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 15px 85px;
+  gap: 20px;
   border-radius: 24px; /* Layout과 통일감을 위해 24px로 조정 */
   box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.08);
 }
-
+.user_grade {
+  display: flex;
+  gap: 20px;
+  width: 100%;
+  align-items: stretch;
+}
+.grade_header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+.grade_header svg {
+  color: var(--color-point);
+  font-size: 26px;
+  display: block;
+}
+.grade_body p {
+  font-size: 17px;
+  font-weight: bold;
+  color: #666666;
+}
+.grade_title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #666666;
+  margin: 0;
+  line-height: 1;
+  padding-top: 2px;
+}
+.ecoGrade {
+  display: flex;
+  flex: 1;
+  padding: 24px;
+  flex-direction: column;
+  background-color: #ffffff;
+  border: 3px solid #2e8147;
+  border-radius: 24px;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.05);
+}
+.grade_name {
+  font-family: var(--font-title);
+  font-size: 24px;
+  margin: 10px 0 16px 0;
+}
+.grade_subtitle {
+  font-size: 13px;
+  color: #666666;
+  background-color: #f4f6f8;
+  padding: 6px 14px;
+  border-radius: 20px;
+  margin: 0;
+  font-weight: 600;
+}
 .icon {
   width: 50px;
   height: 50px;
@@ -30,8 +89,10 @@
 
 .icon_content {
   display: flex;
-  gap: 12px;
+  flex: 1;
+  gap: 16px;
   align-items: center;
+  justify-content: center;
 }
 
 .dashboard {

@@ -109,16 +109,20 @@
 	<update id="deleteMember">
 		update member_tbl
 		set member_status = 2
-		WHERE MEMBER_ID = #{memberId}
+		WHERE MEMBER_ID
+		= #{memberId}
 	</update>
-	<select id="getTotalCarbonPoint" parameterType="string" resultType="int">
-    	SELECT 
-        NVL(SUM(get_point), 0) 
-    	FROM order_tbl 
-    	WHERE member_id = #{memberId}
+	<select id="getTotalCarbonPoint" parameterType="string"
+		resultType="int">
+		SELECT
+		NVL(SUM(get_point), 0)
+		FROM order_tbl
+		WHERE member_id = #{memberId}
 	</select>
 	<select id="getCommunityTotalCarbon" resultType="int">
-    SELECT NVL(SUM(get_point), 0) FROM order_tbl
+		SELECT NVL(SUM(get_point), 0)
+		 FROM order_tbl
+		 WHERE order_status = 4
 	</select>
 
 
@@ -131,7 +135,12 @@
 			LONGITUDE = #{longitude}
 		WHERE MEMBER_ID = #{memberId}
 	</update>
-
+	<select id="checkActiveOrder" resultType="int">
+		select count(*)
+		from order_tbl
+		where member_id = #{memberId}
+		and order_status not in (0,5,9)
+	</select>
 
 
 

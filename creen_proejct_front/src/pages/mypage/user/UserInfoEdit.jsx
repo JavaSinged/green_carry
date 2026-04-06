@@ -292,8 +292,9 @@ export default function UserInfoEdit() {
     }
   };
 
-  // 🌟 회원 탈퇴 핸들러 (Swal 적용)
-  const handleDeleteClick = () => {
+  // 회원 탈퇴 핸들러 (Swal 적용)
+  const handleDeleteClick = async () => {
+    /*
     Swal.fire({
       title: "정말 떠나시겠어요? 😢",
       text: "회원 탈퇴 시 모든 데이터는 복구할 수 없습니다.",
@@ -310,6 +311,28 @@ export default function UserInfoEdit() {
         navigate("/mypage/user/deleteMember");
       }
     });
+    */
+    //탈퇴 시 진행중인 배달 조회
+    if (!user.memberId) return;
+    try {
+      const res = await axios.get(`${import.meta.env.VITE_BACKSERVER}/member/check-active-order`, {
+        params: { memberId: user.memberId }
+      });
+      const axtiveOrderCount = res.data;
+      if (axtiveOrderCount > 0) {
+        Swal.fire({
+          icon: "warning",
+          title: "탈퇴 불가",
+          text: `현재 진행 중인 배달이 ${axtiveOrderCount}건 있습니다. 배달 완료 후 탈퇴가 가능합니다. 🛵`,
+          confirmButtonColor: "#2e8147"
+        });
+        return;
+      }
+      navigate("/mypage/user/deleteMember");
+    } catch (err) {
+      console.err("주문 상태 조회 실패:", err);
+      Swal.fire("에러", "서버와 통신 중 오류가 발생했습니다.", "err");
+    }
   };
 
   if (loading)
@@ -589,4 +612,4 @@ export default function UserInfoEdit() {
       </div>
     </div>
   );
-}
+};
