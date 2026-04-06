@@ -239,7 +239,7 @@ export default function UserInfoEdit() {
         `${import.meta.env.VITE_BACKSERVER}/member/updateAddress`,
         {
           memberId: user.memberId,
-          memberAddrcode: newAddress.memberAddrcode,
+          memberAddrcode: newAddress.memberAddrCode,
           memberAddr: newAddress.memberAddr,
           memberDetailAddr: newAddress.memberDetailAddr,
         },
