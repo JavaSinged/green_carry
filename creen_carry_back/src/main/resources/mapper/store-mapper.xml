@@ -225,69 +225,6 @@
 		ORDER BY o.order_id DESC
 	</select>
 
-		o.used_point AS usedPoint,
-		o.get_point AS getPoint,
-		CASE
-		WHEN
-		o.delivery_type = 1 THEN 0
-		WHEN o.delivery_type = 2 THEN 1000
-		ELSE 2000
-		END AS deliveryPrice,
-		o.delivery_type AS deliveryType,
-		o.order_status AS
-		orderStatus,
-		TO_CHAR(olm.reg_date, 'YYYY-MM-DD') AS orderDate,
-
-		od_sum.totalCount AS totalCount,
-		md.menu_name AS menuName,
-		md.menu_image AS menuImage,
-		od_first.option_string AS optionString,
-
-		s.store_address AS storeAddress,
-		m.member_addr AS deliveryAddress
-
-		FROM
-		order_tbl o
-
-		JOIN store_tbl s
-		ON o.store_id = s.store_id
-
-		JOIN
-		order_list_map olm
-		ON o.order_id = olm.order_id
-
-		JOIN member_tbl m
-		ON
-		o.member_id = m.member_id
-
-		JOIN (SELECT order_id,
-		SUM(quantity) AS
-		totalCount
-		FROM order_detail
-		GROUP BY order_id) od_sum
-		ON o.order_id =
-		od_sum.order_id
-
-		JOIN (SELECT od1.*
-		FROM order_detail od1
-		JOIN (SELECT
-		order_id, MIN(order_detail_id) AS min_detail_id
-		FROM order_detail
-		GROUP
-		BY order_id) x
-		ON od1.order_id = x.order_id
-		AND od1.order_detail_id =
-		x.min_detail_id) od_first
-		ON o.order_id = od_first.order_id
-
-		JOIN
-		menu_tbl md
-		ON od_first.menu_id = md.menu_id
-
-		WHERE o.member_id =
-		#{memberId}
-		ORDER BY o.order_id DESC
-	</select>
 
 	<select id="selectMemberPoint" resultType="int">
 		select member_point

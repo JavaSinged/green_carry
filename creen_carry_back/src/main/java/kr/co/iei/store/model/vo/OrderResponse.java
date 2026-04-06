@@ -11,18 +11,16 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class OrderResponse {
-	
 	private String storeName;
 	private Integer orderId;
-
-    private Integer totalPrice;
-    private Integer usedPoint;
-    private Integer getPoint;
-    private Integer deliveryPrice;
-    private Integer deliveryType;
-    private List<OrderItem> items;
-    private Integer orderStatus;
-    private String orderDate;
-    private Double totalReduceCarbon;
+	private Integer totalPrice;
+	private Integer usedPoint;
+	private Integer getPoint;
+	private Integer deliveryPrice;
+	private Integer deliveryType;
+	private List<OrderItem> items;
+	private Integer orderStatus;
+	private String orderDate;
+	private Double totalReduceCarbon;
 
 }
