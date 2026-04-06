@@ -366,4 +366,18 @@ public class MemberController {
         List<Review> list = memberService.selectReviewList(memberId);
         return ResponseEntity.ok(list);
     }
+    @DeleteMapping("/deleteReview/{orderId}")
+    public ResponseEntity<?> deleteReview(@PathVariable int orderId) {
+        try {
+            boolean result = memberService.deleteReview(orderId);
+            if (result) {
+                return ResponseEntity.ok("SUCCESS");
+            } else {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("DELETE_FAIL");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("SERVER_ERROR");
+        }
+    }
 }

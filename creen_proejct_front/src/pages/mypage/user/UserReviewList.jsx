@@ -8,28 +8,27 @@ const UserReviewList = () => {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
 
-  // 🌟 1. 서버에서 리뷰 목록 가져오는 함수
+  // 🌟 환경 변수에서 백엔드 서버 주소 가져오기
+  const backHost = import.meta.env.VITE_BACKSERVER;
+
+  // 서버에서 내 리뷰 목록 가져오기
   const getMyReviews = async () => {
     try {
-      // 로그인된 사용자 아이디 가져오기
       const memberId = localStorage.getItem("memberId");
+      if (!memberId) return;
 
-      // 백엔드 컨트롤러에 작성할 주소로 요청 (아래 백엔드 섹션 참고)
       const res = await api.get(`/member/myReviewList/${memberId}`);
-
-      setReviews(res.data); // 받아온 데이터를 상태에 저장
+      setReviews(res.data);
     } catch (err) {
       console.error("리뷰 로드 실패:", err);
-      // Swal.fire("에러", "리뷰를 불러오는데 실패했습니다.", "error");
     }
   };
 
-  // 🌟 2. 컴포넌트 마운트 시 실행
   useEffect(() => {
     getMyReviews();
   }, []);
 
-  // 리뷰 삭제 함수 (구현 추가)
+  // 리뷰 삭제 함수
   const deleteReview = (orderId) => {
     Swal.fire({
       title: "리뷰를 삭제하시겠습니까?",
@@ -39,6 +38,7 @@ const UserReviewList = () => {
       confirmButtonColor: "#246337",
       confirmButtonText: "삭제",
       cancelButtonText: "취소",
+      reverseButtons: true,
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
@@ -49,7 +49,7 @@ const UserReviewList = () => {
               "리뷰가 정상적으로 삭제되었습니다.",
               "success",
             );
-            getMyReviews(); // 목록 새로고침
+            getMyReviews();
           }
         } catch (err) {
           Swal.fire("에러", "리뷰 삭제 중 오류가 발생했습니다.", "error");
@@ -60,21 +60,118 @@ const UserReviewList = () => {
 
   return (
     <div className={styles.container}>
-      {/* ... 상단 날짜 필터 생략 ... */}
+      {/* 1. 상단 날짜 필터 영역 */}
+      <div className={styles.filter_row}>
+        <input
+          type="month"
+          value={startDate}
+          onChange={(e) => setStartDate(e.target.value)}
+        />
+        <span>~</span>
+        <input
+          type="month"
+          value={endDate}
+          onChange={(e) => setEndDate(e.target.value)}
+        />
+      </div>
 
+      {/* 2. 리뷰 리스트 영역 */}
       <div className={styles.review_list}>
         {reviews.length > 0 ? (
           reviews.map((review) => (
             <div key={review.orderId} className={styles.review_card}>
-              {/* ... 카드 헤더 및 바디 생략 ... */}
-              {/* ⚠️ totalPrice.toLocaleString() 에러 방지를 위해 review.totalPrice 가 있을때만 호출 */}
-              🍴 {review.menuName} | 💰{" "}
-              {review.totalPrice?.toLocaleString() || 0}원
-              {/* ... 나머지는 동일 ... */}
+              {/* 카드 상단: 가게 및 주문 정보 */}
+              <div className={styles.card_header}>
+                <div className={styles.store_info}>
+                  <span className={styles.store_icon}>🏪</span>
+                  <span className={styles.store_name}>{review.storeName}</span>
+                  <span className={styles.menu_detail}>
+                    🍴 {review.menuName}
+                    {review.extraCount > 0 && ` 외 ${review.extraCount}개`} | 💰{" "}
+                    {review.totalPrice?.toLocaleString() || 0}원
+                  </span>
+                  <span className={styles.order_date}>
+                    📅 {review.reviewDate}
+                  </span>
+                </div>
+                <button
+                  className={styles.delete_btn}
+                  onClick={() => deleteReview(review.orderId)}
+                >
+                  삭제
+                </button>
+              </div>
+
+              {/* 카드 본문: 이미지 + 채팅 영역 */}
+              <div className={styles.card_body}>
+                <img
+                  src={
+                    review.reviewThumb
+                      ? review.reviewThumb.startsWith("/")
+                        ? `${backHost}${review.reviewThumb}`
+                        : `${backHost}/uploads/review/${review.reviewThumb}`
+                      : "/img/no-image.png"
+                  }
+                  alt="리뷰사진"
+                  className={styles.review_img}
+                  onError={(e) => {
+                    e.target.src = "/img/no-image.png";
+                  }}
+                />
+
+                <div className={styles.chat_area}>
+                  {/* 고객(나)의 리뷰 버블 */}
+                  <div className={styles.user_bubble}>
+                    <div className={styles.user_top}>
+                      {/* 🌟 아바타 원형 안에 이미지 넣기 */}
+                      <div className={styles.avatar}>
+                        <img
+                          src={
+                            review.memberProfile
+                              ? `${backHost}${review.memberProfile}`
+                              : "/img/default-user.png"
+                          }
+                          alt="avatar"
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            borderRadius: "50%",
+                            objectFit: "cover",
+                          }}
+                        />
+                      </div>
+
+                      {/* 🌟 별점 옆에 아이디 표시 */}
+                      <span className={styles.member_id}>
+                        {review.memberId}
+                      </span>
+
+                      <span className={styles.star_rating}>
+                        ⭐ {review.reviewRating?.toFixed(1) || "0.0"}
+                      </span>
+                    </div>
+                    <div className={styles.bubble_content}>
+                      {review.reviewContent}
+                    </div>
+                  </div>
+                  {/* 사장님의 답글 버블 (데이터가 있을 때만 표시) */}
+                  {review.replyContent && (
+                    <div className={styles.owner_bubble}>
+                      <div className={styles.bubble_content}>
+                        {review.replyContent}
+                        <span className={styles.reply_date}>
+                          {review.replyDate}
+                        </span>
+                      </div>
+                      <div className={styles.avatar_owner}></div>
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
           ))
         ) : (
-          <p className={styles.no_data}>작성한 리뷰가 없습니다. 🌱</p>
+          <div className={styles.no_data}>작성한 리뷰가 없습니다. 🌱</div>
         )}
       </div>
     </div>

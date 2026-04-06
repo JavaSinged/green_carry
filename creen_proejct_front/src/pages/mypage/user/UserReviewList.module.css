@@ -1,5 +1,7 @@
 .container {
   width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
   padding: 20px;
 }
 
@@ -12,45 +14,55 @@
 }
 
 .filter_row input {
-  border: 1px solid #246337;
+  border: 1.5px solid #246337;
   border-radius: 20px;
   padding: 5px 15px;
   color: #246337;
+  outline: none;
 }
 
 .review_card {
   background: white;
   border-radius: 15px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-  padding: 20px;
+  padding: 25px;
   margin-bottom: 25px;
 }
 
 .card_header {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   border-bottom: 1px solid #eee;
-  padding-bottom: 10px;
-  margin-bottom: 15px;
+  padding-bottom: 12px;
+  margin-bottom: 20px;
+}
+
+.store_info {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .store_name {
   font-weight: bold;
-  margin-right: 10px;
+  font-size: 1.1rem;
 }
+
 .menu_detail,
 .order_date {
   color: #666;
   font-size: 0.85rem;
-  margin-left: 10px;
+  margin-left: 5px;
 }
 
 .delete_btn {
   background: #246337;
   color: white;
   border: none;
-  padding: 4px 12px;
-  border-radius: 15px;
+  padding: 5px 15px;
+  border-radius: 20px;
   font-size: 0.8rem;
   cursor: pointer;
 }
@@ -63,8 +75,9 @@
 .review_img {
   width: 180px;
   height: 180px;
-  border-radius: 10px;
+  border-radius: 12px;
   object-fit: cover;
+  border: 1px solid #f0f0f0;
 }
 
 .chat_area {
@@ -74,58 +87,83 @@
   gap: 15px;
 }
 
-/* 말말풍선 공통 */
+/* 말풍선 공통 */
 .bubble_content {
   padding: 15px;
-  border-radius: 10px;
+  border-radius: 12px;
   font-size: 0.95rem;
-  position: relative;
   line-height: 1.5;
+  position: relative;
 }
 
-/* 사용자 리뷰 스타일 */
+/* 사용자(왼쪽) 스타일 */
 .user_bubble {
   align-self: flex-start;
   width: 90%;
 }
+
 .user_top {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 5px;
+  gap: 8px;
+  margin-bottom: 6px;
 }
+
 .avatar {
-  width: 30px;
-  height: 30px;
+  width: 32px;
+  height: 32px;
   background: #ddd;
   border-radius: 50%;
 }
-.user_bubble .bubble_content {
-  background: #f0f0f0;
+
+.member_id {
+  font-weight: 600;
+  font-size: 0.9rem;
 }
 
-/* 사장님 답글 스타일 (그린톤) */
+.star_rating {
+  color: #ffb800;
+  font-weight: bold;
+}
+
+.user_bubble .bubble_content {
+  background: #f0f0f0;
+  border-top-left-radius: 0;
+}
+
+/* 사장님(오른쪽) 스타일 */
 .owner_bubble {
   align-self: flex-end;
   width: 90%;
   display: flex;
   gap: 10px;
-  align-items: flex-end;
+  align-items: flex-start;
 }
+
 .owner_bubble .bubble_content {
   background: #e8f5e9;
+  color: #246337;
+  border-top-right-radius: 0;
   flex: 1;
 }
+
 .avatar_owner {
-  width: 30px;
-  height: 30px;
+  width: 32px;
+  height: 32px;
   background: #bbb;
   border-radius: 50%;
 }
+
 .reply_date {
   display: block;
   text-align: right;
   font-size: 0.75rem;
   color: #888;
   margin-top: 5px;
+}
+
+.no_data {
+  text-align: center;
+  padding: 80px 0;
+  color: #999;
 }

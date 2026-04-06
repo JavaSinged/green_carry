@@ -170,33 +170,49 @@
 	</insert>
 	<select id="selectReviewList" resultType="Review">
 		SELECT
-		r.order_id AS orderId,
-		s.store_name AS storeName,
+		r.order_id AS
+		orderId,
 		r.review_content AS reviewContent,
-		r.review_rating AS reviewRating,
+		r.review_rating AS
+		reviewRating,
 		r.review_thumb AS reviewThumb,
-		TO_CHAR(r.review_date, 'YYYY-MM-DD') AS reviewDate,
+		TO_CHAR(r.review_date,
+		'YYYY-MM-DD') AS reviewDate,
+
+		r.member_id AS memberId,
+		m.member_thumb AS
+		memberProfile,
+
+		s.store_name AS storeName,
 
 		(SELECT SUM(price * quantity)
 		FROM order_detail
 		WHERE order_id = r.order_id) AS totalPrice,
 
-		(SELECT m.menu_name
+		(SELECT
+		m2.menu_name
 		FROM order_detail od
-		JOIN menu_tbl m ON od.menu_id = m.menu_id
+		JOIN menu_tbl m2 ON od.menu_id =
+		m2.menu_id
 		WHERE od.order_id = r.order_id
 		AND ROWNUM = 1) AS menuName,
 
 		(SELECT COUNT(*) - 1
 		FROM order_detail
-		WHERE order_id = r.order_id) AS extraCount
+		WHERE order_id = r.order_id) AS
+		extraCount
 
 		FROM review_tbl r
 		JOIN store_tbl s ON r.store_id = s.store_id
-		-- ❌ LEFT JOIN review_comment_tbl rc 부분 삭제
-		WHERE r.member_id = #{memberId}
+		JOIN member_tbl m ON r.member_id = m.member_id
+		WHERE r.member_id =
+		#{memberId}
 		ORDER BY r.review_date DESC
 	</select>
+
+	<delete id="deleteReview">
+		DELETE FROM review_tbl WHERE order_id = #{orderId}
+	</delete>
 
 
 

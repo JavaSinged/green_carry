@@ -55,4 +55,6 @@ public interface MemberDao {
 
 	List<Review> selectReviewList(String memberId);
 
+	int deleteReview(int orderId);
+
 }

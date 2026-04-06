@@ -19,6 +19,8 @@ public class Review {
     private String reviewThumb;  // 저장된 사진 파일명 (DB에 들어갈 이름)
     private String reviewDate;   // 작성일
     private int storeId;
+    private String memberProfile;
+    
     
     private String storeName;    // 상점 이름
     private String menuName;     // 대표 메뉴명

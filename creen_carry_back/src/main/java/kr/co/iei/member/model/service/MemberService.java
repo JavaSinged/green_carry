@@ -292,4 +292,15 @@ public class MemberService {
 		return list;
 	}
 
+	@Transactional
+public boolean deleteReview(int orderId) {
+    // 1. 사장님 답글이 있다면 먼저 삭제 (외래키 제약조건 방지)
+    //memberDao.deleteReviewComment(orderId); 
+
+    // 2. 리뷰 본문 삭제
+    int result = memberDao.deleteReview(orderId);
+    
+    return result > 0;
+}
+
 }
