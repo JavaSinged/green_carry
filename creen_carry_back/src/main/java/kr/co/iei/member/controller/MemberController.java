@@ -19,13 +19,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import kr.co.iei.member.model.vo.Member;
@@ -78,7 +72,7 @@ public class MemberController {
             response.put("accessToken", accessToken);
 
 
-            if (member.isAutoLogin()) {
+            if (member.getAutoLogin()) {
 
                 String refreshToken = jwtUtil.createRefreshToken(loginMember.getMemberId());
 
@@ -308,7 +302,7 @@ public class MemberController {
         return ResponseEntity.ok(total);
     }
 
-    @PostMapping("/updateAddress")
+    @PatchMapping("/updateAddress")
     public ResponseEntity<String> updateAddress(@RequestBody Member member) {
         System.out.println(member);
         System.out.println("주소 변경 요청 ID: " + member.getMemberId());

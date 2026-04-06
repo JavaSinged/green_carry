@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Member {
-	private boolean autoLogin;
+	private Boolean autoLogin;
 
 	// 1. 기본 회원 정보
 	private String memberId; // MEMBER_ID (VARCHAR2) : 회원 아이디

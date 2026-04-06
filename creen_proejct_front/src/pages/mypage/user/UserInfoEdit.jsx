@@ -1,21 +1,22 @@
-import React, { useContext, useEffect, useState, useRef } from "react";
-import { AuthContext } from "../../../context/AuthContext";
-import api from "../../../utils/accessToken";
-import styles from "./UserInfoEdit.module.css";
-import Swal from "sweetalert2";
-import { useNavigate } from "react-router-dom";
-import { useDaumPostcodePopup } from "react-daum-postcode";
+import React, { useContext, useEffect, useState, useRef } from 'react';
+import { AuthContext } from '../../../context/AuthContext';
+import api from '../../../utils/accessToken';
+import styles from './UserInfoEdit.module.css';
+import Swal from 'sweetalert2';
+import { useNavigate } from 'react-router-dom';
+import { useDaumPostcodePopup } from 'react-daum-postcode';
 
 // MUI Icons
-import AccountCircleSharpIcon from "@mui/icons-material/AccountCircleSharp";
-import BorderColorIcon from "@mui/icons-material/BorderColor";
-import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
-import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-import Visibility from "@mui/icons-material/Visibility";
-import VisibilityOff from "@mui/icons-material/VisibilityOff";
-import HomeIcon from "@mui/icons-material/Home";
-import Collapse from "@mui/material/Collapse";
-import PhotoCameraIcon from "@mui/icons-material/PhotoCamera";
+import AccountCircleSharpIcon from '@mui/icons-material/AccountCircleSharp';
+import BorderColorIcon from '@mui/icons-material/BorderColor';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import HomeIcon from '@mui/icons-material/Home';
+import Collapse from '@mui/material/Collapse';
+import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
+import axios from 'axios';
 
 export default function UserInfoEdit() {
   const { user, setUser } = useContext(AuthContext);
@@ -29,8 +30,8 @@ export default function UserInfoEdit() {
   // 프로필 수정용 상태
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [profileData, setProfileData] = useState({
-    memberName: "",
-    memberPhone: "",
+    memberName: '',
+    memberPhone: '',
   });
   const [profileImg, setProfileImg] = useState(null);
   const [previewImg, setPreviewImg] = useState(null);
@@ -48,16 +49,16 @@ export default function UserInfoEdit() {
   const [showConfirmPw, setShowConfirmPw] = useState(false);
 
   const [pwData, setPwData] = useState({
-    currentPw: "",
-    newPw: "",
-    confirmPw: "",
+    currentPw: '',
+    newPw: '',
+    confirmPw: '',
   });
 
   // 주소 변경용 상태
   const [newAddress, setNewAddress] = useState({
-    memberAddrCode: "",
-    memberAddr: "",
-    memberDetailAddr: "",
+    memberAddrCode: '',
+    memberAddr: '',
+    memberDetailAddr: '',
   });
 
   useEffect(() => {
@@ -67,14 +68,14 @@ export default function UserInfoEdit() {
         .then((res) => {
           setMemberInfo(res.data);
           setProfileData({
-            memberName: res.data.memberName || "",
-            memberPhone: res.data.memberPhone || "",
+            memberName: res.data.memberName || '',
+            memberPhone: res.data.memberPhone || '',
           });
           if (res.data.memberThumb) setPreviewImg(res.data.memberThumb);
           setLoading(false);
         })
         .catch((err) => {
-          console.error("데이터 로드 실패:", err);
+          console.error('데이터 로드 실패:', err);
           setLoading(false);
         });
     }
@@ -97,31 +98,31 @@ export default function UserInfoEdit() {
   const handleProfileSubmit = async () => {
     if (!profileData.memberName || !profileData.memberPhone) {
       return Swal.fire(
-        "알림",
-        "이름과 전화번호를 모두 입력해주세요.",
-        "warning",
+        '알림',
+        '이름과 전화번호를 모두 입력해주세요.',
+        'warning',
       );
     }
 
     const formData = new FormData();
-    formData.append("memberId", user.memberId);
-    formData.append("memberName", profileData.memberName);
-    formData.append("memberPhone", profileData.memberPhone);
+    formData.append('memberId', user.memberId);
+    formData.append('memberName', profileData.memberName);
+    formData.append('memberPhone', profileData.memberPhone);
     if (profileImg) {
-      formData.append("uploadFile", profileImg);
+      formData.append('uploadFile', profileImg);
     }
 
     try {
-      const response = await api.post("/member/updateProfile", formData);
+      const response = await api.post('/member/updateProfile', formData);
 
-      if (response.data !== "UPDATE_FAIL") {
-        Swal.fire("성공", "기본 정보가 수정되었습니다.", "success");
+      if (response.data !== 'UPDATE_FAIL') {
+        Swal.fire('성공', '기본 정보가 수정되었습니다.', 'success');
 
         const serverPath = response.data;
         const finalPath =
-          serverPath === "SUCCESS_NO_IMAGE" ? previewImg : serverPath;
+          serverPath === 'SUCCESS_NO_IMAGE' ? previewImg : serverPath;
 
-        localStorage.setItem("memberThumb", finalPath);
+        localStorage.setItem('memberThumb', finalPath);
 
         setUser({
           ...user,
@@ -131,8 +132,8 @@ export default function UserInfoEdit() {
         setPreviewImg(finalPath);
         setIsEditingProfile(false);
       }
-    } catch (error) {
-      Swal.fire("에러", "수정 중 오류 발생", "error");
+    } catch (err) {
+      Swal.fire('에러', '수정 중 오류 발생', err);
     }
   };
 
@@ -140,14 +141,14 @@ export default function UserInfoEdit() {
   const handlePwSubmit = async () => {
     const { currentPw, newPw, confirmPw } = pwData;
     if (!currentPw || !newPw || !confirmPw)
-      return Swal.fire("알림", "모든 필드를 입력해주세요.", "warning");
+      return Swal.fire('알림', '모든 필드를 입력해주세요.', 'warning');
 
     const passwordRegex =
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{10,}$/;
     if (!passwordRegex.test(newPw)) {
       return Swal.fire({
-        icon: "warning",
-        title: "비밀번호 보안 수준 미달",
+        icon: 'warning',
+        title: '비밀번호 보안 수준 미달',
         html: `비밀번호는 다음 조건을 모두 만족해야 합니다:<br/>
                <div style="text-align: left; margin-top: 10px; padding-left: 20px;">
                  - 최소 10자 이상<br/>
@@ -159,34 +160,34 @@ export default function UserInfoEdit() {
 
     if (currentPw === newPw)
       return Swal.fire(
-        "알림",
-        "현재 비밀번호와 다른 새 비밀번호를 사용해주세요.",
-        "info",
+        '알림',
+        '현재 비밀번호와 다른 새 비밀번호를 사용해주세요.',
+        'info',
       );
     if (newPw !== confirmPw)
-      return Swal.fire("오류", "새 비밀번호가 일치하지 않습니다.", "error");
+      return Swal.fire('오류', '새 비밀번호가 일치하지 않습니다.', 'error');
 
     try {
-      const response = await api.post("/member/updatePassword", {
+      const response = await api.post('/member/updatePassword', {
         memberId: user.memberId,
         currentPw,
         newPw,
       });
-      if (response.data === "SUCCESS") {
+      if (response.data === 'SUCCESS') {
         await Swal.fire(
-          "성공",
-          "비밀번호가 안전하게 변경되었습니다.",
-          "success",
+          '성공',
+          '비밀번호가 안전하게 변경되었습니다.',
+          'success',
         );
-        setPwData({ currentPw: "", newPw: "", confirmPw: "" });
+        setPwData({ currentPw: '', newPw: '', confirmPw: '' });
         setopenPwSet(false);
       }
     } catch (error) {
       const msg =
-        error.response?.data === "CURRENT_PASSWORD_MISMATCH"
-          ? "현재 비밀번호가 올바르지 않습니다."
-          : "서버 오류가 발생했습니다.";
-      Swal.fire("에러", msg, "error");
+        error.response?.data === 'CURRENT_PASSWORD_MISMATCH'
+          ? '현재 비밀번호가 올바르지 않습니다.'
+          : '서버 오류가 발생했습니다.';
+      Swal.fire('에러', msg, 'error');
     }
   };
 
@@ -197,18 +198,18 @@ export default function UserInfoEdit() {
 
   // 다음 우편번호 API 핸들러
   const openPostcode = useDaumPostcodePopup(
-    "https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js",
+    'https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js',
   );
 
   const handleCompletePostcode = (data) => {
     let fullAddress = data.address;
-    let extraAddress = "";
-    if (data.addressType === "R") {
-      if (data.bname !== "") extraAddress += data.bname;
-      if (data.buildingName !== "")
+    let extraAddress = '';
+    if (data.addressType === 'R') {
+      if (data.bname !== '') extraAddress += data.bname;
+      if (data.buildingName !== '')
         extraAddress +=
-          extraAddress !== "" ? `, ${data.buildingName}` : data.buildingName;
-      fullAddress += extraAddress !== "" ? ` (${extraAddress})` : "";
+          extraAddress !== '' ? `, ${data.buildingName}` : data.buildingName;
+      fullAddress += extraAddress !== '' ? ` (${extraAddress})` : '';
     }
     setNewAddress((prev) => ({
       ...prev,
@@ -223,61 +224,76 @@ export default function UserInfoEdit() {
 
   // 주소 저장 핸들러
   const updateAddress = async () => {
+    // 1. 유효성 검사
     if (!newAddress.memberAddrCode || !newAddress.memberDetailAddr.trim()) {
       Swal.fire({
-        icon: "warning",
-        text: "상세 주소를 포함한 변경할 주소를 모두 입력해주세요.",
+        icon: 'warning',
+        text: '상세 주소를 포함한 변경할 주소를 모두 입력해주세요.',
       });
       return;
     }
 
     try {
-      const response = await api.post("/member/updateAddress", {
-        memberId: user.memberId,
-        memberAddrcode: newAddress.memberAddrCode,
-        memberAddr: newAddress.memberAddr,
-        memberDetailAddr: newAddress.memberDetailAddr,
-      });
+      // 2. axios를 사용한 데이터 전송
+      const response = await axios.patch(
+        `${import.meta.env.VITE_BACKSERVER}/member/updateAddress`,
+        {
+          memberId: user.memberId,
+          memberAddrcode: newAddress.memberAddrcode,
+          memberAddr: newAddress.memberAddr,
+          memberDetailAddr: newAddress.memberDetailAddr,
+        },
+      );
 
-      Swal.fire("성공", "주소지가 성공적으로 변경되었습니다!", "success");
+      // 3. 성공 처리
+      if (response.status === 200) {
+        // 서버 응답이 성공(200)일 때
+        Swal.fire('성공', '주소지가 성공적으로 변경되었습니다!', 'success');
 
-      setMemberInfo((prev) => ({
-        ...prev,
-        memberAddrcode: newAddress.memberAddrCode,
-        memberAddr: newAddress.memberAddr,
-        memberDetailAddr: newAddress.memberDetailAddr,
-      }));
+        setMemberInfo((prev) => ({
+          ...prev,
+          memberAddrcode: newAddress.memberAddrCode,
+          memberAddr: newAddress.memberAddr,
+          memberDetailAddr: newAddress.memberDetailAddr,
+        }));
 
-      setNewAddress({
-        memberAddrCode: "",
-        memberAddr: "",
-        memberDetailAddr: "",
-      });
-      setopenAddSet(false);
+        setNewAddress({
+          memberAddrCode: '',
+          memberAddr: '',
+          memberDetailAddr: '',
+        });
+
+        setopenAddSet(false);
+      }
     } catch (error) {
-      console.error(error);
-      Swal.fire("에러", "주소 변경 중 오류가 발생했습니다.", "error");
+      // 4. 에러 처리
+      console.error('주소 업데이트 에러:', error);
+
+      // 서버가 에러 메시지를 보냈다면 해당 메시지 출력, 없다면 기본 메시지 출력
+      const errorMsg =
+        error.response?.data?.message || '주소 변경 중 오류가 발생했습니다.';
+      Swal.fire('에러', errorMsg, 'error');
     }
   };
 
   // 🌟 회원 탈퇴 핸들러 (Swal 적용)
   const handleDeleteClick = () => {
-    navigate("/mypage/user/deleteMember");
+    navigate('/mypage/user/deleteMember');
 
     Swal.fire({
-      title: "정말 떠나시겠어요? 😢",
-      text: "회원 탈퇴 시 모든 데이터는 복구할 수 없습니다.",
-      icon: "warning",
+      title: '정말 떠나시겠어요? 😢',
+      text: '회원 탈퇴 시 모든 데이터는 복구할 수 없습니다.',
+      icon: 'warning',
       showCancelButton: true,
-      confirmButtonColor: "#d33", // 탈퇴 버튼은 강조색(빨강)
-      cancelButtonColor: "#3085d6",
-      confirmButtonText: "탈퇴하기",
-      cancelButtonText: "취소",
+      confirmButtonColor: '#d33', // 탈퇴 버튼은 강조색(빨강)
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: '탈퇴하기',
+      cancelButtonText: '취소',
       reverseButtons: true, // 취소 버튼을 왼쪽으로
     }).then((result) => {
       if (result.isConfirmed) {
         // 확인 버튼을 눌렀을 때만 탈퇴 페이지로 이동
-        navigate("/mypage/user/deleteMember");
+        navigate('/mypage/user/deleteMember');
       }
     });
   };
@@ -296,13 +312,13 @@ export default function UserInfoEdit() {
           className={`${styles.icon_content} ${isEditingProfile ? styles.icon_content_editing : styles.icon_content_default}`}
         >
           <div
-            className={`${styles.icon_wrapper} ${isEditingProfile ? styles.icon_wrapper_editable : ""}`}
+            className={`${styles.icon_wrapper} ${isEditingProfile ? styles.icon_wrapper_editable : ''}`}
             onClick={() => isEditingProfile && fileInputRef.current.click()}
           >
             {previewImg ? (
               <img
                 src={
-                  previewImg.startsWith("blob:")
+                  previewImg.startsWith('blob:')
                     ? previewImg
                     : `${backHost}${previewImg}`
                 }
@@ -403,20 +419,20 @@ export default function UserInfoEdit() {
               <div className={styles.pw_form_container}>
                 {[
                   {
-                    label: "현재 비밀번호",
-                    name: "currentPw",
+                    label: '현재 비밀번호',
+                    name: 'currentPw',
                     state: showCurrentPw,
                     setState: setShowCurrentPw,
                   },
                   {
-                    label: "새 비밀번호",
-                    name: "newPw",
+                    label: '새 비밀번호',
+                    name: 'newPw',
                     state: showNewPw,
                     setState: setShowNewPw,
                   },
                   {
-                    label: "새 비밀번호 확인",
-                    name: "confirmPw",
+                    label: '새 비밀번호 확인',
+                    name: 'confirmPw',
                     state: showConfirmPw,
                     setState: setShowConfirmPw,
                   },
@@ -425,7 +441,7 @@ export default function UserInfoEdit() {
                     <label>{item.label}</label>
                     <div className={styles.input_wrapper}>
                       <input
-                        type={item.state ? "text" : "password"}
+                        type={item.state ? 'text' : 'password'}
                         name={item.name}
                         value={pwData[item.name]}
                         onChange={handlePwChange}
@@ -475,8 +491,8 @@ export default function UserInfoEdit() {
                     </div>
                     <p className={styles.address_detail}>
                       {memberInfo?.memberAddr
-                        ? `[${memberInfo.memberAddrcode || ""}] ${memberInfo.memberAddr} ${memberInfo.memberDetailAddr || ""}`
-                        : "주소 정보 없음"}
+                        ? `[${memberInfo.memberAddrcode || ''}] ${memberInfo.memberAddr} ${memberInfo.memberDetailAddr || ''}`
+                        : '주소 정보 없음'}
                     </p>
                   </div>
                 </div>
