@@ -147,8 +147,8 @@ export const AuthProvider = ({ children }) => {
 
           if (!isAutoLogin) {
             /*10초 테스트용*/
-            const remainingTimeInMs = 10000;
-            //const remainingTimeInMs = (decodedPayload.exp - currentTime) * 1000;
+            //const remainingTimeInMs = 10000;
+            const remainingTimeInMs = (decodedPayload.exp - currentTime) * 1000;
 
             if (logoutTimerRef.current) clearTimeout(logoutTimerRef.current);
 
