@@ -19,6 +19,7 @@ const ManagerMenuEdit = () => {
     eco: false,
     general: false,
   });
+
   // location.state로 넘어온 menuData가 있으면 그걸 쓰고, 없으면 빈 값으로 세팅
   const initialMenuData = location.state?.menuData || null;
 
@@ -81,6 +82,7 @@ const ManagerMenuEdit = () => {
   }, [menuId]);
 
   const containerList = allOptions.filter((opt) => opt.optionType === 1);
+  const generalList = allOptions.filter((opt) => opt.optionType === 2);
   const ecoList = allOptions.filter((opt) => opt.optionType === 3);
 
   // 기존 DB 옵션 토글
@@ -356,7 +358,7 @@ const ManagerMenuEdit = () => {
           )}
         </div>
 
-        {/* 3. 일반 옵션 아코디언 (직접 입력 추가) */}
+        {/* 3. 일반 옵션 아코디언 */}
         <div className={styles.accordion_group}>
           <div
             className={styles.group_header}
@@ -378,6 +380,7 @@ const ManagerMenuEdit = () => {
           </div>
           {openSections.general && (
             <div className={styles.group_body}>
+              {/* A. 직접 입력해서 추가하는 폼 (이미 만드신 것) */}
               <div className={styles.add_form}>
                 <span>옵션이름</span>
                 <input
@@ -403,7 +406,34 @@ const ManagerMenuEdit = () => {
                   추가
                 </button>
               </div>
-              <p className={styles.opt_desc}>옵션 설명</p>
+
+              {/* B. [추가됨] 기존 DB에 저장된 일반 옵션들 (체크박스 리스트) */}
+              <div
+                className={styles.checkbox_wrap}
+                style={{
+                  marginBottom: "20px",
+                  borderBottom: "1px solid #eee",
+                  paddingBottom: "15px",
+                }}
+              >
+                {generalList.length > 0 ? (
+                  generalList.map((opt) => (
+                    <label key={opt.optionNo} className={styles.check_label}>
+                      <input
+                        type="checkbox"
+                        checked={selectedOptionIds.includes(opt.optionNo)}
+                        onChange={() => toggleOption(opt.optionNo)}
+                      />
+                      {opt.optionName} (+{opt.optionPrice}원)
+                    </label>
+                  ))
+                ) : (
+                  <p style={{ fontSize: "14px", color: "#999" }}>
+                    등록된 일반 옵션이 없습니다.
+                  </p>
+                )}
+              </div>
+
               <div className={styles.badge_wrap}>
                 {newOptions
                   .filter((o) => o.optionType === 2)

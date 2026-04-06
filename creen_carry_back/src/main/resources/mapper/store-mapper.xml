@@ -234,7 +234,7 @@
 <insert id="insertMenuOptions">
     INSERT ALL
     <foreach collection="optionIds" item="optionId">
-        INTO menu_option_map (menu_id, option_id) 
+        INTO menu_option_map (menu_id, option_no) 
         VALUES (#{menuId}, #{optionId})
     </foreach>
     SELECT * FROM DUAL

@@ -268,3 +268,6 @@
   color: white;
   border: none;
 }
+.badge_wrap {
+  padding: 8px;
+}

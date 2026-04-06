@@ -48,7 +48,8 @@ public interface StoreDao {
 
 	int updateMenu(MenuSaveRequestDto dto);
 
-	int deleteMenuOptions(Long menuId);
+	
+	int deleteMenuOptions(@Param("menuId") Long menuId); 
 
 	void insertNewOption(MenuOption newOpt);
 
