@@ -41,5 +41,17 @@ public interface StoreDao {
 		);
 	int getTotalCarbonPoint(String memberId);
 
+	Integer selectMemberPoint(String memberId);
+
+	int updatePoint(Order order);
+
+	int updateOrderStatus(Integer orderId);
+
+	int addReduceCarbon(Integer orderId);
+
+	Menu selectAllMenu(Integer menuId);
+
+	Menu selectMenu(Integer menuId);
+
 
 }

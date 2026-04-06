@@ -10,6 +10,7 @@ import ParkIcon from "@mui/icons-material/Park";
 import CloseIcon from "@mui/icons-material/Close";
 import { useLocation, useNavigate } from "react-router-dom";
 import useCartStore from "../../store/useCartStore";
+import axios from "axios";
 
 const OrderPage = () => {
   // 선택 상태 관리 (기본값: 'pickup')
@@ -27,10 +28,11 @@ const OrderPage = () => {
   const setDeilveryPrice = useCartStore((state) => state.setDeilveryPrice);
   const totalCarbon = cartList.reduce((sum, item) => sum + item.carbonSaved, 0);
   const storeName = useCartStore((state) => state.storeName);
+
   useEffect(() => {
     setNum(deliveryType === 1 ? 0 : deliveryType === 2 ? 1000 : 3000);
   }, [deliveryType]);
-
+  console.log(num);
   const addOrder = () => {};
   return (
     <div className={styles.pageWrapper}>
@@ -188,6 +190,18 @@ const CartItem = ({
   const totalPrice = unitPrice * cart.quantity;
   const options = cart.options;
   useEffect(() => {
+    axios
+      .get(
+        `${import.meta.env.VITE_BACKSERVER}/stores/orders/itemImg/${cart.menuId}`,
+      )
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, []);
+  useEffect(() => {
     handleTotal(totalPrice);
   }, [totalPrice]);
   return (
@@ -215,8 +229,15 @@ const CartItem = ({
         </div>
 
         <div className={styles.menuImageWrapper}>
-          <div className={styles.menuImagePlaceholder}></div>
-          <span>[메뉴사진넣기]</span>
+          {cart.menuImage ? (
+            <img
+              src={cart.menuImage}
+              alt={cart.name}
+              className={styles.menuImage}
+            />
+          ) : (
+            <div className={styles.menuImagePlaceholder}></div>
+          )}
         </div>
       </div>
     </div>

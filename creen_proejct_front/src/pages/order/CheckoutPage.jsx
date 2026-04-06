@@ -21,7 +21,9 @@ const CheckoutPage = () => {
   const paymentOrderId = params.get("orderId");
   const orderId = paymentOrderId ? Number(paymentOrderId.split("_")[1]) : null;
   const [storeName, setStoreName] = useState("");
-  const [orderState, setOrderState] = useState(2);
+  const [orderState, setOrderState] = useState(0);
+  const [orderDate, setOrderDate] = useState("");
+  const [totalCarbon, setTotalCarbon] = useState(0);
 
   useEffect(() => {
     console.log(cartList);
@@ -37,7 +39,9 @@ const CheckoutPage = () => {
         setGetPoint(Number(res.data.getPoint ?? 0));
         setDeliveryPrice(Number(res.data.deliveryPrice ?? 0));
         setStoreName(res.data.storeName);
-        // setOrderState(res.data.orderStatus ?? 0);
+        setOrderState(res.data.orderStatus - 2 ?? 0);
+        setOrderDate(res.data.orderDate);
+        setTotalCarbon(res.data.totalReduceCarbon);
       })
       .catch((err) => {
         console.log(err);
@@ -118,7 +122,10 @@ const CheckoutPage = () => {
           </p>
 
           <button className={styles.orderCheckBtn}>주문내역 확인</button>
-          <p className={styles.orderNumber}>ECO-2026-032501</p>
+          <p className={styles.orderNumber}>
+            ECO-{orderDate}
+            {orderId}
+          </p>
         </section>
 
         <section className={styles.statusCard}>
@@ -251,7 +258,7 @@ const CheckoutPage = () => {
 
               <div className={styles.ecoInfoRow}>
                 <span>누적 탄소 절감량</span>
-                <strong>24.6kg</strong>
+                <strong>{totalCarbon}kg</strong>
               </div>
             </div>
 
