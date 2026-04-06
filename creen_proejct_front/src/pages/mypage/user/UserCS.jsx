@@ -1,18 +1,18 @@
-import styles from "./UserCS.module.css";
-import { useContext, useEffect, useState } from "react";
-import { AuthContext } from "../../../context/AuthContext";
-
+import styles from './UserCS.module.css';
+import { useContext, useEffect, useState } from 'react';
+import { AuthContext } from '../../../context/AuthContext';
+import Swal from 'sweetalert2';
 //icon
-import SearchIcon from "@mui/icons-material/Search";
-import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-import axios from "axios";
-import StarsIcon from "@mui/icons-material/Stars";
+import SearchIcon from '@mui/icons-material/Search';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import axios from 'axios';
+import StarsIcon from '@mui/icons-material/Stars';
 
 const UserCS = () => {
   const { user } = useContext(AuthContext);
-  const [activeTab, setActiveTab] = useState("faq"); // 기본: faq활성화
+  const [activeTab, setActiveTab] = useState('faq'); // 기본: faq활성화
 
-  const [searchKeyword, setSearchKeyword] = useState("");
+  const [searchKeyword, setSearchKeyword] = useState('');
   return (
     <section className={styles.cs_container}>
       <div className={styles.top_section}>
@@ -28,7 +28,7 @@ const UserCS = () => {
           <input
             type="text"
             className={styles.search_input}
-            placeholder="궁금한 점을 검색해보세요."
+            placeholder="자주 묻는 질문을 검색해보세요."
             value={searchKeyword}
             onChange={(e) => {
               setSearchKeyword(e.target.value);
@@ -43,10 +43,10 @@ const UserCS = () => {
           <div className={styles.tabs_nav_faq}>
             <button
               className={`${styles.tab_item} ${
-                activeTab === "faq" ? styles.active : ""
+                activeTab === 'faq' ? styles.active : ''
               }`}
               onClick={() => {
-                setActiveTab("faq");
+                setActiveTab('faq');
               }}
             >
               자주 묻는 질문
@@ -55,10 +55,10 @@ const UserCS = () => {
           <div className={styles.tabs_nav_qna}>
             <button
               className={`${styles.tab_item} ${
-                activeTab === "qna" ? styles.active : ""
+                activeTab === 'qna' ? styles.active : ''
               }`}
               onClick={() => {
-                setActiveTab("qna");
+                setActiveTab('qna');
               }}
             >
               1 : 1 문의하기
@@ -67,10 +67,10 @@ const UserCS = () => {
           <div className={styles.tabs_nav_answer}>
             <button
               className={`${styles.tab_item} ${
-                activeTab === "answer" ? styles.active : ""
+                activeTab === 'answer' ? styles.active : ''
               }`}
               onClick={() => {
-                setActiveTab("answer");
+                setActiveTab('answer');
               }}
             >
               1 : 1 문의내역
@@ -80,19 +80,19 @@ const UserCS = () => {
       </div>
       {/*컨텐츠 랜더링영역 */}
       <div className={styles.content_area}>
-        {activeTab === "faq" ? (
+        {activeTab === 'faq' ? (
           <FAQSection
             searchKeyword={searchKeyword}
             setSearchKeyword={setSearchKeyword}
           />
-        ) : activeTab === "qna" ? (
+        ) : activeTab === 'qna' ? (
           <QnASection
             setSearchKeyword={setSearchKeyword}
             user={user}
             setActiveTab={setActiveTab}
           />
         ) : (
-          <AnswerSection user={user} />
+          <AnswerSection user={user} setSearchKeyword={setSearchKeyword} />
         )}
       </div>
     </section>
@@ -102,11 +102,11 @@ const UserCS = () => {
 const FAQSection = ({ searchKeyword, setSearchKeyword }) => {
   //0:전체조회, 1:결제, 2:배달, 3:에코포인트, 4:서비스이용
   const categories = [
-    { id: 0, label: "전체" },
-    { id: 1, label: "결제" },
-    { id: 2, label: "배달" },
-    { id: 3, label: "에코 포인트" },
-    { id: 4, label: "서비스 이용" },
+    { id: 0, label: '전체' },
+    { id: 1, label: '결제' },
+    { id: 2, label: '배달' },
+    { id: 3, label: '에코 포인트' },
+    { id: 4, label: '서비스 이용' },
   ];
   const [status, setStatus] = useState(0); // 0:전체조회, 1:결제, 2:배달, 3:에코포인트, 4:서비스이용
   const [faqList, setFaqList] = useState([]); // 받아올 리스트
@@ -116,7 +116,7 @@ const FAQSection = ({ searchKeyword, setSearchKeyword }) => {
     setOpenIndex(openIndex === index ? null : index);
   };
 
-  //faq 전체조회
+  //자주묻는질문
   useEffect(() => {
     setOpenIndex(null);
     axios
@@ -142,7 +142,7 @@ const FAQSection = ({ searchKeyword, setSearchKeyword }) => {
             <button
               key={`key:${cat.id}`}
               className={`${styles.cat_btn} ${
-                status === cat.id ? styles.cat_active : ""
+                status === cat.id ? styles.cat_active : ''
               }`}
               onClick={() => {
                 setStatus(cat.id);
@@ -192,68 +192,71 @@ const FAQSection = ({ searchKeyword, setSearchKeyword }) => {
     </div>
   );
 };
-
+//1:1문의하기
 const QnASection = ({ setSearchKeyword, user, setActiveTab }) => {
   useEffect(() => {
-    setSearchKeyword("");
+    setSearchKeyword('');
   }, [setSearchKeyword]);
 
   //입력: 제목, 내용 ( 답변상태: 0 ))
   const [inquiry, setInquiry] = useState({
     memberId: user.memberId,
-    qnaTitle: "",
-    qnaContent: "",
+    qnaTitle: '',
+    qnaContent: '',
   });
 
   const handleChange = (e) => {
     const maxLength = {
-      qnaTitle: 25,
-      qnaContent: 400,
+      qnaTitle: 20,
+      qnaContent: 300,
     };
 
     const { name, value } = e.target;
-    if (value.length >= maxLength[name]) {
-      if (value.length === maxLength[name]) {
-        alert(
-          `${name === "qnaTitle" ? "제목" : "내용"}은 최대 ${
-            maxLength[name]
-          }자까지 입력 가능합니다.`
-        );
-      }
+    if (value.length > maxLength[name]) {
+      Swal.fire({
+        icon: 'warning',
+        title: '글자 수 초과',
+        text: `${name === 'qnaTitle' ? '제목' : '내용'}은 최대 ${maxLength[name]}자까지 입력 가능합니다.`,
+        confirmButtonColor: 'var(--color-brand)',
+        confirmButtonText: '확인',
+      });
+
       setInquiry({ ...inquiry, [name]: value.slice(0, maxLength[name]) });
       return;
     }
     setInquiry({ ...inquiry, [name]: value });
   };
-
+  //1:1문의하기 > 등록
   const insertQna = (e) => {
-    if (inquiry.qnaTitle === "" || inquiry.qnaContent === "") {
-      alert("제목과 내용을 모두 입력해주세요.");
-      return; // 함수를 여기서 종료 (서버로 안 보냄)
-    }
-    if (inquiry.qnaTitle.length > 25) {
-      alert("제목이 25자를 초과했습니다. 내용을 줄여주세요.");
+    if (!ValidateInquiry(inquiry.qnaTitle, inquiry.qnaContent)) {
       return;
     }
-
-    if (inquiry.qnaContent.length > 400) {
-      alert("내용이 400자를 초과했습니다. 내용을 줄여주세요.");
-      return;
-    }
-
     axios
       .post(`${import.meta.env.VITE_BACKSERVER}/cs/inquiries/submit`, inquiry)
       .then((res) => {
         console.log(res);
         console.log(inquiry);
-        alert("문의가 정상적으로 등록되었습니다.");
-        setActiveTab("answer");
+        Swal.fire({
+          icon: 'success',
+          title: '등록 완료',
+          text: '문의가 정상적으로 등록되었습니다.',
+          confirmButtonColor: 'var(--color-brand)',
+          confirmButtonText: '확인',
+          timer: 1500, // 2000ms = 2초 후 자동으로 닫힘
+          timerProgressBar: true,
+        });
+
+        setActiveTab('answer');
       })
       .catch((err) => {
         console.log(err);
-        alert(
-          "글자 수가 너무 길거나 서버 오류가 발생했습니다. 내용을 줄여주세요."
-        );
+        Swal.fire({
+          icon: 'error',
+          title: '등록 실패',
+          text: '서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.',
+          confirmButtonColor: 'var(--color-brand)',
+          confirmButtonText: '확인',
+        });
       });
   };
   return (
@@ -287,16 +290,14 @@ const QnASection = ({ setSearchKeyword, user, setActiveTab }) => {
             placeholder="내용을 입력해주세요."
             value={inquiry.qnaContent}
             onChange={handleChange}
-            maxLength={400}
+            maxLength={300}
           ></textarea>
 
           <div className={styles.char_count_wrapper}>
             <span
-              className={`${styles.char_count} ${
-                inquiry.qnaContent.length >= 400 ? styles.limit_reached : ""
-              }`}
+              className={`${styles.char_count} ${inquiry.qnaContent.length >= 300 ? styles.limit_reached : ''}`}
             >
-              {inquiry.qnaContent.length} / 400자
+              {inquiry.qnaContent.length} / 300자
             </span>
           </div>
         </div>
@@ -308,12 +309,21 @@ const QnASection = ({ setSearchKeyword, user, setActiveTab }) => {
   );
 };
 //1:1문의내역
-const AnswerSection = ({ user }) => {
+const AnswerSection = ({ user, setSearchKeyword }) => {
+  useEffect(() => {
+    setSearchKeyword('');
+  }, [setSearchKeyword]);
+
   const [inquiryList, setInquiryList] = useState([]);
   const [openIndex, setOpenIndex] = useState(null); //아코디언 상태 (null : 모두 닫힘)
   const indexToggle = (index) => {
     if (editingNo !== null) {
-      alert("수정 중인 내용을 먼저 저장하거나 취소해주세요.");
+      Swal.fire({
+        icon: 'warning',
+        text: '수정 중인 내용을 먼저 저장하거나 취소해주세요.',
+        confirmButtonColor: 'var(--color-brand)',
+        confirmButtonText: '확인',
+      });
       return;
     }
     setOpenIndex(openIndex === index ? null : index);
@@ -321,79 +331,108 @@ const AnswerSection = ({ user }) => {
   //글자수제한
   const handleChange = (e) => {
     const maxLength = {
-      qnaTitle: 25,
-      qnaContent: 400,
+      qnaTitle: 20,
+      qnaContent: 300,
     };
 
     const { name, value } = e.target;
     if (value.length >= maxLength[name]) {
       if (value.length === maxLength[name]) {
-        alert(
-          `${name === "qnaTitle" ? "제목" : "내용"}은 최대 ${
-            maxLength[name]
-          }자까지 입력 가능합니다.`
-        );
+        Swal.fire({
+          icon: 'warning',
+          title: '글자 수 초과',
+          text: `${name === 'qnaTitle' ? '제목' : '내용'}은 최대 ${maxLength[name]}자까지 입력 가능합니다.`,
+          confirmButtonColor: 'var(--color-brand)',
+          confirmButtonText: '확인',
+        });
       }
       setUpdateData({ ...updateData, [name]: value.slice(0, maxLength[name]) });
       return;
     }
     setUpdateData({ ...updateData, [name]: value });
   };
-  const [status, setStatus] = useState(0); // 0: 답변대기중, 1:답변완료
+  const [answerStatus, setAnswerStatus] = useState(0); // 0: 답변대기중, 1:답변완료
 
   //현재 수정중인 qnaNo 저장용
   const [editingNo, setEditingNo] = useState(null);
 
   //수정내용 임시저장용
   const [updateData, setUpdateData] = useState({
-    qnaTitle: "",
-    qnaContent: "",
+    qnaTitle: '',
+    qnaContent: '',
   });
 
   //수정취소
   const cancelEdit = () => {
     setEditingNo(null);
     setUpdateData({
-      qnaTitle: "",
-      qnaContent: "",
+      qnaTitle: '',
+      qnaContent: '',
     });
   };
 
-  //삭제
+  //1:1문의내역 > 삭제
   const deleteInquiry = (qnaNo) => {
-    if (!window.confirm("정말삭제하시겠습니까? ")) {
-      return;
-    }
-    if (status === 0) {
-      axios
-        .delete(`${import.meta.env.VITE_BACKSERVER}/cs/inquiries/delete`, {
-          params: { qnaNo: qnaNo },
-        })
-        .then((res) => {
-          console.log(res);
-          alert("작성하신 문의가 삭제되었습니다.");
-          setOpenIndex(null);
-          fetchInquiryList();
-        })
-        .catch((err) => {
-          console.log(err);
-          alert("삭제 중 오류가 발생했습니다. 고객센터에 문의 하세요");
-        });
-    }
+    Swal.fire({
+      title: '정말 삭제하시겠습니까?',
+      text: '삭제된 문의는 복구할 수 없습니다.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d32f2f',
+      cancelButtonColor: '#aaa',
+      confirmButtonText: '삭제',
+      cancelButtonText: '취소',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        if (answerStatus === 0) {
+          axios
+            .delete(`${import.meta.env.VITE_BACKSERVER}/cs/inquiries/delete`, {
+              params: { qnaNo: qnaNo },
+            })
+            .then((res) => {
+              console.log(res);
+              Swal.fire({
+                icon: 'success',
+                title: '삭제 완료',
+                text: '문의가 정상적으로 삭제되었습니다.',
+                confirmButtonColor: 'var(--color-brand)',
+                confirmButtonText: '확인',
+              });
+              setOpenIndex(null);
+              fetchInquiryList();
+            })
+            .catch((err) => {
+              console.log(err);
+              Swal.fire({
+                icon: 'error',
+                title: '등록 실패',
+                text: '삭제 중 오류가 발생했습니다. 고객센터에 문의 하세요.',
+                confirmButtonColor: 'var(--color-brand)',
+                confirmButtonText: '확인',
+              });
+            });
+        }
+      }
+    });
   };
 
-  //수정
+  ////1:1문의내역 > 수정
   const updateInquiry = (item, index) => {
-    if (status === 0) {
-      if (!updateData.qnaTitle || !updateData.qnaContent) {
-        alert("제목과 내용을 모두 입력해주세요.");
+    if (answerStatus === 0) {
+      if (!ValidateInquiry(updateData.qnaTitle, updateData.qnaContent)) {
         return;
       }
       if (
         updateData.qnaTitle === item.qnaTitle &&
         updateData.qnaContent === item.qnaContent
       ) {
-        alert("수정된 내용이 없습니다.");
+        Swal.fire({
+          icon: 'info',
+          text: '수정된 내용이 없습니다.',
+          confirmButtonColor: 'var(--color-brand)',
+          confirmButtonText: '확인',
+        });
+        return;
       } else {
         const dataSend = {
           qnaNo: item.qnaNo,
@@ -403,18 +442,32 @@ const AnswerSection = ({ user }) => {
         axios
           .put(
             `${import.meta.env.VITE_BACKSERVER}/cs/inquiries/update`,
-            dataSend
+            dataSend,
           )
           .then((res) => {
             console.log(res);
-            alert("작성하신 문의가 수정되었습니다.");
+            Swal.fire({
+              icon: 'success',
+              title: '수정 완료',
+              text: '문의가 정상적으로 수정되었습니다.',
+              confirmButtonColor: 'var(--color-brand)',
+              confirmButtonText: '확인',
+              timer: 1500, // 2000ms = 2초 후 자동으로 닫힘
+              timerProgressBar: true,
+            });
             setEditingNo(null); //수정중인 문의번호 삭제 > 인풋이 다시 텍스트로바뀌게
             setOpenIndex(index);
             fetchInquiryList();
           })
           .catch((err) => {
             console.log(err);
-            alert("수정 중 오류가 발생했습니다. 고객센터에 문의 하세요");
+            Swal.fire({
+              icon: 'error',
+              title: '수정 실패',
+              text: '수정 중 오류가 발생했습니다. 고객센터에 문의 하세요.',
+              confirmButtonColor: 'var(--color-brand)',
+              confirmButtonText: '확인',
+            });
           });
       }
     }
@@ -458,7 +511,7 @@ const AnswerSection = ({ user }) => {
                 className={`${styles.faq_header} ${
                   editingNo !== null && editingNo !== item.qnaNo
                     ? styles.disabled
-                    : ""
+                    : ''
                 }`}
                 onClick={(e) => {
                   e.preventDefault(); // 브라우저 기본 토글 동작 중지
@@ -471,7 +524,13 @@ const AnswerSection = ({ user }) => {
 
                   // 2. 내가 아닌 '다른 항목'이 수정 중인데, 이 항목을 클릭했다면?
                   if (editingNo !== null) {
-                    alert("수정 중인 내용을 먼저 저장하거나 취소해주세요.");
+                    Swal.fire({
+                      icon: 'warning',
+                      text: '수정 중인 내용을 먼저 저장하거나 취소해주세요.',
+                      confirmButtonColor: 'var(--color-brand)',
+                      confirmButtonText: '확인',
+                    });
+
                     return; // indexToggle(i)가 실행되지 않도록 여기서 끊어줌
                   }
 
@@ -489,7 +548,25 @@ const AnswerSection = ({ user }) => {
                       onChange={handleChange}
                     />
                   ) : (
-                    <p className={styles.inquiry_subject}>{item.qnaTitle}</p>
+                    <>
+                      {/*답변상태 뱃지 */}
+                      <div className={styles.badge_wrap}>
+                        {item.qnaAnswer ? (
+                          <span
+                            className={`${styles.badge} ${styles.status_complete}`}
+                          >
+                            답변완료
+                          </span>
+                        ) : (
+                          <span
+                            className={`${styles.badge} ${styles.status_waiting}`}
+                          >
+                            답변대기
+                          </span>
+                        )}
+                      </div>
+                      <p className={styles.inquiry_subject}>{item.qnaTitle}</p>
+                    </>
                   )}
 
                   <p className={styles.inquiry_preview_one_line}>
@@ -568,13 +645,9 @@ const AnswerSection = ({ user }) => {
                       />
                       <div className={styles.char_count_wrapper}>
                         <span
-                          className={`${styles.char_count} ${
-                            updateData.qnaContent.length >= 400
-                              ? styles.limit_reached
-                              : ""
-                          }`}
+                          className={`${styles.char_count} ${updateData.qnaContent.length >= 300 ? styles.limit_reached : ''}`}
                         >
-                          {updateData.qnaContent.length} / 400자
+                          {updateData.qnaContent.length} / 300자
                         </span>
                       </div>
                     </>
@@ -608,5 +681,40 @@ const AnswerSection = ({ user }) => {
       </div>
     </div>
   );
+};
+
+//문의 제목, 내용 유효성검사 (등록 및 수정 시 사용)
+const ValidateInquiry = (title, content) => {
+  if (!title?.trim() || !content?.trim()) {
+    Swal.fire({
+      icon: 'error',
+      title: '입력 오류',
+      text: '제목과 내용을 모두 입력해주세요.',
+      confirmButtonColor: 'var(--color-brand)',
+      confirmButtonText: '확인',
+    });
+    return false;
+  }
+  if (title.length > 20) {
+    Swal.fire({
+      icon: 'error',
+      title: '입력 오류',
+      text: '제목이 20자를 초과했습니다. 내용을 줄여주세요.',
+      confirmButtonColor: 'var(--color-brand)',
+      confirmButtonText: '확인',
+    });
+    return false;
+  }
+  if (content.length > 300) {
+    Swal.fire({
+      icon: 'error',
+      title: '입력 오류',
+      text: '내용이 300자를 초과했습니다. 내용을 줄여주세요.',
+      confirmButtonColor: 'var(--color-brand)',
+      confirmButtonText: '확인',
+    });
+    return false;
+  }
+  return true;
 };
 export default UserCS;
