@@ -1,0 +1,169 @@
+/* src/pages/manager/components/managerCharts/managerChart.module.css */
+
+/* =========================================================
+   1. 차트 컴포넌트 공통 스타일 (통합 및 일관성 확보)
+   ========================================================= */
+
+/* 모든 차트 영역을 감싸는 공통 컨테이너 */
+/* 여기에 일관된 패딩과 마진을 적용합니다. */
+.chartContainer {
+  padding: 24px; /* 여백 조정 */
+  box-sizing: border-box;
+}
+
+/* 카드 디자인 (오른쪽 리뷰 통계 카드에서 사용) */
+.chartCard {
+  /* 테두리, 배경, 그림자 등은 부모 컴포넌트의 commonCard에서 처리하므로 삭제 */
+  /* 여기서는 순수하게 카드 내부 레이아웃만 담당 */
+  display: flex;
+  flex-direction: column;
+}
+
+/* 차트 헤더 (제목 + 'View more' 버튼) */
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px; /* 여백 조정 */
+}
+
+/* 카드 제목 */
+.cardTitle {
+  font-family: var(--font-title); /* 티머니 둥근바람 */
+  font-size: 16px;
+  font-weight: bold;
+  color: var(--text-main);
+  margin: 0;
+}
+
+/* 'View more' 버튼 */
+.viewMoreBtn {
+  border: none;
+  background: none;
+  font-size: 12px;
+  color: #2e8147; /* 브랜드 그린 */
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0;
+  transition: color 0.2s ease;
+}
+
+.viewMoreBtn:hover {
+  color: #246a3a;
+}
+
+/* 메인 수치 (금액, 건수) */
+.mainValue {
+  font-size: 28px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+/* 변화 비율 배지 */
+.changePercent {
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background-color: #e8f5e9;
+  color: #2e8147;
+  font-weight: normal;
+}
+
+/* =========================================================
+   2. 리뷰 통계 전용 스타일 (커스텀 범례)
+   ========================================================= */
+
+.legendContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: center;
+  margin-top: 24px;
+  width: 100%;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  width: calc(50% - 16px); /* 두 줄 배치 */
+}
+
+.legendColor {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.legendLabel {
+  color: #757575; /* 회색 텍스트 */
+  flex: 1; /* 라벨이 공간 차지 */
+}
+
+.legendValue {
+  font-weight: 600;
+  color: #212121;
+}
+
+/* =========================================================
+   3. 배달 경로 전용 스타일 (프로그레스 바 - 한 줄 레이아웃 및 꽉 찬 바)
+   ========================================================= */
+
+.progressBarContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 16px; /* 프로그레스 바 행 간격 */
+}
+
+/* 프로그레스 바 한 줄(Row) 전체 컨테이너 */
+.progressRow {
+  display: flex;
+  flex-direction: column; /* 세로 배치 */
+  gap: 6px; /* 상단 그룹과 하단 바 사이 간격 */
+  width: 100%;
+}
+
+.labelValueGroup {
+  display: flex;
+  justify-content: space-between; /* 양 끝 정렬 */
+  align-items: center;
+  width: 100%;
+}
+/* 카테고리 라벨 (왼쪽) */
+.progressLabel {
+  font-size: 13px;
+  color: #757575;
+  text-align: left;
+  white-space: nowrap;
+}
+.progressValue {
+  font-size: 13px;
+  font-weight: 600;
+  color: #212121;
+  text-align: right;
+}
+.progressBarWrapper {
+  width: 100%;
+}
+/* 프로그레스 바 배경 (중앙) */
+.progressBar {
+  width: 100%;
+  height: 8px;
+  background-color: #f1f1f1;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+/* 프로그레스 바 채워진 부분 */
+.progressFill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s ease-in-out;
+}

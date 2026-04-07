@@ -1,30 +1,34 @@
-/* 전체 컨테이너 */
-.managerContainer {
-  padding: 40px;
-  background-color: #f8faf8; /* 연한 그리너리 배경 */
-  min-height: 100vh;
-  font-family:
-    "Pretendard",
-    -apple-system,
-    sans-serif;
+/* src/pages/manager/ManagerDashboard.module.css */
+
+/* =========================================================
+   1. 대시보드 공통 레이아웃 (제공해주신 코드와 동일)
+   ========================================================= */
+
+/* 대시보드 전체 컨테이너 */
+.dashboardContainer {
+  background-color: var(--color-bg);
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 30px;
+  width: 100%;
+  box-sizing: border-box;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+  font-family: var(--font-body);
 }
 
-/* 상단 탭 영역 */
-.tabWrapper {
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: 35px;
-}
+/* =========================================================
+   2. 상단 슬라이드 탭 메뉴 (제공해주신 코드와 동일)
+   ========================================================= */
 
 .tabContainer {
   position: relative;
   display: flex;
-  width: 340px;
-  background: #ffffff;
-  border: 1px solid #eee;
+  width: 400px;
+  background: #f0f0f0; /* 비활성화 배경 (약간의 명도 조절) */
   border-radius: 50px;
   padding: 5px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  margin: 20px auto 40px;
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.05);
 }
 
 .tabButton {
@@ -34,40 +38,25 @@
   border: none;
   background: none;
   padding: 12px 0;
-  font-size: 0.95rem;
-  font-weight: 700;
-  color: #999;
+  font-size: 1rem;
+  font-weight: 600;
+  font-family: var(--font-title); /* 티머니 둥근바람 */
+  color: var(--text-sub);
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
   transition: color 0.3s ease;
 }
 
-.tabIcon {
-  width: 14px;
-  height: 14px;
-  background-color: #ddd;
-  border-radius: 3px;
-}
-
 .activeText {
-  color: #fff !important;
+  color: #ffffff !important;
 }
 
-.activeText .tabIcon {
-  background-color: rgba(255, 255, 255, 0.5);
-}
-
-/* 슬라이딩 인디케이터 */
 .slideIndicator {
   position: absolute;
   top: 5px;
   left: 5px;
   width: calc(50% - 5px);
   height: calc(100% - 10px);
-  background: #2e7d32; /* GreenCarry 브랜드 컬러 */
+  background: var(--color-brand); /* 브랜드 메인 그린 */
   border-radius: 50px;
   transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 1;
@@ -76,217 +65,78 @@
 .slideIndicator.left {
   transform: translateX(0);
 }
+
 .slideIndicator.right {
   transform: translateX(100%);
 }
 
-/* 대시보드 그리드 (2열 레이아웃) */
-.contentGrid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 30px;
-}
+/* =========================================================
+   3. 가맹점 매니저 통계 레이아웃
+   ========================================================= */
 
-/* 카드 스타일 */
-.chartCard {
-  background: #fff;
-  border-radius: 24px;
-  padding: 32px;
-  border: 1px solid #f0f0f0;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+/* StoreStats.jsx에서 사용되는 전체 레이아웃 */
+.statsLayout {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+  margin-top: 20px;
+}
+.commonCard {
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  background-color: #ffffff;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
   display: flex;
   flex-direction: column;
+  overflow: hidden;
+}
+.combinedStatsCard {
+  flex: 1;
 }
 
-.cardHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
+.deliveryPathSection {
+  padding: 24px;
 }
 
-.cardHeader span {
-  font-size: 1rem;
-  font-weight: 600;
-  color: #666;
+/* 배달 경로 소제목 스타일 */
+.sectionSubTitle {
+  font-family: var(--font-title);
+  font-size: 16px;
+  font-weight: bold;
+  color: var(--text-main);
+  margin: 0 0 20px 0;
+  text-align: center;
 }
 
-.viewMore {
-  background: none;
-  border: none;
-  color: #2e7d32;
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
+.rightCardArea {
+  flex: 1;
 }
 
-.mainValue {
-  font-size: 2rem;
-  font-weight: 800;
-  color: #222;
-  margin-bottom: 5px;
-}
+/* =========================================================
+   4. 공통 유틸리티 클래스
+   ========================================================= */
 
-.trendText {
-  font-size: 0.9rem;
-  color: #4caf50;
-  margin-bottom: 20px;
-}
-
-/* 차트 내부 중앙 라벨링 */
-.chartWrapper {
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: 20px 0;
-  height: 200px;
+.fullWidthSection {
   width: 100%;
 }
 
-.chartCenterLabel {
-  position: absolute;
-  text-align: center;
-  top: 50%;
-  transform: translateY(-50%);
-}
+/* =========================================================
+   5. 반응형 미디어 쿼리 (제공해주신 코드 기반으로 조정)
+   ========================================================= */
 
-.reviewCenterLabel {
-  position: absolute;
-  top: 55%;
-  text-align: center;
-}
-
-.chartCenterLabel p,
-.reviewCenterLabel p {
-  font-size: 0.85rem;
-  color: #999;
-  margin: 0;
-}
-
-.chartCenterLabel strong,
-.reviewCenterLabel strong {
-  font-size: 1.5rem;
-  color: #333;
-}
-
-/* 배달 경로 프로그레스 바 영역 */
-.deliveryProgressSection {
-  margin-top: 25px;
-}
-
-.sectionTitle {
-  font-size: 1.1rem;
-  font-weight: 700;
-  margin-bottom: 20px;
-  color: #444;
-}
-
-.progressRow {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  margin-bottom: 15px;
-}
-
-.label {
-  width: 100px; /* 도보 & 자전거를 위해 너비 확보 */
-  font-size: 0.9rem;
-  color: #666;
-  font-weight: 500;
-}
-
-.progressBarBg {
-  flex: 1;
-  height: 10px;
-  background: #f0f2f0;
-  border-radius: 5px;
-  overflow: hidden;
-}
-
-.progressBarFill {
-  height: 100%;
-  border-radius: 5px;
-  transition: width 1s ease-out;
-}
-
-.percent {
-  width: 40px;
-  font-size: 0.9rem;
-  font-weight: 700;
-  color: #333;
-  text-align: right;
-}
-
-/* 리뷰 범례 그리드 */
-.legendGrid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
-  margin-top: 15px;
-  padding: 20px;
-  background: #fcfdfc;
-  border-radius: 16px;
-}
-
-.legendItem {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.statusDot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-}
-
-.legendName {
-  font-size: 0.9rem;
-  color: #666;
-}
-
-.legendPercent {
-  margin-left: auto;
-  font-size: 0.9rem;
-  font-weight: 700;
-  color: #444;
-}
-
-/* 회원 문의 내역 뷰 */
-.inquiryWrapper {
-  background: #fff;
-  border-radius: 24px;
-  padding: 40px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
-}
-
-.inquiryTitle {
-  font-size: 1.5rem;
-  font-weight: 800;
-  margin-bottom: 30px;
-}
-
-.emptyState {
-  padding: 100px 0;
-  text-align: center;
-  color: #bbb;
-  font-size: 1.1rem;
-  border: 2px dashed #eee;
-  border-radius: 20px;
-}
-
-/* 반응형 처리 */
-@media (max-width: 768px) {
-  .contentGrid {
-    grid-template-columns: 1fr;
+@media (max-width: 1024px) {
+  .tabContainer {
+    width: 90%;
   }
 
-  .managerContainer {
-    padding: 20px;
+  /* 통계 레이아웃 세로 배치 */
+  .statsLayout {
+    flex-direction: column;
+    gap: 20px;
   }
 
-  .tabWrapper {
-    justify-content: center;
+  .combinedStatsCard,
+  .rightCardArea {
+    width: 100%;
   }
 }
