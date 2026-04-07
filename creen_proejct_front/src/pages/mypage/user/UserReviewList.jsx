@@ -8,10 +8,8 @@ const UserReviewList = () => {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
 
-  // 🌟 환경 변수에서 백엔드 서버 주소 가져오기
   const backHost = import.meta.env.VITE_BACKSERVER;
 
-  // 서버에서 내 리뷰 목록 가져오기
   const getMyReviews = async () => {
     try {
       const memberId = localStorage.getItem("memberId");
@@ -28,7 +26,6 @@ const UserReviewList = () => {
     getMyReviews();
   }, []);
 
-  // 리뷰 삭제 함수
   const deleteReview = (orderId) => {
     Swal.fire({
       title: "리뷰를 삭제하시겠습니까?",
@@ -58,6 +55,19 @@ const UserReviewList = () => {
     });
   };
 
+  // 🌟 새로 추가된 날짜 필터링 로직
+  const filteredReviews = reviews.filter((review) => {
+    if (!review.reviewDate) return true;
+
+    const reviewMonth = review.reviewDate.substring(0, 7);
+
+    if (startDate && !endDate) return reviewMonth >= startDate;
+    if (!startDate && endDate) return reviewMonth <= endDate;
+    if (startDate && endDate)
+      return reviewMonth >= startDate && reviewMonth <= endDate;
+    return true;
+  });
+
   return (
     <div className={styles.container}>
       {/* 1. 상단 날짜 필터 영역 */}
@@ -77,8 +87,9 @@ const UserReviewList = () => {
 
       {/* 2. 리뷰 리스트 영역 */}
       <div className={styles.review_list}>
-        {reviews.length > 0 ? (
-          reviews.map((review) => (
+        {/* 🌟 reviews 대신 filteredReviews 사용 */}
+        {filteredReviews.length > 0 ? (
+          filteredReviews.map((review) => (
             <div key={review.orderId} className={styles.review_card}>
               {/* 카드 상단: 가게 및 주문 정보 */}
               <div className={styles.card_header}>
@@ -123,7 +134,6 @@ const UserReviewList = () => {
                   {/* 고객(나)의 리뷰 버블 */}
                   <div className={styles.user_bubble}>
                     <div className={styles.user_top}>
-                      {/* 🌟 아바타 원형 안에 이미지 넣기 */}
                       <div className={styles.avatar}>
                         <img
                           src={
@@ -141,7 +151,6 @@ const UserReviewList = () => {
                         />
                       </div>
 
-                      {/* 🌟 별점 옆에 아이디 표시 */}
                       <span className={styles.member_id}>
                         {review.memberId}
                       </span>
@@ -154,7 +163,8 @@ const UserReviewList = () => {
                       {review.reviewContent}
                     </div>
                   </div>
-                  {/* 사장님의 답글 버블 (데이터가 있을 때만 표시) */}
+
+                  {/* 사장님의 답글 버블 */}
                   {review.reviewCommentContent && (
                     <div className={styles.owner_bubble}>
                       <div className={styles.bubble_content}>
@@ -176,8 +186,7 @@ const UserReviewList = () => {
                         </span>
                       </div>
                       <div className={styles.avatar_owner}>
-                        <span style={{ fontSize: "30px" }}>👨‍🍳</span>{" "}
-                        {/* 사장님 아바타 임시 아이콘 */}
+                        <span style={{ fontSize: "30px" }}>👨‍🍳</span>
                       </div>
                     </div>
                   )}
@@ -186,7 +195,9 @@ const UserReviewList = () => {
             </div>
           ))
         ) : (
-          <div className={styles.no_data}>작성한 리뷰가 없습니다. 🌱</div>
+          <div className={styles.no_data}>
+            해당 기간에 작성한 리뷰가 없습니다. 🌱
+          </div>
         )}
       </div>
     </div>
