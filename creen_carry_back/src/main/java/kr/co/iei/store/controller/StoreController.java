@@ -166,12 +166,19 @@ public class StoreController {
     @PatchMapping("/order/{orderId}/status")
     public ResponseEntity<String> changeOrderStatus(
             @PathVariable int orderId, 
-            @RequestBody Map<String, Integer> requestBody) {
+            @RequestBody Map<String, Object> requestBody) { // Integer 대신 Object로 변경 (다양한 타입 대응)
         
-        // 프론트에서 보낸 { status: 2 } 등의 값을 꺼냅니다
-        int status = requestBody.get("status"); 
+    	// 1. status 꺼내기 (숫자로 안전하게 변환)
+        int status = Integer.parseInt(String.valueOf(requestBody.get("status")));
         
-        int result = storeService.changeOrderStatus(orderId, status);
+        // 2. expectedTime 꺼내기 (문자열 "24"를 숫자 24로 변환)
+        Integer expectedTime = null;
+        if (requestBody.containsKey("expectedTime") && requestBody.get("expectedTime") != null) {
+            // String.valueOf를 거쳐 Integer.parseInt를 쓰면 "24"와 24 모두 안전하게 처리됩니다.
+            expectedTime = Integer.parseInt(String.valueOf(requestBody.get("expectedTime")));
+        }
+        
+        int result = storeService.changeOrderStatus(orderId, status, expectedTime);
         
         if(result > 0) {
             return ResponseEntity.ok("success");
@@ -179,5 +186,4 @@ public class StoreController {
             return ResponseEntity.badRequest().body("fail");
         }
     }
-   
 }

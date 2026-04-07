@@ -401,8 +401,11 @@
 
 	<update id="changeOrderStatus">
 		UPDATE order_tbl
-		SET order_status = #{status}
-		WHERE
-		order_id = #{orderId}
+		SET
+		order_status = #{status}
+		<if test="expectedTime != null">
+			, expected_time = #{expectedTime}
+		</if>
+		WHERE order_id = #{orderId}
 	</update>
 </mapper>

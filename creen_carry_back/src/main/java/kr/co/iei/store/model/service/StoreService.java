@@ -19,8 +19,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class StoreService {
@@ -200,9 +202,18 @@ public class StoreService {
         return list;
 	}
 
-	public int changeOrderStatus(int orderId, int status) {
-		int result = storeDao.changeOrderStatus(orderId, status);
-		return result;
+	@Transactional
+	public int changeOrderStatus(int orderId, int status, Integer expectedTime) {
+	    // 1. DAO에 여러 값을 한 번에 넘기기 위해 Map을 생성합니다.
+	    Map<String, Object> params = new HashMap();
+	    params.put("orderId", orderId);
+	    params.put("status", status);
+	    params.put("expectedTime", expectedTime); // 🌟 드디어 배달/픽업 시간이 담깁니다!
+
+	    // 2. Dao의 메서드를 호출하며 params(Map)를 전달합니다.
+	    int result = storeDao.changeOrderStatus(params);
+	    
+	    return result;
 	}
 
 }

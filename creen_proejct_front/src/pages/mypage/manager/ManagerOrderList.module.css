@@ -180,8 +180,8 @@
   color: #00b894;
 } /* 배달중 */
 .status_5 {
-  background: #dfe6e9;
-  color: #636e72;
+  background: var(--color-brand);
+  color: var(--color-bg);
 } /* 배달완료 */
 .status_9 {
   background: #ff7675;

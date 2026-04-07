@@ -16,6 +16,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface StoreDao {
@@ -86,5 +87,7 @@ public interface StoreDao {
 
 	List<OrderResponse> getOrdersByStoreId(int storeId);
 
-	int changeOrderStatus(int orderId, int status);
+	int changeOrderStatus(Map<String, Object> params);
+
+	
 }
