@@ -315,5 +315,9 @@ public boolean deleteReview(int orderId) {
 		return memberDao.checkActiveOrder(memberId);
 	}
 
+	public String getEnrollDate(String memberId) {
+		return memberDao.getEnrollDate(memberId);
+	}
+
 
 }

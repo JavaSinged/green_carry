@@ -386,4 +386,10 @@ public class MemberController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("SERVER_ERROR");
         }
     }
+    @GetMapping("/enroll-date")
+    public ResponseEntity<String> getEnrollDate(@RequestParam("memberId")String memberId) {
+    String enrollDate = memberService.getEnrollDate(memberId);
+    return ResponseEntity.ok(enrollDate);
+    }
+    
 }

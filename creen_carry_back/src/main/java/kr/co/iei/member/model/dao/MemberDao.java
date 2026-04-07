@@ -59,4 +59,6 @@ public interface MemberDao {
 
 	int deleteReview(int orderId);
 
+	String getEnrollDate(String memberId);
+
 }

@@ -219,7 +219,11 @@
 	<delete id="deleteReview">
 		DELETE FROM review_tbl WHERE order_id = #{orderId}
 	</delete>
-
+	<select id="getEnrollDate" parameterType="String" resultType="String">
+        SELECT TO_CHAR(enroll_date, 'YYYY-MM-DD')
+        FROM member_tbl 
+        WHERE member_id = #{memberId}
+    </select>
 
 
 

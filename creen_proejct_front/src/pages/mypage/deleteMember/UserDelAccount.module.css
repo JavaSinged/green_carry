@@ -34,6 +34,8 @@
   text-align: left;
   padding-bottom: 155px;
   margin-top: 25px;
+  border-left: 5px solid var(--color-brand, #2e8147);
+  margin-top: 10px;
 }
 .warning_icon {
   display: flex;
@@ -244,4 +246,9 @@
   display: flex;
   align-items: center;
   cursor: pointer;
+}
+.top_icon {
+  width: 80px;
+  height: auto;
+  margin-bottom: 7px;
 }
