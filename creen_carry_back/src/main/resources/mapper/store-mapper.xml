@@ -176,7 +176,7 @@
 		o.delivery_type AS deliveryType,
 		o.order_status AS
 		orderStatus,
-		TO_CHAR(olm.reg_date, 'YYYYMMDD') AS orderDate
+		TO_CHAR(olm.reg_date, 'YYYY-MM-DD HH24:MI') AS orderDate
 		FROM
 		order_tbl o
 		JOIN store_tbl s ON o.store_id = s.store_id
@@ -202,12 +202,14 @@
 		o.order_status AS orderStatus,
 		o.get_point AS
 		getPoint, o.review_status AS reviewStatus, TO_CHAR(olm.reg_date,
-		'YYYY-MM-DD') AS orderDate,
+		'YYYY-MM-DD HH24:MI') AS orderDate,
 
 		-- 1. 합계 정보
-		od_sum.totalPrice AS totalPrice,
+		od_sum.totalPrice AS
+		totalPrice,
 		od_sum.totalCount AS totalCount,
-		od_sum.orderCarbon AS orderCarbon,
+		od_sum.orderCarbon AS
+		orderCarbon,
 		(od_sum.totalCount - 1) AS extraCount,
 
 		-- 2. 대표 메뉴 정보
@@ -230,7 +232,8 @@
 
 
 
-		FROM order_tbl o
+		FROM
+		order_tbl o
 		JOIN store_tbl s ON o.store_id = s.store_id
 		JOIN
 		order_list_map olm ON o.order_id = olm.order_id
@@ -303,18 +306,22 @@
 		rc.review_comment_content AS
 		reviewCommentContent,
 		TO_CHAR(rc.review_comment_date, 'YYYY-MM-DD
-		HH24:MI') AS reviewCommentDate,
+		HH24:MI') AS
+		reviewCommentDate,
 
 		(SELECT
 		md.menu_name
 		FROM order_detail od
-		JOIN menu_tbl md ON od.menu_id =
+		JOIN menu_tbl
+		md ON od.menu_id =
 		md.menu_id
 		WHERE od.order_id = r.order_id
-		AND ROWNUM = 1) AS menuName
+		AND ROWNUM =
+		1) AS menuName
 
 		FROM review_tbl r
-		JOIN member_tbl m ON r.member_id = m.member_id
+		JOIN member_tbl m ON r.member_id =
+		m.member_id
 		LEFT
 		JOIN review_comment_tbl rc ON r.order_id = rc.order_id
 		WHERE r.store_id
@@ -329,9 +336,11 @@
 		o.store_id AS storeId,
 		s.store_name AS storeName,
 		o.order_status AS orderStatus,
-		o.get_point AS getPoint,
+		o.get_point AS
+		getPoint,
 		o.review_status AS reviewStatus,
-		TO_CHAR(olm.reg_date, 'YYYY-MM-DD HH24:MI') AS orderDate,
+		TO_CHAR(olm.reg_date,
+		'YYYY-MM-DD HH24:MI') AS orderDate,
 
 		od_sum.totalPrice AS totalPrice,
 		od_sum.totalCount AS totalCount,
@@ -343,17 +352,21 @@
 
 		o.delivery_type AS deliveryType,
 		CASE
-		WHEN o.delivery_type = 1 THEN 0
+		WHEN
+		o.delivery_type = 1 THEN 0
 		WHEN o.delivery_type = 2 THEN 1000
 		ELSE 2000
 		END AS deliveryPrice,
 		s.store_address AS storeAddress,
-		m.member_addr AS deliveryAddress
+		m.member_addr AS
+		deliveryAddress
 
 		FROM order_tbl o
-		JOIN store_tbl s ON o.store_id = s.store_id
+		JOIN store_tbl s ON o.store_id =
+		s.store_id
 		JOIN order_list_map olm ON o.order_id = olm.order_id
-		JOIN member_tbl m ON o.member_id = m.member_id
+		JOIN
+		member_tbl m ON o.member_id = m.member_id
 
 		JOIN (
 		SELECT order_id,
@@ -361,21 +374,26 @@
 		SUM(price * quantity) AS totalPrice,
 		SUM(total_carbon * quantity) AS orderCarbon
 		FROM order_detail
-		GROUP BY order_id
+		GROUP BY
+		order_id
 		) od_sum ON o.order_id = od_sum.order_id
 
 		JOIN (
 		SELECT od1.*
 		FROM order_detail od1
 		JOIN (
-		SELECT order_id, MIN(order_detail_id) AS min_detail_id
+		SELECT order_id, MIN(order_detail_id) AS
+		min_detail_id
 		FROM order_detail
 		GROUP BY order_id
-		) x ON od1.order_id = x.order_id AND od1.order_detail_id =
+		) x ON od1.order_id =
+		x.order_id AND od1.order_detail_id =
 		x.min_detail_id
-		) od_first ON o.order_id = od_first.order_id
+		) od_first ON
+		o.order_id = od_first.order_id
 
-		JOIN menu_tbl md ON od_first.menu_id = md.menu_id
+		JOIN menu_tbl md ON od_first.menu_id =
+		md.menu_id
 
 		WHERE o.store_id = #{storeId}
 		ORDER BY o.order_id DESC
@@ -384,6 +402,7 @@
 	<update id="changeOrderStatus">
 		UPDATE order_tbl
 		SET order_status = #{status}
-		WHERE order_id = #{orderId}
+		WHERE
+		order_id = #{orderId}
 	</update>
 </mapper>

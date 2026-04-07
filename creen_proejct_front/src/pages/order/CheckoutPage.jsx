@@ -43,8 +43,6 @@ const CheckoutPage = () => {
         setGetPoint(Number(res.data.getPoint ?? 0));
         setDeliveryPrice(Number(res.data.deliveryPrice ?? 0));
         setStoreName(res.data.storeName);
-
-        // 배달 방식 저장
         setDeliveryType(res.data.deliveryType ?? 0);
 
         const status = res.data.orderStatus ?? 0;
@@ -52,7 +50,6 @@ const CheckoutPage = () => {
         setOrderDate(res.data.orderDate);
         setTotalCarbon(res.data.totalReduceCarbon);
 
-        // 우주 돌파 방지 로직
         if (status === 9 || status < 2) {
           setOrderState(-1);
         } else {
@@ -199,7 +196,6 @@ const CheckoutPage = () => {
     <div className={styles.page}>
       <main className={styles.main}>
         <section className={styles.completeCard}>
-          {/* 🌟 [수정] 취소 상태일 때 아이콘 변경 */}
           <div
             className={styles.completeIcon}
             style={{ backgroundColor: rawOrderStatus === 9 ? "#ff4757" : "" }}
@@ -207,14 +203,12 @@ const CheckoutPage = () => {
             {rawOrderStatus === 9 ? "✕" : "✓"}
           </div>
 
-          {/* 🌟 [수정] 취소 상태일 때 제목 변경 */}
           <h1 className={styles.completeTitle}>
             {rawOrderStatus === 9
               ? "주문이 취소되었습니다."
               : "주문이 완료되었습니다!"}
           </h1>
 
-          {/* 🌟 [수정] 취소 상태일 때 안내 문구 분기 */}
           <p className={styles.completeDesc}>
             {rawOrderStatus === 9
               ? "결제하신 금액은 카드사에 따라 영업일 기준 2~3일 내로 환불될 예정입니다."
@@ -230,7 +224,9 @@ const CheckoutPage = () => {
             주문내역 확인
           </button>
           <p className={styles.orderNumber}>
-            ECO-{orderDate ? orderDate.replace(/-/g, "") : ""}-{orderId}
+            {/* 🌟 [수정] 띄어쓰기 기준으로 앞의 날짜 부분만 가져와서 표시 */}
+            ECO-{orderDate ? orderDate.split(" ")[0].replace(/-/g, "") : ""}-
+            {orderId}
           </p>
         </section>
 
@@ -318,6 +314,20 @@ const CheckoutPage = () => {
           <aside className={styles.rightColumn}>
             <div className={styles.orderInfoCard}>
               <h3 className={styles.rightTitle}>주문 내역</h3>
+
+              {/* 🌟 [추가] 주문 시각 표시 */}
+              {orderDate && (
+                <p
+                  style={{
+                    fontSize: "14px",
+                    color: "#666",
+                    marginBottom: "0px",
+                    marginTop: "0px",
+                  }}
+                >
+                  주문 일시 : {orderDate}
+                </p>
+              )}
 
               <div className={styles.orderList}>
                 <OrderListMap orderList={orderList} />
