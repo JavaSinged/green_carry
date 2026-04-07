@@ -74,6 +74,34 @@ const ManagerReviewComment = () => {
       Swal.fire("실패", "답글 등록 중 서버 오류가 발생했습니다.", "error");
     }
   };
+  const deleteReview = (orderId) => {
+    Swal.fire({
+      title: "리뷰를 삭제하시겠습니까?",
+      text: "삭제된 리뷰는 복구할 수 없습니다.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33", // 삭제 버튼은 빨간색으로 강조
+      cancelButtonColor: "#ccc",
+      confirmButtonText: "삭제",
+      cancelButtonText: "취소",
+      reverseButtons: true,
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          // 기존 유저 리뷰 삭제 API를 그대로 사용하거나,
+          // 사장님 전용 삭제 경로가 필요하다면 주소를 변경하세요.
+          const res = await api.delete(`/member/deleteReview/${orderId}`);
+          if (res.data === "SUCCESS") {
+            Swal.fire("성공", "리뷰가 삭제되었습니다.", "success");
+            fetchReviews(); // 목록 새로고침
+          }
+        } catch (err) {
+          console.error(err);
+          Swal.fire("에러", "리뷰 삭제 중 오류가 발생했습니다.", "error");
+        }
+      }
+    });
+  };
 
   return (
     <div className={styles.page}>
@@ -87,7 +115,19 @@ const ManagerReviewComment = () => {
           <p className={styles.noData}>아직 등록된 리뷰가 없습니다.</p>
         ) : (
           reviews.map((review) => (
-            <div key={review.orderId} className={styles.reviewCard}>
+            <div
+              key={review.orderId}
+              className={styles.reviewCard}
+              style={{ position: "relative" }}
+            >
+              {/* 🗑️ 삭제 버튼 추가 (우측 상단) */}
+              <button
+                className={styles.deleteBtn}
+                onClick={() => deleteReview(review.orderId)}
+                title="리뷰 삭제"
+              >
+                삭제
+              </button>
               {/* 🧑‍🦱 고객 리뷰 영역 */}
               <div className={styles.customerSection}>
                 <div className={styles.reviewHeader}>
@@ -137,7 +177,7 @@ const ManagerReviewComment = () => {
                     <div className={styles.inputWrap}>
                       <textarea
                         className={styles.textarea}
-                        placeholder="고객님께 감사 인사를 남겨보세요. (최소 5자)"
+                        placeholder="고객님께 감사 인사를 남겨주세요. (최소 5자)"
                         value={replyInputs[review.orderId] || ""}
                         onChange={(e) =>
                           handleInputChange(review.orderId, e.target.value)

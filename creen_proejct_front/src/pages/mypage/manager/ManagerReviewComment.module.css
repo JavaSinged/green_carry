@@ -24,15 +24,35 @@
 }
 
 .reviewCard {
+  position: relative;
   background: #fff;
   border-radius: 12px;
   padding: 24px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  margin-bottom: 20px;
 }
 
 /* 고객 리뷰 영역 */
 .customerSection {
   margin-bottom: 20px;
+}
+.deleteBtn {
+  position: absolute;
+  top: 50px;
+  right: 20px;
+  background-color: #ffeded;
+  color: #e74c3c;
+  border: 1px solid #ffcaca;
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.deleteBtn:hover {
+  background-color: #e74c3c;
+  color: #fff;
 }
 
 .reviewHeader {
