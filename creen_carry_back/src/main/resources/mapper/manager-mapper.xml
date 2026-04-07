@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="kr.co.iei.store.model.dao.ManagerDao">
+    <select id="selectAllContainers" resultType="container">
+        select * from carbon_definition_tbl
+    </select>
+
+    <insert id="insertMenu" parameterType="menuSaveRequest">
+        <selectKey keyProperty="menuId" resultType="long" order="BEFORE">
+            SELECT menu_seq.NEXTVAL FROM dual
+        </selectKey>
+        INSERT INTO menu_tbl (
+        menu_id, store_id, menu_name, menu_info, menu_price, menu_category, menu_image, menu_status
+        ) VALUES (
+        #{menuId}, #{storeId}, #{menuName}, #{menuInfo}, #{menuPrice}, #{menuCategory}, #{menuImage}, 1
+        )
+    </insert>
+
+    <update id="updateMenu" parameterType="menuSaveRequest">
+        UPDATE menu_tbl
+        SET menu_name = #{menuName},
+            menu_info = #{menuInfo},
+            menu_price = #{menuPrice},
+            menu_category = #{menuCategory},
+            menu_image = #{menuImage}
+        WHERE menu_id = #{menuId} AND store_id = #{storeId}
+    </update>
+
+    <insert id="insertNewOption" parameterType="menuOption">
+        <selectKey keyProperty="optionNo" resultType="long" order="BEFORE">
+            SELECT option_seq.NEXTVAL FROM dual
+        </selectKey>
+        INSERT INTO option_tbl (
+        option_no, option_type, option_name, option_price
+        ) VALUES (
+        #{optionNo}, #{optionType}, #{optionName}, #{optionPrice}
+        )
+    </insert>
+
+    <insert id="insertMenuOptionMap" parameterType="map">
+        INSERT INTO menu_option_map (menu_id, option_no)
+        VALUES (#{menuId}, #{optionNo})
+    </insert>
+
+    <insert id="insertContainerMap" parameterType="map">
+        INSERT INTO carbon_menu_map (menu_id, product_id, container_count)
+        VALUES (#{menuId}, #{productId}, #{count})
+    </insert>
+
+    <delete id="deleteMenuOptionMap" parameterType="long">
+        DELETE FROM menu_option_map WHERE menu_id = #{menuId}
+    </delete>
+
+    <delete id="deleteContainerMap" parameterType="long">
+        DELETE FROM carbon_menu_map WHERE menu_id = #{menuId}
+    </delete>
+</mapper>

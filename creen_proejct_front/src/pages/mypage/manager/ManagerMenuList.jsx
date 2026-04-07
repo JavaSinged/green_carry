@@ -7,8 +7,11 @@ import SearchIcon from '@mui/icons-material/Search';
 import ImageOutlinedIcon from '@mui/icons-material/ImageOutlined';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import { useNavigate } from 'react-router-dom';
 
 const ManagerMenuList = () => {
+  const navigate = useNavigate();
+
   const [menus, setMenus] = useState([]); // 전체 메뉴 원본 데이터
   const [searchKeyword, setSearchKeyword] = useState('');
   const [storeId, setStoreId] = useState('');
@@ -85,25 +88,41 @@ const ManagerMenuList = () => {
       {/* 상단 헤더 및 검색바 */}
       <div className={styles.header}>
         <h2 className={styles.title}>상점 메뉴 리스트</h2>
-        <div className={styles.search_wrap}>
-          <input
-            type="search"
-            className={styles.search_input}
-            placeholder="메뉴 이름 검색"
-            value={searchKeyword}
-            onChange={handleSearchChange}
-          />
-          <SearchIcon className={styles.search_icon} />
+        <div className={styles.header_right}>
+          <div className={styles.search_wrap}>
+            <input
+              type="search"
+              className={styles.search_input}
+              placeholder="메뉴 이름 검색"
+              value={searchKeyword}
+              onChange={handleSearchChange}
+            />
+            <SearchIcon className={styles.search_icon} />
+          </div>
+          <button
+            className={styles.addButton}
+            onClick={() => {
+              navigate(`/mypage/manager/menus/menuEdit/${storeId}`);
+            }}
+          >
+            메뉴 추가
+          </button>
         </div>
-
-        <button className={styles.addButton}>메뉴 추가</button>
       </div>
 
       {/* 메뉴 리스트 (Grid) */}
       <div className={styles.grid_container}>
         {currentMenus.length > 0 ? (
           currentMenus.map((menu) => (
-            <div key={menu.menuId} className={styles.menu_card}>
+            <div
+              key={menu.menuId}
+              className={styles.menu_card}
+              onClick={() => {
+                navigate(
+                  `/mypage/manager/menus/menuEdit/${storeId}/${menu.menuId}`,
+                );
+              }}
+            >
               <div className={styles.image_placeholder}>
                 {/* 만약 이미지 URL이 있다면 img 태그로 교체 가능 */}
                 <ImageOutlinedIcon sx={{ fontSize: 60, color: '#bdbdbd' }} />

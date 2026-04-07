@@ -3,7 +3,7 @@ package kr.co.iei.store.controller;
 import kr.co.iei.store.model.service.StoreService;
 import kr.co.iei.store.model.vo.Menu;
 import kr.co.iei.store.model.vo.MenuOption;
-import kr.co.iei.store.model.vo.MenuSaveRequestDto;
+import kr.co.iei.store.model.vo.MenuSaveRequest;
 import kr.co.iei.store.model.vo.Order;
 import kr.co.iei.store.model.vo.OrderItem;
 import kr.co.iei.store.model.vo.OrderListResponse;
@@ -55,13 +55,6 @@ public class StoreController {
 
         // 데이터가 없어도 빈 배열([])을 담아 200 OK 응답 (프론트 에러 방지)
         return ResponseEntity.ok(menuList);
-    }
-
-    @GetMapping("/options/all")
-    public ResponseEntity<?> getAllOptions(){
-    	List<MenuOption> options = storeService.getAllMenuOptions();
-    	System.out.println(options);
-    	return ResponseEntity.ok(options);
     }
     
     @GetMapping("/{menuId}/options")

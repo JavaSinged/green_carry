@@ -1,46 +1,46 @@
-import "./App.css";
-import Header from "./components/commons/Header";
-import Footer from "./components/commons/Footer";
-import { Route, Routes, Outlet } from "react-router-dom";
-import Home from "./pages/main/Home";
-import StoreView from "./pages/main/StoreView";
-import StoreDetail from "./pages/main/StoreDetail";
-import NotFound from "./pages/error/NotFound";
+import './App.css';
+import Header from './components/commons/Header';
+import Footer from './components/commons/Footer';
+import { Route, Routes, Outlet } from 'react-router-dom';
+import Home from './pages/main/Home';
+import StoreView from './pages/main/StoreView';
+import StoreDetail from './pages/main/StoreDetail';
+import NotFound from './pages/error/NotFound';
 
-import OrderPage from "./pages/order/OrderPage";
-import PaymentPage from "./pages/order/PaymentPage";
-import CheckoutPage from "./pages/order/CheckoutPage";
+import OrderPage from './pages/order/OrderPage';
+import PaymentPage from './pages/order/PaymentPage';
+import CheckoutPage from './pages/order/CheckoutPage';
 
-import Login from "./pages/login/Login";
-import Account from "./pages/login/FindAccount";
-import UserLayout from "./components/layout/mypageSidebar/UserLayout";
-import ManagerLayout from "./components/layout/mypageSidebar/ManagerLayout";
-import AdminLayout from "./components/layout/mypageSidebar/AdminLayout";
-import UserProfile from "./pages/mypage/user/UserProfile";
-import UserInfoEdit from "./pages/mypage/user/UserInfoEdit";
-import UserDelAccount from "./pages/mypage/deleteMember/UserDelAccount";
+import Login from './pages/login/Login';
+import Account from './pages/login/FindAccount';
+import UserLayout from './components/layout/mypageSidebar/UserLayout';
+import ManagerLayout from './components/layout/mypageSidebar/ManagerLayout';
+import AdminLayout from './components/layout/mypageSidebar/AdminLayout';
+import UserProfile from './pages/mypage/user/UserProfile';
+import UserInfoEdit from './pages/mypage/user/UserInfoEdit';
+import UserDelAccount from './pages/mypage/deleteMember/UserDelAccount';
 
-import { AuthProvider } from "./context/AuthContext";
-import UserSignup from "./pages/signup/UserSignup";
-import ManagerSignup from "./pages/signup/ManagerSignup";
-import Signup from "./pages/signup/Signup";
-import UserCS from "./pages/mypage/user/UserCS";
+import { AuthProvider } from './context/AuthContext';
+import UserSignup from './pages/signup/UserSignup';
+import ManagerSignup from './pages/signup/ManagerSignup';
+import Signup from './pages/signup/Signup';
+import UserCS from './pages/mypage/user/UserCS';
 
-import ManagerInfoEdit from "./pages/mypage/manager/ManagerInfoEdit";
-import ManagerMenuList from "./pages/mypage/manager/ManagerMenuList";
-import ManagerMenuEdit from "./pages/mypage/manager/ManagerMenuEdit";
+import ManagerInfoEdit from './pages/mypage/manager/ManagerInfoEdit';
+import ManagerMenuList from './pages/mypage/manager/ManagerMenuList';
+import ManagerMenuEdit from './pages/mypage/manager/ManagerMenuEdit';
 
-import AdminDashboard from "./pages/mypage/admin/AdminDashboard";
-import AdminUserManagement from "./pages/mypage/admin/AdminUserManagement";
-import AdminStoreManagement from "./pages/mypage/admin/AdminStoreManagement";
-import AdminReviewManagement from "./pages/mypage/admin/AdminReviewManagement";
-import AdminContainerManagement from "./pages/mypage/admin/AdminContainerManagement";
+import AdminDashboard from './pages/mypage/admin/AdminDashboard';
+import AdminUserManagement from './pages/mypage/admin/AdminUserManagement';
+import AdminStoreManagement from './pages/mypage/admin/AdminStoreManagement';
+import AdminReviewManagement from './pages/mypage/admin/AdminReviewManagement';
+import AdminContainerManagement from './pages/mypage/admin/AdminContainerManagement';
 
 // 🌟 문지기 컴포넌트
-import ProtectedRoute from "./context/ProtectedRoute";
-import ManagerDelAccount from "./pages/mypage/deleteMember/ManagerDelAccount";
-import UserOrderList from "./pages/mypage/user/UserOrderList";
-import UserReviewList from "./pages/mypage/user/UserReviewList";
+import ProtectedRoute from './context/ProtectedRoute';
+import ManagerDelAccount from './pages/mypage/deleteMember/ManagerDelAccount';
+import UserOrderList from './pages/mypage/user/UserOrderList';
+import UserReviewList from './pages/mypage/user/UserReviewList';
 
 const BasicLayout = () => {
   return (
@@ -94,7 +94,7 @@ function App() {
                 <Route path="orderList" element={<UserOrderList />} />
                 <Route path="deleteMember" element={<UserDelAccount />} />
               </Route>
-            </Route>{" "}
+            </Route>{' '}
             {/* ---------------------------------------------------- */}
             {/* 사업자 파트너 (Grade: 2) 구역 */}
             <Route element={<ProtectedRoute requireManager={true} />}>
@@ -102,7 +102,10 @@ function App() {
                 <Route index element={<div>사업자 대시보드 화면</div>} />
                 <Route path="profile" element={<ManagerInfoEdit />} />
                 <Route path="menus" element={<ManagerMenuList />} />
-                <Route path="menuEdit" element={<ManagerMenuEdit />} />
+                <Route
+                  path="menus/menuEdit/:storeId/:menuId?"
+                  element={<ManagerMenuEdit />}
+                />
                 <Route path="deleteMember" element={<ManagerDelAccount />} />
               </Route>
             </Route>

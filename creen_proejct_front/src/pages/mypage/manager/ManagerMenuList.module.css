@@ -10,6 +10,11 @@
   margin-bottom: 24px;
 }
 
+.header_right {
+  display: flex;
+  gap: 10px;
+}
+
 .grid_container {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -21,6 +26,7 @@
   font-family: var(--font-title);
   font-size: 24px;
   color: var(--text-main);
+  white-space: nowrap;
   margin: 0;
 }
 
@@ -67,19 +73,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 42px; /* 검색창(input)과 높이 맞춤 */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  height: 100%;
 }
 
 .addButton:hover {
-  background-color: #334155; /* 살짝 밝은 네이비로 호버 효과 */
-  transform: translateY(-1px); /* 살짝 떠오르는 효과 */
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
-}
-
-.addButton:active {
-  transform: translateY(0);
-  background-color: #0f172a; /* 클릭 시 더 어둡게 */
 }
 
 .menu_card {

@@ -1,5 +1,5 @@
-import { NavLink, Outlet } from "react-router-dom";
-import styles from "./Layout.module.css";
+import { NavLink, Outlet } from 'react-router-dom';
+import styles from './Layout.module.css';
 
 export default function ManagerLayout() {
   return (
@@ -11,7 +11,7 @@ export default function ManagerLayout() {
           <li>
             <NavLink
               to="/mypage/orders"
-              className={({ isActive }) => (isActive ? styles.activeMenu : "")}
+              className={({ isActive }) => (isActive ? styles.activeMenu : '')}
             >
               상점 관리
             </NavLink>
@@ -19,7 +19,7 @@ export default function ManagerLayout() {
           <li>
             <NavLink
               to="/mypage/manager/menus"
-              className={({ isActive }) => (isActive ? styles.activeMenu : "")}
+              className={({ isActive }) => (isActive ? styles.activeMenu : '')}
             >
               메뉴 관리
             </NavLink>
@@ -27,7 +27,7 @@ export default function ManagerLayout() {
           <li>
             <NavLink
               to="/mypage/reviews"
-              className={({ isActive }) => (isActive ? styles.activeMenu : "")}
+              className={({ isActive }) => (isActive ? styles.activeMenu : '')}
             >
               주문 관리
             </NavLink>
@@ -35,7 +35,7 @@ export default function ManagerLayout() {
           <li>
             <NavLink
               to="/mypage/points"
-              className={({ isActive }) => (isActive ? styles.activeMenu : "")}
+              className={({ isActive }) => (isActive ? styles.activeMenu : '')}
             >
               리뷰 관리
             </NavLink>
@@ -43,7 +43,7 @@ export default function ManagerLayout() {
           <li>
             <NavLink
               to="/mypage/manager/profile"
-              className={({ isActive }) => (isActive ? styles.activeMenu : "")}
+              className={({ isActive }) => (isActive ? styles.activeMenu : '')}
             >
               개인정보 수정
             </NavLink>
@@ -51,7 +51,7 @@ export default function ManagerLayout() {
           <li>
             <NavLink
               to="/mypage/profile"
-              className={({ isActive }) => (isActive ? styles.activeMenu : "")}
+              className={({ isActive }) => (isActive ? styles.activeMenu : '')}
             >
               고객센터
             </NavLink>
