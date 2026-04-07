@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import styles from "./UserOrderList.module.css";
 import ReviewModal from "../../../components/layout/ReviewModal";
+import Swal from "sweetalert2"; // 🌟 [추가] 알림창을 위한 Swal 임포트
 
 const UserOrderListPage = () => {
   const [orderList, setOrderList] = useState([]);
@@ -10,7 +11,6 @@ const UserOrderListPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
 
-  // 날짜 필터링 상태 (기본값: 빈 문자열)
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
 
@@ -29,9 +29,51 @@ const UserOrderListPage = () => {
 
   useEffect(() => {
     fetchOrders();
+
+    const intervalId = setInterval(() => {
+      fetchOrders();
+    }, 5000);
+
+    return () => {
+      clearInterval(intervalId);
+    };
   }, [memberId]);
 
-  // 날짜 필터링 + 최신순 정렬
+  // 🌟 [추가] 유저용 주문 취소 함수
+  const cancelOrder = (orderId) => {
+    Swal.fire({
+      title: "주문 취소",
+      text: "정말 주문을 취소하시겠습니까?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      confirmButtonText: "취소 확정",
+      cancelButtonText: "돌아가기",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        axios
+          .patch(
+            `${import.meta.env.VITE_BACKSERVER}/stores/order/${orderId}/status`,
+            {
+              status: 9, // 9: 주문취소 상태
+            },
+          )
+          .then(() => {
+            Swal.fire(
+              "취소 완료",
+              "주문이 정상적으로 취소되었습니다.",
+              "success",
+            );
+            fetchOrders(); // 목록 새로고침
+          })
+          .catch((err) => {
+            console.error(err);
+            Swal.fire("오류", "주문 취소에 실패했습니다.", "error");
+          });
+      }
+    });
+  };
+
   const filteredAndSortedOrders = useMemo(() => {
     let filtered = [...orderList];
 
@@ -109,10 +151,8 @@ const UserOrderListPage = () => {
             const isNotReviewed = Number(order.reviewStatus) === 0;
             const isAlreadyReviewed = Number(order.reviewStatus) === 1;
 
-            // 🌟 [추가] 3일 이내 작성 여부 계산 로직
             const orderDateObj = new Date(order.orderDate);
             const now = new Date();
-            // 시간 차이를 일(day) 단위로 변환
             const diffDays =
               (now.getTime() - orderDateObj.getTime()) / (1000 * 60 * 60 * 24);
             const isWithin3Days = diffDays <= 3;
@@ -144,7 +184,17 @@ const UserOrderListPage = () => {
                       {getOrderStatusText(order.orderStatus)}
                     </span>
 
-                    {/* 🌟 [수정] 배달완료 + 3일 이내 조건 적용 */}
+                    {/* 🌟 [추가] 결제대기(0) 또는 접수대기(1)일 때만 주문 취소 버튼 표시 */}
+                    {(order.orderStatus === 0 || order.orderStatus === 1) && (
+                      <button
+                        className={styles.cancelBtn}
+                        onClick={() => cancelOrder(order.orderId)}
+                      >
+                        주문 취소
+                      </button>
+                    )}
+
+                    {/* 배달완료 + 리뷰 조건 로직 */}
                     {isDelivered &&
                       (isAlreadyReviewed ? (
                         <button className={styles.reviewBtnDisabled} disabled>

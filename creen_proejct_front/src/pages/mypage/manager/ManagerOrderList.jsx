@@ -191,8 +191,8 @@ const ManagerOrderList = () => {
                       </button>
                     )}
 
-                    {/* 접수대기(1) 또는 주문접수(2) 상태일 때만 취소 버튼 표시 */}
-                    {(order.orderStatus === 1 || order.orderStatus === 2) && (
+                    {/* 🌟 수정 부분: 접수대기(1) 상태일 때만 '주문 거절' 버튼 표시 */}
+                    {order.orderStatus === 1 && (
                       <button
                         className={styles.cancelBtn}
                         onClick={() => cancelOrder(order.orderId)}

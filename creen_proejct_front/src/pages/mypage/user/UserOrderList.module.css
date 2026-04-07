@@ -217,3 +217,19 @@
 .resetBtn:hover {
   background: #e2e6e3;
 }
+.cancelBtn {
+  background-color: white;
+  color: #ff4757;
+  border: 1px solid #ff4757;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-left: 8px; /* 뱃지와 간격 벌리기 */
+  transition: all 0.2s;
+}
+
+.cancelBtn:hover {
+  background-color: #fff0f1;
+}
