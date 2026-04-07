@@ -25,11 +25,13 @@ const CheckoutPage = () => {
 
   // 상태 관리를 위한 State
   const [orderState, setOrderState] = useState(0); // UI 프로그레스바용
-  const [rawOrderStatus, setRawOrderStatus] = useState(0); // 🌟 [추가] 실제 백엔드 상태(0~9) 저장용
+  const [rawOrderStatus, setRawOrderStatus] = useState(0); // 실제 백엔드 상태(0~9) 저장용
   const [orderDate, setOrderDate] = useState("");
   const [totalCarbon, setTotalCarbon] = useState(0);
 
-  // 🌟 [수정] 1. 주문 정보를 불러오는 함수를 분리
+  // 배달 타입 상태 추가 (1: 픽업, 2/3: 배달)
+  const [deliveryType, setDeliveryType] = useState(0);
+
   const fetchOrderDetails = () => {
     if (!orderId) return;
 
@@ -42,9 +44,11 @@ const CheckoutPage = () => {
         setDeliveryPrice(Number(res.data.deliveryPrice ?? 0));
         setStoreName(res.data.storeName);
 
-        // 상태 업데이트
-        setRawOrderStatus(res.data.orderStatus ?? 0); // 실제 상태 저장
-        setOrderState((res.data.orderStatus ?? 2) - 2); // UI 바 상태
+        // 배달 방식 저장
+        setDeliveryType(res.data.deliveryType ?? 0);
+
+        setRawOrderStatus(res.data.orderStatus ?? 0);
+        setOrderState((res.data.orderStatus ?? 2) - 2);
         setOrderDate(res.data.orderDate);
         setTotalCarbon(res.data.totalReduceCarbon);
       })
@@ -53,18 +57,16 @@ const CheckoutPage = () => {
       });
   };
 
-  // 🌟 [추가] 2. 10초마다 자동 새로고침(폴링) 적용
   useEffect(() => {
-    fetchOrderDetails(); // 첫 진입 시 즉시 실행
+    fetchOrderDetails();
 
     const intervalId = setInterval(() => {
-      fetchOrderDetails(); // 10초마다 반복 실행
+      fetchOrderDetails();
     }, 5000);
 
-    return () => clearInterval(intervalId); // 컴포넌트 언마운트 시 타이머 정리
+    return () => clearInterval(intervalId);
   }, [orderId]);
 
-  // 🌟 [수정] 3. 주문 취소 함수 (SweetAlert 적용 및 백엔드 일치)
   const cancelOrder = () => {
     Swal.fire({
       title: "주문 취소",
@@ -79,7 +81,7 @@ const CheckoutPage = () => {
         axios
           .patch(
             `${import.meta.env.VITE_BACKSERVER}/stores/order/${orderId}/status`,
-            { status: 9 }, // 상태를 9(취소)로 변경
+            { status: 9 },
           )
           .then(() => {
             Swal.fire(
@@ -87,7 +89,7 @@ const CheckoutPage = () => {
               "주문이 정상적으로 취소되었습니다.",
               "success",
             ).then(() => {
-              navigate("/"); // 취소 성공 후 홈이나 주문내역으로 이동
+              navigate("/mypage/user/orderList");
             });
           })
           .catch((err) => {
@@ -163,6 +165,31 @@ const CheckoutPage = () => {
     }
   }, [mapLoaded]);
 
+  // 픽업 여부 변수 (1이면 픽업)
+  const isPickup = deliveryType === 1;
+
+  // 🌟 [추가] 상태별로 안내 메시지를 반환하는 함수
+  const getStatusMessage = (status, isPickup) => {
+    if (status === 9) return "주문이 아쉽게도 취소되었습니다.";
+    if (status === 0 || status === 1)
+      return "주문이 전달되었습니다. 사장님의 수락을 기다리고 있어요!";
+    if (status === 2)
+      return "사장님이 주문을 확인했습니다. 곧 조리가 시작됩니다.";
+    if (status === 3)
+      return "맛있게 음식을 조리하고 있습니다. 조금만 기다려주세요 🍳";
+    if (status === 4) {
+      return isPickup
+        ? "음식이 준비되었습니다! 매장으로 방문해 주세요 🏃‍♂️"
+        : "기사님이 배달을 출발했습니다! 곧 도착합니다 🛵";
+    }
+    if (status === 5) {
+      return isPickup
+        ? "픽업이 완료되었습니다. 맛있게 드세요! 😋"
+        : "배달이 완료되었습니다. 맛있게 드세요! 😋";
+    }
+    return "주문 상태를 확인하고 있습니다.";
+  };
+
   return (
     <div className={styles.page}>
       <main className={styles.main}>
@@ -170,10 +197,17 @@ const CheckoutPage = () => {
           <div className={styles.completeIcon}>✓</div>
           <h1 className={styles.completeTitle}>주문이 완료되었습니다!</h1>
           <p className={styles.completeDesc}>
-            친환경 배달을 선택해 주셔서 감사합니다.
+            {isPickup
+              ? "매장 방문 픽업을 선택해 주셔서 감사합니다."
+              : "친환경 배달을 선택해 주셔서 감사합니다."}
           </p>
 
-          <button className={styles.orderCheckBtn}>주문내역 확인</button>
+          <button
+            className={styles.orderCheckBtn}
+            onClick={() => navigate("/mypage/user/orderList")}
+          >
+            주문내역 확인
+          </button>
           <p className={styles.orderNumber}>
             ECO-{orderDate ? orderDate.replace(/-/g, "") : ""}-{orderId}
           </p>
@@ -195,31 +229,33 @@ const CheckoutPage = () => {
             </div>
 
             <div className={styles.progressSteps}>
-              {["주문 접수", "조리중", "배달중", "배달 완료"].map(
-                (label, index) => (
-                  <div key={index} className={styles.step}>
-                    <div
-                      className={`${styles.circle} ${
-                        orderState >= index ? styles.active : ""
-                      }`}
-                    />
-                    <p
-                      className={
-                        orderState >= index ? styles.labelActive : styles.label
-                      }
-                    >
-                      {label}
-                    </p>
-                  </div>
-                ),
-              )}
+              {[
+                "주문 접수",
+                "조리중",
+                isPickup ? "픽업 대기" : "배달중",
+                isPickup ? "픽업 완료" : "배달 완료",
+              ].map((label, index) => (
+                <div key={index} className={styles.step}>
+                  <div
+                    className={`${styles.circle} ${
+                      orderState >= index ? styles.active : ""
+                    }`}
+                  />
+                  <p
+                    className={
+                      orderState >= index ? styles.labelActive : styles.label
+                    }
+                  >
+                    {label}
+                  </p>
+                </div>
+              ))}
             </div>
           </div>
 
           <p className={styles.statusMessage}>
-            {rawOrderStatus === 9
-              ? "주문이 취소되었습니다."
-              : "정성껏 음식을 준비하고 있습니다."}
+            {/* 🌟 [수정] 안내 메시지 함수 적용 */}
+            {getStatusMessage(rawOrderStatus, isPickup)}
           </p>
         </section>
 
@@ -250,7 +286,7 @@ const CheckoutPage = () => {
               <div className={styles.arrivalRow}>
                 <div className={styles.arrivalLeft}>
                   <span className={styles.smallIcon}></span>
-                  <span>도착 예정 시간</span>
+                  <span>{isPickup ? "픽업 예정 시간" : "도착 예정 시간"}</span>
                 </div>
                 <strong className={styles.arrivalTime}>19:35</strong>
               </div>
@@ -270,7 +306,7 @@ const CheckoutPage = () => {
                 </div>
 
                 <div className={styles.orderRow}>
-                  <span>에코 딜리버리</span>
+                  <span>{isPickup ? "포장 / 픽업" : "에코 딜리버리"}</span>
                   <span>{deliveryPrice.toLocaleString()} 원</span>
                 </div>
 
@@ -318,13 +354,12 @@ const CheckoutPage = () => {
             <button
               className={styles.primaryBtn}
               onClick={() => {
-                navigate("/mypage/user/orderList"); // 목록으로 가기
+                navigate("/mypage/user/orderList");
               }}
             >
               주문 목록 보기
             </button>
 
-            {/* 🌟 [수정] 4. 결제대기(0), 접수대기(1)일 때만 주문 취소 버튼 표시 */}
             {(rawOrderStatus === 0 || rawOrderStatus === 1) && (
               <button className={styles.secondaryBtn} onClick={cancelOrder}>
                 주문 취소
