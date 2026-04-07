@@ -102,7 +102,8 @@ const UserReviewList = () => {
                     {review.totalPrice?.toLocaleString() || 0}원
                   </span>
                   <span className={styles.order_date}>
-                    📅 {review.reviewDate}
+                    <span className={styles.date_icon}>📅</span>
+                    {review.reviewDate}
                   </span>
                 </div>
                 <button

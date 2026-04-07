@@ -196,9 +196,8 @@
 		AS reviewCommentContent,
 		TO_CHAR(rc.review_comment_date, 'YYYY-MM-DD
 		HH24:MI') AS reviewCommentDate,
-		TO_CHAR(r.review_date,
-		'YYYY-MM-DD') AS
-		reviewDate,
+		TO_CHAR(r.review_date, 'YYYY-MM-DD
+		HH24:MI') AS reviewDate,
 
 		r.member_id AS memberId,
 		m.member_thumb AS
@@ -242,11 +241,16 @@
 		resultType="pointHistory">
 		SELECT
 		o.order_id AS orderId,
-		s.store_name AS storeName, TO_CHAR(m.reg_date, 'YYYY-MM-DD') AS orderDate,
-		o.get_point AS pointAmount FROM order_tbl o
-		JOIN order_list_map m ON o.order_id = m.order_id JOIN store_tbl s ON
-		o.store_id = s.store_id WHERE o.member_id = #{memberId}
-		AND o.order_status = 5 AND m.reg_date >= ADD_MONTHS(SYSDATE, -3) ORDER BY
+		s.store_name AS storeName,
+		TO_CHAR(m.reg_date, 'YYYY-MM-DD') AS orderDate,
+		o.get_point AS
+		pointAmount FROM order_tbl o
+		JOIN order_list_map m ON o.order_id =
+		m.order_id JOIN store_tbl s ON
+		o.store_id = s.store_id WHERE
+		o.member_id = #{memberId}
+		AND o.order_status = 5 AND m.reg_date >=
+		ADD_MONTHS(SYSDATE, -3) ORDER BY
 		m.reg_date DESC
 	</select>
 
