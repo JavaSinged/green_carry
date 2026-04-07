@@ -29,4 +29,12 @@ public interface ManagerDao {
     // 삭제 (수정 시 초기화용)
     int deleteMenuOptionMap(Long menuId);
     int deleteContainerMap(Long menuId);
+
+    MenuSaveRequest selectMenuById(Long menuId);
+
+    List<Container> selectContainersByMenuId(Long menuId);
+
+    int updateMenuStatus(Map<String, Object> map);
+
+    int deleteMenu(Long menuId);
 }

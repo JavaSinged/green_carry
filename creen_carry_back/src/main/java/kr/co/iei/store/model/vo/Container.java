@@ -13,4 +13,5 @@ public class Container {
     private Long productId;
     private String productMaterial;
     private double productEmissions;
+    private int containerCount;
 }

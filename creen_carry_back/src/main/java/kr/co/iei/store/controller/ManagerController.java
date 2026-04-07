@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @CrossOrigin("*")
 @RestController
@@ -28,6 +29,20 @@ public class ManagerController {
     public ResponseEntity<?> getMenuOptions(@PathVariable Long menuId) {
         List<MenuOption> options = managerService.getOptionsByMenuId(menuId);
         return ResponseEntity.ok(options);
+    }
+
+    // [추가] 메뉴 단건 조회
+    @GetMapping("/{menuId}")
+    public ResponseEntity<?> getMenuDetail(@PathVariable Long menuId) {
+        MenuSaveRequest menu = managerService.getMenuById(menuId);
+        return ResponseEntity.ok(menu);
+    }
+
+    // [추가] 메뉴별 용기 목록 조회
+    @GetMapping("/{menuId}/containers")
+    public ResponseEntity<?> getMenuContainers(@PathVariable Long menuId) {
+        List<Container> containers = managerService.getContainersByMenuId(menuId);
+        return ResponseEntity.ok(containers);
     }
 
     // 1. 새 메뉴 등록 (POST)
@@ -50,4 +65,21 @@ public class ManagerController {
         int result = managerService.updateMenuAll(request);
         return result > 0 ? ResponseEntity.ok().build() : ResponseEntity.internalServerError().build();
     }
+
+    // [추가] 판매 상태 변경 (PATCH)
+    @PatchMapping("/{menuId}/status")
+    public ResponseEntity<?> updateMenuStatus(
+            @PathVariable Long menuId,
+            @RequestBody Map<String, Integer> body) {
+        int result = managerService.updateMenuStatus(menuId, body.get("menuStatus"));
+        return result > 0 ? ResponseEntity.ok().build() : ResponseEntity.internalServerError().build();
+    }
+
+    // [추가] 메뉴 완전 삭제 (DELETE)
+    @DeleteMapping("/{menuId}")
+    public ResponseEntity<?> deleteMenu(@PathVariable Long menuId) {
+        int result = managerService.deleteMenu(menuId);
+        return result > 0 ? ResponseEntity.ok().build() : ResponseEntity.internalServerError().build();
+    }
+
 }

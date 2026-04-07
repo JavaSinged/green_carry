@@ -18,13 +18,13 @@ const ManagerMenuEdit = () => {
   const { storeId, menuId } = useParams();
 
   // --- [State] 기본 정보 ---
-  const initialMenuData = location.state?.menuData || null;
   const [menu, setMenu] = useState({
-    menuName: initialMenuData ? initialMenuData.menuName : '',
-    menuInfo: initialMenuData ? initialMenuData.menuInfo : '',
-    menuImage: initialMenuData ? initialMenuData.menuImage : null,
-    menuPrice: initialMenuData ? initialMenuData.menuPrice : '',
-    menuCategory: initialMenuData ? initialMenuData.menuCategory : '메인',
+    menuName: '',
+    menuInfo: '',
+    menuImage: null,
+    menuPrice: '',
+    menuCategory: '메인',
+    menuStatus: 1,
   });
 
   // --- [State] 용기 설정 ---
@@ -77,18 +77,29 @@ const ManagerMenuEdit = () => {
 
     // 3. 수정 모드 데이터 로드
     if (menuId) {
+      // ① 메뉴 기본 정보
       axios
         .get(`${import.meta.env.VITE_BACKSERVER}/menus/${menuId}`)
-        .then((res) => setMenu(res.data));
+        .then((res) => {
+          setMenu({
+            menuName: res.data.menuName,
+            menuInfo: res.data.menuInfo,
+            menuImage: res.data.menuImage,
+            menuPrice: res.data.menuPrice,
+            menuCategory: res.data.menuCategory,
+            menuStatus: res.data.menuStatus,
+          });
+        });
 
+      // ② 옵션 목록 (기존 코드 유지)
       axios
         .get(`${import.meta.env.VITE_BACKSERVER}/menus/${menuId}/options`)
         .then((res) => {
-          // 💡 [수정/추가] 받아온 기존 옵션 데이터 전체를 existingOptions에 저장
           setExistingOptions(res.data);
           setSelectedOptionIds(res.data.map((opt) => opt.optionNo));
         });
 
+      // ③ 용기 목록 (응답 필드명 테이블 기준으로 수정)
       axios
         .get(`${import.meta.env.VITE_BACKSERVER}/menus/${menuId}/containers`)
         .then((res) => {
@@ -96,8 +107,8 @@ const ManagerMenuEdit = () => {
             res.data.map((item) => ({
               productId: item.productId,
               name: item.productMaterial,
-              count: item.containerCount,
-              emissions: item.productEmissions || 0,
+              count: item.containerCount, // carbon_menu_map.CONTAINER_COUNT
+              emissions: item.productEmissions,
             })),
           );
         });
@@ -150,6 +161,39 @@ const ManagerMenuEdit = () => {
         navigate(-1);
       },
     );
+  };
+
+  // [추가] 판매 상태 토글 핸들러
+  const handleStatusToggle = () => {
+    const nextStatus = menu.menuStatus === 1 ? 0 : 1;
+    axios
+      .patch(`${import.meta.env.VITE_BACKSERVER}/menus/${menuId}/status`, {
+        menuStatus: nextStatus,
+      })
+      .then(() => {
+        setMenu((prev) => ({ ...prev, menuStatus: nextStatus }));
+        alert(
+          nextStatus === 1
+            ? '판매중으로 변경되었습니다.'
+            : '판매중지로 변경되었습니다.',
+        );
+      })
+      .catch(() => alert('상태 변경에 실패했습니다.'));
+  };
+
+  // [추가] 삭제 핸들러
+  const handleDelete = () => {
+    if (
+      !window.confirm('메뉴를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.')
+    )
+      return;
+    axios
+      .delete(`${import.meta.env.VITE_BACKSERVER}/menus/${menuId}`)
+      .then(() => {
+        alert('메뉴가 삭제되었습니다.');
+        navigate(-1);
+      })
+      .catch(() => alert('삭제에 실패했습니다.'));
   };
 
   const generalList = allOptions.filter((o) => o.optionType === 2);
@@ -595,6 +639,22 @@ const ManagerMenuEdit = () => {
           </div>
         ))}
 
+        {/* 판매 상태 표시 (수정 모드일 때만 표시) */}
+        {menuId && (
+          <div className={styles.status_area}>
+            <span
+              className={
+                menu.menuStatus === 1 ? styles.status_on : styles.status_off
+              }
+            >
+              {menu.menuStatus === 1 ? '● 판매중' : '● 판매중지'}
+            </span>
+            <button className={styles.status_btn} onClick={handleStatusToggle}>
+              {menu.menuStatus === 1 ? '판매중지로 변경' : '판매중으로 변경'}
+            </button>
+          </div>
+        )}
+
         <div className={styles.btn_area}>
           <button className={styles.green_btn} onClick={handleSave}>
             저장하기
@@ -602,6 +662,12 @@ const ManagerMenuEdit = () => {
           <button className={styles.cancel_btn} onClick={() => navigate(-1)}>
             취소
           </button>
+          {/* 삭제 버튼 (수정 모드일 때만) */}
+          {menuId && (
+            <button className={styles.delete_btn} onClick={handleDelete}>
+              메뉴 삭제
+            </button>
+          )}
         </div>
       </div>
     </div>

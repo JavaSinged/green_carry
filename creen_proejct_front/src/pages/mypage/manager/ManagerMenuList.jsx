@@ -42,6 +42,7 @@ const ManagerMenuList = () => {
     axios
       .get(`${import.meta.env.VITE_BACKSERVER}/stores/${storeId}/menus`)
       .then((res) => {
+        console.log('🚀 ~ ManagerMenuList ~ res:', res);
         setMenus(res.data); // 전체 데이터를 한 번에 저장
       })
       .catch((err) => console.error('메뉴 로딩 실패:', err));

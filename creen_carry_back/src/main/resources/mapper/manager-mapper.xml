@@ -3,19 +3,34 @@
 
 <mapper namespace="kr.co.iei.store.model.dao.ManagerDao">
     <select id="selectAllContainers" resultType="container">
-        select * from carbon_definition_tbl
+        select *
+        from carbon_definition_tbl
     </select>
 
-    <select id="selectOptionsByMenuId" parameterType="long" resultType="kr.co.iei.store.model.vo.MenuOption">
+    <select id="selectOptionsByMenuId" parameterType="long" resultType="menuOption">
+        SELECT o.option_no     AS optionNo,
+               o.option_type   AS optionType,
+               o.option_name   AS optionName,
+               o.option_price  AS optionPrice,
+               o.option_carbon AS optionCarbon
+        FROM menu_option_map m
+                 JOIN option_tbl o ON m.option_no = o.option_no
+        WHERE m.menu_id = #{menuId}
+    </select>
+
+    <select id="selectMenuById" parameterType="long" resultType="menuSaveRequest">
         SELECT
-            o.option_no AS optionNo,
-            o.option_type AS optionType,
-            o.option_name AS optionName,
-            o.option_price AS optionPrice,
-            o.option_carbon AS optionCarbon
-        FROM menu_option_map mom
-                 JOIN option_tbl o ON mom.option_no = o.option_no
-        WHERE mom.menu_id = #{menuId}
+        menu_id       AS menuId,
+        store_id      AS storeId,
+        menu_name     AS menuName,
+        menu_info     AS menuInfo,
+        menu_image    AS menuImage,
+        menu_price    AS menuPrice,
+        menu_category AS menuCategory,
+        menu_carbon   AS menuCarbon,
+        menu_status   AS menuStatus
+        FROM menu_tbl
+        WHERE menu_id = #{menuId}
     </select>
 
     <insert id="insertMenu" parameterType="menuSaveRequest">
@@ -29,15 +44,28 @@
         )
     </insert>
 
+    <!-- [추가] 메뉴별 용기 목록 조회 (carbon_menu_map JOIN carbon_definition_tbl) -->
+    <select id="selectContainersByMenuId" parameterType="long" resultType="container">
+        SELECT c.product_id        AS productId,
+               c.product_material  AS productMaterial,
+               c.product_emissions AS productEmissions,
+               m.container_count   AS containerCount
+        FROM carbon_menu_map m
+                 JOIN carbon_definition_tbl c ON m.product_id = c.product_id
+        WHERE m.menu_id = #{menuId}
+    </select>
+
+
     <update id="updateMenu" parameterType="menuSaveRequest">
         UPDATE menu_tbl
-        SET menu_name = #{menuName},
-            menu_info = #{menuInfo},
-            menu_price = #{menuPrice},
+        SET menu_name     = #{menuName},
+            menu_info     = #{menuInfo},
+            menu_price    = #{menuPrice},
             menu_category = #{menuCategory},
-            menu_image = #{menuImage},
-            menu_carbon = #{menuCarbon}
-        WHERE menu_id = #{menuId} AND store_id = #{storeId}
+            menu_image    = #{menuImage},
+            menu_carbon   = #{menuCarbon}
+        WHERE menu_id = #{menuId}
+          AND store_id = #{storeId}
     </update>
 
     <insert id="insertNewOption" parameterType="menuOption">
@@ -62,10 +90,25 @@
     </insert>
 
     <delete id="deleteMenuOptionMap" parameterType="long">
-        DELETE FROM menu_option_map WHERE menu_id = #{menuId}
+        DELETE
+        FROM menu_option_map
+        WHERE menu_id = #{menuId}
     </delete>
 
     <delete id="deleteContainerMap" parameterType="long">
-        DELETE FROM carbon_menu_map WHERE menu_id = #{menuId}
+        DELETE
+        FROM carbon_menu_map
+        WHERE menu_id = #{menuId}
+    </delete>
+
+    <update id="updateMenuStatus" parameterType="map">
+        UPDATE menu_tbl
+        SET menu_status = #{menuStatus}
+        WHERE menu_id = #{menuId}
+    </update>
+
+    <delete id="deleteMenu" parameterType="long">
+        DELETE FROM menu_tbl
+        WHERE menu_id = #{menuId}
     </delete>
 </mapper>

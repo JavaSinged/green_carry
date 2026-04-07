@@ -91,4 +91,27 @@ public class ManagerService {
         }
     }
 
+    // [추가] 메뉴 단건 조회
+    public MenuSaveRequest getMenuById(Long menuId) {
+        return managerDao.selectMenuById(menuId);
     }
+
+    // [추가] 메뉴별 용기 목록 조회
+    public List<Container> getContainersByMenuId(Long menuId) {
+        return managerDao.selectContainersByMenuId(menuId);
+    }
+
+    public int updateMenuStatus(Long menuId, int menuStatus) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("menuId", menuId);
+        map.put("menuStatus", menuStatus);
+        return managerDao.updateMenuStatus(map);
+    }
+
+    @Transactional
+    public int deleteMenu(Long menuId) {
+        managerDao.deleteMenuOptionMap(menuId);   // 기존 메서드 재활용
+        managerDao.deleteContainerMap(menuId);    // 기존 메서드 재활용
+        return managerDao.deleteMenu(menuId);
+    }
+}

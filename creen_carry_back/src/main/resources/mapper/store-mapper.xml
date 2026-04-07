@@ -49,7 +49,6 @@
                menu_info
         FROM MENU_TBL
         WHERE store_id = #{storeId}
-          AND menu_status = 1
         ORDER BY menu_category ASC, menu_id ASC
     </select>
 
