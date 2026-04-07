@@ -120,6 +120,7 @@ const ManagerMenuList = () => {
               onClick={() => {
                 navigate(
                   `/mypage/manager/menus/menuEdit/${storeId}/${menu.menuId}`,
+                  { state: { menuData: menu } },
                 );
               }}
             >

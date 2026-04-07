@@ -6,14 +6,26 @@
         select * from carbon_definition_tbl
     </select>
 
+    <select id="selectOptionsByMenuId" parameterType="long" resultType="kr.co.iei.store.model.vo.MenuOption">
+        SELECT
+            o.option_no AS optionNo,
+            o.option_type AS optionType,
+            o.option_name AS optionName,
+            o.option_price AS optionPrice,
+            o.option_carbon AS optionCarbon
+        FROM menu_option_map mom
+                 JOIN option_tbl o ON mom.option_no = o.option_no
+        WHERE mom.menu_id = #{menuId}
+    </select>
+
     <insert id="insertMenu" parameterType="menuSaveRequest">
         <selectKey keyProperty="menuId" resultType="long" order="BEFORE">
             SELECT menu_seq.NEXTVAL FROM dual
         </selectKey>
         INSERT INTO menu_tbl (
-        menu_id, store_id, menu_name, menu_info, menu_price, menu_category, menu_image, menu_status
+        menu_id, store_id, menu_name, menu_info, menu_price, menu_category, menu_image, menu_status, menu_carbon
         ) VALUES (
-        #{menuId}, #{storeId}, #{menuName}, #{menuInfo}, #{menuPrice}, #{menuCategory}, #{menuImage}, 1
+        #{menuId}, #{storeId}, #{menuName}, #{menuInfo}, #{menuPrice}, #{menuCategory}, #{menuImage}, 1, #{menuCarbon}
         )
     </insert>
 
@@ -23,7 +35,8 @@
             menu_info = #{menuInfo},
             menu_price = #{menuPrice},
             menu_category = #{menuCategory},
-            menu_image = #{menuImage}
+            menu_image = #{menuImage},
+            menu_carbon = #{menuCarbon}
         WHERE menu_id = #{menuId} AND store_id = #{storeId}
     </update>
 
@@ -32,9 +45,9 @@
             SELECT option_seq.NEXTVAL FROM dual
         </selectKey>
         INSERT INTO option_tbl (
-        option_no, option_type, option_name, option_price
+        option_no, option_type, option_name, option_price, option_carbon
         ) VALUES (
-        #{optionNo}, #{optionType}, #{optionName}, #{optionPrice}
+        #{optionNo}, #{optionType}, #{optionName}, #{optionPrice}, #{optionCarbon}
         )
     </insert>
 

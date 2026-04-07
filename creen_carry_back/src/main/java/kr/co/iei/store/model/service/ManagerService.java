@@ -22,6 +22,11 @@ public class ManagerService {
         return managerDao.selectAllContainers();
     }
 
+    // 💡 [추가] 메뉴 ID로 기존 옵션 목록 조회
+    public List<MenuOption> getOptionsByMenuId(Long menuId) {
+        return managerDao.selectOptionsByMenuId(menuId);
+    }
+
     // --- [1. 메뉴 등록 로직] ---
     @Transactional
     public int insertMenuAll(MenuSaveRequest request) {

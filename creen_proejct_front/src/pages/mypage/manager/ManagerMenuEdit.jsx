@@ -17,12 +17,6 @@ const ManagerMenuEdit = () => {
   const location = useLocation();
   const { storeId, menuId } = useParams();
 
-  console.log('현재 가게 ID:', storeId);
-  console.log('현재 메뉴 ID:', menuId);
-
-  console.log('🚀 ~ ManagerMenuEdit ~ menuId:', menuId);
-  console.log('🚀 ~ ManagerMenuEdit ~ storeId:', storeId);
-
   // --- [State] 기본 정보 ---
   const initialMenuData = location.state?.menuData || null;
   const [menu, setMenu] = useState({
@@ -41,10 +35,18 @@ const ManagerMenuEdit = () => {
 
   // --- [State] 옵션 설정 ---
   const [allOptions, setAllOptions] = useState([]);
+  // 💡 [수정/추가] 기존에 등록되어 있던 옵션 전체 정보를 담을 상태 추가
+  const [existingOptions, setExistingOptions] = useState([]);
   const [selectedOptionIds, setSelectedOptionIds] = useState([]);
   const [newOptions, setNewOptions] = useState([]);
-  const [tempSize, setTempSize] = useState({ name: '', price: '' });
-  const [tempGeneral, setTempGeneral] = useState({ name: '', price: '' });
+
+  // 옵션 추가 시 탄소값(carbon) 상태
+  const [tempSize, setTempSize] = useState({ name: '', price: '', carbon: '' });
+  const [tempGeneral, setTempGeneral] = useState({
+    name: '',
+    price: '',
+    carbon: '',
+  });
 
   const [openSections, setOpenSections] = useState({
     size: true,
@@ -52,22 +54,17 @@ const ManagerMenuEdit = () => {
     eco: false,
   });
 
+  // 총 탄소 배출량 계산 로직 (선택된 용기 * 개수 * 용기별 탄소량)
+  const totalCarbonEmission = selectedContainers.reduce((acc, cur) => {
+    return acc + (cur.emissions || 0) * cur.count;
+  }, 0);
+
   // --- [Effect] 데이터 로드 ---
   useEffect(() => {
-    // if (!storeId || storeId === 'undefined') {
-    //   alert(
-    //     '가게 정보(storeId)가 없습니다. 목록으로 돌아가서 다시 시도해주세요.',
-    //   );
-    //   navigate('/');
-    //   return;
-    // }
-
     // 1. 용기 마스터 목록 로드
     axios
       .get(`${import.meta.env.VITE_BACKSERVER}/menus/containers`)
       .then((res) => {
-        console.log('🚀 ~ ManagerMenuEdit ~ res:', res.data);
-
         setContainerMaster(res.data);
       })
       .catch((err) => console.error('용기 데이터 로드 실패', err));
@@ -81,21 +78,26 @@ const ManagerMenuEdit = () => {
     // 3. 수정 모드 데이터 로드
     if (menuId) {
       axios
-        .get(`${import.meta.env.VITE_BACKSERVER}/stores/menu/${menuId}`)
+        .get(`${import.meta.env.VITE_BACKSERVER}/menus/${menuId}`)
         .then((res) => setMenu(res.data));
+
       axios
-        .get(`${import.meta.env.VITE_BACKSERVER}/stores/${menuId}/options`)
-        .then((res) =>
-          setSelectedOptionIds(res.data.map((opt) => opt.optionNo)),
-        );
+        .get(`${import.meta.env.VITE_BACKSERVER}/menus/${menuId}/options`)
+        .then((res) => {
+          // 💡 [수정/추가] 받아온 기존 옵션 데이터 전체를 existingOptions에 저장
+          setExistingOptions(res.data);
+          setSelectedOptionIds(res.data.map((opt) => opt.optionNo));
+        });
+
       axios
-        .get(`${import.meta.env.VITE_BACKSERVER}/stores/${menuId}/containers`)
+        .get(`${import.meta.env.VITE_BACKSERVER}/menus/${menuId}/containers`)
         .then((res) => {
           setSelectedContainers(
             res.data.map((item) => ({
               productId: item.productId,
               name: item.productMaterial,
               count: item.containerCount,
+              emissions: item.productEmissions || 0,
             })),
           );
         });
@@ -112,9 +114,15 @@ const ManagerMenuEdit = () => {
   const addContainer = (target) => {
     if (selectedContainers.find((c) => c.productId === target.productId))
       return alert('이미 추가된 용기입니다.');
+
     setSelectedContainers([
       ...selectedContainers,
-      { productId: target.productId, name: target.productMaterial, count: 1 },
+      {
+        productId: target.productId,
+        name: target.productMaterial,
+        count: 1,
+        emissions: target.productEmissions || 0,
+      },
     ]);
     setSearchTerm('');
     setIsListOpen(false);
@@ -123,8 +131,10 @@ const ManagerMenuEdit = () => {
   const handleSave = () => {
     const finalData = {
       ...menu,
+      menuPrice: Number(menu.menuPrice),
       storeId,
       menuId,
+      menuCarbon: totalCarbonEmission,
       optionIds: selectedOptionIds,
       newOptions,
       containerMap: selectedContainers.map((c) => ({
@@ -178,7 +188,24 @@ const ManagerMenuEdit = () => {
             </div>
 
             <div className={styles.input_row}>
-              <label>용기 설정</label>
+              <label
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                }}
+              >
+                <span>용기 설정</span>
+                <span
+                  style={{
+                    fontSize: '0.85rem',
+                    color: '#10b981',
+                    fontWeight: 'bold',
+                  }}
+                >
+                  예상 총 탄소 배출량: {totalCarbonEmission.toFixed(2)} kg
+                </span>
+              </label>
               <div className={styles.search_container}>
                 <div className={styles.search_bar}>
                   <input
@@ -192,7 +219,6 @@ const ManagerMenuEdit = () => {
                   <SearchIcon size={18} className={styles.search_icon} />
                   {isListOpen && searchTerm && (
                     <ul className={styles.dropdown}>
-                      {/* 💡 Array.isArray 체크를 추가하여 filter 에러를 방지합니다. */}
                       {Array.isArray(containerMaster) &&
                         containerMaster
                           .filter((c) =>
@@ -307,7 +333,6 @@ const ManagerMenuEdit = () => {
 
         <h3 className={styles.sub_title}>옵션 설정</h3>
 
-        {/* 1. 사이즈 / 2. 일반 / 3. 에코 순서 */}
         {[
           { t: '사이즈 옵션', k: 'size', l: [] },
           { t: '일반 옵션', k: 'general', l: generalList },
@@ -361,23 +386,40 @@ const ManagerMenuEdit = () => {
                           : setTempGeneral({ ...tempGeneral, price: val });
                       }}
                     />
+                    <input
+                      type="number"
+                      step="0.01"
+                      placeholder="탄소량(kg)"
+                      style={{ width: '80px' }}
+                      value={
+                        sec.k === 'size' ? tempSize.carbon : tempGeneral.carbon
+                      }
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        sec.k === 'size'
+                          ? setTempSize({ ...tempSize, carbon: val })
+                          : setTempGeneral({ ...tempGeneral, carbon: val });
+                      }}
+                    />
                     <button
                       onClick={() => {
                         const cur = sec.k === 'size' ? tempSize : tempGeneral;
-                        if (!cur.name || !cur.price)
-                          return alert('입력 정보를 확인하세요.');
+                        if (!cur.name || !cur.price || cur.carbon === '')
+                          return alert('이름, 가격, 탄소량을 모두 입력하세요.');
+
                         setNewOptions([
                           ...newOptions,
                           {
                             optionName: cur.name,
                             optionPrice: Number(cur.price),
+                            optionCarbon: Number(cur.carbon),
                             optionType: idx + 1,
                             isNew: true,
                           },
                         ]);
                         sec.k === 'size'
-                          ? setTempSize({ name: '', price: '' })
-                          : setTempGeneral({ name: '', price: '' });
+                          ? setTempSize({ name: '', price: '', carbon: '' })
+                          : setTempGeneral({ name: '', price: '', carbon: '' });
                       }}
                     >
                       추가
@@ -421,42 +463,133 @@ const ManagerMenuEdit = () => {
                     sec.k === 'size' ? styles.badge_wrap : styles.checkbox_grid
                   }
                 >
-                  {sec.k === 'size'
-                    ? newOptions
+                  {sec.k === 'size' ? (
+                    <>
+                      {/* 💡 [수정/추가] 백엔드에서 가져온 기존 사이즈 옵션 렌더링 */}
+                      {existingOptions
+                        .filter((o) => o.optionType === 1)
+                        .map((o) => (
+                          <span
+                            key={`ex-size-${o.optionNo}`}
+                            className={styles.opt_badge}
+                          >
+                            {o.optionName} (+{o.optionPrice}원 / 🌿{' '}
+                            {o.optionCarbon || 0}kg){' '}
+                            <X
+                              size={12}
+                              onClick={() => {
+                                // 화면에서도 지우고, selectedOptionIds 에서도 제거하여 서버로 안 넘어가게 함
+                                setExistingOptions((prev) =>
+                                  prev.filter(
+                                    (item) => item.optionNo !== o.optionNo,
+                                  ),
+                                );
+                                setSelectedOptionIds((prev) =>
+                                  prev.filter((id) => id !== o.optionNo),
+                                );
+                              }}
+                            />
+                          </span>
+                        ))}
+
+                      {/* 새로 추가하는 사이즈 옵션 */}
+                      {newOptions
                         .filter((o) => o.optionType === 1)
                         .map((o, i) => (
-                          <span key={i} className={styles.opt_badge}>
-                            {o.optionName} (+{o.optionPrice}){' '}
+                          <span
+                            key={`new-size-${i}`}
+                            className={styles.opt_badge}
+                          >
+                            {o.optionName} (+{o.optionPrice}원 / 🌿{' '}
+                            {o.optionCarbon}kg){' '}
                             <X
                               size={12}
                               onClick={() =>
                                 setNewOptions(
-                                  newOptions.filter((_, idx) => idx !== i),
+                                  newOptions.filter((item) => item !== o),
                                 )
                               }
                             />
                           </span>
-                        ))
-                    : sec.l
-                        .filter((o) => o.optionNo !== 5 && o.optionNo !== 6)
-                        .map((o) => (
-                          <label key={o.optionNo} className={styles.check_item}>
-                            <input
-                              type="checkbox"
-                              checked={selectedOptionIds.includes(o.optionNo)}
-                              onChange={() =>
-                                setSelectedOptionIds((prev) =>
-                                  prev.includes(o.optionNo)
-                                    ? prev.filter((i) => i !== o.optionNo)
-                                    : [...prev, o.optionNo],
-                                )
-                              }
-                            />{' '}
-                            {o.optionName}{' '}
-                            {o.optionPrice > 0 ? `(+${o.optionPrice})` : ''}
-                          </label>
                         ))}
+                    </>
+                  ) : (
+                    sec.l
+                      .filter((o) => o.optionNo !== 5 && o.optionNo !== 6)
+                      .map((o) => (
+                        <label key={o.optionNo} className={styles.check_item}>
+                          <input
+                            type="checkbox"
+                            checked={selectedOptionIds.includes(o.optionNo)}
+                            onChange={() =>
+                              setSelectedOptionIds((prev) =>
+                                prev.includes(o.optionNo)
+                                  ? prev.filter((i) => i !== o.optionNo)
+                                  : [...prev, o.optionNo],
+                              )
+                            }
+                          />{' '}
+                          {o.optionName}{' '}
+                          {o.optionPrice > 0 ? `(+${o.optionPrice})` : ''}
+                        </label>
+                      ))
+                  )}
                 </div>
+
+                {sec.k === 'general' && (
+                  <div
+                    className={styles.badge_wrap}
+                    style={{ marginTop: '12px' }}
+                  >
+                    {/* 💡 [수정/추가] 기존에 등록되었던 커스텀 일반 옵션 렌더링 (전체 옵션에 없는 애들만 배지로 표시) */}
+                    {existingOptions
+                      .filter(
+                        (o) =>
+                          o.optionType === 2 &&
+                          !generalList.some((g) => g.optionNo === o.optionNo),
+                      )
+                      .map((o) => (
+                        <span
+                          key={`ex-gen-${o.optionNo}`}
+                          className={styles.opt_badge}
+                        >
+                          {o.optionName} (+{o.optionPrice}원 / 🌿{' '}
+                          {o.optionCarbon || 0}kg){' '}
+                          <X
+                            size={12}
+                            onClick={() => {
+                              setExistingOptions((prev) =>
+                                prev.filter(
+                                  (item) => item.optionNo !== o.optionNo,
+                                ),
+                              );
+                              setSelectedOptionIds((prev) =>
+                                prev.filter((id) => id !== o.optionNo),
+                              );
+                            }}
+                          />
+                        </span>
+                      ))}
+
+                    {/* 새로 추가하는 커스텀 일반 옵션 */}
+                    {newOptions
+                      .filter((o) => o.optionType === 2)
+                      .map((o, i) => (
+                        <span key={`new-gen-${i}`} className={styles.opt_badge}>
+                          {o.optionName} (+{o.optionPrice}원 / 🌿{' '}
+                          {o.optionCarbon}kg){' '}
+                          <X
+                            size={12}
+                            onClick={() =>
+                              setNewOptions(
+                                newOptions.filter((item) => item !== o),
+                              )
+                            }
+                          />
+                        </span>
+                      ))}
+                  </div>
+                )}
               </div>
             )}
           </div>

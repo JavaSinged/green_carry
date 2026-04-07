@@ -14,4 +14,5 @@ public class MenuOption {
     private int optionType;
     private String optionName;
     private int optionPrice;
+    private double optionCarbon;
 }

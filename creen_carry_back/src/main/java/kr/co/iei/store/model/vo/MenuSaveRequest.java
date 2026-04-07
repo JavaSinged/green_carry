@@ -14,6 +14,7 @@ public class MenuSaveRequest {
     private String menuImage;
     private Integer menuPrice;
     private String menuCategory;
+    private double menuCarbon;
 
     // 추가 설정 데이터들
     private List<Long> optionIds;

@@ -12,6 +12,9 @@ import java.util.Map;
 public interface ManagerDao {
     List<Container> selectAllContainers();
 
+    // 💡 [추가] 특정 메뉴에 맵핑된 옵션 목록 조회
+    List<MenuOption> selectOptionsByMenuId(Long menuId);
+
     // 등록/수정
     int insertMenu(MenuSaveRequest request);
     int updateMenu(MenuSaveRequest request);
