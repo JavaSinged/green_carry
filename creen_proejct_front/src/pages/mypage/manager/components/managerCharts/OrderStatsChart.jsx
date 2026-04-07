@@ -1,12 +1,8 @@
-// src/pages/manager/components/charts/OrderStatsChart.jsx
-
 import Chart from "react-apexcharts";
 import styles from "./managerChart.module.css";
-// import { FiExternalLink } from "react-icons/fi"; // 이전에 icons/fi를 썼다면 유지
-import OpenInNewIcon from "@mui/icons-material/OpenInNew"; // 이전에 MUI를 썼다면 유지
+import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 
 const OrderStatsChart = ({ data }) => {
-  // apexcharts의 donut 타입을 사용하여 이미지_7.png와 같은 도넛 그래프 구현
   const options = {
     chart: {
       type: "donut", // 차트 종류를 donut으로 설정
@@ -44,8 +40,8 @@ const OrderStatsChart = ({ data }) => {
       },
     },
 
-    colors: ["#2e8147", "#ffb300", "#008080", "#c0e0b0"], // 프로젝트 변수 사용 권장 (Aqua와 Light Green 변수가 없다면 색상 코드를 직접 입력)
-    labels: ["배달 경로 1", "배달 경로 2", "배달 경로 3", "배달 경로 4"], // 각 조각의 라벨 (이미지엔 없지만 내부적으론 필요)
+    colors: ["#ffb300", "#2e8147", "#c0e0b0"],
+    labels: ["포장", "도보 & 자전거", "오토바이"],
     dataLabels: {
       enabled: false, // 차트 조각 위에 데이터를 직접 표시하지 않음 (이미지처럼)
     },
@@ -53,12 +49,14 @@ const OrderStatsChart = ({ data }) => {
       show: false, // 범례 숨기기 (이미지처럼)
     },
     stroke: {
-      show: false, // 조각 사이의 테두리 숨기기 (이미지처럼 매끄럽게)
+      show: true, // 조각 사이의 간격
+      width: 2,
+      colors: ["#ffffff"],
     },
   };
 
   //임시 데이터
-  const tempSeries = [40, 30, 10, 20];
+  const tempSeries = [35, 55, 15];
 
   return (
     <div className={styles.chartContainer}>

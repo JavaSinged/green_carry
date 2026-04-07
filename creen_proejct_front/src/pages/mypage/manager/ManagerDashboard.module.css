@@ -1,30 +1,21 @@
-/* src/pages/manager/ManagerDashboard.module.css */
-
-/* =========================================================
-   1. 대시보드 공통 레이아웃 (제공해주신 코드와 동일)
-   ========================================================= */
-
-/* 대시보드 전체 컨테이너 */
+/* 1. 대시보드 공통 레이아웃 (제공해주신 코드와 동일) */
 .dashboardContainer {
   background-color: var(--color-bg);
-  border: 1px solid #e0e0e0;
-  border-radius: 12px;
+  border: none;
   padding: 30px;
   width: 100%;
   box-sizing: border-box;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
   font-family: var(--font-body);
+  min-height: 100vh;
 }
 
-/* =========================================================
-   2. 상단 슬라이드 탭 메뉴 (제공해주신 코드와 동일)
-   ========================================================= */
-
+/*상단 슬라이드 탭 메뉴 (제공해주신 코드와 동일)*/
 .tabContainer {
   position: relative;
   display: flex;
   width: 400px;
-  background: #f0f0f0; /* 비활성화 배경 (약간의 명도 조절) */
+  background: #f0f0f0;
   border-radius: 50px;
   padding: 5px;
   margin: 20px auto 40px;
@@ -40,7 +31,7 @@
   padding: 12px 0;
   font-size: 1rem;
   font-weight: 600;
-  font-family: var(--font-title); /* 티머니 둥근바람 */
+  font-family: var(--font-title);
   color: var(--text-sub);
   cursor: pointer;
   transition: color 0.3s ease;
@@ -56,7 +47,7 @@
   left: 5px;
   width: calc(50% - 5px);
   height: calc(100% - 10px);
-  background: var(--color-brand); /* 브랜드 메인 그린 */
+  background: var(--color-brand);
   border-radius: 50px;
   transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 1;
@@ -70,11 +61,7 @@
   transform: translateX(100%);
 }
 
-/* =========================================================
-   3. 가맹점 매니저 통계 레이아웃
-   ========================================================= */
-
-/* StoreStats.jsx에서 사용되는 전체 레이아웃 */
+/*  3. 가맹점 매니저 통계 레이아웃 */
 .statsLayout {
   display: flex;
   gap: 24px;
@@ -98,7 +85,6 @@
   padding: 24px;
 }
 
-/* 배달 경로 소제목 스타일 */
 .sectionSubTitle {
   font-family: var(--font-title);
   font-size: 16px;
@@ -112,24 +98,15 @@
   flex: 1;
 }
 
-/* =========================================================
-   4. 공통 유틸리티 클래스
-   ========================================================= */
-
 .fullWidthSection {
   width: 100%;
 }
-
-/* =========================================================
-   5. 반응형 미디어 쿼리 (제공해주신 코드 기반으로 조정)
-   ========================================================= */
 
 @media (max-width: 1024px) {
   .tabContainer {
     width: 90%;
   }
 
-  /* 통계 레이아웃 세로 배치 */
   .statsLayout {
     flex-direction: column;
     gap: 20px;

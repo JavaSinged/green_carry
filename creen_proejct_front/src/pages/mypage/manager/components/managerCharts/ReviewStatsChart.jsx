@@ -42,22 +42,23 @@ const ReviewStatsChart = ({ data }) => {
         },
       },
     },
-    // 이미지의 평점별 색상 적용: 진그린, 오렌지, 연두, 청록
-    colors: ["#2e8147", "#ffb300", "#c0e0b0", "#008080"],
+    colors: [
+      "var(--color-brand)",
+      "var(--color-point)",
+      "#c0e0b0",
+      "var(--color-info)",
+    ],
     labels: ["5점", "4점", "3점", "1점"],
     legend: { show: false }, // 범례는 커스텀 구현
     dataLabels: { enabled: false },
   };
 
   return (
-    /* ❌ 인라인 스타일(style={{ paddingBottom: "10px" }}) 제거 */
-    /* ✅ 오른쪽 단독 카드이므로자체 테두리와 배경(styles.chartCard)은 유지합니다. */
     <div className={styles.chartContainer}>
       <div className={styles.cardHeader}>
         <span className={styles.cardTitle}>리뷰 통계</span>
         <button className={styles.viewMoreBtn}>
           View more
-          {/* MUI 아이콘 사용 권장 */}
           <OpenInNewIcon style={{ fontSize: "1rem", marginLeft: "4px" }} />
         </button>
       </div>

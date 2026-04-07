@@ -10,7 +10,7 @@ export default function StoreStats() {
     totalAmount: 1178909,
     currentMonthAmount: 1178909,
     // Radial Bar를 위한 데이터 비율
-    series: [40, 30, 10, 20],
+    series: [40, 55, 15],
   });
 
   const [reviewStatsData, setReviewStatsData] = useState({
@@ -27,10 +27,9 @@ export default function StoreStats() {
   });
 
   const [deliveryPathData, setDeliveryPathData] = useState([
-    { type: "포장", percent: 10, color: "#ccc" },
-    { type: "도보 배달", percent: 10, color: "#2e8147" },
-    { type: "자전거 배달", percent: 30, color: "#008080" },
-    { type: "오토바이 배달", percent: 40, color: "#ffb300" },
+    { type: "포장", percent: 35, color: "#ffb300" },
+    { type: "도보 & 자전거", percent: 55, color: "#2e8147" },
+    { type: "오토바이", percent: 15, color: "#c0e0b0" },
   ]);
 
   // 2. 초기 데이터 로드 (API 호출 부분 명시)
