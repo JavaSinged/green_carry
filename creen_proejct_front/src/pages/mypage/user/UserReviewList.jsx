@@ -55,7 +55,6 @@ const UserReviewList = () => {
     });
   };
 
-  // 🌟 새로 추가된 날짜 필터링 로직
   const filteredReviews = reviews.filter((review) => {
     if (!review.reviewDate) return true;
 
@@ -70,7 +69,6 @@ const UserReviewList = () => {
 
   return (
     <div className={styles.container}>
-      {/* 1. 상단 날짜 필터 영역 */}
       <div className={styles.filter_row}>
         <input
           type="month"
@@ -85,13 +83,10 @@ const UserReviewList = () => {
         />
       </div>
 
-      {/* 2. 리뷰 리스트 영역 */}
       <div className={styles.review_list}>
-        {/* 🌟 reviews 대신 filteredReviews 사용 */}
         {filteredReviews.length > 0 ? (
           filteredReviews.map((review) => (
             <div key={review.orderId} className={styles.review_card}>
-              {/* 카드 상단: 가게 및 주문 정보 */}
               <div className={styles.card_header}>
                 <div className={styles.store_info}>
                   <span className={styles.store_icon}>🏪</span>
@@ -114,7 +109,6 @@ const UserReviewList = () => {
                 </button>
               </div>
 
-              {/* 카드 본문: 이미지 + 채팅 영역 */}
               <div className={styles.card_body}>
                 <img
                   src={
@@ -132,7 +126,6 @@ const UserReviewList = () => {
                 />
 
                 <div className={styles.chat_area}>
-                  {/* 고객(나)의 리뷰 버블 */}
                   <div className={styles.user_bubble}>
                     <div className={styles.user_top}>
                       <div className={styles.avatar}>
@@ -165,7 +158,6 @@ const UserReviewList = () => {
                     </div>
                   </div>
 
-                  {/* 사장님의 답글 버블 */}
                   {review.reviewCommentContent && (
                     <div className={styles.owner_bubble}>
                       <div className={styles.bubble_content}>

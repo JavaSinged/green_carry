@@ -248,8 +248,7 @@
 		JOIN order_list_map m ON o.order_id =
 		m.order_id JOIN store_tbl s ON
 		o.store_id = s.store_id WHERE
-		o.member_id = #{memberId}
-		AND o.order_status = 5 AND m.reg_date >=
+		o.member_id = #{memberId} AND m.reg_date >=
 		ADD_MONTHS(SYSDATE, -3) ORDER BY
 		m.reg_date DESC
 	</select>
