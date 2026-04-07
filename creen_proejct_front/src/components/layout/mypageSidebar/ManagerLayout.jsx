@@ -10,7 +10,7 @@ export default function ManagerLayout() {
         <ul>
           <li>
             <NavLink
-              to="/mypage/orders"
+              to="/mypage/manager/info"
               className={({ isActive }) => (isActive ? styles.activeMenu : "")}
             >
               상점 관리
@@ -26,7 +26,7 @@ export default function ManagerLayout() {
           </li>
           <li>
             <NavLink
-              to="/mypage/reviews"
+              to="/mypage/manager/orders"
               className={({ isActive }) => (isActive ? styles.activeMenu : "")}
             >
               주문 관리
@@ -34,7 +34,7 @@ export default function ManagerLayout() {
           </li>
           <li>
             <NavLink
-              to="/mypage/points"
+              to="/mypage/manager/reviews"
               className={({ isActive }) => (isActive ? styles.activeMenu : "")}
             >
               리뷰 관리

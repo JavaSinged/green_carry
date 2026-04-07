@@ -208,6 +208,10 @@ const Login = () => {
           localStorage.setItem("memberGrade", loginUser.memberGrade);
           localStorage.setItem("memberThumb", loginUser.memberThumb);
 
+          if (loginUser.storeId) {
+            localStorage.setItem("storeId", loginUser.storeId);
+          }
+
           if (rememberId) {
             localStorage.setItem("savedUserId", memberId);
           } else {

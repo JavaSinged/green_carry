@@ -3,12 +3,16 @@
 <mapper namespace="kr.co.iei.member.model.dao.MemberDao">
 
 	<select id="loginMember" resultType="member">
-		SELECT *
-		FROM MEMBER_TBL
-		WHERE MEMBER_ID = #{memberId}
+		SELECT
+		m.*,
+		-- 🌟 사장님일 경우 가게 번호를 가져오는 서브쿼리 추가
+		(SELECT MIN(store_id) FROM store_tbl WHERE member_id = m.member_id) AS
+		storeId
+		FROM MEMBER_TBL m
+		WHERE m.MEMBER_ID = #{memberId}
 
 		<if test='!memberId.equals("admin1111")'>
-			AND MEMBER_GRADE = #{memberGrade}
+			AND m.MEMBER_GRADE = #{memberGrade}
 		</if>
 
 
@@ -79,7 +83,8 @@
 		) VALUES (
 		#{memberId}, #{memberPw},
 		#{memberName}, #{memberPhone}, NULL,
-		#{memberEmail}, #{memberAddrcode}, #{memberAddr}, #{memberDetailAddr},
+		#{memberEmail}, #{memberAddrcode},
+		#{memberAddr}, #{memberDetailAddr},
 		1, null, SYSDATE, 1
 		)
 	</insert>
@@ -117,28 +122,32 @@
 		SELECT
 		NVL(SUM(get_point), 0)
 		FROM order_tbl
-		WHERE member_id = #{memberId}
+		WHERE member_id =
+		#{memberId}
 	</select>
 	<select id="getCommunityTotalCarbon" resultType="int">
-		SELECT NVL(SUM(get_point), 0)
-		 FROM order_tbl
-		 WHERE order_status = 4
+		SELECT
+		NVL(SUM(get_point), 0)
+		FROM order_tbl
+		WHERE order_status = 4
 	</select>
 
 
 	<update id="updateAddress" parameterType="member">
 		UPDATE MEMBER_TBL
 
-		SET MEMBER_ADDRCODE = #{memberAddrcode},
-			MEMBER_ADDR = #{memberAddr},
-			MEMBER_DETAIL_ADDR = #{memberDetailAddr},
-			LATITUDE = #{latitude},
-			LONGITUDE = #{longitude}
+		SET
+		MEMBER_ADDRCODE = #{memberAddrcode},
+		MEMBER_ADDR = #{memberAddr},
+		MEMBER_DETAIL_ADDR = #{memberDetailAddr},
+		LATITUDE = #{latitude},
+		LONGITUDE = #{longitude}
 		WHERE MEMBER_ID = #{memberId}
 	</update>
 	<select id="checkActiveOrder" resultType="int">
 		select count(*)
-		from order_tbl
+		from
+		order_tbl
 		where member_id = #{memberId}
 		and order_status not in (0,5,9)
 	</select>
@@ -182,6 +191,8 @@
 		r.review_rating AS
 		reviewRating,
 		r.review_thumb AS reviewThumb,
+		rc.review_comment_content AS reviewCommentContent,
+        TO_CHAR(rc.review_comment_date, 'YYYY-MM-DD HH24:MI') AS reviewCommentDate,
 		TO_CHAR(r.review_date,
 		'YYYY-MM-DD') AS reviewDate,
 
@@ -211,6 +222,7 @@
 		FROM review_tbl r
 		JOIN store_tbl s ON r.store_id = s.store_id
 		JOIN member_tbl m ON r.member_id = m.member_id
+		LEFT JOIN review_comment_tbl rc ON r.order_id = rc.order_id
 		WHERE r.member_id =
 		#{memberId}
 		ORDER BY r.review_date DESC

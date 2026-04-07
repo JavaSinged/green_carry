@@ -81,6 +81,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("memberName");
     localStorage.removeItem("memberGrade");
     localStorage.removeItem("memberThumb");
+    localStorage.removeItem("storeId");
     setIsLogin(false);
     setUser(null);
   };

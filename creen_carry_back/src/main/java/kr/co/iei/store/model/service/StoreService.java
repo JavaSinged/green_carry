@@ -9,7 +9,10 @@ import kr.co.iei.store.model.vo.OrderItem;
 import kr.co.iei.store.model.vo.OrderListObject;
 import kr.co.iei.store.model.vo.OrderListResponse;
 import kr.co.iei.store.model.vo.OrderResponse;
+import kr.co.iei.store.model.vo.ReviewComment;
 import kr.co.iei.store.model.vo.Store;
+import kr.co.iei.store.model.vo.StoreReviewResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -180,5 +183,15 @@ public class StoreService {
 
 	    return 1;
 	}
+	// 1. 가게 리뷰 목록 가져오기
+    public List<StoreReviewResponse> selectStoreReviews(int storeId) {
+        return storeDao.selectStoreReviews(storeId);
+    }
+
+    // 2. 사장님 답글 등록
+    @Transactional
+    public int insertReviewComment(ReviewComment comment) {
+        return storeDao.insertReviewComment(comment);
+    }
 
 }

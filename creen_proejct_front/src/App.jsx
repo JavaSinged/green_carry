@@ -41,6 +41,7 @@ import ProtectedRoute from "./context/ProtectedRoute";
 import ManagerDelAccount from "./pages/mypage/deleteMember/ManagerDelAccount";
 import UserOrderList from "./pages/mypage/user/UserOrderList";
 import UserReviewList from "./pages/mypage/user/UserReviewList";
+import ManagerReviewComment from "./pages/mypage/manager/ManagerReviewComment";
 
 const BasicLayout = () => {
   return (
@@ -104,6 +105,7 @@ function App() {
                 <Route path="menus" element={<ManagerMenuList />} />
                 <Route path="menuEdit" element={<ManagerMenuEdit />} />
                 <Route path="deleteMember" element={<ManagerDelAccount />} />
+                <Route path="reviews" element={<ManagerReviewComment />} />
               </Route>
             </Route>
             {/* ---------------------------------------------------- */}

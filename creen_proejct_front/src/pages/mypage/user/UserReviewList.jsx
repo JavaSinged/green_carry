@@ -155,15 +155,30 @@ const UserReviewList = () => {
                     </div>
                   </div>
                   {/* 사장님의 답글 버블 (데이터가 있을 때만 표시) */}
-                  {review.replyContent && (
+                  {review.reviewCommentContent && (
                     <div className={styles.owner_bubble}>
                       <div className={styles.bubble_content}>
-                        {review.replyContent}
+                        <span
+                          style={{
+                            fontWeight: "bold",
+                            color: "#2f8f46",
+                            fontSize: "13px",
+                            marginBottom: "4px",
+                            display: "inline-block",
+                          }}
+                        >
+                          ↳ 사장님 답글
+                        </span>
+                        <br />
+                        {review.reviewCommentContent}
                         <span className={styles.reply_date}>
-                          {review.replyDate}
+                          {review.reviewCommentDate}
                         </span>
                       </div>
-                      <div className={styles.avatar_owner}></div>
+                      <div className={styles.avatar_owner}>
+                        <span style={{ fontSize: "30px" }}>👨‍🍳</span>{" "}
+                        {/* 사장님 아바타 임시 아이콘 */}
+                      </div>
                     </div>
                   )}
                 </div>
