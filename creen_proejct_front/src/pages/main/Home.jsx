@@ -14,6 +14,8 @@ import StarIcon from "@mui/icons-material/Star";
 import StarHalfIcon from "@mui/icons-material/StarHalf";
 import StarOutlineIcon from "@mui/icons-material/StarOutline";
 import useCartStore from "../../store/useCartStore";
+
+// 이스터에그 컴포넌트
 import EcoLightSwitch from "../../components/Easter Egg/EcoLightSwitch";
 import EcoRider from "../../components/Easter Egg/EcoRider";
 import EcoClean from "../../components/Easter Egg/EcoClean";
@@ -47,34 +49,31 @@ const categories = [
 
 export default function Home() {
   const navigate = useNavigate();
+  // 🌟 백엔드 서버 주소 설정
+  const backHost = import.meta.env.VITE_BACKSERVER;
 
-  const [isLoading, setLoading] = useState(true); // 로딩 상태 추가
+  const [isLoading, setLoading] = useState(true);
   const { storeId, setStoreId } = useCartStore();
   const [selectedCategory, setSelectedCategory] = useState("인기맛집");
   const [searchTerm, setSearchTerm] = useState("");
-
-  // 1. 서버에서 받아온 원본 리스트를 저장할 State
   const [storeList, setStoreList] = useState([]);
 
-  // 2. 서버 데이터를 가져오는 useEffect
+  // 🚀 서버 데이터 로드
   useEffect(() => {
-    setLoading(true); // 데이터 로딩 시작
+    setLoading(true);
     axios
-      .get(`${import.meta.env.VITE_BACKSERVER}/stores`)
+      .get(`${backHost}/stores`)
       .then((res) => {
-        //console.log("서버 데이터 확인:", res.data);
-        // 서버에서 넘어온 배열 데이터를 상태에 저장
         setStoreList(res.data);
-        setLoading(false); // 데이터 로딩 완료
+        setLoading(false);
       })
       .catch((err) => {
         console.error("데이터 로딩 에러:", err);
-        setLoading(false); // 에러 발생해도 로딩 상태 해제
+        setLoading(false);
       });
-  }, []);
+  }, [backHost]);
 
-  // 3. 필터링 로직 (storeList가 변경될 때마다 자동 계산)
-  // 서버 데이터 필드명에 맞춰 수정 (storeName, storeCategory 등)
+  // 🔍 검색 및 카테고리 필터링
   const filteredStores = storeList.filter((store) => {
     const isCategoryMatch =
       selectedCategory === "인기맛집" ||
@@ -87,24 +86,27 @@ export default function Home() {
     return isCategoryMatch && isSearchMatch;
   });
 
-  // 별 렌더링
+  // ⭐ 별점 렌더링 함수
   const renderStars = (rating) => {
     const stars = [];
     for (let i = 1; i <= 5; i++) {
       if (i <= Math.floor(rating)) {
-        // 꽉 찬 별
         stars.push(
-          <StarIcon key={i} sx={{ color: "#ffb300", fontSize: "1.2rem" }} />
+          <StarIcon key={i} sx={{ color: "#ffb300", fontSize: "1.2rem" }} />,
         );
       } else if (i === Math.ceil(rating) && rating % 1 !== 0) {
-        // 반 개 별 (소수점이 있는 경우)
         stars.push(
-          <StarHalfIcon key={i} sx={{ color: "#ffb300", fontSize: "1.2rem" }} />
+          <StarHalfIcon
+            key={i}
+            sx={{ color: "#ffb300", fontSize: "1.2rem" }}
+          />,
         );
       } else {
-        // 빈 별
         stars.push(
-          <StarOutlineIcon key={i} sx={{ color: "#ccc", fontSize: "1.2rem" }} />
+          <StarOutlineIcon
+            key={i}
+            sx={{ color: "#ccc", fontSize: "1.2rem" }}
+          />,
         );
       }
     }
@@ -113,6 +115,7 @@ export default function Home() {
 
   return (
     <div className={styles.page_container}>
+      {/* 이스터에그 컴포넌트 */}
       <EcoLightSwitch />
       <EcoClean />
       <EcoRider />
@@ -120,7 +123,8 @@ export default function Home() {
       <EcoRecycle />
       <EcoEarth />
       <EcoFlood />
-      {/* 1. 배너 (기존 유지) */}
+
+      {/* 1. 배너 영역 */}
       <div className={styles.banner_wrap}>
         <Swiper
           spaceBetween={0}
@@ -181,11 +185,11 @@ export default function Home() {
           </div>
         </div>
 
-        {/* 4. 카드 목록 (서버에서 받아온 실제 필드값 바인딩) */}
+        {/* 4. 카드 목록 */}
         <div className={styles.card_wrap}>
           {isLoading ? (
-            // 로딩 중일 때 보여줄 UI
-            [1, 2, 3].map((n) => (
+            // 로딩 중 스켈레톤 UI
+            [1, 2, 3, 4].map((n) => (
               <div
                 key={n}
                 className={`${styles.card_item} ${styles.skeleton_card}`}
@@ -203,23 +207,25 @@ export default function Home() {
           ) : filteredStores.length > 0 ? (
             filteredStores.map((store) => (
               <div
-                key={store.storeId} // storeId 사용
+                key={store.storeId}
                 className={styles.card_item}
-                // 클릭 시 해당 상점 ID를 가지고 이동하거나 상세 페이지 로직 처리
                 onClick={() => {
-                  setStoreId(store.storeId),
-                    navigate("/storeView", {
-                      state: { storeId: store.storeId },
-                    });
+                  setStoreId(store.storeId);
+                  navigate("/storeView", {
+                    state: { storeId: store.storeId },
+                  });
                 }}
               >
                 <div className={styles.image_wrap}>
-                  {/* storeThumb가 null일 경우 기본 이미지 처리 */}
                   <img
-                    src={store.storeThumb || "/image/default_store.png"}
+                    src={
+                      store.storeThumb
+                        ? `${backHost}/${store.storeThumb}`
+                        : "/image/default_store.png"
+                    }
                     alt={store.storeName}
+                    style={{ objectFit: "cover" }}
                   />
-                  {/* 서버 데이터에 거리가 없다면 임시값이나 위치 계산값 사용 */}
                   <div className={styles.card_badge}>약 100m</div>
                 </div>
                 <div className={styles.card_info}>
@@ -230,10 +236,8 @@ export default function Home() {
                   </div>
                   <div className={styles.store_rating_wrap}>
                     <div className={styles.stars_box}>
-                      {/* 별 아이콘들 출력 */}
                       {renderStars(store.storeRating)}
                     </div>
-                    {/* 실제 숫자 점수 표시 */}
                     <span className={styles.rating_number}>
                       {store.storeRating.toFixed(1)}
                     </span>
@@ -244,7 +248,7 @@ export default function Home() {
           ) : (
             <div className={styles.empty_msg_box}>
               <p className={styles.empty_msg}>
-                아직 등록된 매장이 없거나 검색 결과가 없습니다.
+                해당 카테고리에 등록된 매장이 없습니다.
               </p>
             </div>
           )}

@@ -176,8 +176,9 @@
   position: relative; /* 배지 위치를 위해 필요 */
 }
 
-/* 수정 */
 .image_wrap > img {
+  width: 100%;
+  height: 100%;
   object-fit: contain;
 }
 
