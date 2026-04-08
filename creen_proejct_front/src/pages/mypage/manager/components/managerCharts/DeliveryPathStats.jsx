@@ -8,8 +8,6 @@ const DeliveryPathStats = ({ data }) => {
 
   return (
     <div className={styles.pathWrap}>
-      <h3 className={styles.title}>배달 경로</h3>
-
       <div className={styles.list}>
         {data.map((item) => (
           <div className={styles.item} key={item.deliveryType}>

@@ -14,6 +14,11 @@ const OrderStatsChart = ({ data }) => {
 
   const series = data.map((item) => item.percent); // 배달수단 비중
   const labels = data.map((item) => item.label); // 배달수단 카테고리
+  const chartColors = data.map((item) => {
+    if (item.deliveryType === 1) return "var(--color-point)";
+    if (item.deliveryType === 2) return "var(--color-brand)";
+    return "var(--color-info)";
+  });
   const totalAmount = data.reduce((sum, item) => sum + item.seriesAmount, 0); // 총매출
 
   const options = {
@@ -58,7 +63,7 @@ const OrderStatsChart = ({ data }) => {
       },
     },
 
-    colors: ["var(--color-point)", "var(--color-brand)", "var(--color-info)"],
+    colors: chartColors,
     labels: labels,
     dataLabels: {
       enabled: false, // 차트 조각 위에 데이터를 직접 표시하지 않음 (이미지처럼)

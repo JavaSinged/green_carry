@@ -1,8 +1,10 @@
 import Chart from "react-apexcharts";
 import styles from "./managerChart.module.css";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
+import { useNavigate } from "react-router-dom";
 
 const ReviewStatsChart = ({ data }) => {
+  const navigate = useNavigate();
   const options = {
     chart: {
       type: "donut",
@@ -57,7 +59,12 @@ const ReviewStatsChart = ({ data }) => {
     <div className={styles.chartContainer}>
       <div className={styles.cardHeader}>
         <span className={styles.cardTitle}>리뷰 통계</span>
-        <button className={styles.viewMoreBtn}>
+        <button
+          className={styles.viewMoreBtn}
+          onClick={() => {
+            navigate("/mypage/manager/reviews");
+          }}
+        >
           View more
           <OpenInNewIcon style={{ fontSize: "1rem", marginLeft: "4px" }} />
         </button>
