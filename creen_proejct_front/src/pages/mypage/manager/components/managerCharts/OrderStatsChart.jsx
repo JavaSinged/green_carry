@@ -1,8 +1,11 @@
 import Chart from "react-apexcharts";
 import styles from "./managerChart.module.css";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
+import { useNavigate } from "react-router-dom";
 
 const OrderStatsChart = ({ data }) => {
+  const navigate = useNavigate();
+
   if (!data || data.length === 0) {
     return (
       <div className={styles.noData}>당월 주문 데이터가 존재하지 않습니다.</div>
@@ -74,7 +77,12 @@ const OrderStatsChart = ({ data }) => {
     <div className={styles.chartContainer}>
       <div className={styles.cardHeader}>
         <span className={styles.cardTitle}>주문 통계</span>
-        <button className={styles.viewMoreBtn}>
+        <button
+          className={styles.viewMoreBtn}
+          onClick={() => {
+            navigate("/mypage/manager/orders");
+          }}
+        >
           View more
           <OpenInNewIcon style={{ fontSize: "1rem", marginLeft: "4px" }} />
         </button>
