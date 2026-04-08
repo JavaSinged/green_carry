@@ -10,6 +10,8 @@ import kr.co.iei.store.model.vo.OrderListObject;
 import kr.co.iei.store.model.vo.OrderListResponse;
 import kr.co.iei.store.model.vo.OrderResponse;
 import kr.co.iei.store.model.vo.Store;
+import kr.co.iei.store.model.vo.StoreReviewResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -103,5 +105,21 @@ public class StoreService {
 	public String getMenuImageById(int menuId) {
 		String imagePath = storeDao.getMenuImageById(menuId);
         return imagePath;
+	}
+
+	public List<OrderResponse> getOrdersByStoreId(Integer storeId) {
+		List<OrderResponse> list = storeDao.getOrdersByStoreId(storeId);
+        return list;
+
+	}
+
+	public List<StoreReviewResponse> selectStoreReviews(Integer storeId) {
+		List<StoreReviewResponse> list = storeDao.selectStoreReviews(storeId);
+		return list;
+	}
+
+	public int changeOrderStatus(Integer orderId, int status, Integer expectedTime) {
+		int result = storeDao.changeOrderStatus(orderId, status, expectedTime);
+		return result;
 	}
 }

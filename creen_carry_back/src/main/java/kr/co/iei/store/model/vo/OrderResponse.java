@@ -29,6 +29,8 @@ public class OrderResponse {
 	private Integer deliveryPrice;
 	private Integer deliveryType;
 	private Integer expectedTime;
+	private String confirmDate;
+	private String completeDate;
 	
 
 	// 4. 🌟 메뉴 상세 정보 (리뷰 모달 및 목록용)

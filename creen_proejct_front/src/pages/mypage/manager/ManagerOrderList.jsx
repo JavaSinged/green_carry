@@ -18,7 +18,7 @@ const ManagerOrderList = () => {
     setIsLoading(true);
 
     axios
-      .get(`${import.meta.env.VITE_BACKSERVER}/stores/owner/orders/${storeId}`)
+      .get(`${import.meta.env.VITE_BACKSERVER}/stores/orders/owner/${storeId}`)
       .then((res) => {
         setOrderList(Array.isArray(res.data) ? res.data : []);
       })
