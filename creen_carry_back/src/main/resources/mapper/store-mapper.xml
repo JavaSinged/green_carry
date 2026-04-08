@@ -46,7 +46,8 @@
                menu_price,
                menu_category,
                menu_image,
-               menu_info
+               menu_info,
+               menu_status
         FROM MENU_TBL
         WHERE store_id = #{storeId}
         ORDER BY menu_category ASC, menu_id ASC
@@ -413,7 +414,8 @@
 	</update>
 	
 	<select id="getMenuImageById" parameterType="int" resultType="string">
-		SELECT menu_image
+		SELECT menu_image,
+		menu_status
 		FROM menu_tbl
 		WHERE menu_id = #{menuId}
 	</select>
