@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import styles from "./Home.module.css";
@@ -21,6 +21,7 @@ import EcoDrone from "../../components/Easter Egg/EcoDrone";
 import EcoRecycle from "../../components/Easter Egg/EcoRecycle";
 import EcoEarth from "../../components/Easter Egg/EcoEarth";
 import EcoFlood from "../../components/Easter Egg/EcoFlood";
+import { AuthContext } from "../../context/AuthContext";
 
 const banners = [
   {
@@ -48,10 +49,36 @@ const categories = [
 export default function Home() {
   const navigate = useNavigate();
 
+  const { user } = useContext(AuthContext);
+
+  console.log("홈에서 확인되는 유저 정보:", user);
+
   const [isLoading, setLoading] = useState(true); // 로딩 상태 추가
   const { storeId, setStoreId } = useCartStore();
   const [selectedCategory, setSelectedCategory] = useState("인기맛집");
   const [searchTerm, setSearchTerm] = useState("");
+
+  const calculateDistance = (storeLat, storeLng) => {
+    if (!user?.lat || !user?.lng || !storeLat || !storeLng)
+      return "위치 정보 없음";
+
+    // 하버사인 공식으로 직접 계산 (네이버 Projection은 지도 로드 후에만 동작)
+    const R = 6371; // 지구 반지름 (km)
+    const dLat = ((storeLat - user.lat) * Math.PI) / 180;
+    const dLng = ((storeLng - user.lng) * Math.PI) / 180;
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos((user.lat * Math.PI) / 180) *
+        Math.cos((storeLat * Math.PI) / 180) *
+        Math.sin(dLng / 2) *
+        Math.sin(dLng / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const distance = R * c;
+
+    return distance < 1
+      ? `${Math.round(distance * 1000)}m` // 1km 미만은 m 단위로
+      : `${distance.toFixed(1)}km`;
+  };
 
   // 1. 서버에서 받아온 원본 리스트를 저장할 State
   const [storeList, setStoreList] = useState([]);
@@ -62,7 +89,7 @@ export default function Home() {
     axios
       .get(`${import.meta.env.VITE_BACKSERVER}/stores`)
       .then((res) => {
-        //console.log("서버 데이터 확인:", res.data);
+        console.log("서버 데이터 확인:", res.data);
         // 서버에서 넘어온 배열 데이터를 상태에 저장
         setStoreList(res.data);
         setLoading(false); // 데이터 로딩 완료
@@ -220,7 +247,10 @@ export default function Home() {
                     alt={store.storeName}
                   />
                   {/* 서버 데이터에 거리가 없다면 임시값이나 위치 계산값 사용 */}
-                  <div className={styles.card_badge}>약 100m</div>
+
+                  <div className={styles.card_badge}>
+                    {calculateDistance(store.LATITUDE, store.LONGITUDE)}
+                  </div>
                 </div>
                 <div className={styles.card_info}>
                   <h3 className={styles.store_name}>{store.storeName}</h3>

@@ -207,6 +207,8 @@ const Login = () => {
           localStorage.setItem("memberName", loginUser.memberName);
           localStorage.setItem("memberGrade", loginUser.memberGrade);
           localStorage.setItem("memberThumb", loginUser.memberThumb);
+          localStorage.setItem("LATITUDE", loginUser.latitude);
+          localStorage.setItem("LONGITUDE", loginUser.longitude);
 
           if (loginUser.storeId) {
             localStorage.setItem("storeId", loginUser.storeId);
@@ -336,18 +338,24 @@ const Login = () => {
 
           <div className="premium-tabs">
             <div
-              className={`slide-indicator ${activeTab === "business" ? "right" : "left"}`}
+              className={`slide-indicator ${
+                activeTab === "business" ? "right" : "left"
+              }`}
             ></div>
             <button
               type="button"
-              className={`tab-button ${activeTab === "personal" ? "active" : ""}`}
+              className={`tab-button ${
+                activeTab === "personal" ? "active" : ""
+              }`}
               onClick={() => handleTabChange("personal")}
             >
               개인 이용자
             </button>
             <button
               type="button"
-              className={`tab-button ${activeTab === "business" ? "active" : ""}`}
+              className={`tab-button ${
+                activeTab === "business" ? "active" : ""
+              }`}
               onClick={() => handleTabChange("business")}
             >
               사업자
