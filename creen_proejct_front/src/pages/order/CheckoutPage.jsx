@@ -352,8 +352,38 @@ const CheckoutPage = () => {
 
               <div className={styles.arrivalRow}>
                 <div className={styles.arrivalLeft}>
-                  <span className={styles.smallIcon}></span>
-                  <span>{isPickup ? "픽업 예정 시간" : "도착 예정 시간"}</span>
+                  {/* 🌟 완료 시 아이콘에도 불이 들어오도록 필터 효과 추가 */}
+                  <span
+                    className={styles.smallIcon}
+                    style={{
+                      backgroundColor:
+                        rawOrderStatus === 5 ? "#2f8f46" : "#ccc",
+                      boxShadow:
+                        rawOrderStatus === 5
+                          ? "0 0 8px rgba(47, 143, 70, 0.6)"
+                          : "none",
+                    }}
+                  ></span>
+
+                  <span
+                    style={{
+                      color: rawOrderStatus === 5 ? "#2f8f46" : "#333",
+                      fontWeight: rawOrderStatus === 5 ? "bold" : "500",
+                      textShadow:
+                        rawOrderStatus === 5
+                          ? "0 0 5px rgba(47, 143, 70, 0.3)"
+                          : "none",
+                      transition: "all 0.3s ease",
+                    }}
+                  >
+                    {rawOrderStatus === 5
+                      ? isPickup
+                        ? "픽업 완료 시간"
+                        : "배달 완료 시간"
+                      : isPickup
+                        ? "픽업 예정 시간"
+                        : "도착 예정 시간"}
+                  </span>
                 </div>
 
                 <div
@@ -455,7 +485,7 @@ const CheckoutPage = () => {
               </div>
               <div className={styles.ecoInfoRow}>
                 <span>누적 탄소 절감량</span>
-                <strong>{totalCarbon}kg</strong>
+                <strong>{getPoint}g</strong>
               </div>
             </div>
 
