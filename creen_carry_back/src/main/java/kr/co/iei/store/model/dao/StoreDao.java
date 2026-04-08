@@ -8,15 +8,11 @@ import kr.co.iei.store.model.vo.OrderItem;
 import kr.co.iei.store.model.vo.OrderListObject;
 import kr.co.iei.store.model.vo.OrderListResponse;
 import kr.co.iei.store.model.vo.OrderResponse;
-import kr.co.iei.store.model.vo.ReviewComment;
 import kr.co.iei.store.model.vo.Store;
-import kr.co.iei.store.model.vo.StoreReviewResponse;
-
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
-import java.util.Map;
 
 @Mapper
 public interface StoreDao {
@@ -61,17 +57,5 @@ public interface StoreDao {
 
 	int updateOrderStatus(Integer orderId);
 
-
-	List<StoreReviewResponse> selectStoreReviews(int storeId);
-
-	int insertReviewComment(ReviewComment comment);
-
-	List<OrderResponse> getOrdersByStoreId(int storeId);
-
-	int changeOrderStatus(Map<String, Object> params);
-
-	
-
     Store findStoreByMemberId(String memberId);
-
 }
