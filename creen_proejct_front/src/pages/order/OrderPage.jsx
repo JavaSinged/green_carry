@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"; // useState 추가
+import React, { useEffect, useState } from "react";
 import styles from "./OrderPage.module.css";
 import Header from "../../components/commons/Header";
 import Footer from "../../components/commons/Footer";
@@ -32,8 +32,9 @@ const OrderPage = () => {
   useEffect(() => {
     setNum(deliveryType === 1 ? 0 : deliveryType === 2 ? 1000 : 3000);
   }, [deliveryType]);
-  console.log(num);
+
   const addOrder = () => {};
+
   return (
     <div className={styles.pageWrapper}>
       <main className={styles.mainContainer}>
@@ -57,7 +58,7 @@ const OrderPage = () => {
           </div>
           <div className={styles.totalPriceText}>
             <u>
-              총 결제금액 <tr></tr>
+              총 결제금액 <br />
               {(realTotal + num).toLocaleString()}원
             </u>
           </div>
@@ -71,7 +72,8 @@ const OrderPage = () => {
             <div
               className={`${styles.miniCard} ${selectedRide === "pickup" ? styles.selected : ""}`}
               onClick={() => {
-                (setSelectedRide("pickup"), setDeliveryType(1));
+                setSelectedRide("pickup");
+                setDeliveryType(1);
               }}
             >
               <DirectionsRunIcon />
@@ -86,7 +88,8 @@ const OrderPage = () => {
             <div
               className={`${styles.miniCard} ${selectedRide === "bike" ? styles.selected : ""}`}
               onClick={() => {
-                (setSelectedRide("bike"), setDeliveryType(2));
+                setSelectedRide("bike");
+                setDeliveryType(2);
               }}
             >
               <DirectionsBikeIcon />
@@ -102,7 +105,8 @@ const OrderPage = () => {
             <div
               className={`${styles.miniCard} ${selectedRide === "moto" ? styles.selected : ""}`}
               onClick={() => {
-                (setSelectedRide("moto"), setDeliveryType(3));
+                setSelectedRide("moto");
+                setDeliveryType(3);
               }}
             >
               <TwoWheelerIcon />
@@ -137,10 +141,10 @@ const OrderPage = () => {
           <div
             className={styles.payButton}
             onClick={() => {
-              (addOrder(),
-                setSuperTotalPrice(realTotal),
-                setDeilveryPrice(num),
-                navigate("/paymentPage"));
+              addOrder();
+              setSuperTotalPrice(realTotal);
+              setDeilveryPrice(num);
+              navigate("/paymentPage");
             }}
           >
             결제하기
@@ -160,15 +164,18 @@ const MenuList = ({ changeTotal }) => {
     (sum, item) => sum + item.unitPrice * item.quantity,
     0,
   );
+
   useEffect(() => {
     changeTotal(totalPrice);
   }, [totalPrice]);
+
   const { increaseQuantity, decreaseQuantity } = useCartStore();
+
   if (cartList !== null) {
     return cartList.map((cart) => {
       return (
         <CartItem
-          key={`cartList-${cartList.length}`}
+          key={cart.id} // 🌟 고유한 아이디 사용 (리액트 경고 방지)
           cart={cart}
           increaseQuantity={increaseQuantity}
           decreaseQuantity={decreaseQuantity}
@@ -178,6 +185,7 @@ const MenuList = ({ changeTotal }) => {
     });
   }
 };
+
 export default OrderPage;
 
 const CartItem = ({
@@ -189,21 +197,29 @@ const CartItem = ({
   const unitPrice = cart.unitPrice;
   const totalPrice = unitPrice * cart.quantity;
   const options = cart.options;
+
+  // 🌟 백엔드 호스트 및 이미지 상태 추가
+  const backHost = import.meta.env.VITE_BACKSERVER;
+  const [fetchedImage, setFetchedImage] = useState("");
+
   useEffect(() => {
     axios
-      .get(
-        `${import.meta.env.VITE_BACKSERVER}/stores/orders/itemImg/${cart.menuId}`,
-      )
+      .get(`${backHost}/stores/orders/itemImg/${cart.menuId}`)
       .then((res) => {
-        console.log(res);
+        // 🌟 서버에서 사진 경로를 받아왔다면, 백엔드 주소를 붙여서 상태에 저장
+        if (res.data) {
+          setFetchedImage(`${backHost}${res.data}`);
+        }
       })
       .catch((err) => {
-        console.log(err);
+        console.log("이미지 로드 에러:", err);
       });
-  }, []);
+  }, [cart.menuId, backHost]);
+
   useEffect(() => {
     handleTotal(totalPrice);
   }, [totalPrice]);
+
   return (
     <div className={styles.menuList}>
       <div className={styles.menuItem}>
@@ -211,12 +227,12 @@ const CartItem = ({
           <p>
             메뉴 : {cart.name} * ({cart.quantity})
           </p>
-          <p>가격 :{unitPrice.toLocaleString()}원</p>
+          <p>가격 : {unitPrice.toLocaleString()}원</p>
           <p className={styles.options}>
             옵션 :
-            {options.map((option) => {
+            {options.map((option, index) => {
               const name = option.optionName;
-              return <span>&nbsp;{name},&nbsp;</span>;
+              return <span key={index}>&nbsp;{name},&nbsp;</span>;
             })}
           </p>
           <div className={styles.quantityBox}>
@@ -229,11 +245,17 @@ const CartItem = ({
         </div>
 
         <div className={styles.menuImageWrapper}>
-          {cart.menuImage ? (
+          {/* 🌟 장바구니 자체에 이미지가 있거나(cart.menuImage), axios로 가져온 이미지가 있다면 출력 */}
+          {fetchedImage || cart.menuImage ? (
             <img
-              src={cart.menuImage}
+              src={fetchedImage || `${backHost}${cart.menuImage}`}
               alt={cart.name}
               className={styles.menuImage}
+              style={{ objectFit: "cover" }}
+              onError={(e) => {
+                // 이미지 로드 실패 시 대체 이미지 처리
+                e.target.src = "https://via.placeholder.com/150?text=No+Image";
+              }}
             />
           ) : (
             <div className={styles.menuImagePlaceholder}></div>

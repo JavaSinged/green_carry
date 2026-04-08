@@ -58,4 +58,6 @@ public interface StoreDao {
 	int updateOrderStatus(Integer orderId);
 
     Store findStoreByMemberId(String memberId);
+    
+    String getMenuImageById(int menuId);
 }

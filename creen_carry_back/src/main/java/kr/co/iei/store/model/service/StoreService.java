@@ -11,6 +11,7 @@ import kr.co.iei.store.model.vo.OrderListResponse;
 import kr.co.iei.store.model.vo.OrderResponse;
 import kr.co.iei.store.model.vo.Store;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -97,5 +98,10 @@ public class StoreService {
 
 	public Store getStoreByMemberId(String memberId) {
 		return storeDao.findStoreByMemberId(memberId);
+	}
+
+	public String getMenuImageById(int menuId) {
+		String imagePath = storeDao.getMenuImageById(menuId);
+        return imagePath;
 	}
 }

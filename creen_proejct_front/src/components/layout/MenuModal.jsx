@@ -8,6 +8,7 @@ import useCartStore from "../../store/useCartStore";
 import { useNavigate } from "react-router-dom";
 
 export default function MenuModal({ isOpen, onClose, menuData }) {
+  const backHost = import.meta.env.VITE_BACKSERVER;
   const addToCart = useCartStore((state) => state.addToCart);
   const storeName = useCartStore((state) => state.setStoreName);
 
@@ -149,12 +150,24 @@ export default function MenuModal({ isOpen, onClose, menuData }) {
         {/* 본문 */}
         <div className={styles.body}>
           <div className={styles.image_placeholder}>
-            {menuData.menuImage && (
+            {menuData?.menuImage ? (
               <img
-                src={menuData.menuImage}
-                alt="메뉴"
-                style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                src={`${backHost}${menuData.menuImage}`}
+                alt={menuData.menuName}
+                style={{ width: "100%", height: "100%", objectFit: "contain" }}
+                onError={(e) => {
+                  e.target.src =
+                    "https://via.placeholder.com/150?text=No+Image";
+                }}
               />
+            ) : (
+              <div
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  backgroundColor: "#f0f0f0",
+                }}
+              ></div>
             )}
           </div>
 

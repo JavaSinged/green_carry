@@ -27,7 +27,7 @@ const ManagerMenuList = () => {
     if (!memberId) return;
 
     axios
-      .get(`${import.meta.env.VITE_BACKSERVER}/stores/${memberId}`)
+      .get(`${import.meta.env.VITE_BACKSERVER}/stores/member/${memberId}`)
       .then((res) => {
         if (res.data && res.data.storeId) {
           setStoreId(res.data.storeId);

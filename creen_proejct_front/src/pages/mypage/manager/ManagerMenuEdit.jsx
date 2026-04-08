@@ -84,16 +84,30 @@ const ManagerMenuEdit = () => {
     // 3. 수정 모드 데이터 로드
     if (menuId) {
       axios.get(`${backHost}/menus/${menuId}`).then((res) => {
+        const imagePath =
+          res.data.menuImagePath ||
+          res.data.menuImage ||
+          res.data.menu_image ||
+          "";
+
         setMenu({
           menuName: res.data.menuName,
           menuInfo: res.data.menuInfo,
-          menuImage: res.data.menuImage,
+          menuImage: imagePath, // 찾은 경로를 넣어줌
           menuPrice: res.data.menuPrice,
           menuCategory: res.data.menuCategory,
           menuStatus: res.data.menuStatus,
         });
-        if (res.data.menuImage) {
-          setPreviewUrl(`${backHost}${res.data.menuImage}`);
+
+        // 🌟 기존 이미지가 있다면 서버 주소를 붙여서 미리보기 세팅
+        if (imagePath) {
+          setPreviewUrl(`${backHost}${imagePath}`);
+        } else {
+          // 혹시라도 경로가 안 왔을 경우를 위해 콘솔에 찍어보기
+          console.warn(
+            "⚠️ 서버에서 사진 경로를 보내주지 않았습니다!",
+            res.data,
+          );
         }
       });
 

@@ -42,7 +42,7 @@ public class StoreController {
         return ResponseEntity.ok(store);
     }
 
-    @GetMapping("/{memberId}")
+    @GetMapping("/member/{memberId}")
     public ResponseEntity<?> getStoreByMemberId(@PathVariable String memberId) {
         Store store = storeService.getStoreByMemberId(memberId);
         return  ResponseEntity.ok(store);
@@ -80,5 +80,10 @@ public class StoreController {
     public ResponseEntity<?> searchOrderList(@PathVariable String memberId){
         List<OrderResponse> list = storeService.searchOrderList(memberId);
         return ResponseEntity.ok(list);
+    }
+    @GetMapping("/orders/itemImg/{menuId}")
+    public ResponseEntity<String> getMenuImage(@PathVariable int menuId) {
+        String imagePath = storeService.getMenuImageById(menuId);
+        return ResponseEntity.ok(imagePath);
     }
 }

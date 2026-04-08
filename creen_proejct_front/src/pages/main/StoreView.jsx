@@ -8,6 +8,7 @@ import CartBar from "../../components/layout/ui/CartBar";
 import useCartStore from "../../store/useCartStore";
 
 export default function StoreView() {
+  const backHost = import.meta.env.VITE_BACKSERVER;
   const location = useLocation();
   const storeId = location.state?.storeId || 1;
   //store state
@@ -182,16 +183,28 @@ export default function StoreView() {
               onClick={() => handleMenuClick(menu)}
             >
               <div className={styles.menu_image}>
-                {menu.menuImage && (
+                {menu.menuImage ? (
                   <img
-                    src={menu.menuImage}
+                    src={`${backHost}${menu.menuImage}`}
                     alt={menu.menuName}
                     style={{
                       width: "100%",
                       height: "100%",
-                      objectFit: "cover",
+                      objectFit: "contain",
+                    }}
+                    onError={(e) => {
+                      e.target.src =
+                        "https://via.placeholder.com/150?text=No+Image";
                     }}
                   />
+                ) : (
+                  <div
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      backgroundColor: "#f0f0f0",
+                    }}
+                  ></div>
                 )}
               </div>
               <div className={styles.menu_info}>

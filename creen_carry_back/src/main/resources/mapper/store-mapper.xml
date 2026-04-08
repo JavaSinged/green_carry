@@ -411,4 +411,10 @@
 		</if>
 		WHERE order_id = #{orderId}
 	</update>
+	
+	<select id="getMenuImageById" parameterType="int" resultType="string">
+		SELECT menu_image
+		FROM menu_tbl
+		WHERE menu_id = #{menuId}
+	</select>
 </mapper>

@@ -26,7 +26,7 @@
 		store_id AS storeId,
 		menu_name AS menuName,
 		menu_info AS menuInfo,
-		menu_image AS menuImage,
+		menu_image AS menuImagePath,
 		menu_price AS menuPrice,
 		menu_category AS menuCategory,
 		menu_carbon AS menuCarbon,
