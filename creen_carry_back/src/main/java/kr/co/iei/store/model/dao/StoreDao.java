@@ -60,9 +60,14 @@ public interface StoreDao {
 
 	int updateOrderStatus(Integer orderId);
 
-	StoreIdResponse selectStoreId(String memberId);
+    Store findStoreByMemberId(String memberId);
+    
+    String getMenuImageById(int menuId);
+
+    StoreIdResponse selectStoreId(String memberId);
 
 	List<StatsOrderInfo> selectStatsOrderInfo(Integer storeId, String yearMonth);
 
-    Store findStoreByMemberId(String memberId);
+
+    
 }

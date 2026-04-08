@@ -7,50 +7,51 @@
 		from store_tbl
 	</select>
 
-    <select id="findStoreById" parameterType="int"
-            resultType="store">
-        SELECT store_id            AS storeId,
-               member_id           AS memberId,
-               store_name
-                                   AS storeName,
-               store_address       AS storeAddress,
-               store_phone         AS
-                                      storePhone,
-               store_intro         AS storeIntro,
-               store_owner         AS storeOwner,
-               store_owner_address AS storeOwnerAddress,
-               store_origin_info   AS
-                                      storeOriginInfo,
-               store_owner_no      AS storeOwnerNo,
-               store_category      AS
-                                      storeCategory,
-               store_rating        AS storeRating,
-               latitude            AS LATITUDE,
-               longitude           AS LONGITUDE,
-               store_thumb         AS storeThumb
-        FROM STORE_TBL
-        WHERE store_id = #{storeId}
-    </select>
-    
-    <select id="findStoreByMemberId" resultType="store">
-        select store_id from store_tbl
-        where member_id = (select member_id from member_tbl
-                           where member_id = #{memberId})
-    </select>
+	<select id="findStoreById" parameterType="int"
+		resultType="store">
+		SELECT store_id AS storeId,
+		member_id AS memberId,
+		store_name
+		AS storeName,
+		store_address AS storeAddress,
+		store_phone AS
+		storePhone,
+		store_intro AS storeIntro,
+		store_owner AS storeOwner,
+		store_owner_address AS storeOwnerAddress,
+		store_origin_info AS
+		storeOriginInfo,
+		store_owner_no AS storeOwnerNo,
+		store_category AS
+		storeCategory,
+		store_rating AS storeRating,
+		latitude AS LATITUDE,
+		longitude AS LONGITUDE,
+		store_thumb AS storeThumb
+		FROM STORE_TBL
+		WHERE store_id = #{storeId}
+	</select>
 
-    <select id="selectAllMenu" resultType="menu">
-        SELECT menu_id,
-               store_id,
-               menu_name,
-               menu_carbon,
-               menu_price,
-               menu_category,
-               menu_image,
-               menu_info
-        FROM MENU_TBL
-        WHERE store_id = #{storeId}
-        ORDER BY menu_category ASC, menu_id ASC
-    </select>
+	<select id="findStoreByMemberId" resultType="store">
+		select store_id from store_tbl
+		where member_id = (select member_id from member_tbl
+		where member_id = #{memberId})
+	</select>
+
+	<select id="selectAllMenu" resultType="menu">
+		SELECT menu_id,
+		store_id,
+		menu_name,
+		menu_carbon,
+		menu_price,
+		menu_category,
+		menu_image,
+		menu_info,
+		menu_status
+		FROM MENU_TBL
+		WHERE store_id = #{storeId}
+		ORDER BY menu_category ASC, menu_id ASC
+	</select>
 
 	<select id="getMenuOptions" parameterType="long"
 		resultType="menuOption">
@@ -268,33 +269,6 @@
 		x.min_detail_id
 		) od_first ON o.order_id = od_first.order_id
 
-        WHERE o.member_id = #{memberId}
-        ORDER BY o.order_id DESC
-    </select>
-    
-    
-    <select id="selectStoreId" resultType="storeIdResponse">
-    SELECT store_id 
-	FROM store_tbl 
-	WHERE member_id = #{memberId}
-    </select>
-    
-    <select id="selectStatsOrderInfo" resultType="statsOrderInfo">
-    SELECT
-      o.DELIVERY_TYPE AS deliveryType,
-      SUM(od.PRICE * od.QUANTITY) AS seriesAmount
-    FROM order_list_map m  JOIN order_tbl o ON m.order_id = o.order_id
-    
-    JOIN order_detail od ON o.order_id = od.order_id
-    WHERE o.store_id = #{storeId}
-      AND o.order_status = 5
-      AND TO_CHAR(m.reg_date, 'YYYY-MM') = #{yearMonth} 
-    GROUP BY o.delivery_type
-    ORDER BY o.delivery_type ASC
-    </select>
-    
-    
-    
 		JOIN
 		menu_tbl md ON od_first.menu_id = md.menu_id
 
@@ -438,4 +412,33 @@
 		</if>
 		WHERE order_id = #{orderId}
 	</update>
+
+	<select id="getMenuImageById" parameterType="int"
+		resultType="string">
+		SELECT menu_image,
+		menu_status
+		FROM menu_tbl
+		WHERE menu_id =
+		#{menuId}
+	</select>
+
+	<select id="selectStoreId" resultType="storeIdResponse">
+		SELECT store_id
+		FROM store_tbl
+		WHERE member_id = #{memberId}
+	</select>
+
+	<select id="selectStatsOrderInfo" resultType="statsOrderInfo">
+		SELECT
+		o.DELIVERY_TYPE AS deliveryType,
+		SUM(od.PRICE * od.QUANTITY) AS seriesAmount
+		FROM order_list_map m JOIN order_tbl o ON m.order_id = o.order_id
+
+		JOIN order_detail od ON o.order_id = od.order_id
+		WHERE o.store_id = #{storeId}
+		AND o.order_status = 5
+		AND TO_CHAR(m.reg_date, 'YYYY-MM') = #{yearMonth}
+		GROUP BY o.delivery_type
+		ORDER BY o.delivery_type ASC
+	</select>
 </mapper>
