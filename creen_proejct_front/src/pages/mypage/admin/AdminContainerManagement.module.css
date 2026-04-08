@@ -64,17 +64,27 @@
 
 .attached_container {
   display: flex;
-  justify-content: space-between;
+  justify-content: column;
   align-items: center;
+  padding: 30px;
   width: 100%;
-  max-width: none;
+  gap: 16px;
   padding: 20px 30px;
+  position: relative;
 }
-
+.preview_img {
+  width: 200px;
+  height: 200px;
+  object-fit: contain;
+  border-radius: 8px;
+  background-color: #ffffff;
+  border: 1px solid #e2e8e4;
+  margin-bottom: 10px;
+}
 .attached_left {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
 }
 
 .check_icon {
@@ -94,18 +104,21 @@
 
 .attached_name {
   font-family: var(--font-title);
-  font-size: 15px;
+  font-size: 16px;
   font-weight: bold;
   color: #333333;
 }
 
 .attached_size {
-  font-size: 13px;
+  font-size: 14px;
   color: #888888;
   margin-top: 2px;
 }
 
 .close_btn {
+  position: absolute;
+  top: 15px;
+  right: 15px;
   background: transparent;
   border: none;
   color: var(--color-brand);
