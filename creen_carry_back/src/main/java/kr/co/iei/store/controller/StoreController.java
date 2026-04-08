@@ -3,7 +3,7 @@ package kr.co.iei.store.controller;
 import kr.co.iei.store.model.service.StoreService;
 import kr.co.iei.store.model.vo.Menu;
 import kr.co.iei.store.model.vo.MenuOption;
-import kr.co.iei.store.model.vo.MenuSaveRequestDto;
+import kr.co.iei.store.model.vo.MenuSaveRequest;
 import kr.co.iei.store.model.vo.Order;
 import kr.co.iei.store.model.vo.OrderItem;
 import kr.co.iei.store.model.vo.OrderListResponse;
@@ -35,8 +35,8 @@ public class StoreController {
         return ResponseEntity.ok(list);
     }
 
-    @GetMapping("/{storeId}")
-    public ResponseEntity<Store> getStoreDetail(@PathVariable Integer storeId) {
+    @GetMapping("/{storeId:[0-9]+}")
+    public ResponseEntity<?> getStoreDetail(@PathVariable Integer storeId) {
         Store store = storeService.getStoreById(storeId);
 
         if (store == null) {
@@ -45,19 +45,19 @@ public class StoreController {
         return ResponseEntity.ok(store);
     }
 
+    @GetMapping("/{memberId}")
+    public ResponseEntity<?> getStoreByMemberId(@PathVariable String memberId) {
+        Store store = storeService.getStoreByMemberId(memberId);
+        return  ResponseEntity.ok(store);
+    }
+
     @GetMapping("/{storeId}/menus")
-    public ResponseEntity<List<Menu>> getMenuList(@PathVariable Long storeId) {
+    public ResponseEntity<?> getMenuList(@PathVariable Long storeId) {
         // 서비스 호출
         List<Menu> menuList = storeService.selectAllMenu(storeId);
 
         // 데이터가 없어도 빈 배열([])을 담아 200 OK 응답 (프론트 에러 방지)
         return ResponseEntity.ok(menuList);
-    }
-    @GetMapping("/options/all")
-    public ResponseEntity<?> getAllOptions(){
-    	List<MenuOption> options = storeService.getAllMenuOptions();
-    	System.out.println(options);
-    	return ResponseEntity.ok(options);
     }
     
     @GetMapping("/{menuId}/options")
@@ -148,3 +148,4 @@ public class StoreController {
         }
     }
 }
+

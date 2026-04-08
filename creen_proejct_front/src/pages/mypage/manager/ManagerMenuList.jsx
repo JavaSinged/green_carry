@@ -1,183 +1,191 @@
-import SearchIcon from "@mui/icons-material/Search";
+import { useEffect, useState, useMemo } from "react";
+import axios from "axios";
 import styles from "./ManagerMenuList.module.css";
-import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+
+// MUI Icons
+import SearchIcon from "@mui/icons-material/Search";
+import ImageOutlinedIcon from "@mui/icons-material/ImageOutlined";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const ManagerMenuList = () => {
   const navigate = useNavigate();
-  const [searchTerm, setSearchTerm] = useState("");
-  const [menuList, setMenuList] = useState([]);
-  const [menuId, setMenuId] = useState("");
+  const backHost = import.meta.env.VITE_BACKSERVER;
+
+  const [menus, setMenus] = useState([]); // 전체 메뉴 원본 데이터
+  const [searchKeyword, setSearchKeyword] = useState("");
   const [storeId, setStoreId] = useState("");
-  const [storeName, setStoreName] = useState("");
+
+  // 페이지네이션 상태
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
 
-  const searchMenus = menuList.filter((menu) =>
-    menu.menuName.toLowerCase().includes(searchTerm.toLowerCase()),
-  );
-  // 2. 페이지네이션을 위한 계산 (여기를 추가!)
-  const indexOfLastItem = currentPage * itemsPerPage; // 현재 페이지의 마지막 인덱스
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage; // 현재 페이지의 첫 인덱스
-  const currentItems = searchMenus.slice(indexOfFirstItem, indexOfLastItem); // 화면에 그릴 진짜 데이터
-  const totalPages = Math.ceil(searchMenus.length / itemsPerPage); // 총 페이지 수
-
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchTerm]);
+  // 1. 가게 정보 가져오기
   useEffect(() => {
     const memberId = localStorage.getItem("memberId");
-
-    if (!memberId) {
-      console.warn("로그인 정보(memberId)가 없습니다.");
-      return;
-    }
+    if (!memberId) return;
 
     axios
-      .get(
-        `${import.meta.env.VITE_BACKSERVER}/stores/myStore?memberId=${memberId}`,
-      )
-      .then((Res) => {
-        const store = Res.data;
-
-        if (!store) {
-          console.warn("해당 유저의 상점 정보가 없습니다.");
-          return;
+      .get(`${import.meta.env.VITE_BACKSERVER}/stores/${memberId}`)
+      .then((res) => {
+        if (res.data && res.data.storeId) {
+          setStoreId(res.data.storeId);
         }
-
-        setStoreId(store.storeId);
-        setStoreName(store.storeName);
-
-        axios
-          .get(
-            `${import.meta.env.VITE_BACKSERVER}/stores/${store.storeId}/menus`,
-          )
-          .then((res) => {
-            console.log("메뉴 확인", res.data);
-            setMenuList(res.data);
-          })
-          .catch((err) => {
-            console.log("데이터 로딩 에러:", err);
-          });
       })
-      .catch((err) => {
-        console.error("상점 정보 로딩 중 에러 발생:", err);
-      });
+      .catch((err) => console.error("가게 정보 조회 실패:", err));
   }, []);
 
+  // 2. 메뉴 정보 전체 가져오기
+  useEffect(() => {
+    if (!storeId) return;
+
+    axios
+      .get(`${import.meta.env.VITE_BACKSERVER}/stores/${storeId}/menus`)
+      .then((res) => {
+        console.log("🚀 ~ ManagerMenuList ~ res:", res);
+        setMenus(res.data); // 전체 데이터를 한 번에 저장
+      })
+      .catch((err) => console.error("메뉴 로딩 실패:", err));
+  }, [storeId]);
+
+  // 📌 3. 데이터 가공 파이프라인 (검색어 필터링)
+  const filteredMenus = useMemo(() => {
+    let result = menus;
+    if (searchKeyword) {
+      result = result.filter((menu) =>
+        menu.menuName.toLowerCase().includes(searchKeyword.toLowerCase()),
+      );
+    }
+    return result;
+  }, [menus, searchKeyword]);
+
+  // 📌 4. 페이지네이션 계산 로직
+  const totalPages = Math.ceil(filteredMenus.length / itemsPerPage);
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  // 현재 페이지에 보여줄 6개만 추출
+  const currentMenus = filteredMenus.slice(indexOfFirstItem, indexOfLastItem);
+
+  // 페이지 이동 핸들러
+  const handlePrevPage = () => {
+    if (currentPage > 1) setCurrentPage(currentPage - 1);
+  };
+  const handleNextPage = () => {
+    if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+  };
+  const handlePageClick = (pageNumber) => {
+    setCurrentPage(pageNumber);
+    window.scrollTo(0, 0);
+  };
+
+  // 검색어 입력 시 페이지 리셋
+  const handleSearchChange = (e) => {
+    setSearchKeyword(e.target.value);
+    setCurrentPage(1);
+  };
+
   return (
-    <div className={styles.menu_list_container}>
-      <div className={styles.menu_header}>
-        <h3 className={styles.store_name}>{storeName}</h3>
+    <div className={styles.container}>
+      {/* 상단 헤더 및 검색바 */}
+      <div className={styles.header}>
+        <h2 className={styles.title}>상점 메뉴 리스트</h2>
         <div className={styles.header_right}>
           <div className={styles.search_wrap}>
             <input
               type="search"
               className={styles.search_input}
-              placeholder="메뉴이름"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="메뉴 이름 검색"
+              value={searchKeyword}
+              onChange={handleSearchChange}
             />
             <SearchIcon className={styles.search_icon} />
           </div>
-          <div>
-            <button
-              className={styles.add_btn}
-              onClick={() => {
-                navigate("/mypage/manager/menuEdit", {
-                  state: { storeId: storeId },
-                });
-              }}
-            >
-              메뉴 추가
-            </button>
-          </div>
+          <button
+            className={styles.addButton}
+            onClick={() => {
+              navigate(`/mypage/manager/menus/menuEdit/${storeId}`);
+            }}
+          >
+            메뉴 추가
+          </button>
         </div>
       </div>
 
-      <div className={styles.menu_grid}>
-        {currentItems.map((menu) => (
-          <div
-            key={menu.menuId}
-            className={styles.menu_card}
-            onClick={() => {
-              setMenuId(menu.menuId);
-              navigate("/mypage/manager/menuEdit", {
-                state: {
-                  menuId: menu.menuId,
-                  storeId: storeId,
-                  menuData: menu,
-                },
-              });
-            }}
-          >
-            <div className={styles.menu_image}>
-              {menu.menuImage && (
-                <img
-                  src={menu.menuImage}
-                  alt={menu.menuName}
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "cover",
-                  }}
-                />
-              )}
-            </div>
-            <div className={styles.menu_info}>
-              <span className={styles.menu_title}>{menu.menuName}</span>
-              <p className={styles.menu_price}>
-                {menu.menuPrice.toLocaleString() || 0}원
-              </p>
-              {menu.menuInfo && (
-                <p
-                  className={styles.menu_desc}
-                  style={{ fontSize: "12px", color: "#666", margin: "4px 0" }}
-                >
-                  {menu.menuInfo}
+      {/* 메뉴 리스트 (Grid) */}
+      <div className={styles.grid_container}>
+        {currentMenus.length > 0 ? (
+          currentMenus.map((menu) => (
+            <div
+              key={menu.menuId}
+              className={styles.menu_card}
+              onClick={() => {
+                navigate(
+                  `/mypage/manager/menus/menuEdit/${storeId}/${menu.menuId}`,
+                  { state: { menuData: menu } },
+                );
+              }}
+            >
+              <div className={styles.image_placeholder}>
+                {/* 🌟 1. 이미지가 있으면 img 태그를, 없으면 기본 아이콘을 출력합니다. */}
+                {menu.menuImage ? (
+                  <img
+                    src={`${backHost}${menu.menuImage}`}
+                    alt={menu.menuName}
+                    className={styles.menu_img} // CSS에서 크기 조절 필요
+                    onError={(e) => {
+                      // 이미지 로드 실패 시 대체 이미지나 아이콘 처리
+                      e.target.src =
+                        "https://via.placeholder.com/150?text=No+Image";
+                    }}
+                  />
+                ) : (
+                  <ImageOutlinedIcon sx={{ fontSize: 60, color: "#bdbdbd" }} />
+                )}
+              </div>
+              <div className={styles.menu_info}>
+                <p className={styles.menu_name}>{menu.menuName}</p>
+                <p className={styles.menu_price}>
+                  {menu.menuPrice?.toLocaleString()}원
                 </p>
-              )}
+              </div>
             </div>
-          </div>
-        ))}
-        {searchMenus.length === 0 && (
-          <p style={{ textAlign: "center", marginTop: "20px", color: "#888" }}>
-            해당 메뉴가 없습니다.
-          </p>
+          ))
+        ) : (
+          <div className={styles.no_result}>검색 결과가 없습니다.</div>
         )}
       </div>
 
+      {/* 페이지네이션 영역 (관리자 페이지와 동일한 스타일 적용) */}
       <div className={styles.pagination}>
         <button
           className={styles.page_btn_nav}
-          onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+          onClick={handlePrevPage}
           disabled={currentPage === 1}
         >
-          <ChevronLeftIcon fontSize="small" /> Previous
+          <ChevronLeftIcon /> 이전
         </button>
+
         <div className={styles.page_numbers}>
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map((number) => (
-            <button
-              key={number}
-              // 현재 페이지면 active 클래스 추가
-              className={`${styles.page_num} ${currentPage === number ? styles.active : ""}`}
-              onClick={() => setCurrentPage(number)}
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map((num) => (
+            <div
+              key={num}
+              className={`${styles.page_num} ${
+                currentPage === num ? styles.active : ""
+              }`}
+              onClick={() => handlePageClick(num)}
             >
-              {number < 10 ? `0${number}` : number}
-            </button>
+              {num < 10 ? `0${num}` : num}
+            </div>
           ))}
         </div>
+
         <button
           className={styles.page_btn_nav}
-          onClick={() =>
-            setCurrentPage((prev) => Math.min(totalPages, prev + 1))
-          }
-          disabled={currentPage === totalPages}
+          onClick={handleNextPage}
+          disabled={currentPage === totalPages || totalPages === 0}
         >
-          Next <ChevronRightIcon fontSize="small" />
+          다음 <ChevronRightIcon />
         </button>
       </div>
     </div>

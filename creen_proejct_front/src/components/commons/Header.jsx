@@ -107,8 +107,8 @@ export default function Header() {
                 {Number(user.memberGrade) === 0
                   ? "관리자"
                   : Number(user.memberGrade) === 1
-                  ? "개인"
-                  : "사업자"}
+                    ? "개인"
+                    : "사업자"}
                 )
               </span>
             )}

@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import kr.co.iei.member.model.vo.Member;
+import kr.co.iei.member.model.vo.PointHistory;
 import kr.co.iei.member.model.vo.Review;
 import kr.co.iei.utils.EmailSender;
 import kr.co.iei.utils.JwtUtil;
@@ -386,4 +387,20 @@ public class MemberController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("SERVER_ERROR");
         }
     }
+    @GetMapping("/point-history/{memberId}")
+    public ResponseEntity<?> getPointHistory(@PathVariable String memberId) {
+        try {
+            List<PointHistory> list = memberService.selectPointHistory(memberId);
+            return ResponseEntity.ok(list);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body("SERVER_ERROR");
+        }
+    }
+    @GetMapping("/enroll-date")
+    public ResponseEntity<String> getEnrollDate(@RequestParam("memberId")String memberId) {
+    String enrollDate = memberService.getEnrollDate(memberId);
+    return ResponseEntity.ok(enrollDate);
+    }
+    
 }

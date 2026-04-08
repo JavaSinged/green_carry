@@ -37,6 +37,7 @@ public class Member {
 	private String storeOwnerNo; // STORE_OWNER_NO (NUMBER) : 사업자 등록 번호 (10자리 숫자이므로 Long 사용)
 	private String storeName; // STORE_NAME (VARCHAR2) : 가게 이름
 	private String openingDate; // OPENING_DATE (DATE) : 개업일 (화면 출력을 위해 String으로 받음)
+	private Integer storeId;
 
 	// 위 경도 저장
 	private Double latitude;

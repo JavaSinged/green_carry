@@ -1,0 +1,244 @@
+.page {
+  padding: 30px;
+  background-color: #f8f9fa;
+  min-height: 100vh;
+}
+
+.pageTitle {
+  font-size: 24px;
+  font-weight: 800;
+  color: #222;
+  margin-bottom: 8px;
+}
+
+.pageDesc {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 24px;
+}
+
+.reviewList {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.reviewCard {
+  position: relative;
+  background: #fff;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  margin-bottom: 20px;
+}
+
+/* 고객 리뷰 영역 */
+.customerSection {
+  margin-bottom: 20px;
+}
+.deleteBtn {
+  position: absolute;
+  top: 70px;
+  right: 20px;
+  background-color: #ffeded;
+  color: #e74c3c;
+  border: 1px solid #ffcaca;
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.userInfo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 15px;
+}
+
+.userAvatar {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%; /* 동그랗게 */
+  object-fit: cover;
+  border: 1px solid #eee;
+}
+
+.userNameArea {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.userName {
+  font-weight: 700;
+  font-size: 15px;
+  color: #333;
+}
+.deleteBtn:hover {
+  background-color: #e74c3c;
+  color: #fff;
+}
+
+.reviewHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.stars {
+  color: #fbbd0a;
+  font-size: 18px;
+  letter-spacing: 2px;
+}
+
+.date {
+  font-size: 13px;
+  color: #999;
+}
+
+.menuName {
+  font-size: 13px;
+  font-weight: 600;
+  color: #2f8f46;
+  background: #e8f4ea;
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 6px;
+  margin-bottom: 12px;
+}
+
+.content {
+  font-size: 15px;
+  line-height: 1.6;
+  color: #333;
+}
+
+.reviewImg {
+  margin-top: 12px;
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+/* 사장님 답글 영역 */
+.bossSection {
+  background: #fdfdfd;
+  border-top: 1px dashed #eee;
+  padding-top: 20px;
+}
+
+.bossTitle {
+  font-weight: 700;
+  color: #2f8f46;
+  margin-bottom: 10px;
+  font-size: 14px;
+}
+
+/* 완료된 답글 */
+.replyCompleted {
+  background: #f4f9f5;
+  padding: 16px;
+  border-radius: 8px;
+}
+
+.replyContent {
+  font-size: 14.5px;
+  color: #444;
+  line-height: 1.5;
+  margin-bottom: 8px;
+}
+
+.replyDate {
+  font-size: 12px;
+  color: #aaa;
+}
+
+/* 답글 작성 폼 */
+.inputWrap {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.textarea {
+  flex: 1;
+  height: 80px;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  resize: none;
+  font-size: 14px;
+  font-family: inherit;
+}
+
+.textarea:focus {
+  outline: none;
+  border-color: #2f8f46;
+}
+
+.submitBtn {
+  background: #2f8f46;
+  color: white;
+  border: none;
+  padding: 0 24px;
+  height: 80px; /* textarea와 높이 맞춤 */
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.submitBtn:hover {
+  background: #246337;
+}
+
+.noData {
+  text-align: center;
+  padding: 50px;
+  color: #888;
+}
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-top: 40px;
+  padding-bottom: 20px;
+}
+
+.pageBtn {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  background-color: #fff;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: 0.2s;
+}
+
+.pageBtn:disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+  color: #ccc;
+}
+
+.pageNumber {
+  padding: 8px 14px;
+  border: 1px solid #ddd;
+  background-color: #fff;
+  cursor: pointer;
+  border-radius: 5px;
+  font-weight: bold;
+}
+
+.activePage {
+  background-color: #2e7d32; /* 앱의 포인트 컬러(예: 초록색) */
+  color: #fff;
+  border-color: #2e7d32;
+}
+
+.pageNumber:hover:not(.activePage) {
+  background-color: #f0f0f0;
+}

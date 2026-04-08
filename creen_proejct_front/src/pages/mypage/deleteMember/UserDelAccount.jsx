@@ -13,6 +13,7 @@ const UserDelAccount = () => {
     const [password, setPassword] = useState(""); // 입력한 비밀번호
     const [isAgreed, setIsAgreed] = useState(false); // 마지막 체크박스 동의
     const [totalCarbon, setTotalCarbon] = useState(0); //탄소량 저장
+    const [enrollDate, setEnrollDate] = useState(""); // 가입일
 
     const togglePassword = () => {
         setShowPassword(!showPassword);
@@ -46,6 +47,33 @@ const UserDelAccount = () => {
             }
         };
         fetchCarbon();
+    }, [user]);
+
+    useEffect(() => {
+        const MemberDate = async () => {
+            if (user?.memberId) {
+                try {
+                    const token = localStorage.getItem("accessToken");
+
+                    const response = await axios.get(
+                        `${import.meta.env.VITE_BACKSERVER}/member/enroll-date`,
+                        {
+                            params: { memberId: user.memberId },
+                            headers: { Authorization: `Bearer ${token}` }
+                        }
+                    );
+                    if (response.data) {
+                        // DB에서 온 "2023-03-15"를 "2023년 3월"로
+                        const [year, month] = response.data.split('-');
+                        // parseInt를 쓰면 03이 3으로
+                        setEnrollDate(`${year}년 ${parseInt(month, 10)}월`)
+                    }
+                } catch (err) {
+                    console.log("가입일 로딩 실패", err);
+                }
+            }
+        };
+        MemberDate();
     }, [user]);
 
     const handleDeleteAccount = async () => {
@@ -119,9 +147,12 @@ const UserDelAccount = () => {
             <div className={styles.main_container}>
                 <section>
                     <div className={styles.main_text}>
+                        <div className={styles.icon_wrapper}>
+                            <img src="/image/asking-help.png" alt="닫기 아이콘" className={styles.top_icon} />
+                        </div>
                         <h1>회원 탈퇴</h1>
                         <h2>탈퇴를 진행하시겠습니까?</h2>
-                        <p>회원님은 <span>2023년 3월</span>부터 저희와 함께했어요</p>
+                        <p><span>{user.memberName}</span> 회원님은 <span>{enrollDate}</span>부터 저희와 함께했어요</p>
                     </div>
                 </section>
                 <section>

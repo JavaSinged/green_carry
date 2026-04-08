@@ -17,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import kr.co.iei.member.model.dao.MemberDao;
 import kr.co.iei.member.model.vo.Member;
+import kr.co.iei.member.model.vo.PointHistory;
 import kr.co.iei.member.model.vo.Review;
 import kr.co.iei.utils.EmailSender;
 import tools.jackson.databind.JsonNode;
@@ -290,6 +291,9 @@ public class MemberService {
 		if (result > 0) {
 			// (선택) 에코 포인트 지급 로직 추가
 			// memberDao.addEcoPoint(review.getMemberId(), 100);
+			if (result > 0) {
+		        memberDao.updateReviewStatus(review.getOrderId());
+		    }
 		} else {
 			throw new RuntimeException("리뷰 등록에 실패했습니다.");
 		}
@@ -313,6 +317,13 @@ public boolean deleteReview(int orderId) {
 
 	public int checkActiveOrder(String memberId) {
 		return memberDao.checkActiveOrder(memberId);
+	}
+
+	public List<PointHistory> selectPointHistory(String memberId) {
+		return memberDao.selectPointHistory(memberId);
+	}
+	public String getEnrollDate(String memberId) {
+		return memberDao.getEnrollDate(memberId);
 	}
 
 

@@ -71,20 +71,11 @@ export default function ReviewModal({ order, onClose }) {
           솔직한 리뷰를 남겨주시면 에코 포인트를 드려요!
         </p>
 
-        {/* 상단 주문 정보 카드 */}
         <div className={styles.order_card}>
-          <img
-            src={order.menuImage}
-            alt="menu"
-            className={styles.order_img}
-            onError={(e) => {
-              e.target.src = "/img/no-image.png";
-            }}
-          />
+          <img src={order.menuImage} alt="menu" className={styles.order_img} />
           <div className={styles.order_info}>
             <p className={styles.store_name_title}>{order.storeName}</p>
 
-            {/* 🌟 메뉴명 + 외 N건 표시 */}
             <p
               className={styles.menu_name_text}
               style={{ fontWeight: "700", color: "#222", marginTop: "4px" }}
@@ -97,7 +88,6 @@ export default function ReviewModal({ order, onClose }) {
               )}
             </p>
 
-            {/* 🌟 결제 금액 표시 추가 */}
             <p style={{ color: "#555", fontSize: "0.9rem", marginTop: "2px" }}>
               결제금액:{" "}
               <span style={{ fontWeight: "600" }}>
@@ -124,15 +114,12 @@ export default function ReviewModal({ order, onClose }) {
           </div>
         </div>
 
-        {/* 🌟 가로(좌우) 배치를 만들어주는 flex_row 영역 */}
         <div className={styles.flex_row}>
-          {/* 👈 왼쪽 영역: 사진 첨부 */}
           <div className={styles.input_box}>
             <h3 className={styles.section_title}>
               사진 첨부 <span className={styles.optional_text}>(선택)</span>
             </h3>
             <div className={styles.upload_box}>
-              {/* 사진이 올라가면 텍스트를 숨기고 이미지만 꽉 차게! */}
               {preview ? (
                 <img
                   src={preview}
@@ -168,7 +155,6 @@ export default function ReviewModal({ order, onClose }) {
             </div>
           </div>
 
-          {/* 👉 오른쪽 영역: 별점 및 리뷰 텍스트 */}
           <div className={styles.input_box}>
             <h3 className={styles.section_title}>이 메뉴, 추천하시나요?</h3>
             <div className={styles.stars}>

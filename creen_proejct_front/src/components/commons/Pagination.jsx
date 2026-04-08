@@ -1,6 +1,6 @@
-import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import styles from "./Pagination.module.css";
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import styles from './Pagination.module.css';
 
 export default function Pagination({ currentPage, totalPages, onPageChange }) {
   if (totalPages === 0) return null;
@@ -22,11 +22,11 @@ export default function Pagination({ currentPage, totalPages, onPageChange }) {
             <button
               key={pageNum}
               className={`${styles.page_num} ${
-                currentPage === pageNum ? styles.active : ""
+                currentPage === pageNum ? styles.active : ''
               }`}
               onClick={() => onPageChange(pageNum)}
             >
-              {String(pageNum).padStart(2, "0")}
+              {String(pageNum).padStart(2, '0')}
             </button>
           );
         })}

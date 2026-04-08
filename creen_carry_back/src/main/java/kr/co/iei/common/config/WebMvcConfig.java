@@ -18,5 +18,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
 		registry.addResourceHandler("/uploads/review/**")
 				.addResourceLocations("file:////192.168.31.26/project/upload/web/review/");
 
+		// 메뉴 이미지용
+		registry.addResourceHandler("/uploads/menu/**")
+				.addResourceLocations("file:////192.168.31.26/project/upload/web/menu/");
 	}
 }

@@ -22,43 +22,88 @@ const CheckoutPage = () => {
   const paymentOrderId = params.get("orderId");
   const orderId = paymentOrderId ? Number(paymentOrderId.split("_")[1]) : null;
   const [storeName, setStoreName] = useState("");
+
+  // 상태 관리를 위한 State
   const [orderState, setOrderState] = useState(0);
+  const [rawOrderStatus, setRawOrderStatus] = useState(0);
   const [orderDate, setOrderDate] = useState("");
   const [totalCarbon, setTotalCarbon] = useState(0);
-  const [cancel, setCancel] = useState(0);
-  const cancleOrder = () => {
-    axios
-      .patch(`${import.meta.env.VITE_BACKSERVER}/stores/order/${orderId}`)
-      .then((res) => {
-        console.log(res);
-        setCancel(res.data);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
-  useEffect(() => {
-    console.log(cartList);
+
+  // 배달 타입 상태 추가 (1: 픽업, 2/3: 배달)
+  const [deliveryType, setDeliveryType] = useState(0);
+
+  const fetchOrderDetails = () => {
     if (!orderId) return;
 
     axios
       .get(`${import.meta.env.VITE_BACKSERVER}/stores/order/${orderId}`)
       .then((res) => {
-        console.log(res.data);
-
         setOrderList(res.data.items ?? []);
         setUsedPoint(Number(res.data.usedPoint ?? 0));
         setGetPoint(Number(res.data.getPoint ?? 0));
         setDeliveryPrice(Number(res.data.deliveryPrice ?? 0));
         setStoreName(res.data.storeName);
-        setOrderState(res.data.orderStatus - 2 ?? 0);
+        setDeliveryType(res.data.deliveryType ?? 0);
+
+        const status = res.data.orderStatus ?? 0;
+        setRawOrderStatus(status);
         setOrderDate(res.data.orderDate);
         setTotalCarbon(res.data.totalReduceCarbon);
+
+        if (status === 9 || status < 2) {
+          setOrderState(-1);
+        } else {
+          setOrderState(status - 2);
+        }
       })
       .catch((err) => {
-        console.log(err);
+        console.error("주문 정보 갱신 실패:", err);
       });
-  }, [orderId, cartList]);
+  };
+
+  useEffect(() => {
+    fetchOrderDetails();
+
+    const intervalId = setInterval(() => {
+      fetchOrderDetails();
+    }, 5000);
+
+    return () => clearInterval(intervalId);
+  }, [orderId]);
+
+  const cancelOrder = () => {
+    Swal.fire({
+      title: "주문 취소",
+      text: "정말 주문을 취소하시겠습니까?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      confirmButtonText: "취소 확정",
+      cancelButtonText: "돌아가기",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        axios
+          .patch(
+            `${import.meta.env.VITE_BACKSERVER}/stores/order/${orderId}/status`,
+            { status: 9 },
+          )
+          .then(() => {
+            Swal.fire(
+              "취소 완료",
+              "주문이 정상적으로 취소되었습니다.",
+              "success",
+            ).then(() => {
+              navigate("/mypage/user/orderList");
+            });
+          })
+          .catch((err) => {
+            console.error(err);
+            Swal.fire("오류", "주문 취소를 실패했습니다.", "error");
+          });
+      }
+    });
+  };
+
   useEffect(() => {
     const total = orderList.reduce((sum, item) => {
       return sum + Number(item.price ?? 0) * Number(item.quantity ?? 0);
@@ -66,6 +111,7 @@ const CheckoutPage = () => {
 
     setOrderAmount(total);
   }, [orderList]);
+
   useEffect(() => {
     const paymentAmount = Math.max(
       0,
@@ -123,19 +169,63 @@ const CheckoutPage = () => {
     }
   }, [mapLoaded]);
 
+  const isPickup = deliveryType === 1;
+
+  const getStatusMessage = (status, isPickup) => {
+    if (status === 9) return "주문이 아쉽게도 취소되었습니다.";
+    if (status === 0 || status === 1)
+      return "주문이 전달되었습니다. 사장님의 수락을 기다리고 있어요!";
+    if (status === 2)
+      return "사장님이 주문을 확인했습니다. 곧 조리가 시작됩니다.";
+    if (status === 3)
+      return "맛있게 음식을 조리하고 있습니다. 조금만 기다려주세요 🍳";
+    if (status === 4) {
+      return isPickup
+        ? "음식이 준비되었습니다! 매장으로 방문해 주세요 🏃‍♂️"
+        : "기사님이 배달을 출발했습니다! 곧 도착합니다 🛵";
+    }
+    if (status === 5) {
+      return isPickup
+        ? "픽업이 완료되었습니다. 맛있게 드세요! 😋"
+        : "배달이 완료되었습니다. 맛있게 드세요! 😋";
+    }
+    return "주문 상태를 확인하고 있습니다.";
+  };
+
   return (
     <div className={styles.page}>
       <main className={styles.main}>
         <section className={styles.completeCard}>
-          <div className={styles.completeIcon}>✓</div>
-          <h1 className={styles.completeTitle}>주문이 완료되었습니다!</h1>
+          <div
+            className={styles.completeIcon}
+            style={{ backgroundColor: rawOrderStatus === 9 ? "#ff4757" : "" }}
+          >
+            {rawOrderStatus === 9 ? "✕" : "✓"}
+          </div>
+
+          <h1 className={styles.completeTitle}>
+            {rawOrderStatus === 9
+              ? "주문이 취소되었습니다."
+              : "주문이 완료되었습니다!"}
+          </h1>
+
           <p className={styles.completeDesc}>
-            친환경 배달을 선택해 주셔서 감사합니다.
+            {rawOrderStatus === 9
+              ? "결제하신 금액은 카드사에 따라 영업일 기준 2~3일 내로 환불될 예정입니다."
+              : isPickup
+                ? "매장 방문 픽업을 선택해 주셔서 감사합니다."
+                : "친환경 배달을 선택해 주셔서 감사합니다."}
           </p>
 
-          <button className={styles.orderCheckBtn}>주문내역 확인</button>
+          <button
+            className={styles.orderCheckBtn}
+            onClick={() => navigate("/mypage/user/orderList")}
+          >
+            주문내역 확인
+          </button>
           <p className={styles.orderNumber}>
-            ECO-{orderDate}
+            {/* 🌟 [수정] 띄어쓰기 기준으로 앞의 날짜 부분만 가져와서 표시 */}
+            ECO-{orderDate ? orderDate.split(" ")[0].replace(/-/g, "") : ""}-
             {orderId}
           </p>
         </section>
@@ -147,7 +237,9 @@ const CheckoutPage = () => {
             <div className={styles.progressBar}>
               <div
                 className={styles.progressFill}
-                style={{ width: `${(orderState / 3) * 100}%` }}
+                style={{
+                  width: `${Math.max(0, Math.min(100, (orderState / 3) * 100))}%`,
+                }}
               >
                 <span className={styles.seed}>🌱</span>
               </div>
@@ -156,29 +248,32 @@ const CheckoutPage = () => {
             </div>
 
             <div className={styles.progressSteps}>
-              {["주문 접수", "조리중", "배달중", "배달 완료"].map(
-                (label, index) => (
-                  <div key={index} className={styles.step}>
-                    <div
-                      className={`${styles.circle} ${
-                        orderState >= index ? styles.active : ""
-                      }`}
-                    />
-                    <p
-                      className={
-                        orderState >= index ? styles.labelActive : styles.label
-                      }
-                    >
-                      {label}
-                    </p>
-                  </div>
-                ),
-              )}
+              {[
+                "주문 접수",
+                "조리중",
+                isPickup ? "픽업 대기" : "배달중",
+                isPickup ? "픽업 완료" : "배달 완료",
+              ].map((label, index) => (
+                <div key={index} className={styles.step}>
+                  <div
+                    className={`${styles.circle} ${
+                      orderState >= index ? styles.active : ""
+                    }`}
+                  />
+                  <p
+                    className={
+                      orderState >= index ? styles.labelActive : styles.label
+                    }
+                  >
+                    {label}
+                  </p>
+                </div>
+              ))}
             </div>
           </div>
 
           <p className={styles.statusMessage}>
-            정성껏 음식을 준비하고 있습니다.
+            {getStatusMessage(rawOrderStatus, isPickup)}
           </p>
         </section>
 
@@ -209,7 +304,7 @@ const CheckoutPage = () => {
               <div className={styles.arrivalRow}>
                 <div className={styles.arrivalLeft}>
                   <span className={styles.smallIcon}></span>
-                  <span>도착 예정 시간</span>
+                  <span>{isPickup ? "픽업 예정 시간" : "도착 예정 시간"}</span>
                 </div>
                 <strong className={styles.arrivalTime}>19:35</strong>
               </div>
@@ -220,6 +315,20 @@ const CheckoutPage = () => {
             <div className={styles.orderInfoCard}>
               <h3 className={styles.rightTitle}>주문 내역</h3>
 
+              {/* 🌟 [추가] 주문 시각 표시 */}
+              {orderDate && (
+                <p
+                  style={{
+                    fontSize: "14px",
+                    color: "#666",
+                    marginBottom: "0px",
+                    marginTop: "0px",
+                  }}
+                >
+                  주문 일시 : {orderDate}
+                </p>
+              )}
+
               <div className={styles.orderList}>
                 <OrderListMap orderList={orderList} />
 
@@ -229,7 +338,7 @@ const CheckoutPage = () => {
                 </div>
 
                 <div className={styles.orderRow}>
-                  <span>에코 딜리버리</span>
+                  <span>{isPickup ? "포장 / 픽업" : "에코 딜리버리"}</span>
                   <span>{deliveryPrice.toLocaleString()} 원</span>
                 </div>
 
@@ -243,7 +352,15 @@ const CheckoutPage = () => {
 
               <div className={styles.totalRow}>
                 <span>총 결제 금액</span>
-                <strong>{finalPrice.toLocaleString()} 원</strong>
+                <strong
+                  style={{
+                    color: rawOrderStatus === 9 ? "#999" : "",
+                    textDecoration:
+                      rawOrderStatus === 9 ? "line-through" : "none",
+                  }}
+                >
+                  {finalPrice.toLocaleString()} 원
+                </strong>
               </div>
             </div>
 
@@ -277,27 +394,17 @@ const CheckoutPage = () => {
             <button
               className={styles.primaryBtn}
               onClick={() => {
-                navigate("/");
+                navigate("/mypage/user/orderList");
               }}
             >
-              주문 내역보기
+              주문 목록 보기
             </button>
 
-            <button
-              className={styles.secondaryBtn}
-              onClick={() => {
-                cancleOrder();
-                if (cancel == 1) {
-                  Swal.fire("완료", "주문이 취소 되었습니다.", "success");
-                  navigate("/");
-                } else {
-                  Swal.fire("실패", "주문을 취소 할 수 없습니다.", "error");
-                }
-                // navigate("/");
-              }}
-            >
-              주문 취소
-            </button>
+            {(rawOrderStatus === 0 || rawOrderStatus === 1) && (
+              <button className={styles.secondaryBtn} onClick={cancelOrder}>
+                주문 취소
+              </button>
+            )}
           </aside>
         </div>
       </main>

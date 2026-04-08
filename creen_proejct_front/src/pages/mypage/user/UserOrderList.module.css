@@ -100,13 +100,23 @@
 }
 
 .reviewBtn {
-  border: none;
-  background: #2f8f46;
+  background-color: var(--color-brand); /* 기존 녹색 계열 */
   color: white;
-  border-radius: 999px;
-  padding: 12px 22px;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
   cursor: pointer;
-  font-size: 14px;
+  font-weight: bold;
+}
+
+.reviewBtnDisabled {
+  background-color: #e0e0e0;
+  color: #999;
+  border: 1px solid #ccc;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: not-allowed;
+  font-weight: bold;
 }
 
 .orderMiddle {
@@ -155,4 +165,161 @@
   font-size: 28px;
   color: #12803c;
   font-weight: 700;
+}
+.filterContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: white;
+  padding: 16px 20px;
+  border-radius: 12px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.dateInputs {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.dateInput {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #333;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.dateInput:focus {
+  border-color: #2f8f46;
+}
+
+.dateSeparator {
+  color: #888;
+  font-weight: bold;
+}
+
+.resetBtn {
+  background: #f1f3f1;
+  color: #555;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.resetBtn:hover {
+  background: #e2e6e3;
+}
+.cancelBtn {
+  background-color: white;
+  color: #ff4757;
+  border: 1px solid #ff4757;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-left: 8px; /* 뱃지와 간격 벌리기 */
+  transition: all 0.2s;
+}
+
+.cancelBtn:hover {
+  background-color: #fff0f1;
+}
+.canceledCard {
+  opacity: 0.6;
+  background-color: #fdfdfd;
+  position: relative;
+  overflow: hidden; /* 워터마크가 카드 밖으로 나가지 않게 */
+  border: 1px solid #e0e0e0;
+}
+
+/* 2. 음식 사진 흑백 처리 */
+.canceledImg {
+  filter: grayscale(100%);
+  opacity: 0.7;
+}
+
+/* 3. 취소선 그어주기 (가격, 탄소 절감량 등) */
+.strikeThrough {
+  text-decoration: line-through;
+  color: #999;
+}
+
+/* 4. 붉은색 상태 뱃지 (주문취소 전용) */
+.canceledBadge {
+  background-color: #ffeaea;
+  color: #ff4757;
+  border: 1px solid #ff4757;
+}
+
+/* 5. 가운데 크게 찍히는 '취소된 주문' 워터마크 도장 */
+.canceledWatermark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-15deg);
+  font-size: 36px;
+  font-weight: 900;
+  color: rgba(255, 71, 87, 0.4); /* 연한 빨간색 */
+  border: 6px solid rgba(255, 71, 87, 0.4);
+  padding: 12px 28px;
+  border-radius: 16px;
+  letter-spacing: 4px;
+  pointer-events: none; /* 클릭을 방해하지 않음 */
+  z-index: 10; /* 글씨 위로 띄움 */
+}
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-top: 32px;
+  margin-bottom: 20px;
+}
+
+.pageBtn {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 500;
+  color: #333;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pageBtn:hover:not(:disabled) {
+  background-color: #f5f5f5;
+  border-color: #ccc;
+}
+
+/* 현재 선택된 페이지 버튼 */
+.activePage {
+  background-color: #2f8f46; /* 메인 에코 초록색 */
+  color: white;
+  border-color: #2f8f46;
+  font-weight: bold;
+}
+
+.activePage:hover {
+  background-color: #267a39;
+}
+
+/* 이전/다음 버튼이 비활성화되었을 때 (1페이지거나 마지막 페이지일 때) */
+.pageBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }

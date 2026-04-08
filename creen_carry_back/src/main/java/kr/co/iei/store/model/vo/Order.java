@@ -21,4 +21,6 @@ public class Order {
 	private Integer totalPrice;
 	private Integer getPoint;
 	private List<OrderItem> items;
+	private Integer expectedTime;
+	private int reviewStatus;
 }

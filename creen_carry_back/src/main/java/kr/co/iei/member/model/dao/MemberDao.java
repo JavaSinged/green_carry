@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import kr.co.iei.member.model.vo.Member;
+import kr.co.iei.member.model.vo.PointHistory;
 import kr.co.iei.member.model.vo.Review;
 
 @Mapper
@@ -58,5 +59,10 @@ public interface MemberDao {
 	List<Review> selectReviewList(String memberId);
 
 	int deleteReview(int orderId);
+
+	List<PointHistory> selectPointHistory(String memberId);
+
+	void updateReviewStatus(int orderId);
+	String getEnrollDate(String memberId);
 
 }

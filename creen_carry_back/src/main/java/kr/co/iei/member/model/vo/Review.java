@@ -20,12 +20,13 @@ public class Review {
     private String reviewDate;   // 작성일
     private int storeId;
     private String memberProfile;
+    private int reviewStatus;
     
     
     private String storeName;    // 상점 이름
     private String menuName;     // 대표 메뉴명
     private int extraCount;      // 외 N건
     private int totalPrice;      // 주문 총 금액
-    private String replyContent; // 사장님 답글
-    private String replyDate;    // 답글 작성일
+    private String reviewCommentContent;
+    private String reviewCommentDate;
 }

@@ -8,11 +8,10 @@ import org.apache.ibatis.type.Alias;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-@Alias("menuOption")
-public class MenuOption {
-    private Long optionNo;
-    private int optionType;
-    private String optionName;
-    private int optionPrice;
-    private double optionCarbon;
+@Alias("container")
+public class Container {
+    private Long productId;
+    private String productMaterial;
+    private double productEmissions;
+    private int containerCount;
 }
