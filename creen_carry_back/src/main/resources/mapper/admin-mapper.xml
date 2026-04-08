@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="kr.co.iei.admin.model.dao.AdminDao">
+	<select id="selectMonthlySales" resultType="map">
+		SELECT
+		TO_CHAR(L.reg_DATE, 'YYYY-MM') AS monthly, -- reg_date를 ORDER_DATE로 변경
+		SUM(D.price * D.quantity) AS total_sales
+		FROM order_detail D
+		INNER JOIN
+		order_list_map L ON D.order_id = L.order_id
+		WHERE
+		(L.reg_DATE BETWEEN
+		TRUNC(ADD_MONTHS(SYSDATE, -5), 'MM') AND LAST_DAY(SYSDATE))
+		OR
+		(L.reg_DATE BETWEEN TRUNC(ADD_MONTHS(SYSDATE, -17), 'MM') AND
+		LAST_DAY(ADD_MONTHS(SYSDATE, -12)))
+		GROUP BY TO_CHAR(L.reg_DATE,
+		'YYYY-MM')
+		ORDER BY monthly ASC
+	</select>
+	<resultMap id="orderMap" type="OrderListByStoreId">
+		<id property="orderId" column="order_id" />
+		<result property="memberId" column="member_id" />
+		<result property="memberEmail" column="member_email" />
+		<result property="totalPrice" column="total_price" />
+		<result property="storeName" column="store_name" />
+		<result property="orderStatus" column="order_status" />
+		<result property="memberThumb" column="member_thumb" />
+	</resultMap>
+	<select id="selectOrdersByStoreId" resultMap="orderMap">
+		SELECT
+		o.order_id,
+		o.member_id,
+		m.member_email,
+
+		(
+		SELECT SUM(d.price * d.quantity)
+		FROM order_detail d
+		WHERE d.order_id = o.order_id
+		) AS total_price,
+
+		s.store_name,
+		o.order_status AS order_status,
+		m.member_thumb
+		FROM order_tbl o
+		JOIN member_tbl m ON o.member_id = m.member_id
+		JOIN store_tbl s ON o.store_id = s.store_id
+
+		WHERE s.store_id = #{storeId}
+		ORDER BY o.order_id DESC
+	</select>
+	<select id="selectMenuListByOrderId" resultType="Menu">
+		SELECT
+		d.menu_id,
+		m.menu_name,
+		m.menu_image,
+		d.option_string,
+		d.quantity
+		FROM order_detail d
+		JOIN menu_tbl m ON d.menu_id = m.menu_id
+		WHERE d.order_id = #{orderId}
+	</select>
+</mapper>

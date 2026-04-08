@@ -202,7 +202,11 @@ export default function StoreView() {
                 {menu.menuInfo && (
                   <p
                     className={styles.menu_desc}
-                    style={{ fontSize: "12px", color: "#666", margin: "4px 0" }}
+                    style={{
+                      fontSize: "12px",
+                      color: "#666",
+                      margin: "4px 0",
+                    }}
                   >
                     {menu.menuInfo}
                   </p>

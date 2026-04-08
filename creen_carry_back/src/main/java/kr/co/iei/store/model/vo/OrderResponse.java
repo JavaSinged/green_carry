@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class OrderResponse {
+	private String memberId;
 	// 1. 기본 주문 정보
 	private Integer orderId;
 	private String orderDate;

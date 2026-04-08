@@ -10,6 +10,8 @@ import kr.co.iei.store.model.vo.OrderListObject;
 import kr.co.iei.store.model.vo.OrderListResponse;
 import kr.co.iei.store.model.vo.OrderResponse;
 import kr.co.iei.store.model.vo.StatsOrderInfo;
+import kr.co.iei.store.model.vo.ReviewComment;
+import kr.co.iei.store.model.vo.SaleMonth;
 import kr.co.iei.store.model.vo.Store;
 import kr.co.iei.store.model.vo.StoreIdResponse;
 
@@ -28,7 +30,14 @@ public class StoreService {
     private StoreDao storeDao;
 
     public List<Store> selectAllStore() {
-        return storeDao.selectAllStore();
+        List<Store> list = storeDao.selectAllStore();
+
+        for (Store store : list) {
+            List<SaleMonth> monthlySalesList = storeDao.selectMonthlySalesByStoreId(store.getStoreId());
+            store.setSaleMonth(monthlySalesList);
+        }
+
+        return list;
     }
 
     public Store getStoreById(Integer storeId) {

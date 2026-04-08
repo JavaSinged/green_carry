@@ -441,4 +441,15 @@
 		GROUP BY o.delivery_type
 		ORDER BY o.delivery_type ASC
 	</select>
+	<select id="selectMonthlySalesByStoreId" parameterType="Integer" resultType="SaleMonth">
+    select
+        to_char(olm.reg_date, 'yyyy-mm') as sale_month,
+        sum(od.price * od.quantity) as total_sales
+    from order_detail od
+    join order_tbl o on od.order_id = o.order_id
+    join order_list_map olm on o.order_id = olm.order_id
+    where o.store_id = #{storeId}
+    group by to_char(olm.reg_date, 'yyyy-mm')
+    order by sale_month
+</select>
 </mapper>
