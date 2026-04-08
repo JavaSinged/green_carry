@@ -294,37 +294,22 @@ export default function UserInfoEdit() {
 
   // 회원 탈퇴 핸들러 (Swal 적용)
   const handleDeleteClick = async () => {
-    /*
-    Swal.fire({
-      title: "정말 떠나시겠어요? 😢",
-      text: "회원 탈퇴 시 모든 데이터는 복구할 수 없습니다.",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#d33", // 탈퇴 버튼은 강조색(빨강)
-      cancelButtonColor: "#3085d6",
-      confirmButtonText: "탈퇴하기",
-      cancelButtonText: "취소",
-      reverseButtons: true, // 취소 버튼을 왼쪽으로
-    }).then((result) => {
-      if (result.isConfirmed) {
-        // 확인 버튼을 눌렀을 때만 탈퇴 페이지로 이동
-        navigate("/mypage/user/deleteMember");
-      }
-    });
-    */
     //탈퇴 시 진행중인 배달 조회
     if (!user.memberId) return;
     try {
-      const res = await axios.get(`${import.meta.env.VITE_BACKSERVER}/member/check-active-order`, {
-        params: { memberId: user.memberId }
-      });
+      const res = await axios.get(
+        `${import.meta.env.VITE_BACKSERVER}/member/check-active-order`,
+        {
+          params: { memberId: user.memberId },
+        }
+      );
       const axtiveOrderCount = res.data;
       if (axtiveOrderCount > 0) {
         Swal.fire({
           icon: "warning",
           title: "탈퇴 불가",
           text: `현재 진행 중인 배달이 ${axtiveOrderCount}건 있습니다. 배달 완료 후 탈퇴가 가능합니다. 🛵`,
-          confirmButtonColor: "#2e8147"
+          confirmButtonColor: "#2e8147",
         });
         return;
       }
@@ -443,11 +428,8 @@ export default function UserInfoEdit() {
         </div>
 
         {!isEditingProfile && (
-          <div
-            className={styles.set_icon}
-            onClick={() => setIsEditingProfile(true)}
-          >
-            <BorderColorIcon />
+          <div className={styles.set_icon}>
+            <BorderColorIcon onClick={() => setIsEditingProfile(true)} />
           </div>
         )}
       </section>
@@ -612,4 +594,4 @@ export default function UserInfoEdit() {
       </div>
     </div>
   );
-};
+}

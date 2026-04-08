@@ -36,6 +36,60 @@
 .dashboard_phoneNumber {
   margin: 2px;
 }
+
+/* 🌟 프로필 수정 입력 폼 */
+.edit_form_container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.edit_input {
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  outline: none;
+  font-family: var(--font-body);
+}
+
+.edit_btn_group {
+  display: flex;
+  gap: 8px;
+  margin-top: 5px;
+}
+
+.save_btn {
+  flex: 1;
+  padding: 8px;
+  background-color: var(--color-brand);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.cancel_btn {
+  flex: 1;
+  padding: 8px;
+  background-color: #999;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+/* 아이콘 버튼 (우측 상단 연필) */
+.set_icon {
+  text-align: right;
+}
+
+.set_icon svg {
+  cursor: pointer;
+}
+
 .pwSet {
   padding: 22px 25px;
   display: flex;
@@ -98,9 +152,7 @@
 
 .delete_btn span {
   position: absolute;
-  transition:
-    opacity 0.3s ease,
-    transform 0.3s ease;
+  transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
 .text_default {

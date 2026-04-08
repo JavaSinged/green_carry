@@ -154,9 +154,11 @@
 /* 아이콘 버튼 (우측 상단 연필) */
 .set_icon {
   text-align: right;
-  cursor: pointer;
 }
 
+.set_icon svg {
+  cursor: pointer;
+}
 /* ------------------------------------- */
 /* 기존 박스 영역 스타일 유지 */
 /* ------------------------------------- */
@@ -490,9 +492,7 @@
 
 .delete_btn span {
   position: absolute;
-  transition:
-    opacity 0.3s ease,
-    transform 0.3s ease;
+  transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
 .text_default {
