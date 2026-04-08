@@ -124,7 +124,11 @@
   border-radius: 8px;
   flex-shrink: 0;
 }
-
+.store_image_placeholder > img {
+  width: 100%;
+  height: 100%;
+  border-radius: 8px;
+}
 .store_text {
   display: flex;
   flex-direction: column;
