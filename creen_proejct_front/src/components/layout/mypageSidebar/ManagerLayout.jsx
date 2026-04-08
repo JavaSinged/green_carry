@@ -10,7 +10,8 @@ export default function ManagerLayout() {
         <ul>
           <li>
             <NavLink
-              to="/mypage/manager/info"
+              to="/mypage/manager"
+              end
               className={({ isActive }) => (isActive ? styles.activeMenu : "")}
             >
               상점 관리

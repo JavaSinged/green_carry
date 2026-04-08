@@ -8,7 +8,10 @@ import kr.co.iei.store.model.vo.Order;
 import kr.co.iei.store.model.vo.OrderItem;
 import kr.co.iei.store.model.vo.OrderListResponse;
 import kr.co.iei.store.model.vo.OrderResponse;
+import kr.co.iei.store.model.vo.StatsOrderInfo;
 import kr.co.iei.store.model.vo.Store;
+import kr.co.iei.store.model.vo.StoreIdResponse;
+
 import org.apache.ibatis.type.Alias;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -42,7 +45,7 @@ public class StoreController {
         return ResponseEntity.ok(store);
     }
 
-    @GetMapping("/{memberId}")
+    @GetMapping("/member/{memberId}")
     public ResponseEntity<?> getStoreByMemberId(@PathVariable String memberId) {
         Store store = storeService.getStoreByMemberId(memberId);
         return  ResponseEntity.ok(store);
@@ -80,5 +83,32 @@ public class StoreController {
     public ResponseEntity<?> searchOrderList(@PathVariable String memberId){
         List<OrderResponse> list = storeService.searchOrderList(memberId);
         return ResponseEntity.ok(list);
+    }
+    @GetMapping("/orders/itemImg/{menuId}")
+    public ResponseEntity<String> getMenuImage(@PathVariable int menuId) {
+        String imagePath = storeService.getMenuImageById(menuId);
+        return ResponseEntity.ok(imagePath);
+    }
+    
+  //대시보드용 (memberId 로 storeId조회)
+    @GetMapping(value="/id")
+    public ResponseEntity<?> selectStoreId(@RequestParam String memberId){
+    	StoreIdResponse storeId = storeService.selectStoreId(memberId);
+    	if (storeId != null && storeId.getStoreId() != null) {
+    		return ResponseEntity.ok(storeId);
+          } else {
+            return ResponseEntity.notFound().build();
+          }
+    }
+   
+    @GetMapping(value="/stats/order")
+    public ResponseEntity<?> selectStatsOrderInfo(@RequestParam Integer storeId,@RequestParam String yearMonth ){
+    	System.out.println("주문 통계 요청 - 상점ID: " + storeId + ", 조회월: " + yearMonth);
+    	List<StatsOrderInfo> list = storeService.selectStatsOrderInfo(storeId,yearMonth );
+    	if (list != null && !list.isEmpty()) {
+            return ResponseEntity.ok(list); 
+        } else {
+            return ResponseEntity.noContent().build();
+        }
     }
 }
