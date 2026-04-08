@@ -21,16 +21,38 @@ export default function AdminStoreManagement() {
       .get(`${import.meta.env.VITE_BACKSERVER}/stores`)
       .then((res) => {
         // 매출 데이터가 없으므로 정렬 테스트를 위해 가짜 데이터(sales)를 주입해봅니다.
-        const dataWithSales = res.data.map((item) => ({
-          ...item,
-          currentSales: Math.floor(Math.random() * 5000), // 가짜 당월 매출
-          prevSales: Math.floor(Math.random() * 5000), // 가짜 전월 매출
-        }));
+        console.log(res.data);
+
+        const now = new Date();
+
+        const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+
+        const prevDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+        const prevMonth = `${prevDate.getFullYear()}-${String(prevDate.getMonth() + 1).padStart(2, "0")}`;
+
+        const dataWithSales = res.data.map((item) => {
+          const salesList = item.SaleMonth || [];
+
+          const currentData = salesList.find(
+            (sale) => sale.saleMonth === currentMonth,
+          );
+          const prevData = salesList.find(
+            (sale) => sale.saleMonth === prevMonth,
+          );
+
+          return {
+            ...item,
+            currentSales: currentData?.totalSales || 0,
+            prevSales: prevData?.totalSales || 0,
+          };
+        });
+
+        setStores(dataWithSales);
+
         setStores(dataWithSales);
       })
       .catch((err) => console.log(err));
   }, []);
-
   // 2. 정렬 실행 함수
   const handleSort = (key) => {
     let direction = "asc";
@@ -44,7 +66,7 @@ export default function AdminStoreManagement() {
   const getSortedStores = () => {
     // 먼저 검색어로 필터링
     let items = stores.filter((store) =>
-      store.storeName.toLowerCase().includes(searchTerm.toLowerCase())
+      store.storeName.toLowerCase().includes(searchTerm.toLowerCase()),
     );
 
     // 그 다음 정렬 적용
@@ -134,8 +156,10 @@ export default function AdminStoreManagement() {
                 <td>
                   <span className={styles.badge}>{store.storeCategory}</span>
                 </td>
-                <td>{store.currentSales?.toLocaleString()}만원</td>
-                <td>{store.prevSales?.toLocaleString()}만원</td>
+                {/* 당월 */}
+                <td>{store.currentSales?.toLocaleString()}원</td>
+                {/* 전월 */}
+                <td>{store.prevSales?.toLocaleString()}원</td>
                 <td>
                   <div className={styles.rating_wrap}>
                     <div className={styles.stars}>

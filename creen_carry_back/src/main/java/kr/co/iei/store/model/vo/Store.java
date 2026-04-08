@@ -3,6 +3,9 @@ package kr.co.iei.store.model.vo;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
+
 import org.apache.ibatis.type.Alias;
 
 @NoArgsConstructor
@@ -25,4 +28,6 @@ public class Store {
     private Double LATITUDE;
     private Double LONGITUDE;
     private String storeThumb;
+    private Long totalSale;
+    private List<SaleMonth> SaleMonth;
 }

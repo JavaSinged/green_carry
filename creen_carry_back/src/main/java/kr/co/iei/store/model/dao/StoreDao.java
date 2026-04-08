@@ -9,6 +9,7 @@ import kr.co.iei.store.model.vo.OrderListObject;
 import kr.co.iei.store.model.vo.OrderListResponse;
 import kr.co.iei.store.model.vo.OrderResponse;
 import kr.co.iei.store.model.vo.ReviewComment;
+import kr.co.iei.store.model.vo.SaleMonth;
 import kr.co.iei.store.model.vo.Store;
 import kr.co.iei.store.model.vo.StoreReviewResponse;
 
@@ -88,6 +89,8 @@ public interface StoreDao {
 	List<OrderResponse> getOrdersByStoreId(int storeId);
 
 	int changeOrderStatus(Map<String, Object> params);
+
+	List<SaleMonth> selectMonthlySalesByStoreId(Integer storeId);
 
 	
 }
