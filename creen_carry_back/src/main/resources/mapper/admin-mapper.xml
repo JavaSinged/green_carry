@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="kr.co.iei.admin.model.dao.AdminDao">
+<select id="selectMonthlySales" resultType="map">
+    SELECT 
+        TO_CHAR(L.reg_DATE, 'YYYY-MM') AS monthly, -- reg_date를 ORDER_DATE로 변경
+        SUM(D.price * D.quantity) AS total_sales
+    FROM order_detail D
+    INNER JOIN order_list_map L ON D.order_id = L.order_id
+    WHERE
+        (L.reg_DATE BETWEEN TRUNC(ADD_MONTHS(SYSDATE, -5), 'MM') AND LAST_DAY(SYSDATE))
+        OR 
+        (L.reg_DATE BETWEEN TRUNC(ADD_MONTHS(SYSDATE, -17), 'MM') AND LAST_DAY(ADD_MONTHS(SYSDATE, -12)))
+    GROUP BY TO_CHAR(L.reg_DATE, 'YYYY-MM')
+    ORDER BY monthly ASC
+</select>
+</mapper>

@@ -11,10 +11,8 @@ public class MenuSaveRequestDto {
     private String menuImage;
     private Integer menuPrice;    
     private String menuCategory;
-
     private Long storeId;
     private Long menuId;
-
     private List<Long> optionIds;         
     private List<MenuOption> newOptions;   
 }
