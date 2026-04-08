@@ -1,7 +1,8 @@
 import React, { useContext, useEffect, useState, useRef } from "react";
 import { AuthContext } from "../../../context/AuthContext";
 import api from "../../../utils/accessToken"; // 경로는 프로젝트에 맞게 확인해주세요
-import styles from "./ManagerInfoEdit.module.css";
+// import styles from "./ManagerInfoEdit.module.css";
+import styles from "../user/UserInfoEdit.module.css"; // UserInfoEdit 스타일 재사용
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 
