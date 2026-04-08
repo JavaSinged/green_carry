@@ -56,7 +56,7 @@ const TotalSalesChart = () => {
     },
     yaxis: {
       labels: {
-        formatter: (val) => (val / 10000).toLocaleString() + "만",
+        formatter: (val) => (val / 10000).toLocaleString() + "만원",
       },
     },
     legend: {
