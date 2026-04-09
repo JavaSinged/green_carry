@@ -44,6 +44,7 @@ const PaymentPage = () => {
   // 결제 요청 함수
   const handlePayment = async () => {
     console.log("주문하려는 매장 ID:", storeId);
+    console.log(cartList);
     // 🌟 결제 시점의 최신 데이터를 담은 orderData
     const orderData = {
       memberId: memberId,
@@ -80,8 +81,8 @@ const PaymentPage = () => {
 
       const orderNameStr =
         cartList.length > 1
-          ? `${cartList[0].menuName} 외 ${cartList.length - 1}건`
-          : `${cartList[0].menuName}`;
+          ? `${cartList[0].name} 외 ${cartList.length - 1}건`
+          : `${cartList[0].name}`;
 
       await payment.requestPayment({
         method: "CARD",
