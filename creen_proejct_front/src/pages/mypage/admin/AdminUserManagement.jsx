@@ -13,6 +13,7 @@ import AccessTimeIcon from "@mui/icons-material/AccessTime";
 
 export default function AdminUserManagement() {
   const [memberList, setMemberList] = useState([]);
+  const backHost = import.meta.env.VITE_BACKSERVER;
 
   // 페이지네이션 상태
   const [currentPage, setCurrentPage] = useState(1);
@@ -56,7 +57,7 @@ export default function AdminUserManagement() {
     let filtered = memberList;
     if (searchTerm) {
       filtered = filtered.filter((member) =>
-        member.memberId.toLowerCase().includes(searchTerm.toLowerCase())
+        member.memberId.toLowerCase().includes(searchTerm.toLowerCase()),
       );
     }
 
@@ -82,7 +83,7 @@ export default function AdminUserManagement() {
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentMembers = processedMembers.slice(
     indexOfFirstItem,
-    indexOfLastItem
+    indexOfLastItem,
   );
 
   // 페이지 이동 핸들러
@@ -172,18 +173,20 @@ export default function AdminUserManagement() {
                   <td className={styles.col_left}>
                     <div className={styles.store_info}>
                       <div className={styles.store_image_placeholder}>
-                        {member.memberThumb && (
-                          <img
-                            src={member.memberThumb}
-                            alt="profile"
-                            style={{
-                              width: "100%",
-                              height: "100%",
-                              borderRadius: "50%",
-                              objectFit: "cover",
-                            }}
-                          />
-                        )}
+                        <img
+                          src={
+                            member.memberThumb
+                              ? `${backHost}${member.memberThumb}`
+                              : "/image/default-user.png"
+                          }
+                          alt="profile"
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            borderRadius: "50%",
+                            objectFit: "cover",
+                          }}
+                        />
                       </div>
                       <div className={styles.store_text}>
                         <span className={styles.store_name}>
@@ -202,8 +205,8 @@ export default function AdminUserManagement() {
                       {member.memberGrade === 1
                         ? "일반 회원"
                         : member.memberGrade === 2
-                        ? "사업자 회원"
-                        : "관리자"}
+                          ? "사업자 회원"
+                          : "관리자"}
                     </span>
                   </td>
 
