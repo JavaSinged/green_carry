@@ -11,9 +11,9 @@ import PersonIcon from "@mui/icons-material/Person";
 import LockIcon from "@mui/icons-material/Lock";
 import InputAdornment from "@mui/material/InputAdornment";
 import TextField from "@mui/material/TextField";
-import IconButton from "@mui/material/IconButton"; // 🌟 눈 아이콘 버튼
-import Visibility from "@mui/icons-material/Visibility"; // 🌟 눈 뜬 아이콘
-import VisibilityOff from "@mui/icons-material/VisibilityOff"; // 🌟 눈 감은 아이콘
+import IconButton from "@mui/material/IconButton";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import EcoEarth from "../../components/Easter Egg/EcoEarth";
 
 const Login = () => {
@@ -81,8 +81,9 @@ const Login = () => {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
-  // 유저 카운트
+  // 유저 카운트 및 🌟[추가] 커뮤니티 탄소 절감량 상태
   const [userCount, setUserCount] = useState(0);
+  const [communityCarbon, setCommunityCarbon] = useState(0);
 
   const [member, setMember] = useState({
     memberId: "",
@@ -95,7 +96,7 @@ const Login = () => {
   const [autoLogin, setAutoLogin] = useState(false);
   const [isCapsLockOn, setIsCapsLockOn] = useState(false);
 
-  // 🌟 [추가] 비밀번호 보이기/숨기기 상태
+  // 비밀번호 보이기/숨기기 상태
   const [showPassword, setShowPassword] = useState(false);
   const handleClickShowPassword = () => setShowPassword((show) => !show);
   const handleMouseDownPassword = (event) => {
@@ -109,6 +110,7 @@ const Login = () => {
   };
 
   useEffect(() => {
+    // 1. 유저 수 로드
     axios
       .get(`${import.meta.env.VITE_BACKSERVER}/member`)
       .then((res) => {
@@ -116,6 +118,16 @@ const Login = () => {
       })
       .catch((err) => {
         console.log(err);
+      });
+
+    // 🌟 2. 전체 커뮤니티 탄소 절감량 로드 (Header와 동일한 로직)
+    axios
+      .get(`${import.meta.env.VITE_BACKSERVER}/member/community-carbon`)
+      .then((res) => {
+        setCommunityCarbon(Number(res.data) || 0);
+      })
+      .catch((err) => {
+        console.error("커뮤니티 탄소량 로드 실패:", err);
       });
   }, []);
 
@@ -130,14 +142,14 @@ const Login = () => {
     }
   }, []);
 
-  // 🌟 [수정] 복붙할 때 들어오는 공백 원천 차단
+  // 복붙할 때 들어오는 공백 원천 차단
   const inputMember = (e) => {
     const { name, value } = e.target;
     const noSpaceValue = value.replace(/\s/g, ""); // 모든 공백 제거
     setMember({ ...member, [name]: noSpaceValue });
   };
 
-  // 🌟 [추가] 스페이스바 타이핑 자체를 막는 함수
+  // 스페이스바 타이핑 자체를 막는 함수
   const preventSpace = (e) => {
     if (e.key === " ") {
       e.preventDefault();
@@ -336,11 +348,22 @@ const Login = () => {
             맛있는 한 끼
           </h2>
           <div className="stats">
+            {/* 🌟 실제 데이터 바인딩 영역 */}
             <div className="stat-item">
-              🌿 오늘 아낀 탄소 <span className="stat-value">1,245kg</span>
+              🌿 함께 아낀 탄소{" "}
+              <span className="stat-value">
+                {communityCarbon.toLocaleString(undefined, {
+                  maximumFractionDigits: 1,
+                })}
+                kg
+              </span>
             </div>
             <div className="stat-item">
-              🌳 식재 효과 <span className="stat-value">156그루</span>
+              🌳 식재 효과{" "}
+              <span className="stat-value">
+                {Math.floor((communityCarbon * 1000) / 6600).toLocaleString()}
+                그루
+              </span>
             </div>
           </div>
         </section>
@@ -392,7 +415,7 @@ const Login = () => {
               placeholder="아이디를 입력해주세요."
               value={member.memberId}
               onChange={inputMember}
-              onKeyDown={preventSpace} // 🌟 아이디칸 스페이스 방지
+              onKeyDown={preventSpace}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
@@ -405,20 +428,19 @@ const Login = () => {
             <TextField
               fullWidth
               variant="outlined"
-              type={showPassword ? "text" : "password"} // 🌟 눈 아이콘 상태에 따라 타입 변경
+              type={showPassword ? "text" : "password"}
               name="memberPw"
               placeholder="비밀번호를 입력해주세요."
               value={member.memberPw}
               onChange={inputMember}
               onKeyUp={handleKeyUp}
-              onKeyDown={preventSpace} // 🌟 비밀번호칸 스페이스 방지
+              onKeyDown={preventSpace}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
                     <LockIcon style={{ color: "#2e7d32" }} />
                   </InputAdornment>
                 ),
-                // 🌟 눈 모양 아이콘 추가
                 endAdornment: (
                   <InputAdornment position="end">
                     <IconButton
