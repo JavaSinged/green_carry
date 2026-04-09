@@ -334,3 +334,67 @@
   width: 300px;
   color: var(--text-sub);
 }
+.emptySection {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 60vh; /* 화면의 절반 이상 차지하도록 */
+  width: 100%;
+}
+
+/* 중앙 정렬된 카드 박스 */
+.emptyCard {
+  text-align: center;
+  background-color: #ffffff;
+  padding: 50px 40px;
+  border-radius: 20px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05); /* 은은한 그림자 */
+  max-width: 400px;
+  width: 90%;
+}
+
+/* 장바구니 아이콘(이모지) */
+.emptyIcon {
+  font-size: 60px;
+  margin-bottom: 20px;
+  display: block;
+}
+
+.emptyCard h2 {
+  font-size: 1.5rem;
+  color: #333;
+  margin-bottom: 10px;
+  font-weight: 700;
+}
+
+.emptyCard p {
+  font-size: 1rem;
+  color: #777;
+  margin-bottom: 30px;
+}
+
+/* 🌟 홈으로 가기 버튼 (GreenCarry 브랜드 컬러 적용) */
+.goHomeButton {
+  background-color: #22c55e; /* 산뜻한 그린 */
+  color: #ffffff;
+  padding: 14px 30px;
+  border-radius: 12px;
+  border: none;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  width: 100%; /* 버튼 꽉 차게 */
+}
+
+/* 버튼 마우스 올렸을 때 효과 */
+.goHomeButton:hover {
+  background-color: #16a34a; /* 조금 더 진한 그린 */
+  transform: translateY(-2px); /* 살짝 위로 뜨는 느낌 */
+  box-shadow: 0 5px 15px rgba(34, 197, 94, 0.3);
+}
+
+/* 버튼 눌렀을 때 효과 */
+.goHomeButton:active {
+  transform: translateY(0);
+}

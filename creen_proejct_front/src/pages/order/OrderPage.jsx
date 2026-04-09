@@ -14,11 +14,10 @@ import axios from "axios";
 
 const OrderPage = () => {
   const navigate = useNavigate();
-  const list = useLocation();
 
   // 🌟 Zustand 스토어 데이터 추출
   const cartList = useCartStore((state) => state.cart);
-  const storeId = useCartStore((state) => state.storeId); // 👈 핵심: 저장된 매장 ID
+  const storeId = useCartStore((state) => state.storeId);
   const storeName = useCartStore((state) => state.storeName);
   const setSuperTotalPrice = useCartStore((state) => state.setSuperTotalPrice);
   const setDeilveryPrice = useCartStore((state) => state.setDeilveryPrice);
@@ -30,150 +29,165 @@ const OrderPage = () => {
   const [deliveryType, setDeliveryType] = useState(1);
   const [num, setNum] = useState(0);
 
+  // 장바구니 비어있음 여부 체크
+  const isCartEmpty = !cartList || cartList.length === 0;
+
   // 탄소 절감량 계산
   const totalCarbon = cartList.reduce((sum, item) => sum + item.carbonSaved, 0);
 
-  // 배달 타입에 따른 배달비 설정
   useEffect(() => {
     setNum(deliveryType === 1 ? 0 : deliveryType === 2 ? 1000 : 3000);
   }, [deliveryType]);
 
   const addOrder = () => {
-    // 주문 추가 로직 (필요 시 작성)
+    // 주문 추가 로직
   };
 
   return (
     <div className={styles.pageWrapper}>
       <main className={styles.mainContainer}>
-        <section className={styles.leftSection}>
-          <div className={styles.card}>
-            <div className={styles.cardsHeader}>
-              {/* 🌟 수정: /storeView/${storeId} 로 이동하여 매장 컨텍스트 유지 */}
-              <h2
-                onClick={() => {
-                  navigate(`/storeView/${storeId}`);
-                }}
-                style={{ cursor: "pointer" }}
+        {isCartEmpty ? (
+          /* 🌟 장바구니가 비었을 때 보여줄 화면 */
+          <section className={styles.emptySection}>
+            <div className={styles.emptyCard}>
+              <div className={styles.emptyIcon}>🛒</div>
+              <h2>장바구니가 비어있습니다</h2>
+              <p>맛있는 음식을 담으러 가볼까요?</p>
+              <button
+                className={styles.goHomeButton}
+                onClick={() => navigate("/")}
               >
-                <u>{storeName}</u> <NavigateNextIcon />
-              </h2>
-              <CloseIcon
-                style={{ cursor: "pointer" }}
+                홈으로 가기
+              </button>
+            </div>
+          </section>
+        ) : (
+          /* 🌟 장바구니에 물건이 있을 때만 출력되는 영역 */
+          <>
+            <section className={styles.leftSection}>
+              <div className={styles.card}>
+                <div className={styles.cardsHeader}>
+                  <h2
+                    onClick={() => navigate(`/storeView/${storeId}`)}
+                    style={{ cursor: "pointer" }}
+                  >
+                    <u>{storeName}</u> <NavigateNextIcon />
+                  </h2>
+                  <CloseIcon
+                    style={{ cursor: "pointer" }}
+                    onClick={() => navigate(`/storeView/${storeId}`)}
+                  />
+                </div>
+                {/* 메뉴 리스트 영역 */}
+                <MenuList
+                  cartList={cartList}
+                  changeTotal={setRealTotal}
+                  increaseQuantity={increaseQuantity}
+                  decreaseQuantity={decreaseQuantity}
+                />
+              </div>
+              <div className={styles.totalPriceText}>
+                <u>
+                  총 결제금액 <br />
+                  {(realTotal + num).toLocaleString()}원
+                </u>
+              </div>
+            </section>
+
+            <section className={styles.rightSection}>
+              <div className={styles.card_ride}>
+                <h3>배달방식</h3>
+
+                <div
+                  className={`${styles.miniCard} ${selectedRide === "pickup" ? styles.selected : ""}`}
+                  onClick={() => {
+                    setSelectedRide("pickup");
+                    setDeliveryType(1);
+                  }}
+                >
+                  <DirectionsRunIcon />
+                  <p>픽업</p>
+                  <p className={styles.feeText}>배달비 0원</p>
+                  <div className={styles.carbonBadge}>
+                    <p>🌱1km당 탄소 -150g</p>
+                  </div>
+                </div>
+
+                <div
+                  className={`${styles.miniCard} ${selectedRide === "bike" ? styles.selected : ""}`}
+                  onClick={() => {
+                    setSelectedRide("bike");
+                    setDeliveryType(2);
+                  }}
+                >
+                  <DirectionsBikeIcon />
+                  <p>도보 / 자전거</p>
+                  <p className={styles.feeText}>1,000원</p>
+                  <span>예상 배달 시간 30분</span>
+                  <div className={styles.carbonBadge}>
+                    <p>🌱1km당 탄소 -150g</p>
+                  </div>
+                </div>
+
+                <div
+                  className={`${styles.miniCard} ${selectedRide === "moto" ? styles.selected : ""}`}
+                  onClick={() => {
+                    setSelectedRide("moto");
+                    setDeliveryType(3);
+                  }}
+                >
+                  <TwoWheelerIcon />
+                  <p>오토바이</p>
+                  <p className={styles.feeText}>3,000원</p>
+                  <span>예상 배달 시간 25분</span>
+                </div>
+
+                <div className={styles.ecoInfoContainer}>
+                  <div className={styles.ecoTitle}>
+                    <ParkIcon />
+                    <h4>에코 딜리버리 선택</h4>
+                  </div>
+                  <div className={styles.ecoList}>
+                    <div className={styles.ecoItem}>
+                      <span>이동 거리:</span>
+                      <span>3km</span>
+                    </div>
+                    <div className={styles.ecoItem}>
+                      <span>탄소 절감:</span>
+                      <span>
+                        {totalCarbon + (deliveryType === 3 ? 0 : 300)}g
+                      </span>
+                    </div>
+                    <div className={styles.ecoItem}>
+                      <span>적립 예정:</span>
+                      <span>
+                        {totalCarbon + (deliveryType === 3 ? 0 : 300)} 포인트
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                className={styles.payButton}
                 onClick={() => {
-                  navigate(`/storeView/${storeId}`);
+                  addOrder();
+                  setSuperTotalPrice(realTotal);
+                  setDeilveryPrice(num);
+                  navigate("/paymentPage");
                 }}
-              />
-            </div>
-            {/* 메뉴 리스트 영역 */}
-            <MenuList
-              cartList={cartList}
-              changeTotal={setRealTotal}
-              increaseQuantity={increaseQuantity}
-              decreaseQuantity={decreaseQuantity}
-            />
-          </div>
-          <div className={styles.totalPriceText}>
-            <u>
-              총 결제금액 <br />
-              {(realTotal + num).toLocaleString()}원
-            </u>
-          </div>
-        </section>
-
-        <section className={styles.rightSection}>
-          <div className={styles.card_ride}>
-            <h3>배달방식</h3>
-
-            {/* 1. 픽업 카드 */}
-            <div
-              className={`${styles.miniCard} ${selectedRide === "pickup" ? styles.selected : ""}`}
-              onClick={() => {
-                setSelectedRide("pickup");
-                setDeliveryType(1);
-              }}
-            >
-              <DirectionsRunIcon />
-              <p>픽업</p>
-              <p className={styles.feeText}>배달비 0원</p>
-              <div className={styles.carbonBadge}>
-                <p>🌱1km당 탄소 -150g</p>
+              >
+                결제하기
               </div>
-            </div>
-
-            {/* 2. 도보 / 자전거 카드 */}
-            <div
-              className={`${styles.miniCard} ${selectedRide === "bike" ? styles.selected : ""}`}
-              onClick={() => {
-                setSelectedRide("bike");
-                setDeliveryType(2);
-              }}
-            >
-              <DirectionsBikeIcon />
-              <p>도보 / 자전거</p>
-              <p className={styles.feeText}>1,000원</p>
-              <span>예상 배달 시간 30분</span>
-              <div className={styles.carbonBadge}>
-                <p>🌱1km당 탄소 -150g</p>
-              </div>
-            </div>
-
-            {/* 3. 오토바이 카드 */}
-            <div
-              className={`${styles.miniCard} ${selectedRide === "moto" ? styles.selected : ""}`}
-              onClick={() => {
-                setSelectedRide("moto");
-                setDeliveryType(3);
-              }}
-            >
-              <TwoWheelerIcon />
-              <p>오토바이</p>
-              <p className={styles.feeText}>3,000원</p>
-              <span>예상 배달 시간 25분</span>
-            </div>
-
-            {/* 에코 정보 섹션 */}
-            <div className={styles.ecoInfoContainer}>
-              <div className={styles.ecoTitle}>
-                <ParkIcon />
-                <h4>에코 딜리버리 선택</h4>
-              </div>
-              <div className={styles.ecoList}>
-                <div className={styles.ecoItem}>
-                  <span>이동 거리:</span>
-                  <span>3km</span>
-                </div>
-                <div className={styles.ecoItem}>
-                  <span>탄소 절감:</span>
-                  <span>{totalCarbon + (deliveryType === 3 ? 0 : 300)}g</span>
-                </div>
-                <div className={styles.ecoItem}>
-                  <span>적립 예정:</span>
-                  <span>
-                    {totalCarbon + (deliveryType === 3 ? 0 : 300)} 포인트
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div
-            className={styles.payButton}
-            onClick={() => {
-              addOrder();
-              setSuperTotalPrice(realTotal);
-              setDeilveryPrice(num);
-              navigate("/paymentPage");
-            }}
-          >
-            결제하기
-          </div>
-        </section>
+            </section>
+          </>
+        )}
       </main>
     </div>
   );
 };
 
-// 🌟 MenuList 컴포넌트
+// MenuList 컴포넌트
 const MenuList = ({
   cartList,
   changeTotal,
@@ -189,10 +203,6 @@ const MenuList = ({
     changeTotal(totalPrice);
   }, [totalPrice, changeTotal]);
 
-  if (!cartList || cartList.length === 0) {
-    return <div className={styles.emptyCart}>장바구니가 비어있습니다.</div>;
-  }
-
   return cartList.map((cart) => (
     <CartItem
       key={cart.id}
@@ -203,7 +213,7 @@ const MenuList = ({
   ));
 };
 
-// 🌟 CartItem 컴포넌트
+// CartItem 컴포넌트
 const CartItem = ({ cart, increaseQuantity, decreaseQuantity }) => {
   const unitPrice = cart.unitPrice;
   const totalPrice = unitPrice * cart.quantity;
@@ -230,7 +240,7 @@ const CartItem = ({ cart, increaseQuantity, decreaseQuantity }) => {
         <div className={styles.menuInfo}>
           <p className={styles.menuNameTitle}>메뉴 : {cart.name}</p>
           <p>가격 : {unitPrice.toLocaleString()}원</p>
-          <p className={styles.options}>
+          <div className={styles.options}>
             옵션 :
             {options && options.length > 0
               ? options.map((option, index) => (
@@ -240,7 +250,7 @@ const CartItem = ({ cart, increaseQuantity, decreaseQuantity }) => {
                   </span>
                 ))
               : " 없음"}
-          </p>
+          </div>
           <div className={styles.quantityBox}>
             <button onClick={() => decreaseQuantity(cart.id)}>-</button>
             <span>{cart.quantity}</span>
