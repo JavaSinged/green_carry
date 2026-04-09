@@ -1,5 +1,5 @@
-import React, { useContext, useState, useEffect } from "react"; // 🌟 useState, useEffect 추가
-import axios from "axios"; // 🌟 axios 추가
+import React, { useContext, useState, useEffect } from "react";
+import axios from "axios";
 import styles from "./Header.module.css";
 import Swal from "sweetalert2";
 import AccountCircleSharpIcon from "@mui/icons-material/AccountCircleSharp";
@@ -10,22 +10,26 @@ import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
 import PersonIcon from "@mui/icons-material/Person";
 import LogoutIcon from "@mui/icons-material/Logout";
 import LoginIcon from "@mui/icons-material/Login";
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart"; // 🌟 장바구니 아이콘 추가
 
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
+import useCartStore from "../../store/useCartStore"; // 🌟 장바구니 스토어 가져오기
 
 export default function Header() {
   const navigate = useNavigate();
   const { isLogin, user, logout, isLoading } = useContext(AuthContext);
   const backHost = import.meta.env.VITE_BACKSERVER;
 
-  // 🌟 [추가] 전체 커뮤니티 탄소 포인트를 저장할 상태
+  // 🌟 [추가] 장바구니 개수 실시간 확인
+  const cart = useCartStore((state) => state.cart);
+  const cartCount = cart.length;
+
   const [communityPoint, setCommunityPoint] = useState(0);
 
-  // 🌟 [추가] 전체 커뮤니티 탄소 절감량 합계 가져오기
   useEffect(() => {
     axios
-      .get(`${backHost}/member/community-carbon`) // 백엔드에서 만든 전체 합계 API 호출
+      .get(`${backHost}/member/community-carbon`)
       .then((res) => {
         setCommunityPoint(Number(res.data));
       })
@@ -34,7 +38,6 @@ export default function Header() {
       });
   }, [backHost]);
 
-  // 🎨 GreenCarry 전용 Swal 스타일 함수
   const fireStyledSwal = (icon, title, text) => {
     return Swal.fire({
       icon: icon,
@@ -127,6 +130,17 @@ export default function Header() {
                 )
               </span>
             )}
+
+            {/* 🌟 장바구니 아이콘 추가 영역 */}
+            <div
+              className={styles.cart_icon_wrap}
+              onClick={() => navigate("/orderPage")}
+            >
+              <ShoppingCartIcon />
+              {cartCount > 0 && (
+                <span className={styles.cart_badge}>{cartCount}</span>
+              )}
+            </div>
 
             <NotificationsNoneIcon style={{ cursor: "pointer" }} />
 

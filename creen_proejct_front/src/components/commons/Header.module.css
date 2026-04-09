@@ -128,3 +128,27 @@
   color: #bfbfbf;
   font-size: 45px;
 }
+.cart_icon_wrap {
+  position: relative;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  margin-right: 5px; /* 아이콘 간격 조절 */
+}
+
+.cart_badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background-color: #ff4757; /* 강렬한 레드 또는 그린포인트 컬러 */
+  color: white;
+  font-size: 10px;
+  font-weight: bold;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid white;
+}
