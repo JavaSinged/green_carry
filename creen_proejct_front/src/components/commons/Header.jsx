@@ -161,7 +161,9 @@ export default function Header() {
                       alt="profile"
                       className={styles.profile_img}
                       onError={(e) => {
-                        e.target.style.display = "none";
+                        e.target.src = "/path/to/default-user.png";
+
+                        e.target.onerror = null;
                       }}
                     />
                   ) : (
