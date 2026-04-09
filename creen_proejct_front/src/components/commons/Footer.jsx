@@ -56,20 +56,21 @@ export default function Footer() {
             <div className={styles.link_column}>
               <h4>Platform</h4>
               <ul>
-                <li>How it Works</li>
-                <li>For Restaurants</li>
-                <li>For Riders</li>
+                <li>Zero Waste Delivery</li>
+                <li>Plastic-Free Zone</li>
+                <li>Every Box Matters</li>
               </ul>
             </div>
             <div className={styles.link_column}>
               <h4>Impact</h4>
               <ul>
-                <li>Carbon Report</li>
-                <li>Forest Fund</li>
-                <li>Reusable Stats</li>
+                <li>Small Steps, Big Change</li>
+                <li>Cycle of Kindness</li>
+                <li>Sustainable Future</li>
               </ul>
             </div>
           </div>
+
         </div>
 
         <hr className={styles.divider} />
@@ -97,7 +98,7 @@ export default function Footer() {
               <span className={styles.one_divider}>|</span>
               <span>Spring</span>
               <span className={styles.one_divider}>|</span>
-              <span>Carbon Report</span>
+              <span>Oracle DB</span>
             </div>
             <p className={styles.copyright}>
               © 2026. <strong>GReen Carry™</strong>. All footprints offset. 🌱
