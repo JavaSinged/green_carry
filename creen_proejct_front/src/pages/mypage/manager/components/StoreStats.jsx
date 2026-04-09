@@ -13,6 +13,55 @@ const StoreStats = () => {
   const [orderStatsData, setOrderStatsData] = useState([]); // 1. 차트에 표시할 데이터 저장용
   const [isLoading, setIsLoading] = useState(true); //데이터 로딩 상태관리(가져왔는지 아직인지 확인용)
 
+  //수치보정 함수 (100% 로 맞추기)
+  const getAdjustedData = (rawData) => {
+    if (!rawData || !Array.isArray(rawData) || rawData.length === 0) {
+      // rawData가 배열인지 검증
+      return [];
+    }
+    //1.모든숫자 정수로 만들기
+    let roundedData = rawData.map((item) => {
+      const multiplied = item.percent * 10;
+      const rounded = Math.round(multiplied);
+      return {
+        ...item,
+        tempValue: rounded, // 정수값 저장 (333)
+        diff: multiplied - rounded, // 오차 저장
+      };
+    });
+    //2.현재 합계 계산(정수)
+    const currentSum = roundedData.reduce(
+      (sum, item) => sum + item.tempValue,
+      0,
+    );
+    const targetSum = 1000; // 100.0%는 정수로 1000
+    let difference = targetSum - currentSum; // 모자라거나 남는 양 (예: 2)
+
+    //3.오차보정
+    if (difference !== 0) {
+      const sortedByDiff = [...roundedData].sort((a, b) => b.diff - a.diff);
+      const direction = difference > 0 ? 1 : -1;
+      const absDiff = Math.abs(difference);
+
+      for (let i = 0; i < absDiff; i++) {
+        //차이가 큰 항목부터 0.1%씩 조정
+        const targetIndex = roundedData.findIndex(
+          (item) => item === sortedByDiff[i % roundedData.length],
+        );
+        if (targetIndex !== -1) {
+          roundedData[targetIndex].tempValue += direction;
+        }
+      }
+    }
+    // 4. 다시 10으로 나눠서 최종 percent 결정 (334 -> 33.4)
+    return roundedData.map((item) => ({
+      ...item,
+      percent: item.tempValue / 10,
+      tempValue: undefined, // 임시 변수 삭제
+      diff: undefined, // 임시 변수 삭제
+    }));
+  };
+
   ////////////////////////리뷰차트영역///////////////////////////
   const [reviewStatsData, setReviewStatsData] = useState({
     totalCount: 140,
@@ -61,10 +110,10 @@ const StoreStats = () => {
           }
         })
         .then((statsRes) => {
-          // statsRes는 두 번째 axios 요청의 결과입니다.
+          // statsRes는 두 번째 axios 요청의 결과입니다.(배열형태)
           if (statsRes) {
             console.log("주문 통계 데이터:", statsRes.data);
-            setOrderStatsData(statsRes.data);
+            setOrderStatsData(getAdjustedData(statsRes.data)); // 보정거치는 단계
           }
         })
         .catch((err) => {
