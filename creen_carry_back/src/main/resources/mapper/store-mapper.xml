@@ -7,9 +7,11 @@
 		SELECT
 		s.*,
 		(SELECT NVL(AVG(review_rating), 0)
-		FROM review_tbl r
+		FROM
+		review_tbl r
 		WHERE r.store_id = s.store_id) AS storeRating,
-		(SELECT COUNT(*)
+		(SELECT
+		COUNT(*)
 		FROM review_tbl r
 		WHERE r.store_id = s.store_id) AS reviewCount
 		FROM store_tbl s
@@ -502,10 +504,14 @@
 		NVL(AVG(review_rating), 0) AS "avgRating",
 		COUNT(*) AS "totalCount",
 		COUNT(CASE WHEN review_rating = 5 THEN 1 END) AS "star5",
-		COUNT(CASE WHEN review_rating = 4 THEN 1 END) AS "star4",
-		COUNT(CASE WHEN review_rating = 3 THEN 1 END) AS "star3",
-		COUNT(CASE WHEN review_rating = 2 THEN 1 END) AS "star2",
-		COUNT(CASE WHEN review_rating = 1 THEN 1 END) AS "star1"
+		COUNT(CASE
+		WHEN review_rating = 4 THEN 1 END) AS "star4",
+		COUNT(CASE WHEN
+		review_rating = 3 THEN 1 END) AS "star3",
+		COUNT(CASE WHEN review_rating
+		= 2 THEN 1 END) AS "star2",
+		COUNT(CASE WHEN review_rating = 1 THEN 1
+		END) AS "star1"
 		FROM review_tbl
 		WHERE store_id = #{storeId}
 	</select>
@@ -524,4 +530,12 @@
 		to_char(olm.reg_date, 'yyyy-mm')
 		order by sale_month
 	</select>
+
+
+	<select id="selectTotalSales" resultType="Long">
+		select sum(price *
+		quantity) from order_detail where order_id in (select order_id from
+		order_tbl where store_id = #{storeId})
+	</select>
+
 </mapper>

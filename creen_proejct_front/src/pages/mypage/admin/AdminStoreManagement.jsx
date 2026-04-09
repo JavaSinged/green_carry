@@ -133,7 +133,7 @@ export default function AdminStoreManagement() {
                 당월 매출 <UnfoldMoreIcon className={styles.sort_icon} />
               </th>
               <th onClick={() => handleSort("prevSales")}>
-                전월 매출 <UnfoldMoreIcon className={styles.sort_icon} />
+                총 매출 <UnfoldMoreIcon className={styles.sort_icon} />
               </th>
               <th onClick={() => handleSort("storeRating")}>
                 상점 평점 <UnfoldMoreIcon className={styles.sort_icon} />
@@ -175,7 +175,9 @@ export default function AdminStoreManagement() {
                 {/* 당월 */}
                 <td>{store.currentSales?.toLocaleString()}원</td>
                 {/* 전월 */}
-                <td>{store.prevSales?.toLocaleString()}원</td>
+                <td>
+                  {store.totalSale ? store.totalSale?.toLocaleString() : 0}원
+                </td>
                 <td>
                   <div className={styles.rating_wrap}>
                     <div className={styles.stars}>
