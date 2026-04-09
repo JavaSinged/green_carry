@@ -16,6 +16,11 @@ const UserOrderListPage = () => {
 
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const todayStr = new Date(
+    new Date().getTime() - new Date().getTimezoneOffset() * 60000,
+  )
+    .toISOString()
+    .split("T")[0];
 
   // 🌟 [추가] 페이지네이션 상태
   const [currentPage, setCurrentPage] = useState(1);
@@ -160,6 +165,7 @@ const UserOrderListPage = () => {
             className={styles.dateInput}
             value={startDate}
             onChange={(e) => setStartDate(e.target.value)}
+            max={todayStr}
           />
           <span className={styles.dateSeparator}>~</span>
           <input
@@ -167,6 +173,7 @@ const UserOrderListPage = () => {
             className={styles.dateInput}
             value={endDate}
             onChange={(e) => setEndDate(e.target.value)}
+            max={todayStr}
           />
         </div>
         <button className={styles.resetBtn} onClick={resetFilter}>

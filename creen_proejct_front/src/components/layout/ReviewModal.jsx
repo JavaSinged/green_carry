@@ -5,6 +5,7 @@ import styles from "./ReviewModal.module.css";
 import CloseIcon from "@mui/icons-material/Close";
 
 export default function ReviewModal({ order, onClose }) {
+  const backHost = import.meta.env.VITE_BACKSERVER;
   const [rating, setRating] = useState(5);
   const [hover, setHover] = useState(0);
   const [content, setContent] = useState("");
@@ -72,7 +73,15 @@ export default function ReviewModal({ order, onClose }) {
         </p>
 
         <div className={styles.order_card}>
-          <img src={order.menuImage} alt="menu" className={styles.order_img} />
+          <img
+            src={
+              order.storeThumb
+                ? `${backHost}/${order.storeThumb}`
+                : "/default-image.png"
+            }
+            alt="store"
+            className={styles.order_img}
+          />
           <div className={styles.order_info}>
             <p className={styles.store_name_title}>{order.storeName}</p>
 

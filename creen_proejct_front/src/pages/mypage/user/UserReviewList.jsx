@@ -7,6 +7,8 @@ const UserReviewList = () => {
   const [reviews, setReviews] = useState([]);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const today = new Date();
+  const currentMonthStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}`;
 
   // 🌟 [추가] 페이지네이션 상태
   const [currentPage, setCurrentPage] = useState(1);
@@ -91,12 +93,14 @@ const UserReviewList = () => {
           type="month"
           value={startDate}
           onChange={(e) => setStartDate(e.target.value)}
+          max={currentMonthStr}
         />
         <span>~</span>
         <input
           type="month"
           value={endDate}
           onChange={(e) => setEndDate(e.target.value)}
+          max={currentMonthStr}
         />
       </div>
 
