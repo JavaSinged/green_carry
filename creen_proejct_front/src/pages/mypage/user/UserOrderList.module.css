@@ -324,3 +324,72 @@
   opacity: 0.4;
   cursor: not-allowed;
 }
+
+/*////////페이지네이션영역*/
+/* 전체 컨테이너: 이전 - 숫자들 - 다음 버튼을 양 끝으로 배치 */
+.pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 24px;
+}
+
+/* 이전/다음 네비게이션 버튼 */
+.page_btn_nav {
+  display: flex;
+  align-items: center;
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text-main);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.page_btn_nav:hover {
+  background-color: #f9f9f9;
+}
+
+/* 버튼이 비활성화(disabled) 되었을 때의 처리 (추가 권장) */
+.page_btn_nav:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* 숫자 버튼들을 감싸는 영역 */
+.page_numbers {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* 개별 숫자 버튼 */
+.page_num {
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text-main);
+  cursor: pointer;
+}
+
+.page_num:hover {
+  background-color: #f9f9f9;
+}
+
+/* 현재 활성화된(선택된) 페이지 숫자 스타일 */
+.page_num.active {
+  border: 1px solid var(--color-brand); /* 브랜드 컬러 적용 */
+  color: var(--color-brand);
+  background-color: var(--color-surface);
+  font-weight: 600;
+}
