@@ -1,27 +1,26 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios"; // axios 추가
+import React, { useState } from "react";
+import axios from "axios";
 import styles from "./StoreInfoEdit.module.css";
+import { useDaumPostcodePopup } from "react-daum-postcode";
 
 export default function StoreInfoEdit({ storeId = 1 }) {
-  // 예시로 storeId를 props로 받는다고 가정
   // 1. 기본 폼 데이터 상태
   const [formData, setFormData] = useState({
     storeName: "",
     storeIntro: "",
     storePhone: "",
-    storeAddrCode: "",
-    storeAddr: "",
+    storeAddrCode: "", // 우편번호
+    storeAddr: "", // 기본주소
     storeAddrDetail: "",
     businessNumber: "",
     storeOriginInfo: "",
   });
 
   const [activeCategory, setActiveCategory] = useState("한식");
-  const [hoursType, setHoursType] = useState("same"); // 'same' or 'diff'
+  const [hoursType, setHoursType] = useState("same");
   const [is24h, setIs24h] = useState(false);
 
-  // 🌟 2. 영업시간 상태 (백엔드 전송용)
-  // 매일 같은 시간일 경우
+  // 2. 영업시간 상태
   const [sameTime, setSameTime] = useState({
     startH: "09",
     startM: "00",
@@ -29,7 +28,6 @@ export default function StoreInfoEdit({ storeId = 1 }) {
     endM: "00",
   });
 
-  // 요일별 다를 경우
   const [diffTimes, setDiffTimes] = useState([
     {
       day: "mon",
@@ -131,7 +129,36 @@ export default function StoreInfoEdit({ storeId = 1 }) {
     { value: "sun", label: "일요일" },
   ];
 
-  // 시간 select 생성을 위한 헬퍼 함수
+  // 🌟 다음 우편번호 API 핸들러 수정 완료
+  const openPostcode = useDaumPostcodePopup(
+    "https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"
+  );
+
+  const handleCompletePostcode = (data) => {
+    let fullAddress = data.address;
+    let extraAddress = "";
+
+    if (data.addressType === "R") {
+      if (data.bname !== "") extraAddress += data.bname;
+      if (data.buildingName !== "")
+        extraAddress +=
+          extraAddress !== "" ? `, ${data.buildingName}` : data.buildingName;
+      fullAddress += extraAddress !== "" ? ` (${extraAddress})` : "";
+    }
+
+    // 수정: setNewAddress 대신 setFormData 사용, 필드명을 state와 일치시킴
+    setFormData((prev) => ({
+      ...prev,
+      storeAddrCode: data.zonecode,
+      storeAddr: fullAddress,
+    }));
+  };
+
+  const handleSearchAddress = () => {
+    openPostcode({ onComplete: handleCompletePostcode });
+  };
+
+  // 시간 select 헬퍼
   const renderTimeOptions = (max, step = 1) => {
     const options = [];
     for (let i = 0; i <= max; i += step) {
@@ -145,7 +172,7 @@ export default function StoreInfoEdit({ storeId = 1 }) {
     return options;
   };
 
-  // --- 핸들러 로직 ---
+  // --- 텍스트 입력 핸들러 ---
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     let formattedValue = value;
@@ -175,7 +202,7 @@ export default function StoreInfoEdit({ storeId = 1 }) {
     setFormData((prev) => ({ ...prev, [name]: formattedValue }));
   };
 
-  // 🌟 요일별 시간 변경 핸들러
+  // --- 휴무일 및 영업시간 핸들러 ---
   const handleDiffTimeChange = (index, field, value) => {
     const newDiff = [...diffTimes];
     newDiff[index][field] = value;
@@ -199,7 +226,7 @@ export default function StoreInfoEdit({ storeId = 1 }) {
     );
   };
 
-  // --- 🌟 폼 제출 및 Axios 전송 ---
+  // --- 폼 제출 ---
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -214,17 +241,9 @@ export default function StoreInfoEdit({ storeId = 1 }) {
     if (!formData.storeOriginInfo.trim())
       return alert("원산지 정보를 입력해주세요.");
 
-    // 백엔드로 보낼 최종 페이로드 조립
     const payload = {
-      storeId: storeId,
-      storeName: formData.storeName,
-      storeIntro: formData.storeIntro,
-      storePhone: formData.storePhone,
-      storeAddrCode: formData.storeAddrCode,
-      storeAddr: formData.storeAddr,
-      storeAddrDetail: formData.storeAddrDetail,
-      businessNumber: formData.businessNumber,
-      storeOriginInfo: formData.storeOriginInfo,
+      storeId,
+      ...formData,
       storeCategory: activeCategory,
       hoursInfo: {
         hoursType,
@@ -236,12 +255,9 @@ export default function StoreInfoEdit({ storeId = 1 }) {
     };
 
     try {
-      // API 호출 (엔드포인트는 상황에 맞게 수정)
       const response = await axios.post("/api/store/update", payload);
-
       if (response.status === 200 || response.data === "SUCCESS") {
         alert("정보 변경이 완료되었습니다.");
-        console.log("전송 성공:", payload);
       }
     } catch (error) {
       console.error("저장 실패", error);
@@ -299,7 +315,7 @@ export default function StoreInfoEdit({ storeId = 1 }) {
           </div>
         </div>
 
-        {/* 가게 주소 */}
+        {/* 가게 주소 (🌟 value 바인딩 수정됨) */}
         <div className={styles.formRow}>
           <label className={styles.label}>가게 주소</label>
           <div className={styles.inputWrap}>
@@ -309,8 +325,13 @@ export default function StoreInfoEdit({ storeId = 1 }) {
                 readOnly
                 placeholder="우편번호"
                 className={styles.inputBase}
+                value={formData.storeAddrCode} // 🌟 추가됨
               />
-              <button type="button" className={styles.addressSearchBtn}>
+              <button
+                type="button"
+                className={styles.addressSearchBtn}
+                onClick={handleSearchAddress}
+              >
                 주소 찾기
               </button>
             </div>
@@ -320,6 +341,7 @@ export default function StoreInfoEdit({ storeId = 1 }) {
               placeholder="주소"
               className={styles.inputBase}
               style={{ marginBottom: "8px" }}
+              value={formData.storeAddr} // 🌟 추가됨
             />
             <input
               type="text"
@@ -407,7 +429,7 @@ export default function StoreInfoEdit({ storeId = 1 }) {
           </div>
         </div>
 
-        {/* 영업시간 및 휴무일 */}
+        {/* 영업시간 및 휴무일 설정 */}
         <div className={styles.sectionDivider}>영업시간 및 휴무일 설정</div>
 
         <div className={styles.formRow}>
@@ -454,7 +476,6 @@ export default function StoreInfoEdit({ storeId = 1 }) {
                       <label htmlFor="is24h">24시간 영업</label>
                     </div>
                   </div>
-                  {/* 🌟 매일 같음 시간 select 바인딩 */}
                   <div className={styles.timeInputRow}>
                     <span className={styles.timeLabel}>시작</span>
                     <select
@@ -508,7 +529,6 @@ export default function StoreInfoEdit({ storeId = 1 }) {
                 </>
               ) : (
                 <div className={styles.diffHoursList}>
-                  {/* 🌟 요일별 다름 시간 select & 체크박스 바인딩 */}
                   {diffTimes.map((item, idx) => (
                     <div key={idx} className={styles.dayRow}>
                       <div className={styles.checkboxWrap}>
@@ -579,7 +599,7 @@ export default function StoreInfoEdit({ storeId = 1 }) {
           </div>
         </div>
 
-        {/* 휴무일 설정 (기존 로직 동일) */}
+        {/* 휴무일 설정 */}
         <div className={styles.formRow}>
           <label className={styles.label}>휴무일</label>
           <div className={styles.inputWrap}>
