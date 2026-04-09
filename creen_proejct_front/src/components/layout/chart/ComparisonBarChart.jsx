@@ -1,8 +1,67 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Chart from "react-apexcharts";
 import styles from "./chart.module.css";
+import axios from "axios";
 
 const CarbonComparisonChart = () => {
+  const [chartData, setChartData] = useState({
+    categories: [],
+    currentSeries: [],
+    pastSeries: [],
+  });
+  const monthMap = {
+    "01월": "Jan",
+    "02월": "Feb",
+    "03월": "Mar",
+    "04월": "Apr",
+    "05월": "May",
+    "06월": "Jun",
+    "07월": "Jul",
+    "08월": "Aug",
+    "09월": "Sep",
+    "10월": "Oct",
+    "11월": "Nov",
+    "12월": "Dec",
+  };
+  useEffect(() => {
+    axios
+      .get(`${import.meta.env.VITE_BACKSERVER}/admin/api/point/stats`)
+      .then((res) => {
+        const currentCarbon = res.data.currentSeries.map((val) => val / 1000);
+        const pastCarbon = res.data.pastSeries.map((val) => val / 1000);
+        // 🚨 카테고리 글자 변환 (ex: "03월" -> "MAR")
+        const engCategories = res.data.categories.map((monthStr) => {
+          // 서버에서 온 글자가 "03월" 이라면, monthMap에서 "MAR"를 꺼냄
+          // 혹시 맵에 없는 이상한 글자면 원래 글자 그대로 둠
+          return monthMap[monthStr] || monthStr;
+        });
+
+        setChartData({
+          categories: engCategories, // 변환된 영문 배열을 꽂아줌
+          currentSeries: currentCarbon,
+          pastSeries: pastCarbon,
+        });
+
+        console.log("서버 응답 데이터:", res.data);
+      });
+  }, []);
+
+  const currentTotal =
+    chartData.currentSeries?.reduce((acc, cur) => acc + cur, 0) || 0;
+
+  const pastTotal =
+    chartData.pastSeries?.reduce((acc, cur) => acc + cur, 0) || 0;
+
+  let growthRate = 0;
+  if (pastTotal > 0) {
+    growthRate = ((currentTotal - pastTotal) / pastTotal) * 100;
+  }
+
+  const series = [
+    { name: "2025 ~ 2026", data: chartData.currentSeries },
+    { name: "2024 ~ 2025", data: chartData.pastSeries },
+  ];
+
   const chartOptions = {
     chart: {
       type: "bar",
@@ -23,9 +82,9 @@ const CarbonComparisonChart = () => {
       colors: ["transparent"],
     },
     // 전역 변수 컬러에 맞춤: 포인트 오렌지, 브랜드 그린
-    colors: ["#ffb300", "#2e8147"],
+    colors: ["#2e8147", "#ffb300"],
     xaxis: {
-      categories: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+      categories: chartData.categories,
       labels: {
         style: { colors: "#999", fontSize: "12px" },
       },
@@ -71,19 +130,17 @@ const CarbonComparisonChart = () => {
           <p className={styles.subTitle}>Past 6 months</p>
         </div>
         <div className={styles.valueGroup}>
-          <div className={styles.carbonValue}>12.573 Kg</div>
-          <div className={styles.badge}>
-            ↑ 12% <span className={styles.badgeText}>(전년 대비)</span>
-          </div>
+          <div className={styles.carbonValue}>{currentTotal.toFixed(3)} Kg</div>
+          <span
+            className={styles.badge}
+            style={{ color: growthRate >= 0 ? "#2e8147" : "#e74c3c" }}
+          >
+            {growthRate >= 0 ? "↑" : "↓"} {Math.abs(growthRate).toFixed(1)}%
+          </span>
         </div>
       </div>
-
-      <Chart
-        options={chartOptions}
-        series={chartSeries}
-        type="bar"
-        height="100%"
-      />
+      <Chart options={chartOptions} series={series} type="bar" height="100%" />
+      {/*<Chart options={chartOptions} series={chartSeries} type="bar" height="100%" />*/}
     </div>
   );
 };

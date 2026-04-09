@@ -18,6 +18,21 @@
 		'YYYY-MM')
 		ORDER BY monthly ASC
 	</select>
+	<select id="selectMonthlyPoint" resultType="map">
+		SELECT
+		TO_CHAR(COMPLETE_DATE, 'YYYY-MM') AS monthly, 
+		SUM(get_point) AS total_point
+		FROM ORDER_TBL
+		WHERE
+		(COMPLETE_DATE BETWEEN
+		TRUNC(ADD_MONTHS(SYSDATE, -5), 'MM') AND LAST_DAY(SYSDATE))
+		OR
+		(COMPLETE_DATE BETWEEN TRUNC(ADD_MONTHS(SYSDATE, -17), 'MM') AND
+		LAST_DAY(ADD_MONTHS(SYSDATE, -12)))
+		GROUP BY TO_CHAR(COMPLETE_DATE,
+		'YYYY-MM')
+		ORDER BY monthly ASC
+	</select>
 	<resultMap id="orderMap" type="OrderListByStoreId">
 		<id property="orderId" column="order_id" />
 		<result property="memberId" column="member_id" />

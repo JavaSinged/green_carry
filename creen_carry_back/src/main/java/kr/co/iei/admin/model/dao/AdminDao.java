@@ -13,9 +13,14 @@ public interface AdminDao {
 
 	List<Map<String, Object>> selectMonthlySales();
 
+	List<Map<String, Object>> selectMonthlyPoint();
+
 	List<OrderListByStoreId> selectOrdersByStoreId(int storeId);
 
 	List<Menu> selectMenuListByOrderId(Long orderId);
 
+
 	Long selectTotalSales(int storeId);
+
+
 }
