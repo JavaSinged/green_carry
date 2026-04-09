@@ -375,7 +375,7 @@
 
 /* 🌟 홈으로 가기 버튼 (GreenCarry 브랜드 컬러 적용) */
 .goHomeButton {
-  background-color: #22c55e; /* 산뜻한 그린 */
+  background-color: var(--color-brand); /* 산뜻한 그린 */
   color: #ffffff;
   padding: 14px 30px;
   border-radius: 12px;
