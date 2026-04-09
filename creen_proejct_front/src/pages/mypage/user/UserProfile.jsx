@@ -131,7 +131,7 @@ const UserProfile = () => {
             <div className={styles.dashboard}>
               <p className={styles.dashboard_title}>커뮤니티가 절약한 탄소</p>
               <p className={styles.dashboard_value}>
-                {(communityPoint / 1000).toFixed(1)}kg
+                {communityPoint.toFixed(1)}kg
               </p>
               <p className={styles.dashbboard_subtitle}>CO2</p>
             </div>

@@ -1,4 +1,5 @@
-import React, { useContext } from "react";
+import React, { useContext, useState, useEffect } from "react"; // 🌟 useState, useEffect 추가
+import axios from "axios"; // 🌟 axios 추가
 import styles from "./Header.module.css";
 import Swal from "sweetalert2";
 import AccountCircleSharpIcon from "@mui/icons-material/AccountCircleSharp";
@@ -16,9 +17,22 @@ import { AuthContext } from "../../context/AuthContext";
 export default function Header() {
   const navigate = useNavigate();
   const { isLogin, user, logout, isLoading } = useContext(AuthContext);
-
   const backHost = import.meta.env.VITE_BACKSERVER;
-  //console.log("현재 헤더에 들어온 유저 정보:", user);
+
+  // 🌟 [추가] 전체 커뮤니티 탄소 포인트를 저장할 상태
+  const [communityPoint, setCommunityPoint] = useState(0);
+
+  // 🌟 [추가] 전체 커뮤니티 탄소 절감량 합계 가져오기
+  useEffect(() => {
+    axios
+      .get(`${backHost}/member/community-carbon`) // 백엔드에서 만든 전체 합계 API 호출
+      .then((res) => {
+        setCommunityPoint(Number(res.data));
+      })
+      .catch((err) => {
+        console.error("커뮤니티 탄소량 로드 실패:", err);
+      });
+  }, [backHost]);
 
   // 🎨 GreenCarry 전용 Swal 스타일 함수
   const fireStyledSwal = (icon, title, text) => {
@@ -33,24 +47,21 @@ export default function Header() {
       },
       buttonsStyling: false,
       confirmButtonText: "확인",
-      timer: 1500, // 1.5초 후 자동 닫힘
-      showConfirmButton: false, // 버튼 없이 깔끔하게 문구만 노출
+      timer: 1500,
+      showConfirmButton: false,
     });
   };
 
-  // [수정] 클릭 시 즉시 안내 문구 노출 후 로그아웃
   const handleLogoutClick = () => {
     fireStyledSwal(
       "success",
       "로그아웃 완료",
-      "안전하게 로그아웃 되었습니다. 메인으로 이동합니다."
+      "안전하게 로그아웃 되었습니다. 메인으로 이동합니다.",
     ).then(() => {
-      // 팝업이 닫히거나 시간이 다 되면 즉시 로그아웃 실행
       logout();
     });
   };
 
-  // 마이페이지 클릭 함수
   const handleMyPageClick = () => {
     if (isLogin) {
       let targetPath = "/mypage/user";
@@ -68,13 +79,13 @@ export default function Header() {
       fireStyledSwal(
         "success",
         "이동 중",
-        `${roleText}님의 공간으로 이동합니다.`
+        `${roleText}님의 공간으로 이동합니다.`,
       ).then(() => navigate(targetPath));
     } else {
       fireStyledSwal(
         "warning",
         "로그인 필요",
-        "로그인 페이지로 이동합니다."
+        "로그인 페이지로 이동합니다.",
       ).then(() => navigate("/login"));
     }
   };
@@ -93,7 +104,11 @@ export default function Header() {
       <div className={styles.center_wrap}>
         <ParkIcon />
         <span>
-          지금까지 함께 심은 나무, 총 <span className={styles.badge}>41</span>{" "}
+          지금까지 우리 모두가 심은 나무, 총
+          <strong>
+            {" "}
+            {Math.floor((communityPoint * 1000) / 6600).toLocaleString()}
+          </strong>{" "}
           그루
         </span>
       </div>
@@ -145,7 +160,6 @@ export default function Header() {
               )}
             </div>
 
-            {/* 로그아웃 버튼: 클릭 시 바로 문구 -> 로그아웃 */}
             {isLogin ? (
               <div
                 onClick={handleLogoutClick}

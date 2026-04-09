@@ -5,11 +5,11 @@
   font-weight: 500;
   font-display: swap;
 }
+
 .header {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
-
   padding: 0 40px;
   height: 80px;
   background-color: var(--color-brand);
@@ -60,13 +60,15 @@
   line-height: 1.5;
 }
 
-.badge {
-  background-color: var(--color-point);
+/* 🌟 [핵심] 기존 badge 스타일을 strong 태그에도 적용 */
+.center_wrap span strong {
+  background-color: var(--color-point); /* 포인트 색상 (연두색/초록색) */
   color: #ffffff;
-  padding: 1px 8px;
-  border-radius: 8px;
+  padding: 2px 10px;
+  border-radius: 12px;
   font-weight: bold;
   font-family: var(--font-body);
+  margin: 0 4px; /* 숫자 좌우 간격 */
 }
 
 .button_wrap {
@@ -105,31 +107,24 @@
   transform: scale(1.1);
 }
 
-.button_wrap a {
-  display: flex;
-  align-items: center;
-  text-decoration: none;
-  color: inherit;
-}
 .profile_circle {
-  width: 50px;
-  height: 50px;
+  width: 45px;
+  height: 45px;
   border-radius: 50%;
   overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
+  background-color: #f0f0f0; /* 이미지가 없을 때 배경색 */
 }
 
 .profile_img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border: none;
-  outline: none;
 }
-/* 아이콘 스타일 */
+
 .icon_inside_header_image {
-  color: #bfbfbf; /* 아이콘 색상: 회색 */
-  font-size: 50px; /* 아이콘 크기: 원 크기와 같게 설정 */
+  color: #bfbfbf;
+  font-size: 45px;
 }

@@ -122,13 +122,12 @@
 		resultType="Double">
 		SELECT NVL(total_carbon_reduce, 0)
 		FROM member_tbl
-		WHERE member_id = #{memberId}
+		WHERE
+		member_id = #{memberId}
 	</select>
-	<select id="getCommunityTotalCarbon" resultType="int">
-		SELECT
-		NVL(SUM(get_point), 0)
-		FROM order_tbl
-		WHERE order_status = 4
+	<select id="getCommunityTotalCarbon" resultType="double"> SELECT
+		NVL(SUM(total_carbon_reduce), 0)
+		FROM member_tbl
 	</select>
 
 

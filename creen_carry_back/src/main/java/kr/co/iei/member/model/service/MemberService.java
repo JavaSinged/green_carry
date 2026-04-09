@@ -227,7 +227,7 @@ public class MemberService {
         return memberDao.getTotalCarbonPoint(memberId);
     }
 
-    public int getCommunityTotalCarbon() {
+    public Double getCommunityTotalCarbon() {
         return memberDao.getCommunityTotalCarbon();
     }
 

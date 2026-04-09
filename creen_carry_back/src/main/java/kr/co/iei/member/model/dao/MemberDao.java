@@ -46,7 +46,7 @@ public interface MemberDao {
 
 	Double getTotalCarbonPoint(String memberId);
 
-	int getCommunityTotalCarbon();
+	Double getCommunityTotalCarbon();
 
 	int checkActiveOrder(String memberId);
 

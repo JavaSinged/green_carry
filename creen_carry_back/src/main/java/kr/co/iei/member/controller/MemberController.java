@@ -298,9 +298,8 @@ public class MemberController {
     }
 
     @GetMapping("/community-carbon")
-    @CrossOrigin(origins = "http://localhost:5173")
-    public ResponseEntity<Integer> getCommunityCarbon() {
-        int total = memberService.getCommunityTotalCarbon();
+    public ResponseEntity<?> getCommunityCarbon() {
+        Double total = memberService.getCommunityTotalCarbon();
         return ResponseEntity.ok(total);
     }
 
