@@ -53,10 +53,15 @@ const TotalSalesChart = () => {
     xaxis: {
       categories: chartData.categories,
       axisBorder: { show: false },
+
+      labels: {
+        style: { colors: "#999", fontSize: "12px" },
+      },
     },
     yaxis: {
       labels: {
         formatter: (val) => (val / 10000).toLocaleString() + "만원",
+        style: { colors: "#999" },
       },
     },
     legend: {

@@ -11,15 +11,19 @@ import kr.co.iei.admin.model.vo.OrderListByStoreId;
 import kr.co.iei.store.model.vo.Menu;
 import kr.co.iei.store.model.vo.OrderResponse;
 
-
 @Service
 public class AdminService {
-	
+
 	@Autowired
-    private AdminDao adminDao;
+	private AdminDao adminDao;
 
 	public List<Map<String, Object>> selectMonthlySales() {
 		List<Map<String, Object>> list = adminDao.selectMonthlySales();
+		return list;
+	}
+
+	public List<Map<String, Object>> selectMonthlyPoint() {
+		List<Map<String, Object>> list = adminDao.selectMonthlyPoint();
 		return list;
 	}
 
@@ -27,8 +31,8 @@ public class AdminService {
 		List<OrderListByStoreId> list = adminDao.selectOrdersByStoreId(storeId);
 
 		for (OrderListByStoreId o : list) {
-		    List<Menu> menuList = adminDao.selectMenuListByOrderId(o.getOrderId());
-		    o.setMenuList(menuList);
+			List<Menu> menuList = adminDao.selectMenuListByOrderId(o.getOrderId());
+			o.setMenuList(menuList);
 		}
 		return list;
 	}

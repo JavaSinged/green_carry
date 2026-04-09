@@ -1,8 +1,47 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Chart from "react-apexcharts";
 import styles from "./chart.module.css";
+import axios from "axios";
 
 const CarbonComparisonChart = () => {
+  const [chartData, setChartData] = useState({
+    categories: [],
+    currentSeries: [],
+    pastSeries: [],
+  });
+
+  useEffect(() => {
+    axios
+      .get(`${import.meta.env.VITE_BACKSERVER}/admin/api/point/stats`)
+      .then((res) => {
+        const currentCarbon = res.data.currentSeries.map((val) => val / 1000);
+        const pastCarbon = res.data.pastSeries.map((val) => val / 1000);
+        setChartData({
+          categories: res.data.categories,
+          currentSeries: currentCarbon,
+          pastSeries: pastCarbon,
+        });
+
+        console.log("서버 응답 데이터:", res.data);
+      });
+  }, []);
+
+  const currentTotal =
+    chartData.currentSeries?.reduce((acc, cur) => acc + cur, 0) || 0;
+
+  const pastTotal =
+    chartData.pastSeries?.reduce((acc, cur) => acc + cur, 0) || 0;
+
+  let growthRate = 0;
+  if (pastTotal > 0) {
+    growthRate = ((currentTotal - pastTotal) / pastTotal) * 100;
+  }
+
+  const series = [
+    { name: "2025 ~ 2026", data: chartData.currentSeries },
+    { name: "2024 ~ 2025", data: chartData.pastSeries },
+  ];
+
   const chartOptions = {
     chart: {
       type: "bar",
@@ -23,9 +62,9 @@ const CarbonComparisonChart = () => {
       colors: ["transparent"],
     },
     // 전역 변수 컬러에 맞춤: 포인트 오렌지, 브랜드 그린
-    colors: ["#ffb300", "#2e8147"],
+    colors: ["#2e8147", "#ffb300"],
     xaxis: {
-      categories: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+      categories: chartData.categories,
       labels: {
         style: { colors: "#999", fontSize: "12px" },
       },
@@ -71,19 +110,17 @@ const CarbonComparisonChart = () => {
           <p className={styles.subTitle}>Past 6 months</p>
         </div>
         <div className={styles.valueGroup}>
-          <div className={styles.carbonValue}>12.573 Kg</div>
-          <div className={styles.badge}>
-            ↑ 12% <span className={styles.badgeText}>(전년 대비)</span>
-          </div>
+          <div className={styles.carbonValue}>{currentTotal.toFixed(3)} Kg</div>
+          <span
+            className={styles.badge}
+            style={{ color: growthRate >= 0 ? "#2e8147" : "#e74c3c" }}
+          >
+            {growthRate >= 0 ? "↑" : "↓"} {Math.abs(growthRate).toFixed(1)}%
+          </span>
         </div>
       </div>
-
-      <Chart
-        options={chartOptions}
-        series={chartSeries}
-        type="bar"
-        height="100%"
-      />
+      <Chart options={chartOptions} series={series} type="bar" height="100%" />
+      {/*<Chart options={chartOptions} series={chartSeries} type="bar" height="100%" />*/}
     </div>
   );
 };
