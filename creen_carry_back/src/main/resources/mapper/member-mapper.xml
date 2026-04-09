@@ -86,7 +86,7 @@
 		#{memberName}, #{memberPhone}, NULL,
 		#{memberEmail}, #{memberAddrcode},
 		#{memberAddr}, #{memberDetailAddr},
-		1, null, SYSDATE, 1
+		1, default, SYSDATE, 1
 		)
 	</insert>
 
