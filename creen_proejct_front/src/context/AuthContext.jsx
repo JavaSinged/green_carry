@@ -83,7 +83,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("memberName");
     localStorage.removeItem("memberGrade");
     localStorage.removeItem("memberThumb");
-    localStorage.removeItem("memberPoint"); // 🌟 [추가] 포인트 데이터 삭제
+    localStorage.removeItem("memberPoint");
     localStorage.removeItem("storeId");
     localStorage.removeItem("LATITUDE");
     localStorage.removeItem("LONGITUDE");
@@ -102,7 +102,7 @@ export const AuthProvider = ({ children }) => {
       fireStyledSwal(
         "warning",
         "세션 만료",
-        "로그인 유지 시간이 만료되어 자동 로그아웃 되었습니다.",
+        "로그인 유지 시간이 만료되어 자동 로그아웃 되었습니다."
       ).then(() => {
         clearAuthData();
         window.location.replace("/");
@@ -126,6 +126,8 @@ export const AuthProvider = ({ children }) => {
     const lat = localStorage.getItem("LATITUDE");
     const lng = localStorage.getItem("LONGITUDE");
 
+    const storeId = localStorage.getItem("storeId");
+
     const isAutoLogin = localStorage.getItem("isAutoLogin") === "true";
 
     if (token) {
@@ -141,6 +143,7 @@ export const AuthProvider = ({ children }) => {
           memberGrade: Number(grade),
           memberThumb: thumb,
           memberPoint: Number(point) || 0, // 숫자로 형변환
+          storeId: Number(storeId) || null,
         };
 
         if (decodedPayload.exp && decodedPayload.exp < currentTime) {
@@ -155,6 +158,7 @@ export const AuthProvider = ({ children }) => {
               memberThumb: thumb,
               lat: lat ? parseFloat(lat) : null,
               lng: lng ? parseFloat(lng) : null,
+              storeId: Number(storeId) || null,
             });
           }
         } else {
@@ -166,6 +170,7 @@ export const AuthProvider = ({ children }) => {
             memberThumb: thumb,
             lat: lat ? parseFloat(lat) : null,
             lng: lng ? parseFloat(lng) : null,
+            storeId: Number(storeId) || null,
           });
 
           if (!isAutoLogin) {

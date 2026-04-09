@@ -1,9 +1,18 @@
-import React, { useState } from "react";
+/* global naver */
+import React, { useContext, useState } from "react";
 import axios from "axios";
 import styles from "./StoreInfoEdit.module.css";
 import { useDaumPostcodePopup } from "react-daum-postcode";
+// 🌟 1. DatePicker 및 CSS 임포트
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { AuthContext } from "../../../../context/AuthContext";
 
-export default function StoreInfoEdit({ storeId = 1 }) {
+export default function StoreInfoEdit() {
+  // 가게 id
+  const { user } = useContext(AuthContext) || {};
+  const storeId = user?.storeId || null;
+
   // 1. 기본 폼 데이터 상태
   const [formData, setFormData] = useState({
     storeName: "",
@@ -13,6 +22,7 @@ export default function StoreInfoEdit({ storeId = 1 }) {
     storeAddr: "", // 기본주소
     storeAddrDetail: "",
     businessNumber: "",
+    openDate: null, // 🌟 2. 개업일자 상태 추가
     storeOriginInfo: "",
   });
 
@@ -129,7 +139,7 @@ export default function StoreInfoEdit({ storeId = 1 }) {
     { value: "sun", label: "일요일" },
   ];
 
-  // 🌟 다음 우편번호 API 핸들러 수정 완료
+  // 다음 우편번호 API 핸들러
   const openPostcode = useDaumPostcodePopup(
     "https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"
   );
@@ -146,7 +156,6 @@ export default function StoreInfoEdit({ storeId = 1 }) {
       fullAddress += extraAddress !== "" ? ` (${extraAddress})` : "";
     }
 
-    // 수정: setNewAddress 대신 setFormData 사용, 필드명을 state와 일치시킴
     setFormData((prev) => ({
       ...prev,
       storeAddrCode: data.zonecode,
@@ -202,6 +211,11 @@ export default function StoreInfoEdit({ storeId = 1 }) {
     setFormData((prev) => ({ ...prev, [name]: formattedValue }));
   };
 
+  // 🌟 달력 날짜 변경 핸들러
+  const handleDateChange = (date) => {
+    setFormData((prev) => ({ ...prev, openDate: date }));
+  };
+
   // --- 휴무일 및 영업시간 핸들러 ---
   const handleDiffTimeChange = (index, field, value) => {
     const newDiff = [...diffTimes];
@@ -238,30 +252,70 @@ export default function StoreInfoEdit({ storeId = 1 }) {
       return alert("상세 주소를 입력해주세요.");
     if (formData.businessNumber.length !== 12)
       return alert("사업자 번호(10자리)를 올바르게 입력해주세요.");
+    if (!formData.openDate) return alert("개업일자를 선택해주세요.");
     if (!formData.storeOriginInfo.trim())
       return alert("원산지 정보를 입력해주세요.");
 
-    const payload = {
-      storeId,
-      ...formData,
-      storeCategory: activeCategory,
-      hoursInfo: {
-        hoursType,
-        is24h,
-        sameTime: hoursType === "same" ? sameTime : null,
-        diffTimes: hoursType === "diff" ? diffTimes : null,
-        restDays,
-      },
-    };
+    // 날짜 포맷 (YYYY-MM-DD 변환)
+    const formattedOpenDate = formData.openDate
+      ? formData.openDate
+          .toLocaleDateString("ko-KR")
+          .replace(/\. /g, "-")
+          .replace(/\./g, "")
+      : null;
 
     try {
+      // 1. 네이버 지도 Geocoding으로 위경도 가져오기
+      const coords = await new Promise((resolve, reject) => {
+        naver.maps.Service.geocode(
+          { query: formData.storeAddr },
+          (status, response) => {
+            if (status !== naver.maps.Service.Status.OK) {
+              reject(new Error("주소 변환 실패"));
+              return;
+            }
+            const addresses = response.v2.addresses;
+            if (!addresses || addresses.length === 0) {
+              reject(new Error("주소 결과 없음"));
+              return;
+            }
+            const result = addresses[0];
+            resolve({
+              latitude: parseFloat(result.y),
+              longitude: parseFloat(result.x),
+            });
+          }
+        );
+      });
+
+      // 2. 위경도 포함해서 백엔드로 전송
+      const payload = {
+        storeId,
+        ...formData,
+        openDate: formattedOpenDate,
+        storeCategory: activeCategory,
+        latitude: coords.latitude,
+        longitude: coords.longitude,
+        hoursInfo: {
+          hoursType,
+          is24h,
+          sameTime: hoursType === "same" ? sameTime : null,
+          diffTimes: hoursType === "diff" ? diffTimes : null,
+          restDays,
+        },
+      };
+
       const response = await axios.post("/api/store/update", payload);
       if (response.status === 200 || response.data === "SUCCESS") {
         alert("정보 변경이 완료되었습니다.");
       }
     } catch (error) {
       console.error("저장 실패", error);
-      alert("서버 오류가 발생했습니다. 다시 시도해주세요.");
+      const errorMsg =
+        error.message === "주소 변환 실패" || error.message === "주소 결과 없음"
+          ? "주소를 위경도로 변환하는 데 실패했습니다. 주소를 다시 확인해주세요."
+          : "서버 오류가 발생했습니다. 다시 시도해주세요.";
+      alert(errorMsg);
     }
   };
 
@@ -315,7 +369,7 @@ export default function StoreInfoEdit({ storeId = 1 }) {
           </div>
         </div>
 
-        {/* 가게 주소 (🌟 value 바인딩 수정됨) */}
+        {/* 가게 주소 */}
         <div className={styles.formRow}>
           <label className={styles.label}>가게 주소</label>
           <div className={styles.inputWrap}>
@@ -325,7 +379,7 @@ export default function StoreInfoEdit({ storeId = 1 }) {
                 readOnly
                 placeholder="우편번호"
                 className={styles.inputBase}
-                value={formData.storeAddrCode} // 🌟 추가됨
+                value={formData.storeAddrCode}
               />
               <button
                 type="button"
@@ -341,7 +395,7 @@ export default function StoreInfoEdit({ storeId = 1 }) {
               placeholder="주소"
               className={styles.inputBase}
               style={{ marginBottom: "8px" }}
-              value={formData.storeAddr} // 🌟 추가됨
+              value={formData.storeAddr}
             />
             <input
               type="text"
@@ -367,6 +421,24 @@ export default function StoreInfoEdit({ storeId = 1 }) {
               placeholder="000-00-00000"
               className={styles.inputBase}
               maxLength={12}
+            />
+          </div>
+        </div>
+
+        {/* 🌟 개업일자 입력 (React DatePicker) */}
+        <div className={styles.formRow}>
+          <label className={styles.label}>개업일자</label>
+          <div className={styles.inputWrap}>
+            <DatePicker
+              selected={formData.openDate}
+              onChange={handleDateChange}
+              maxDate={new Date()}
+              dateFormat="yyyy-MM-dd"
+              placeholderText="YYYY-MM-DD"
+              className={styles.inputBase}
+              showYearDropdown
+              showMonthDropdown
+              dropdownMode="select"
             />
           </div>
         </div>
