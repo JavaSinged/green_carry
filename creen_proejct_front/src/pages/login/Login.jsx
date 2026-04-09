@@ -11,6 +11,9 @@ import PersonIcon from "@mui/icons-material/Person";
 import LockIcon from "@mui/icons-material/Lock";
 import InputAdornment from "@mui/material/InputAdornment";
 import TextField from "@mui/material/TextField";
+import IconButton from "@mui/material/IconButton"; // 🌟 눈 아이콘 버튼
+import Visibility from "@mui/icons-material/Visibility"; // 🌟 눈 뜬 아이콘
+import VisibilityOff from "@mui/icons-material/VisibilityOff"; // 🌟 눈 감은 아이콘
 import EcoEarth from "../../components/Easter Egg/EcoEarth";
 
 const Login = () => {
@@ -42,17 +45,13 @@ const Login = () => {
         leaf.className = "easter-egg-leaf";
         leaf.innerHTML = "🍃"; // 나뭇잎 이모지
         leaf.style.left = Math.random() * 130 + "vw";
-
-        // 🌟 세로 시작 위치 랜덤 (0 ~ -100vh 사이의 깊이로 배치)
-        // 이렇게 하면 어떤 나뭇잎은 한참 뒤에 화면에 나타나서 자연스럽습니다.
         leaf.style.top = -(Math.random() * 130) + "vh";
-        leaf.style.animationDuration = Math.random() * 1 + 3 + "s"; // 3~5초 사이 랜덤 속도
+        leaf.style.animationDuration = Math.random() * 1 + 3 + "s";
         leaf.style.opacity = Math.random();
         leaf.style.fontSize = Math.random() * 20 + 10 + "px";
 
         document.body.appendChild(leaf);
 
-        // 애니메이션이 끝나면 요소 삭제 (메모리 관리)
         setTimeout(() => {
           leaf.remove();
         }, 6000);
@@ -64,7 +63,7 @@ const Login = () => {
       inputKeys = inputKeys.slice(-4);
 
       if (inputKeys.join("") === konamiCode) {
-        triggerLeafRain(); // 🌟 나뭇잎 비 실행!
+        triggerLeafRain();
 
         Swal.fire({
           title: "🍃 Nature Power!",
@@ -96,6 +95,13 @@ const Login = () => {
   const [autoLogin, setAutoLogin] = useState(false);
   const [isCapsLockOn, setIsCapsLockOn] = useState(false);
 
+  // 🌟 [추가] 비밀번호 보이기/숨기기 상태
+  const [showPassword, setShowPassword] = useState(false);
+  const handleClickShowPassword = () => setShowPassword((show) => !show);
+  const handleMouseDownPassword = (event) => {
+    event.preventDefault();
+  };
+
   const swalCustomClass = {
     popup: "greencarry-swal-popup",
     title: "greencarry-swal-title",
@@ -124,9 +130,18 @@ const Login = () => {
     }
   }, []);
 
+  // 🌟 [수정] 복붙할 때 들어오는 공백 원천 차단
   const inputMember = (e) => {
     const { name, value } = e.target;
-    setMember({ ...member, [name]: value });
+    const noSpaceValue = value.replace(/\s/g, ""); // 모든 공백 제거
+    setMember({ ...member, [name]: noSpaceValue });
+  };
+
+  // 🌟 [추가] 스페이스바 타이핑 자체를 막는 함수
+  const preventSpace = (e) => {
+    if (e.key === " ") {
+      e.preventDefault();
+    }
   };
 
   const handleKeyUp = (e) => {
@@ -377,6 +392,7 @@ const Login = () => {
               placeholder="아이디를 입력해주세요."
               value={member.memberId}
               onChange={inputMember}
+              onKeyDown={preventSpace} // 🌟 아이디칸 스페이스 방지
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
@@ -389,16 +405,30 @@ const Login = () => {
             <TextField
               fullWidth
               variant="outlined"
-              type="password"
+              type={showPassword ? "text" : "password"} // 🌟 눈 아이콘 상태에 따라 타입 변경
               name="memberPw"
               placeholder="비밀번호를 입력해주세요."
               value={member.memberPw}
               onChange={inputMember}
               onKeyUp={handleKeyUp}
+              onKeyDown={preventSpace} // 🌟 비밀번호칸 스페이스 방지
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
                     <LockIcon style={{ color: "#2e7d32" }} />
+                  </InputAdornment>
+                ),
+                // 🌟 눈 모양 아이콘 추가
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label="toggle password visibility"
+                      onClick={handleClickShowPassword}
+                      onMouseDown={handleMouseDownPassword}
+                      edge="end"
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
                   </InputAdornment>
                 ),
               }}
