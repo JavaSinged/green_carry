@@ -1,23 +1,8 @@
 package kr.co.iei.store.model.dao;
 
-import kr.co.iei.store.model.vo.Menu;
-import kr.co.iei.store.model.vo.MenuOption;
-import kr.co.iei.store.model.vo.MenuSaveRequest;
-import kr.co.iei.store.model.vo.Order;
-import kr.co.iei.store.model.vo.OrderItem;
-import kr.co.iei.store.model.vo.OrderListObject;
-import kr.co.iei.store.model.vo.OrderListResponse;
-import kr.co.iei.store.model.vo.OrderResponse;
-import kr.co.iei.store.model.vo.StatsOrderInfo;
-import kr.co.iei.store.model.vo.Store;
+import kr.co.iei.store.model.vo.*;
 
-import kr.co.iei.store.model.vo.StoreIdResponse;
-import kr.co.iei.store.model.vo.StoreOperating;
-import kr.co.iei.store.model.vo.ReviewComment;
-import kr.co.iei.store.model.vo.SaleMonth;
 import kr.co.iei.store.model.vo.Store;
-
-import kr.co.iei.store.model.vo.StoreReviewResponse;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -100,4 +85,8 @@ public interface StoreDao {
 	int changeOrderStatus(Integer orderId, int status, Integer expectedTime);
 
 	List<StoreOperating> getStoreOperatingHours(Integer storeId);
+
+	void updateStore(StoreSaveRequest req);
+	void deleteOperatingHours(Integer storeId);
+	void insertOperatingHours(OperatingHours dto);
 }

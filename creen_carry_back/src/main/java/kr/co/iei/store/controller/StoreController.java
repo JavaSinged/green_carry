@@ -1,23 +1,12 @@
 package kr.co.iei.store.controller;
 
 import kr.co.iei.store.model.service.StoreService;
-import kr.co.iei.store.model.vo.Menu;
-import kr.co.iei.store.model.vo.MenuOption;
-import kr.co.iei.store.model.vo.MenuSaveRequest;
-import kr.co.iei.store.model.vo.Order;
-import kr.co.iei.store.model.vo.OrderItem;
-import kr.co.iei.store.model.vo.OrderListResponse;
-import kr.co.iei.store.model.vo.OrderResponse;
-import kr.co.iei.store.model.vo.StatsOrderInfo;
-import kr.co.iei.store.model.vo.Store;
-
-import kr.co.iei.store.model.vo.StoreIdResponse;
-import kr.co.iei.store.model.vo.StoreOperating;
-import kr.co.iei.store.model.vo.StoreReviewResponse;
+import kr.co.iei.store.model.vo.*;
 
 
 import org.apache.ibatis.type.Alias;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -150,6 +139,8 @@ public class StoreController {
             return ResponseEntity.internalServerError().body("상태 변경 실패");
         }
     }
+
+    // 매장 운영 정보 가져오기
     @GetMapping("/{storeId}/hours")
     public ResponseEntity<?> getStoreOperatingHours(@PathVariable Integer storeId) {
     
@@ -161,4 +152,16 @@ public class StoreController {
     	}
     	return ResponseEntity.ok(hours);
     }
+
+//    ------------------- 매장 수정 로직 ----------------------
+@PostMapping("/update")
+public ResponseEntity<String> updateStore(@RequestBody StoreSaveRequest request) {
+    try {
+        storeService.updateStoreInfoAndHours(request);
+        return ResponseEntity.ok("SUCCESS");
+    } catch (Exception e) {
+        e.printStackTrace();
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("FAIL");
     }
+}
+}

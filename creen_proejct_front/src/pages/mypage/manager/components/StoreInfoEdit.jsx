@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios"; // axios 추가
 import styles from "./StoreInfoEdit.module.css";
 
-export default function StoreInfoEdit() {
-  // 1. 기본 폼 데이터 상태 (정규식 제한 대상)
+export default function StoreInfoEdit({ storeId = 1 }) {
+  // 예시로 storeId를 props로 받는다고 가정
+  // 1. 기본 폼 데이터 상태
   const [formData, setFormData] = useState({
     storeName: "",
     storeIntro: "",
@@ -18,7 +20,83 @@ export default function StoreInfoEdit() {
   const [hoursType, setHoursType] = useState("same"); // 'same' or 'diff'
   const [is24h, setIs24h] = useState(false);
 
-  // 2. 동적 휴무일 배열 상태 (초기값 빈 배열 = 연중무휴 가능)
+  // 🌟 2. 영업시간 상태 (백엔드 전송용)
+  // 매일 같은 시간일 경우
+  const [sameTime, setSameTime] = useState({
+    startH: "09",
+    startM: "00",
+    endH: "22",
+    endM: "00",
+  });
+
+  // 요일별 다를 경우
+  const [diffTimes, setDiffTimes] = useState([
+    {
+      day: "mon",
+      label: "월",
+      isOpen: true,
+      startH: "09",
+      startM: "00",
+      endH: "22",
+      endM: "00",
+    },
+    {
+      day: "tue",
+      label: "화",
+      isOpen: true,
+      startH: "09",
+      startM: "00",
+      endH: "22",
+      endM: "00",
+    },
+    {
+      day: "wed",
+      label: "수",
+      isOpen: true,
+      startH: "09",
+      startM: "00",
+      endH: "22",
+      endM: "00",
+    },
+    {
+      day: "thu",
+      label: "목",
+      isOpen: true,
+      startH: "09",
+      startM: "00",
+      endH: "22",
+      endM: "00",
+    },
+    {
+      day: "fri",
+      label: "금",
+      isOpen: true,
+      startH: "09",
+      startM: "00",
+      endH: "22",
+      endM: "00",
+    },
+    {
+      day: "sat",
+      label: "토",
+      isOpen: true,
+      startH: "09",
+      startM: "00",
+      endH: "22",
+      endM: "00",
+    },
+    {
+      day: "sun",
+      label: "일",
+      isOpen: true,
+      startH: "09",
+      startM: "00",
+      endH: "22",
+      endM: "00",
+    },
+  ]);
+
+  // 3. 동적 휴무일 배열 상태
   const [restDays, setRestDays] = useState([]);
 
   // --- 옵션 데이터 ---
@@ -53,8 +131,6 @@ export default function StoreInfoEdit() {
     { value: "sun", label: "일요일" },
   ];
 
-  const daysOfWeek = ["월", "화", "수", "목", "금", "토", "일"];
-
   // 시간 select 생성을 위한 헬퍼 함수
   const renderTimeOptions = (max, step = 1) => {
     const options = [];
@@ -69,13 +145,12 @@ export default function StoreInfoEdit() {
     return options;
   };
 
-  // --- 정규식 및 포맷팅 로직 ---
+  // --- 핸들러 로직 ---
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     let formattedValue = value;
 
     if (name === "storePhone") {
-      // 숫자만 추출 후 010-0000-0000 포맷
       const nums = value.replace(/\D/g, "");
       if (nums.length <= 3) formattedValue = nums;
       else if (nums.length <= 7)
@@ -86,7 +161,6 @@ export default function StoreInfoEdit() {
           11
         )}`;
     } else if (name === "businessNumber") {
-      // 숫자만 추출 후 111-22-33333 포맷
       const nums = value.replace(/\D/g, "");
       if (nums.length <= 3) formattedValue = nums;
       else if (nums.length <= 5)
@@ -101,7 +175,13 @@ export default function StoreInfoEdit() {
     setFormData((prev) => ({ ...prev, [name]: formattedValue }));
   };
 
-  // --- 휴무일 제어 로직 ---
+  // 🌟 요일별 시간 변경 핸들러
+  const handleDiffTimeChange = (index, field, value) => {
+    const newDiff = [...diffTimes];
+    newDiff[index][field] = value;
+    setDiffTimes(newDiff);
+  };
+
   const handleAddRestDay = () => {
     setRestDays([
       ...restDays,
@@ -119,8 +199,8 @@ export default function StoreInfoEdit() {
     );
   };
 
-  // --- 폼 제출 유효성 검사 ---
-  const handleSubmit = (e) => {
+  // --- 🌟 폼 제출 및 Axios 전송 ---
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!formData.storeName.trim()) return alert("가게명을 입력해주세요.");
@@ -134,14 +214,39 @@ export default function StoreInfoEdit() {
     if (!formData.storeOriginInfo.trim())
       return alert("원산지 정보를 입력해주세요.");
 
-    alert("정보 변경이 완료되었습니다.");
-    console.log("제출 데이터:", {
-      formData,
-      activeCategory,
-      hoursType,
-      is24h,
-      restDays,
-    });
+    // 백엔드로 보낼 최종 페이로드 조립
+    const payload = {
+      storeId: storeId,
+      storeName: formData.storeName,
+      storeIntro: formData.storeIntro,
+      storePhone: formData.storePhone,
+      storeAddrCode: formData.storeAddrCode,
+      storeAddr: formData.storeAddr,
+      storeAddrDetail: formData.storeAddrDetail,
+      businessNumber: formData.businessNumber,
+      storeOriginInfo: formData.storeOriginInfo,
+      storeCategory: activeCategory,
+      hoursInfo: {
+        hoursType,
+        is24h,
+        sameTime: hoursType === "same" ? sameTime : null,
+        diffTimes: hoursType === "diff" ? diffTimes : null,
+        restDays,
+      },
+    };
+
+    try {
+      // API 호출 (엔드포인트는 상황에 맞게 수정)
+      const response = await axios.post("/api/store/update", payload);
+
+      if (response.status === 200 || response.data === "SUCCESS") {
+        alert("정보 변경이 완료되었습니다.");
+        console.log("전송 성공:", payload);
+      }
+    } catch (error) {
+      console.error("저장 실패", error);
+      alert("서버 오류가 발생했습니다. 다시 시도해주세요.");
+    }
   };
 
   return (
@@ -316,7 +421,7 @@ export default function StoreInfoEdit() {
                 }`}
                 onClick={() => setHoursType("same")}
               >
-                매일 같은 시간에 영업해요
+                매일 같은 시간에 영업해요{" "}
                 {hoursType === "same" && (
                   <span className={styles.checkIcon}>✓</span>
                 )}
@@ -328,7 +433,7 @@ export default function StoreInfoEdit() {
                 }`}
                 onClick={() => setHoursType("diff")}
               >
-                요일별로 다르게 영업해요
+                요일별로 다르게 영업해요{" "}
                 {hoursType === "diff" && (
                   <span className={styles.checkIcon}>✓</span>
                 )}
@@ -349,24 +454,53 @@ export default function StoreInfoEdit() {
                       <label htmlFor="is24h">24시간 영업</label>
                     </div>
                   </div>
+                  {/* 🌟 매일 같음 시간 select 바인딩 */}
                   <div className={styles.timeInputRow}>
                     <span className={styles.timeLabel}>시작</span>
-                    <select className={styles.timeSelect} disabled={is24h}>
+                    <select
+                      className={styles.timeSelect}
+                      value={sameTime.startH}
+                      onChange={(e) =>
+                        setSameTime({ ...sameTime, startH: e.target.value })
+                      }
+                      disabled={is24h}
+                    >
                       {renderTimeOptions(23)}
                     </select>{" "}
                     시
-                    <select className={styles.timeSelect} disabled={is24h}>
+                    <select
+                      className={styles.timeSelect}
+                      value={sameTime.startM}
+                      onChange={(e) =>
+                        setSameTime({ ...sameTime, startM: e.target.value })
+                      }
+                      disabled={is24h}
+                    >
                       {renderTimeOptions(50, 10)}
                     </select>{" "}
                     분
                   </div>
                   <div className={styles.timeInputRow}>
                     <span className={styles.timeLabel}>종료</span>
-                    <select className={styles.timeSelect} disabled={is24h}>
+                    <select
+                      className={styles.timeSelect}
+                      value={sameTime.endH}
+                      onChange={(e) =>
+                        setSameTime({ ...sameTime, endH: e.target.value })
+                      }
+                      disabled={is24h}
+                    >
                       {renderTimeOptions(23)}
                     </select>{" "}
                     시
-                    <select className={styles.timeSelect} disabled={is24h}>
+                    <select
+                      className={styles.timeSelect}
+                      value={sameTime.endM}
+                      onChange={(e) =>
+                        setSameTime({ ...sameTime, endM: e.target.value })
+                      }
+                      disabled={is24h}
+                    >
                       {renderTimeOptions(50, 10)}
                     </select>{" "}
                     분
@@ -374,30 +508,66 @@ export default function StoreInfoEdit() {
                 </>
               ) : (
                 <div className={styles.diffHoursList}>
-                  {daysOfWeek.map((day, idx) => (
+                  {/* 🌟 요일별 다름 시간 select & 체크박스 바인딩 */}
+                  {diffTimes.map((item, idx) => (
                     <div key={idx} className={styles.dayRow}>
                       <div className={styles.checkboxWrap}>
                         <input
                           type="checkbox"
                           id={`day_${idx}`}
-                          defaultChecked
+                          checked={item.isOpen}
+                          onChange={(e) =>
+                            handleDiffTimeChange(
+                              idx,
+                              "isOpen",
+                              e.target.checked
+                            )
+                          }
                         />
-                        <label htmlFor={`day_${idx}`}>{day}요일</label>
+                        <label htmlFor={`day_${idx}`}>{item.label}요일</label>
                       </div>
                       <div className={styles.dayTimeGroup}>
-                        <select className={styles.timeSelect}>
+                        <select
+                          className={styles.timeSelect}
+                          value={item.startH}
+                          onChange={(e) =>
+                            handleDiffTimeChange(idx, "startH", e.target.value)
+                          }
+                          disabled={!item.isOpen}
+                        >
                           {renderTimeOptions(23)}
                         </select>{" "}
                         :
-                        <select className={styles.timeSelect}>
+                        <select
+                          className={styles.timeSelect}
+                          value={item.startM}
+                          onChange={(e) =>
+                            handleDiffTimeChange(idx, "startM", e.target.value)
+                          }
+                          disabled={!item.isOpen}
+                        >
                           {renderTimeOptions(50, 10)}
                         </select>
                         <span className={styles.tilde}>~</span>
-                        <select className={styles.timeSelect}>
+                        <select
+                          className={styles.timeSelect}
+                          value={item.endH}
+                          onChange={(e) =>
+                            handleDiffTimeChange(idx, "endH", e.target.value)
+                          }
+                          disabled={!item.isOpen}
+                        >
                           {renderTimeOptions(23)}
                         </select>{" "}
                         :
-                        <select className={styles.timeSelect}>
+                        <select
+                          className={styles.timeSelect}
+                          value={item.endM}
+                          onChange={(e) =>
+                            handleDiffTimeChange(idx, "endM", e.target.value)
+                          }
+                          disabled={!item.isOpen}
+                        >
                           {renderTimeOptions(50, 10)}
                         </select>
                       </div>
@@ -409,7 +579,7 @@ export default function StoreInfoEdit() {
           </div>
         </div>
 
-        {/* 휴무일 설정 */}
+        {/* 휴무일 설정 (기존 로직 동일) */}
         <div className={styles.formRow}>
           <label className={styles.label}>휴무일</label>
           <div className={styles.inputWrap}>

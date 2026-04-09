@@ -1,22 +1,7 @@
 package kr.co.iei.store.model.service;
 
 import kr.co.iei.store.model.dao.StoreDao;
-import kr.co.iei.store.model.vo.Menu;
-import kr.co.iei.store.model.vo.MenuOption;
-import kr.co.iei.store.model.vo.MenuSaveRequest;
-import kr.co.iei.store.model.vo.Order;
-import kr.co.iei.store.model.vo.OrderItem;
-import kr.co.iei.store.model.vo.OrderListObject;
-import kr.co.iei.store.model.vo.OrderListResponse;
-import kr.co.iei.store.model.vo.OrderResponse;
-import kr.co.iei.store.model.vo.StatsOrderInfo;
-import kr.co.iei.store.model.vo.ReviewComment;
-import kr.co.iei.store.model.vo.SaleMonth;
-import kr.co.iei.store.model.vo.Store;
-
-import kr.co.iei.store.model.vo.StoreIdResponse;
-import kr.co.iei.store.model.vo.StoreOperating;
-import kr.co.iei.store.model.vo.StoreReviewResponse;
+import kr.co.iei.store.model.vo.*;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -186,4 +171,83 @@ public class StoreService {
 
 		return storeDao.getStoreOperatingHours(storeId);
 	}
+
+    @Transactional // 도중에 에러나면 롤백되도록 트랜잭션 처리
+    public void updateStoreInfoAndHours(StoreSaveRequest req) {
+        // 1. STORE_TBL 정보 업데이트
+        storeDao.updateStore(req);
+
+        // 2. 기존 OPERATING_HOURS_TBL 정보 전체 삭제 (초기화)
+        storeDao.deleteOperatingHours(req.getStoreId());
+
+        // 3. 새 영업시간 데이터 구성
+        List<OperatingHours> hoursList = new ArrayList<>();
+        HoursInfo hoursInfo = req.getHoursInfo();
+        String[] allDays = {"mon", "tue", "wed", "thu", "fri", "sat", "sun"};
+
+        // 3-1. 기본 영업시간 7일 세팅 (weekOfMonth = 0)
+        for (String day : allDays) {
+            OperatingHours dto = new OperatingHours();
+            dto.setStoreId(req.getStoreId());
+            dto.setDayOfWeek(day);
+            dto.setWeekOfMonth(0); // 매주 기본값
+
+            if (hoursInfo.getHoursType().equals("same")) {
+                if (hoursInfo.is24h()) {
+                    dto.setOpenTime("00:00");
+                    dto.setCloseTime("24:00");
+                    dto.setIsDayOff(0);
+                } else {
+                    dto.setOpenTime(hoursInfo.getSameTime().get("startH") + ":" + hoursInfo.getSameTime().get("startM"));
+                    dto.setCloseTime(hoursInfo.getSameTime().get("endH") + ":" + hoursInfo.getSameTime().get("endM"));
+                    dto.setIsDayOff(0);
+                }
+            } else {
+                // 요일별 다름 (diff)
+                DiffTime diffDay = hoursInfo.getDiffTimes().stream()
+                        .filter(d -> d.getDay().equals(day)).findFirst().orElse(null);
+
+                if (diffDay != null && diffDay.isOpen()) {
+                    dto.setOpenTime(diffDay.getStartH() + ":" + diffDay.getStartM());
+                    dto.setCloseTime(diffDay.getEndH() + ":" + diffDay.getEndM());
+                    dto.setIsDayOff(0);
+                } else {
+                    // 체크 해제된 요일은 정기 휴무
+                    dto.setIsDayOff(1);
+                }
+            }
+            hoursList.add(dto);
+        }
+
+        // 3-2. 정기 휴무일 추가 세팅 (restDays)
+        if (hoursInfo.getRestDays() != null) {
+            for (RestDay restDay : hoursInfo.getRestDays()) {
+                OperatingHours dto = new OperatingHours();
+                dto.setStoreId(req.getStoreId());
+                dto.setDayOfWeek(restDay.getDay());
+                dto.setIsDayOff(1); // 무조건 휴무
+
+                // weekMonth 매핑 (week=0, month=0(특정 로직 필요시 조정), week2=1 등 프론트 값에 맞춰 파싱)
+                int weekNum = parseWeekMonth(restDay.getWeekMonth());
+                dto.setWeekOfMonth(weekNum);
+
+                hoursList.add(dto);
+            }
+        }
+
+        // 4. DB에 영업시간 리스트 반복 Insert
+        for (OperatingHours hours : hoursList) {
+            storeDao.insertOperatingHours(hours);
+        }
+    }
+
+    private int parseWeekMonth(String val) {
+        return switch (val) {
+            case "week3" -> 1; // 첫째주
+            case "week4" -> 2; // 둘째주
+            case "week5" -> 3; // 셋째주
+            case "week6" -> 4; // 넷째주
+            default -> 0; // week(매주), week2(격주-별도 로직 필요)
+        };
+    }
 }
