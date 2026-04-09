@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import kr.co.iei.CreenCarryBackApplication;
 import kr.co.iei.admin.model.service.AdminService;
 import kr.co.iei.admin.model.vo.OrderListByStoreId;
+import kr.co.iei.admin.model.vo.StoreResponse;
 
 
 @RestController
@@ -65,7 +66,8 @@ public class AdminController {
 	 
 	 @GetMapping("/{storeId}")
 	 public ResponseEntity<?> selectOrdersByStoreId(@PathVariable int storeId){
-		 List<OrderListByStoreId> list = adminService.selectOrdersByStoreId(storeId);   
+		 List<OrderListByStoreId> list = adminService.selectOrdersByStoreId(storeId);
+		 
 		 return ResponseEntity.ok(list);
 	 }
 

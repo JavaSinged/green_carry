@@ -97,4 +97,6 @@ public interface StoreDao {
 	List<StoreReviewResponse> selectStoreReviews(Integer storeId);
 
 	int changeOrderStatus(Integer orderId, int status, Integer expectedTime);
+
+	Long selectTotalSales(Integer storeId);
 }

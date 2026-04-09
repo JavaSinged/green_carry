@@ -488,4 +488,7 @@
     group by to_char(olm.reg_date, 'yyyy-mm')
     order by sale_month
 </select>
+<select id="selectTotalSales" resultType = "Long">
+		select sum(price * quantity) from order_detail where order_id in (select order_id from order_tbl where store_id = #{storeId})
+	</select>
 </mapper>
