@@ -79,6 +79,7 @@
 		MEMBER_NAME, MEMBER_PHONE, MEMBER_THUMB,
 		MEMBER_EMAIL, MEMBER_ADDRCODE,
 		MEMBER_ADDR, MEMBER_DETAIL_ADDR,
+		LATITUDE, LONGITUDE,
 		MEMBER_GRADE, MEMBER_POINT,
 		ENROLL_DATE, MEMBER_STATUS
 		) VALUES (
@@ -86,7 +87,8 @@
 		#{memberName}, #{memberPhone}, NULL,
 		#{memberEmail}, #{memberAddrcode},
 		#{memberAddr}, #{memberDetailAddr},
-		1, null, SYSDATE, 1
+		#{latitude}, #{longitude},
+		1, default, SYSDATE, 1
 		)
 	</insert>
 
@@ -125,7 +127,7 @@
 		WHERE
 		member_id = #{memberId}
 	</select>
-	
+
 	<select id="getCommunityTotalCarbon" resultType="double"> SELECT
 		NVL(SUM(total_carbon_reduce), 0)
 		FROM member_tbl

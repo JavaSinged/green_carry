@@ -50,29 +50,29 @@ const categories = [
 
 export default function Home() {
   const navigate = useNavigate();
-  // 🌟 백엔드 서버 주소 설정
   const backHost = import.meta.env.VITE_BACKSERVER;
 
-  const { user } = useContext(AuthContext);
-
-  console.log("홈에서 확인되는 유저 정보:", user);
+  const { user } = useContext(AuthContext); // 🌟 글로벌 유저 정보 가져오기
 
   const [isLoading, setLoading] = useState(true);
-  const { storeId, setStoreId } = useCartStore();
   const [selectedCategory, setSelectedCategory] = useState("인기맛집");
   const [searchTerm, setSearchTerm] = useState("");
+  const [storeList, setStoreList] = useState([]);
 
+  // 🌟 [수정] 거리 계산 함수 (변수명을 LATITUDE, LONGITUDE로 통일)
   const calculateDistance = (storeLat, storeLng) => {
-    if (!user?.lat || !user?.lng || !storeLat || !storeLng)
-      return "위치 정보 없음";
+    // 1. user 객체에 값이 있는지 먼저 확인, 없으면 로컬스토리지에서 가져옴 (최종 수단)
+    const myLat = user?.LATITUDE || localStorage.getItem("LATITUDE");
+    const myLng = user?.LONGITUDE || localStorage.getItem("LONGITUDE");
 
-    // 하버사인 공식으로 직접 계산 (네이버 Projection은 지도 로드 후에만 동작)
+    if (!myLat || !myLng || !storeLat || !storeLng) return "위치 정보 없음";
+
     const R = 6371; // 지구 반지름 (km)
-    const dLat = ((storeLat - user.lat) * Math.PI) / 180;
-    const dLng = ((storeLng - user.lng) * Math.PI) / 180;
+    const dLat = ((storeLat - myLat) * Math.PI) / 180;
+    const dLng = ((storeLng - myLng) * Math.PI) / 180;
     const a =
       Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.cos((user.lat * Math.PI) / 180) *
+      Math.cos((myLat * Math.PI) / 180) *
         Math.cos((storeLat * Math.PI) / 180) *
         Math.sin(dLng / 2) *
         Math.sin(dLng / 2);
@@ -80,13 +80,9 @@ export default function Home() {
     const distance = R * c;
 
     return distance < 1
-      ? `${Math.round(distance * 1000)}m` // 1km 미만은 m 단위로
+      ? `${Math.round(distance * 1000)}m`
       : `${distance.toFixed(1)}km`;
   };
-
-  // 1. 서버에서 받아온 원본 리스트를 저장할 State
-
-  const [storeList, setStoreList] = useState([]);
 
   // 🚀 서버 데이터 로드
   useEffect(() => {
@@ -94,9 +90,6 @@ export default function Home() {
     axios
       .get(`${backHost}/stores`)
       .then((res) => {
-        console.log("서버 데이터 확인:", res.data);
-        // 서버에서 넘어온 배열 데이터를 상태에 저장
-
         setStoreList(res.data);
         setLoading(false);
       })
@@ -104,7 +97,8 @@ export default function Home() {
         console.error("데이터 로딩 에러:", err);
         setLoading(false);
       });
-  }, [backHost]);
+    // 🌟 [중요] user의 위치 정보가 바뀌면 이 useEffect가 다시 실행되어 리스트를 새로 갱신함
+  }, [backHost, user?.LATITUDE, user?.LONGITUDE]);
 
   // 🔍 검색 및 카테고리 필터링
   const filteredStores = storeList.filter((store) => {
@@ -221,7 +215,6 @@ export default function Home() {
         {/* 4. 카드 목록 */}
         <div className={styles.card_wrap}>
           {isLoading ? (
-            // 로딩 중 스켈레톤 UI
             [1, 2, 3, 4].map((n) => (
               <div
                 key={n}
@@ -256,8 +249,7 @@ export default function Home() {
                     alt={store.storeName}
                     style={{ objectFit: "cover" }}
                   />
-                  {/* 서버 데이터에 거리가 없다면 임시값이나 위치 계산값 사용 */}
-
+                  {/* 🌟 렌더링 시점에 실시간으로 계산된 거리 표시 */}
                   <div className={styles.card_badge}>
                     {calculateDistance(store.LATITUDE, store.LONGITUDE)}
                   </div>

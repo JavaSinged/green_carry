@@ -26,6 +26,8 @@ const UserSignup = () => {
     memberAddrcode: "",
     memberAddr: "",
     memberDetailAddr: "",
+    latitude: 0,
+    longitude: 0,
   });
 
   const idRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
@@ -40,7 +42,7 @@ const UserSignup = () => {
   const [mailAuthCode, setMailAuthCode] = useState(null);
   const [mailAuthInput, setMailAuthInput] = useState("");
   const [time, setTime] = useState(180);
-  const [timeout, setTimeout] = useState(null);
+  const [timeoutId, setTimeoutId] = useState(null);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   const inputMember = (e) => {
@@ -114,7 +116,7 @@ const UserSignup = () => {
       }
     }
     setTime(180);
-    if (timeout) window.clearInterval(timeout);
+    if (timeoutId) window.clearInterval(timeoutId);
     setMailAuth(1);
     axios
       .post(`${import.meta.env.VITE_BACKSERVER}/member/email-verification`, {
@@ -126,7 +128,7 @@ const UserSignup = () => {
         const intervalId = window.setInterval(() => {
           setTime((prev) => prev - 1);
         }, 1000);
-        setTimeout(intervalId);
+        setTimeoutId(intervalId);
       })
       .catch((err) => {
         Swal.fire({ icon: "error", text: "메일 발송 중 오류가 발생했습니다." });
@@ -144,8 +146,8 @@ const UserSignup = () => {
     if (String(mailAuthCode) === mailAuthInput) {
       Swal.fire({ icon: "success", text: "이메일 인증이 완료되었습니다!" });
       setMailAuth(3);
-      window.clearInterval(timeout);
-      setTimeout(null);
+      window.clearInterval(timeoutId);
+      setTimeoutId(null);
     } else {
       Swal.fire({
         icon: "error",
@@ -156,9 +158,9 @@ const UserSignup = () => {
 
   useEffect(() => {
     if (time === 0) {
-      window.clearInterval(timeout);
+      window.clearInterval(timeoutId);
       setMailAuthCode(null);
-      setTimeout(null);
+      setTimeoutId(null);
       Swal.fire({
         icon: "error",
         text: "인증 시간이 만료되었습니다. 다시 시도해주세요.",
@@ -176,6 +178,7 @@ const UserSignup = () => {
   const openPostcode = useDaumPostcodePopup(
     "https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js",
   );
+
   const handleCompletePostcode = (data) => {
     let fullAddress = data.address;
     let extraAddress = "";
@@ -186,12 +189,37 @@ const UserSignup = () => {
           extraAddress !== "" ? `, ${data.buildingName}` : data.buildingName;
       fullAddress += extraAddress !== "" ? ` (${extraAddress})` : "";
     }
-    setMember((prev) => ({
-      ...prev,
-      memberAddrcode: data.zonecode,
-      memberAddr: fullAddress,
-    }));
+
+    // 네이버 Geocoding API로 위경도 변환
+    if (window.naver && naver.maps.Service) {
+      naver.maps.Service.geocode({ query: fullAddress }, (status, response) => {
+        if (status === naver.maps.Service.Status.OK) {
+          const result = response.v2.addresses[0];
+          setMember((prev) => ({
+            ...prev,
+            memberAddrcode: data.zonecode,
+            memberAddr: fullAddress,
+            latitude: parseFloat(result.y),
+            longitude: parseFloat(result.x),
+          }));
+        } else {
+          console.error("좌표 변환 실패");
+          setMember((prev) => ({
+            ...prev,
+            memberAddrcode: data.zonecode,
+            memberAddr: fullAddress,
+          }));
+        }
+      });
+    } else {
+      setMember((prev) => ({
+        ...prev,
+        memberAddrcode: data.zonecode,
+        memberAddr: fullAddress,
+      }));
+    }
   };
+
   const handleSearchAddress = () => {
     openPostcode({ onComplete: handleCompletePostcode });
   };
@@ -208,6 +236,7 @@ const UserSignup = () => {
       return { text: "중복 확인 버튼을 눌러주세요.", isError: true };
     return { text: "사용 가능한 아이디입니다.", isError: false };
   };
+
   const getPwMessage = () => {
     if (!member.memberPw)
       return {
@@ -221,6 +250,7 @@ const UserSignup = () => {
       };
     return { text: "사용 가능한 비밀번호입니다.", isError: false };
   };
+
   const getPwReMessage = () => {
     if (!memberPwRe)
       return {
@@ -231,6 +261,7 @@ const UserSignup = () => {
       return { text: "비밀번호와 일치하지 않습니다.", isError: true };
     return { text: "비밀번호와 일치합니다.", isError: false };
   };
+
   const getEmailMessage = () => {
     if (!member.memberEmail)
       return {
@@ -250,6 +281,7 @@ const UserSignup = () => {
       return { text: "이메일 인증이 완료되었습니다.", isError: false };
     return { text: "\u00A0", isError: false };
   };
+
   const getNameMessage = () => {
     if (!member.memberName.trim())
       return {
@@ -258,6 +290,7 @@ const UserSignup = () => {
       };
     return { text: "\u00A0", isError: false };
   };
+
   const getPhoneMessage = () => {
     if (!member.memberPhone.trim())
       return {
@@ -268,6 +301,7 @@ const UserSignup = () => {
       return { text: "연락처 11자리를 모두 입력해주세요.", isError: true };
     return { text: "\u00A0", isError: false };
   };
+
   const getAddrMessage = () => {
     if (!member.memberAddrcode || !member.memberDetailAddr.trim())
       return {
@@ -297,6 +331,7 @@ const UserSignup = () => {
       !member.memberPhone.trim() ||
       !member.memberAddrcode ||
       !member.memberDetailAddr.trim();
+
     if (
       hasEmpty ||
       idStatus.isError ||
@@ -313,6 +348,7 @@ const UserSignup = () => {
       });
       return;
     }
+
     axios
       .post(`${import.meta.env.VITE_BACKSERVER}/member/userSignup`, member)
       .then((res) => {
@@ -577,9 +613,11 @@ const UserSignup = () => {
                   />
                 </div>
                 <p
-                  className={`signup-status-msg ${addrStatus.isError ? "signup-error-msg" : ""}`}
+                  className={`signup-status-msg ${!member.memberAddrcode && isSubmitted ? "signup-error-msg" : ""}`}
                 >
-                  {addrStatus.text}
+                  {!member.memberAddrcode && isSubmitted
+                    ? "주소를 입력해주세요."
+                    : "\u00A0"}
                 </p>
               </div>
             </div>

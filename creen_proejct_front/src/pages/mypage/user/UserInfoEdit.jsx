@@ -100,7 +100,7 @@ export default function UserInfoEdit() {
       return Swal.fire(
         "알림",
         "이름과 전화번호를 모두 입력해주세요.",
-        "warning"
+        "warning",
       );
     }
 
@@ -162,7 +162,7 @@ export default function UserInfoEdit() {
       return Swal.fire(
         "알림",
         "현재 비밀번호와 다른 새 비밀번호를 사용해주세요.",
-        "info"
+        "info",
       );
     if (newPw !== confirmPw)
       return Swal.fire("오류", "새 비밀번호가 일치하지 않습니다.", "error");
@@ -177,7 +177,7 @@ export default function UserInfoEdit() {
         await Swal.fire(
           "성공",
           "비밀번호가 안전하게 변경되었습니다.",
-          "success"
+          "success",
         );
         setPwData({ currentPw: "", newPw: "", confirmPw: "" });
         setopenPwSet(false);
@@ -198,7 +198,7 @@ export default function UserInfoEdit() {
 
   // 다음 우편번호 API 핸들러
   const openPostcode = useDaumPostcodePopup(
-    "https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"
+    "https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js",
   );
 
   const handleCompletePostcode = (data) => {
@@ -247,7 +247,7 @@ export default function UserInfoEdit() {
               latitude: parseFloat(result.y),
               longitude: parseFloat(result.x),
             });
-          }
+          },
         );
       });
 
@@ -261,19 +261,36 @@ export default function UserInfoEdit() {
           memberDetailAddr: newAddress.memberDetailAddr,
           latitude: coords.latitude,
           longitude: coords.longitude,
-        }
+        },
       );
 
       if (response.status === 200) {
-        // 서버 응답이 성공(200)일 때
         Swal.fire("성공", "주소지가 성공적으로 변경되었습니다!", "success");
 
+        // 1. 마이페이지 UI 상태 업데이트
         setMemberInfo((prev) => ({
           ...prev,
           memberAddrcode: newAddress.memberAddrCode,
           memberAddr: newAddress.memberAddr,
           memberDetailAddr: newAddress.memberDetailAddr,
         }));
+
+        // 🌟 2. [완벽 해결] 로컬스토리지에 위도/경도를 직접 덮어쓰기!
+        localStorage.setItem("LATITUDE", coords.latitude);
+        localStorage.setItem("LONGITUDE", coords.longitude);
+
+        localStorage.setItem("memberAddrcode", newAddress.memberAddrCode);
+        localStorage.setItem("memberAddr", newAddress.memberAddr);
+
+        setUser((prevUser) => ({
+          ...prevUser,
+          memberAddrcode: newAddress.memberAddrCode,
+          memberAddr: newAddress.memberAddr,
+          memberDetailAddr: newAddress.memberDetailAddr,
+          LATITUDE: coords.latitude,
+          LONGITUDE: coords.longitude,
+        }));
+
         setNewAddress({
           memberAddrCode: "",
           memberAddr: "",
@@ -282,10 +299,7 @@ export default function UserInfoEdit() {
         setopenAddSet(false);
       }
     } catch (error) {
-      // 4. 에러 처리
       console.error("주소 업데이트 에러:", error);
-
-      // 서버가 에러 메시지를 보냈다면 해당 메시지 출력, 없다면 기본 메시지 출력
       const errorMsg =
         error.response?.data?.message || "주소 변경 중 오류가 발생했습니다.";
       Swal.fire("에러", errorMsg, "error");
@@ -301,7 +315,7 @@ export default function UserInfoEdit() {
         `${import.meta.env.VITE_BACKSERVER}/member/check-active-order`,
         {
           params: { memberId: user.memberId },
-        }
+        },
       );
       const axtiveOrderCount = res.data;
       if (axtiveOrderCount > 0) {
@@ -315,8 +329,8 @@ export default function UserInfoEdit() {
       }
       navigate("/mypage/user/deleteMember");
     } catch (err) {
-      console.err("주문 상태 조회 실패:", err);
-      Swal.fire("에러", "서버와 통신 중 오류가 발생했습니다.", "err");
+      console.error("주문 상태 조회 실패:", err);
+      Swal.fire("에러", "서버와 통신 중 오류가 발생했습니다.", "error");
     }
   };
 
