@@ -14,10 +14,35 @@ export default function Footer() {
               GReen Carry™ — A New Standard for Sustainable Delivery.
             </p>
             <div className={styles.sns_links}>
-              <span>Instagram</span>
-              <span>LinkedIn</span>
               <a
-                href="https://github.com/우리팀레포지토리주소"
+                href="https://docs.google.com/spreadsheets/d/1y5An1r5wMXSMTQPvI4N7ahxKFxeL8jKXqveL0prBrEk/edit?usp=drive_link"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={styles.footerLink}
+              >
+                Spec
+              </a>
+              <span className={styles.one_divider}>|</span>
+              <a
+                href="https://www.erdcloud.com/d/itPtb4kbn5yTwFpjg"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={styles.footerLink}
+              >
+                ERD
+              </a>
+              <span className={styles.one_divider}>|</span>
+              <a
+                href="https://www.figma.com/design/23TrLwzZlitTNLkalzGG44/GreenCarry?node-id=994-3555&t=3N6NHCV4HpVGbcYF-1"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={styles.footerLink}
+              >
+                Figma
+              </a>
+              <span className={styles.one_divider}>|</span>
+              <a
+                href="https://github.com/JavaSinged/creen_proejct"
                 target="_blank"
                 rel="noopener noreferrer"
                 className={styles.footerLink}
@@ -54,22 +79,24 @@ export default function Footer() {
           <div className={styles.company_info}>
             <p>
               <span className={styles.highlight}>CEO.</span> 신지웅
-              <span className={styles.divider}> | </span> Seoul, KR
+              <span className={styles.one_divider}>|</span> Seoul, KR
               (123-45-67890)
             </p>
             <div className={styles.csInfo}>
               <span>CS. 1600-0000</span>
-              <span className={styles.divider}> | </span>
-              <Link to="/faq" className={styles.footerLink}>자주 묻는 질문</Link>
-              <span className={styles.divider}> | </span>
+              <span className={styles.one_divider}>  |  </span>
+              <Link to="/mypage/user/userCS" className={styles.footerLink}>자주 묻는 질문</Link>
+              <span className={styles.one_divider}>  |  </span>
               <span>partner@greencarry.com</span>
             </div>
           </div>
 
           <div className={styles.legal_info}>
             <div className={styles.legal_links}>
-              <span>Privacy Policy</span>
-              <span>Terms of Service</span>
+              <span>React</span>
+              <span className={styles.one_divider}>|</span>
+              <span>Spring</span>
+              <span className={styles.one_divider}>|</span>
               <span>Carbon Report</span>
             </div>
             <p className={styles.copyright}>
