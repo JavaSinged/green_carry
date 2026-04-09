@@ -4,18 +4,23 @@
 <mapper namespace="kr.co.iei.store.model.dao.StoreDao">
 
 	<select id="selectAllStore">
-		select *
-		from store_tbl
+		SELECT
+		s.*,
+		(SELECT NVL(AVG(review_rating), 0)
+		FROM review_tbl r
+		WHERE r.store_id = s.store_id) AS storeRating
+		FROM store_tbl s
 	</select>
 
 	<select id="findStoreById" parameterType="int"
 		resultType="store">
-		SELECT store_id AS storeId,
+		SELECT
+		store_id AS storeId,
 		member_id AS memberId,
-		store_name AS storeName,
+		store_name
+		AS storeName,
 		store_address AS storeAddress,
-		store_phone AS
-		storePhone,
+		store_phone AS storePhone,
 		store_intro AS storeIntro,
 		store_owner AS storeOwner,
 		store_owner_address AS storeOwnerAddress,
@@ -24,13 +29,15 @@
 		store_owner_no AS storeOwnerNo,
 		store_category AS
 		storeCategory,
-		store_rating AS storeRating,
+		(SELECT NVL(AVG(review_rating), 0)
+		FROM review_tbl r
+		WHERE r.store_id = s.store_id) AS storeRating,
 		latitude AS LATITUDE,
 		longitude AS LONGITUDE,
 		store_thumb AS storeThumb
-		FROM STORE_TBL
+		FROM STORE_TBL s
 		WHERE
-		store_id = #{storeId}
+		s.store_id = #{storeId}
 	</select>
 
 	<select id="findStoreByMemberId" resultType="store">
@@ -105,13 +112,16 @@
 
 	<update id="addReduceCarbon">
 		UPDATE member_tbl
-		SET total_carbon_reduce = NVL(total_carbon_reduce, 0) + (
+		SET total_carbon_reduce =
+		NVL(total_carbon_reduce, 0) + (
 		SELECT NVL(get_point, 0) / 1000
-		FROM order_tbl
+		FROM
+		order_tbl
 		WHERE order_id = #{orderId}
 		)
 		WHERE member_id = (
-		SELECT member_id
+		SELECT
+		member_id
 		FROM order_tbl
 		WHERE order_id = #{orderId}
 		)
@@ -460,32 +470,42 @@
 
 	<select id="selectStoreId" resultType="storeIdResponse">
 		SELECT store_id
-		FROM store_tbl
+		FROM
+		store_tbl
 		WHERE member_id = #{memberId}
 	</select>
 
 	<select id="selectStatsOrderInfo" resultType="statsOrderInfo">
 		SELECT
 		o.DELIVERY_TYPE AS deliveryType,
-		SUM(od.PRICE * od.QUANTITY) AS seriesAmount
-		FROM order_list_map m JOIN order_tbl o ON m.order_id = o.order_id
+		SUM(od.PRICE * od.QUANTITY) AS
+		seriesAmount
+		FROM order_list_map m JOIN order_tbl o ON m.order_id =
+		o.order_id
 
 		JOIN order_detail od ON o.order_id = od.order_id
-		WHERE o.store_id = #{storeId}
+		WHERE
+		o.store_id = #{storeId}
 		AND o.order_status = 5
-		AND TO_CHAR(m.reg_date, 'YYYY-MM') = #{yearMonth}
+		AND TO_CHAR(m.reg_date,
+		'YYYY-MM') = #{yearMonth}
 		GROUP BY o.delivery_type
-		ORDER BY o.delivery_type ASC
+		ORDER BY
+		o.delivery_type ASC
 	</select>
-	<select id="selectMonthlySalesByStoreId" parameterType="Integer" resultType="SaleMonth">
-    select
-        to_char(olm.reg_date, 'yyyy-mm') as sale_month,
-        sum(od.price * od.quantity) as total_sales
-    from order_detail od
-    join order_tbl o on od.order_id = o.order_id
-    join order_list_map olm on o.order_id = olm.order_id
-    where o.store_id = #{storeId}
-    group by to_char(olm.reg_date, 'yyyy-mm')
-    order by sale_month
-</select>
+	<select id="selectMonthlySalesByStoreId" parameterType="Integer"
+		resultType="SaleMonth">
+		select
+		to_char(olm.reg_date, 'yyyy-mm') as sale_month,
+		sum(od.price * od.quantity) as total_sales
+		from order_detail od
+		join
+		order_tbl o on od.order_id = o.order_id
+		join order_list_map olm on
+		o.order_id = olm.order_id
+		where o.store_id = #{storeId}
+		group by
+		to_char(olm.reg_date, 'yyyy-mm')
+		order by sale_month
+	</select>
 </mapper>
