@@ -97,7 +97,11 @@ public interface StoreDao {
 
 	int changeOrderStatus(Integer orderId, int status, Integer expectedTime);
 
+
 	Map<String, Object> selectStoreReviewStats(int storeId);
 
 	int insertReviewComment(Map<String, Object> payload);
+
+	Long selectTotalSales(Integer storeId);
+
 }

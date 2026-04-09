@@ -39,7 +39,10 @@ public class StoreService {
 
         for (Store store : list) {
             List<SaleMonth> monthlySalesList = storeDao.selectMonthlySalesByStoreId(store.getStoreId());
+            Long totalSales = storeDao.selectTotalSales(store.getStoreId());
             store.setSaleMonth(monthlySalesList);
+            System.out.println(totalSales);
+            store.setTotalSale(totalSales);
         }
 
         return list;

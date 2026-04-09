@@ -51,6 +51,7 @@ export default function StoreView() {
       .get(`${backHost}/stores/${storeId}/menus`)
       .then((res) => {
         const activeMenus = res.data.filter((item) => item.menuStatus === 1);
+        console.log(res.data);
         setMenuList(activeMenus);
         const uniqueCategories = [
           "전체",
@@ -97,7 +98,6 @@ export default function StoreView() {
     setSelectedMenu(menu);
     setIsModalOpen(true);
   };
-
   return (
     <div className={styles.page_container}>
       {/* 상단: 상점 대표 정보 영역 */}

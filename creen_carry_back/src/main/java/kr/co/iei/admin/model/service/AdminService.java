@@ -33,4 +33,9 @@ public class AdminService {
 		return list;
 	}
 
+	public Long selectTotalSales(int storeId) {
+		Long totalSales = adminDao.selectTotalSales(storeId);
+		return totalSales;
+	}
+
 }

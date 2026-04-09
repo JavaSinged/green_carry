@@ -33,7 +33,9 @@ const OrderPage = () => {
   const isCartEmpty = !cartList || cartList.length === 0;
 
   // 탄소 절감량 계산
-  const totalCarbon = cartList.reduce((sum, item) => sum + item.carbonSaved, 0);
+  const totalCarbon = Math.floor(
+    cartList.reduce((sum, item) => sum + item.totalCarbon, 0),
+  );
 
   useEffect(() => {
     setNum(deliveryType === 1 ? 0 : deliveryType === 2 ? 1000 : 3000);

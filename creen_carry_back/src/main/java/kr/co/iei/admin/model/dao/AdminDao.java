@@ -16,4 +16,6 @@ public interface AdminDao {
 	List<OrderListByStoreId> selectOrdersByStoreId(int storeId);
 
 	List<Menu> selectMenuListByOrderId(Long orderId);
+
+	Long selectTotalSales(int storeId);
 }
