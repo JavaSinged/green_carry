@@ -4,6 +4,8 @@ import styles from "./UserOrderList.module.css";
 import ReviewModal from "../../../components/layout/ReviewModal";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 
 const UserOrderListPage = () => {
   const backHost = import.meta.env.VITE_BACKSERVER;
@@ -22,9 +24,73 @@ const UserOrderListPage = () => {
     .toISOString()
     .split("T")[0];
 
-  // 🌟 [추가] 페이지네이션 상태
+  // 검색어 상태 (요청하신 로직에 포함되어 있어 추가)
+  const [searchKeyword, setSearchKeyword] = useState("");
+
+  // 🌟 [페이지네이션 상태 및 로직 시작] ---------------------------------------
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5; // 한 페이지에 보여줄 주문 개수 (원하는 대로 수정 가능)
+  const itemsPerPage = 6;
+  const [pageGroup, setPageGroup] = useState(0);
+  const pageLimit = 5;
+
+  // 1. 필터링 로직 (날짜 필터 + 매장명 검색 통합)
+  const filteredList = useMemo(() => {
+    let filtered = [...orderList];
+
+    // 날짜 필터
+    if (startDate) {
+      filtered = filtered.filter(
+        (order) => new Date(order.orderDate) >= new Date(startDate),
+      );
+    }
+    if (endDate) {
+      const end = new Date(endDate);
+      end.setHours(23, 59, 59, 999);
+      filtered = filtered.filter((order) => new Date(order.orderDate) <= end);
+    }
+    // 매장명 검색 필터
+    if (searchKeyword) {
+      filtered = filtered.filter((item) =>
+        item.storeName?.toLowerCase().includes(searchKeyword.toLowerCase()),
+      );
+    }
+    return filtered;
+  }, [orderList, startDate, endDate, searchKeyword]);
+
+  const totalPages = Math.ceil(filteredList.length / itemsPerPage);
+
+  // 2. 정렬 로직 (기본은 최신순)
+  const sortedList = useMemo(() => {
+    return [...filteredList].sort(
+      (a, b) =>
+        new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime(),
+    );
+  }, [filteredList]);
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+
+  // 현재 페이지 아이템
+  const currentOrders = sortedList.slice(indexOfFirstItem, indexOfLastItem);
+
+  const startPage = Math.floor((currentPage - 1) / pageLimit) * pageLimit + 1;
+  const endPage = Math.min(startPage + pageLimit - 1, totalPages);
+
+  // 페이지 이동 핸들러
+  const handlePrevGroup = () => {
+    if (pageGroup > 0) {
+      setPageGroup(pageGroup - 1);
+      setCurrentPage((pageGroup - 1) * pageLimit + 1);
+    }
+  };
+  const handleNextGroup = () => {
+    const maxGroup = Math.floor((totalPages - 1) / pageLimit);
+    if (pageGroup < maxGroup) {
+      setPageGroup(pageGroup + 1);
+      setCurrentPage((pageGroup + 1) * pageLimit + 1);
+    }
+  };
+  // ----------------------------------------------------------- [로직 끝]
 
   const fetchOrders = () => {
     if (!memberId) return;
@@ -41,24 +107,21 @@ const UserOrderListPage = () => {
 
   useEffect(() => {
     fetchOrders();
-
     const intervalId = setInterval(() => {
       fetchOrders();
     }, 5000);
-
-    return () => {
-      clearInterval(intervalId);
-    };
+    return () => clearInterval(intervalId);
   }, [memberId]);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [currentPage]);
 
-  // 🌟 [추가] 필터 날짜가 변경되면 무조건 1페이지로 이동
+  // 필터 변경 시 1페이지로
   useEffect(() => {
     setCurrentPage(1);
-  }, [startDate, endDate]);
+    setPageGroup(0);
+  }, [startDate, endDate, searchKeyword]);
 
   const cancelOrder = (orderId) => {
     Swal.fire({
@@ -74,9 +137,7 @@ const UserOrderListPage = () => {
         axios
           .patch(
             `${import.meta.env.VITE_BACKSERVER}/stores/order/${orderId}/status`,
-            {
-              status: 9,
-            },
+            { status: 9 },
           )
           .then(() => {
             Swal.fire(
@@ -94,39 +155,11 @@ const UserOrderListPage = () => {
     });
   };
 
-  const filteredAndSortedOrders = useMemo(() => {
-    let filtered = [...orderList];
-
-    if (startDate) {
-      filtered = filtered.filter(
-        (order) => new Date(order.orderDate) >= new Date(startDate),
-      );
-    }
-
-    if (endDate) {
-      const end = new Date(endDate);
-      end.setHours(23, 59, 59, 999);
-      filtered = filtered.filter((order) => new Date(order.orderDate) <= end);
-    }
-
-    return filtered.sort(
-      (a, b) =>
-        new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime(),
-    );
-  }, [orderList, startDate, endDate]);
-
-  // 🌟 [추가] 현재 페이지에 해당하는 주문들만 잘라내기 로직
-  const totalPages = Math.ceil(filteredAndSortedOrders.length / itemsPerPage);
-  const currentOrders = filteredAndSortedOrders.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage,
-  );
-
   const totalRecentCarbon = useMemo(() => {
-    return filteredAndSortedOrders
+    return filteredList
       .slice(0, 5)
       .reduce((sum, order) => sum + Number(order.getPoint ?? 0), 0);
-  }, [filteredAndSortedOrders]);
+  }, [filteredList]);
 
   const openReviewModal = (order) => {
     setSelectedOrder(order);
@@ -136,13 +169,14 @@ const UserOrderListPage = () => {
   const resetFilter = () => {
     setStartDate("");
     setEndDate("");
-    setCurrentPage(1); // 🌟 [추가] 초기화 시 1페이지로
+    setSearchKeyword("");
+    setCurrentPage(1);
+    setPageGroup(0);
   };
 
   const goToCheckoutPage = (order) => {
     const tossStyleOrderId = `ORDER_${order.orderId}_${new Date().getTime()}`;
     const amount = order.totalPrice || 0;
-
     navigate(`/checkoutPage?orderId=${tossStyleOrderId}&amount=${amount}`);
   };
 
@@ -182,20 +216,17 @@ const UserOrderListPage = () => {
       </div>
 
       <div className={styles.orderListWrap}>
-        {/* 🌟 [수정] filteredAndSortedOrders 대신 currentOrders로 매핑 */}
         {currentOrders.length > 0 ? (
           currentOrders.map((order, index) => {
             const isCompleted = order.orderStatus === 5;
             const isCanceled = order.orderStatus === 9;
             const isNotReviewed = Number(order.reviewStatus) === 0;
             const isAlreadyReviewed = Number(order.reviewStatus) === 1;
-
             const orderDateObj = new Date(order.orderDate);
             const now = new Date();
             const diffDays =
               (now.getTime() - orderDateObj.getTime()) / (1000 * 60 * 60 * 24);
             const isWithin3Days = diffDays <= 3;
-
             const itemKey = order.orderId
               ? `order-${order.orderId}`
               : `idx-${index}`;
@@ -215,7 +246,7 @@ const UserOrderListPage = () => {
                   <div className={styles.leftInfo}>
                     <img
                       src={
-                        order.menuImage
+                        order.storeThumb
                           ? `${backHost}/${order.storeThumb}`
                           : "/img/no-image.png"
                       }
@@ -337,36 +368,43 @@ const UserOrderListPage = () => {
         )}
       </div>
 
-      {/* 🌟 [추가] 페이지네이션 UI (총 페이지가 1보다 클 때만 렌더링) */}
-      {totalPages > 1 && (
-        <div className={styles.pagination}>
-          <button
-            className={styles.pageBtn}
-            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-            disabled={currentPage === 1}
-          >
-            &lt;
-          </button>
+      {/* 페이지네이션 영역*/}
+      <div className={styles.pagination}>
+        <button
+          className={styles.page_btn_nav}
+          onClick={handlePrevGroup}
+          disabled={pageGroup === 0}
+        >
+          <ChevronLeftIcon fontSize="small" />
+          이전
+        </button>
 
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-            <button
-              key={page}
-              className={`${styles.pageBtn} ${currentPage === page ? styles.activePage : ""}`}
-              onClick={() => setCurrentPage(page)}
+        <div className={styles.page_numbers}>
+          {Array.from(
+            { length: endPage - startPage + 1 },
+            (_, i) => startPage + i,
+          ).map((num) => (
+            <div
+              key={num}
+              className={`${styles.page_num} ${
+                currentPage === num ? styles.active : ""
+              }`}
+              onClick={() => setCurrentPage(num)}
             >
-              {page}
-            </button>
+              {num}
+            </div>
           ))}
-
-          <button
-            className={styles.pageBtn}
-            onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-            disabled={currentPage === totalPages}
-          >
-            &gt;
-          </button>
         </div>
-      )}
+
+        <button
+          className={styles.page_btn_nav}
+          onClick={handleNextGroup}
+          disabled={endPage === totalPages || totalPages === 0}
+        >
+          다음
+          <ChevronRightIcon fontSize="small" />
+        </button>
+      </div>
 
       {isModalOpen && selectedOrder && (
         <ReviewModal
@@ -381,6 +419,7 @@ const UserOrderListPage = () => {
 
 export default UserOrderListPage;
 
+// 보조 함수들
 const getOrderStatusText = (status, deliveryType) => {
   const isPickup = deliveryType === 1;
   const statusMap = {
@@ -398,13 +437,10 @@ const getOrderStatusText = (status, deliveryType) => {
 const formatDate = (dateString) => {
   if (!dateString) return "";
   const date = new Date(dateString);
-
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, "0");
   const day = String(date.getDate()).padStart(2, "0");
-
   const hours = String(date.getHours()).padStart(2, "0");
   const minutes = String(date.getMinutes()).padStart(2, "0");
-
   return `${year}-${month}-${day} ${hours}:${minutes}`;
 };

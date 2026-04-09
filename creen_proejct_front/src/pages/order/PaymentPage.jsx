@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import styles from "./PaymentPage.module.css";
 import RoomIcon from "@mui/icons-material/Room";
 import ChatBubbleIcon from "@mui/icons-material/ChatBubble";
@@ -7,8 +7,48 @@ import { useNavigate } from "react-router-dom";
 import useCartStore from "../../store/useCartStore";
 import axios from "axios";
 import { loadTossPayments } from "@tosspayments/tosspayments-sdk";
+import { AuthContext } from "../../context/AuthContext";
 
 const PaymentPage = () => {
+  //user 가져오기
+  const { user } = useContext(AuthContext);
+  const [userInfo, setUserInfo] = useState({
+    memberPhone: "",
+    memberAddrCode: "",
+    memberAddr: "",
+    memberDetailAddr: "",
+  });
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    const fetchUserInfo = async () => {
+      if (!user?.memberId) {
+        return;
+      }
+      try {
+        const response = await axios.get(
+          `${import.meta.env.VITE_BACKSERVER}/member/getMemberInfo`,
+          {
+            params: { memberId: user.memberId },
+          },
+        );
+        if (response.data) {
+          const { memberPhone, memberAddr, memberDetailAddr, memberAddrCode } =
+            response.data;
+          setUserInfo({
+            memberPhone,
+            memberAddr,
+            memberDetailAddr,
+            memberAddrCode: memberAddrCode,
+          });
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchUserInfo();
+  }, [user?.memberId]);
+
   const { superTotalPrice, deliveryPrice, setUsingEcoPoint } = useCartStore();
   const navigate = useNavigate();
 
@@ -139,7 +179,11 @@ const PaymentPage = () => {
                 </div>
                 <button
                   className={styles["text-btn"]}
-                  onClick={() => navigate("/changeAddr")}
+                  onClick={() =>
+                    navigate("/mypage/user/profile", {
+                      state: { openAddress: true },
+                    })
+                  }
                 >
                   주소 변경
                 </button>
@@ -148,13 +192,13 @@ const PaymentPage = () => {
                 <label>배송 주소</label>
                 <input
                   type="text"
-                  value="서울시 종로구 대왕빌딩 301"
+                  value={userInfo.memberAddr + " " + userInfo.memberDetailAddr}
                   readOnly
                 />
               </div>
               <div className={styles["form-group"]}>
                 <label>연락처</label>
-                <input type="text" value="010-0000-0000" readOnly />
+                <input type="text" value={userInfo.memberPhone} readOnly />
               </div>
             </div>
 

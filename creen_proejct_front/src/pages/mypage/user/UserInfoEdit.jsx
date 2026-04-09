@@ -3,7 +3,7 @@ import { AuthContext } from "../../../context/AuthContext";
 import api from "../../../utils/accessToken";
 import styles from "./UserInfoEdit.module.css";
 import Swal from "sweetalert2";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useDaumPostcodePopup } from "react-daum-postcode";
 
 // MUI Icons
@@ -60,6 +60,21 @@ export default function UserInfoEdit() {
     memberAddr: "",
     memberDetailAddr: "",
   });
+
+  //paymantPage에서 진입시 아코디언 열기
+  const location = useLocation();
+  const addressSectionRef = useRef(null);
+  useEffect(() => {
+    if (location.state?.openAddress) {
+      setopenAddSet(true);
+      setTimeout(() => {
+        addressSectionRef.current?.scrollIntoView({
+          behavior: "smooth",
+          block: "center", // 화면의 중앙에 오도록 설정
+        });
+      }, 300);
+    }
+  }, [location]);
 
   useEffect(() => {
     if (user && user.memberId) {
@@ -297,6 +312,16 @@ export default function UserInfoEdit() {
           memberDetailAddr: "",
         });
         setopenAddSet(false);
+        if (location.state?.openAddress) {
+          navigate("/paymentPage", { replace: true });
+        } else {
+          setNewAddress({
+            memberAddrCode: "",
+            memberAddr: "",
+            memberDetailAddr: "",
+          });
+          setopenAddSet(false);
+        }
       }
     } catch (error) {
       console.error("주소 업데이트 에러:", error);
@@ -514,7 +539,7 @@ export default function UserInfoEdit() {
         </div>
 
         {/* 주소지 변경 */}
-        <div className={styles.Wrapper}>
+        <div className={styles.Wrapper} ref={addressSectionRef}>
           <div className={styles.addSet} onClick={toggleAddSet}>
             <p>주소지 변경</p>
             <div className={styles.add_icon}>
