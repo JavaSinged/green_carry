@@ -70,7 +70,8 @@
 		SELECT o.option_no,
 		o.option_type,
 		o.option_name,
-		o.option_price
+		o.option_price,
+		o.option_carbon
 		FROM OPTION_TBL o
 		JOIN MENU_OPTION_MAP mom ON o.option_no
 		= mom.option_no

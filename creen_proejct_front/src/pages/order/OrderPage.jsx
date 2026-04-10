@@ -17,6 +17,7 @@ const OrderPage = () => {
 
   // 🌟 Zustand 스토어 데이터 추출
   const cartList = useCartStore((state) => state.cart);
+  const clear = useCartStore((state) => state.clearCart);
   const storeId = useCartStore((state) => state.storeId);
   const storeName = useCartStore((state) => state.storeName);
   const setSuperTotalPrice = useCartStore((state) => state.setSuperTotalPrice);
@@ -79,10 +80,7 @@ const OrderPage = () => {
                   >
                     <u>{storeName}</u> <NavigateNextIcon />
                   </h2>
-                  <CloseIcon
-                    style={{ cursor: "pointer" }}
-                    onClick={() => navigate(`/storeView/${storeId}`)}
-                  />
+                  <CloseIcon style={{ cursor: "pointer" }} onClick={clear} />
                 </div>
                 {/* 메뉴 리스트 영역 */}
                 <MenuList

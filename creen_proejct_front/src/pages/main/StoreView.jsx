@@ -51,7 +51,6 @@ export default function StoreView() {
       .get(`${backHost}/stores/${storeId}/menus`)
       .then((res) => {
         const activeMenus = res.data.filter((item) => item.menuStatus === 1);
-        console.log(res.data);
         setMenuList(activeMenus);
         const uniqueCategories = [
           "전체",

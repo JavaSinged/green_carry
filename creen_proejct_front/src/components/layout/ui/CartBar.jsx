@@ -14,7 +14,6 @@ export default function CartBar() {
     0,
   );
   const navigate = useNavigate();
-  console.log(cart);
   if (cart.length === 0) return null;
   return (
     <div className={styles.cart_container}>

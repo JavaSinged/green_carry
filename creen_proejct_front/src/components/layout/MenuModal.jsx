@@ -59,9 +59,7 @@ export default function MenuModal({
   // 탄소 계산
   const menuCarbon = Number(menuData?.menuCarbon || 0) * 1000;
   const baseCarbon = menuCarbon - menuCarbon * optionCarbonRateSum;
-  const reusableAppliedCarbon = reusable
-    ? baseCarbon + baseCarbon * 0.5
-    : baseCarbon;
+  const reusableAppliedCarbon = reusable ? baseCarbon * 0.5 : 0;
   const totalCarbon = reusableAppliedCarbon * quantity + selectedEcoCount * 20;
   const optionCarbon = Number(selectedEcoCount * 20);
 
@@ -329,7 +327,7 @@ export default function MenuModal({
               <span>🍃 다회용 용기 사용</span>
               <span className={styles.badge}>+에코 포인트</span>
             </div>
-            <p>탄소 배출량 15g 감소</p>
+            <p>용기 탄소 배출량 50% 감소</p>
           </div>
           <label className={styles.toggle_switch}>
             <input
