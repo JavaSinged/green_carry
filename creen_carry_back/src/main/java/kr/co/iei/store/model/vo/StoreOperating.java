@@ -16,4 +16,5 @@ public class StoreOperating {
     private String openTime;
     private String closeTime;
     private String isDayOff;
+    private int weekOfMonth;
 }

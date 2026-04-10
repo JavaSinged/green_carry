@@ -66,7 +66,7 @@
             = mom.option_no
         WHERE mom.menu_id = #{menuId}
         ORDER BY o.option_type
-                ASC, o.option_no ASC
+            ASC, o.option_no ASC
     </select>
 
     <insert id="insertOrder" parameterType="order">
@@ -458,8 +458,8 @@
         ORDER BY DECODE(day_of_week, 'MON', 1, 'TUE', 2, 'WED', 3, 'THU', 4, 'FRI', 5, 'SAT', 6, 'SUN', 7)
     </select>
 
-<!--	가게 정보 수정    -->
-    <update id="updateStore" parameterType="StoreSaveRequest">
+    <!--	가게 정보 수정    -->
+    <update id="updateStore" parameterType="storeSaveRequest">
         UPDATE STORE_TBL
         SET STORE_NAME        = #{storeName},
             STORE_INTRO       = #{storeIntro},
@@ -471,13 +471,13 @@
         WHERE STORE_ID = #{storeId}
     </update>
 
-    <delete id="deleteOperatingHours" parameterType="int">
+    <delete id="deleteOperatingHours" parameterType="java.lang.Integer">
         DELETE
         FROM OPERATING_HOURS_TBL
         WHERE STORE_ID = #{storeId}
     </delete>
 
-    <insert id="insertOperatingHours" parameterType="OperatingHours">
+    <insert id="insertOperatingHours" parameterType="operatingHours">
         INSERT INTO OPERATING_HOURS_TBL (STORE_ID,
                                          DAY_OF_WEEK,
                                          OPEN_TIME,
@@ -486,8 +486,8 @@
                                          WEEK_OF_MONTH)
         VALUES (#{storeId},
                 #{dayOfWeek},
-                #{openTime, jdbcType=VARCHAR},
-                #{closeTime, jdbcType=VARCHAR},
+                #{openTime},
+                #{closeTime},
                 #{isDayOff},
                 #{weekOfMonth})
     </insert>
