@@ -552,4 +552,10 @@
     ORDER BY DECODE(day_of_week, 'MON', 1, 'TUE', 2, 'WED', 3, 'THU', 4, 'FRI', 5, 'SAT', 6, 'SUN', 7)
 </select>
 
+	<select id="getMemberIdByOrderId" resultType="string">
+		SELECT member_id
+		FROM order_tbl
+		WHERE order_id = #{orderId}
+	</select>
+
 </mapper>

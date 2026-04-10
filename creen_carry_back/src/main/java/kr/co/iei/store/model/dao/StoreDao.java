@@ -106,4 +106,7 @@ public interface StoreDao {
 	Long selectTotalSales(Integer storeId);
 
 	List<StoreOperating> getStoreOperatingHours(Integer storeId);
+	
+	String getMemberIdByOrderId(Integer orderId);
+
 }

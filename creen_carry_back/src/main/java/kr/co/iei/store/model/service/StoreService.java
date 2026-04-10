@@ -199,4 +199,9 @@ public class StoreService {
 
 		return storeDao.getStoreOperatingHours(storeId);
 	}
+
+	public String getMemberIdByOrderId(Integer orderId) {
+	    
+	    return storeDao.getMemberIdByOrderId(orderId);
+	}
 }

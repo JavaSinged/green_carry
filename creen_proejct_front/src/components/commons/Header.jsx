@@ -3,6 +3,7 @@ import axios from "axios";
 import styles from "./Header.module.css";
 import Swal from "sweetalert2";
 import AccountCircleSharpIcon from "@mui/icons-material/AccountCircleSharp";
+import HeaderNotification from "./HeaderNotification";
 
 // Icons
 import ParkIcon from "@mui/icons-material/Park";
@@ -143,8 +144,8 @@ export default function Header() {
               </div>
             )}
 
-            <NotificationsNoneIcon style={{ cursor: "pointer" }} />
-
+            {/* 1. 실시간 알림 아이콘  */}
+            {isLogin && <HeaderNotification />}
             <div
               onClick={handleMyPageClick}
               style={{
