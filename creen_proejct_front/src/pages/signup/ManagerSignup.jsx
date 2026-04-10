@@ -27,16 +27,21 @@ const ManagerSignup = () => {
     memberName: "",
     memberPhone: "",
     memberEmail: "",
-    storeOwnerNo: "",
+    //storeName: "",
+    //storeOwnerNo: "",
+    //openingDate: "",
+  });
+  const [store, setStore] = useState({
     storeName: "",
-    openingDate: "",
+    memberId: "",
+    storeOwner: "",
   });
   const [memberPwRe, setMemberPwRe] = useState("");
 
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [checkId, setCheckId] = useState(0);
   const [mailAuth, setMailAuth] = useState(0);
-  const [checkStoreOwnerNo, setCheckStoreOwnerNo] = useState(0);
+  //const [checkStoreOwnerNo, setCheckStoreOwnerNo] = useState(0);
   const [mailAuthCode, setMailAuthCode] = useState(null);
   const [mailAuthInput, setMailAuthInput] = useState("");
   const [time, setTime] = useState(180);
@@ -50,6 +55,7 @@ const ManagerSignup = () => {
 
   const inputMember = (e) => {
     const { name, value } = e.target;
+
     // 1. 휴대폰 번호 자동 하이픈
     if (name === "memberPhone") {
       const onlyNums = value.replace(/[^0-9]/g, "");
@@ -59,11 +65,33 @@ const ManagerSignup = () => {
         formattedPhone = `${onlyNums.slice(0, 3)}-${onlyNums.slice(3)}`;
       else
         formattedPhone = `${onlyNums.slice(0, 3)}-${onlyNums.slice(3, 7)}-${onlyNums.slice(7, 11)}`;
-      setMember({ ...member, [name]: formattedPhone });
+
+      setMember({ ...member, memberPhone: formattedPhone });
       return;
     }
 
+    // 2. 데이터 분배 로직
+    if (name === "memberId") {
+      // memberId는 양쪽 다 업데이트
+      setMember((prev) => ({ ...prev, memberId: value }));
+      setStore((prev) => ({ ...prev, memberId: value }));
+      setCheckId(0);
+    } else if (name === "memberName") {
+      // memberName이 들어오면 member에는 성명으로, store에는 대표자명으로 저장
+      setMember((prev) => ({ ...prev, memberName: value }));
+      setStore((prev) => ({ ...prev, storeOwner: value }));
+    } else if (name === "storeName") {
+      // 상호명은 store 상태에만 저장
+      setStore((prev) => ({ ...prev, storeName: value }));
+    } else {
+      // 나머지(PW, Email 등)는 member 상태에만 저장
+      setMember((prev) => ({ ...prev, [name]: value }));
+    }
+
+    if (name === "memberEmail") setMailAuth(0);
+
     // 2. 사업자 번호 자동 하이픈
+    /*
     if (name === "storeOwnerNo") {
       const onlyNums = value.replace(/[^0-9]/g, "");
       let formattedStoreNo = "";
@@ -76,12 +104,8 @@ const ManagerSignup = () => {
       setCheckStoreOwnerNo(0);
       return;
     }
-
-    setMember({ ...member, [name]: value });
-    if (name === "memberId") setCheckId(0);
-    if (name === "memberEmail") setMailAuth(0);
+    */
   };
-
   const handleIdCheck = () => {
     if (!idRegex.test(member.memberId)) {
       Swal.fire({ icon: "warning", text: "아이디 형식을 먼저 맞춰주세요." });
@@ -190,7 +214,7 @@ const ManagerSignup = () => {
     const sec = String(time % 60).padStart(2, "0");
     return `${min}:${sec}`;
   };
-
+  /*
   const handleStoreOwnerNoCheck = () => {
     if (member.storeOwnerNo.length < 12) {
       Swal.fire({
@@ -222,6 +246,7 @@ const ManagerSignup = () => {
         });
       });
   };
+*/
 
   const getIdMessage = () => {
     if (!member.memberId)
@@ -277,6 +302,7 @@ const ManagerSignup = () => {
       return { text: "이메일 인증이 완료되었습니다.", isError: false };
     return { text: "\u00A0", isError: false };
   };
+  /*
   const getStoreOwnerNoMessage = () => {
     if (!member.storeOwnerNo.trim())
       return {
@@ -289,6 +315,7 @@ const ManagerSignup = () => {
       return { text: "사업자번호 중복 확인을 눌러주세요.", isError: true };
     return { text: "가입 가능한 사업자 번호입니다.", isError: false };
   };
+  */
   const getPhoneMessage = () => {
     if (!member.memberPhone.trim())
       return {
@@ -300,7 +327,7 @@ const ManagerSignup = () => {
     return { text: "\u00A0", isError: false };
   };
   const getStoreNameMessage = () => {
-    if (!member.storeName.trim())
+    if (!store.storeName.trim())
       return {
         text: isSubmitted ? "상호명을 입력하세요." : "\u00A0",
         isError: isSubmitted,
@@ -315,6 +342,7 @@ const ManagerSignup = () => {
       };
     return { text: "\u00A0", isError: false };
   };
+  /*
   const getOpeningDateMessage = () => {
     if (!member.openingDate.trim())
       return {
@@ -323,17 +351,18 @@ const ManagerSignup = () => {
       };
     return { text: "\u00A0", isError: false };
   };
-
+  */
   const idStatus = getIdMessage();
   const pwStatus = getPwMessage();
   const pwReStatus = getPwReMessage();
   const emailStatus = getEmailMessage();
-  const storeOwnerNoStatus = getStoreOwnerNoMessage();
   const storeNameStatus = getStoreNameMessage();
   const memberNameStatus = getMemberNameMessage();
   const phoneStatus = getPhoneMessage();
+  /*
   const openingDateStatus = getOpeningDateMessage();
-
+  const storeOwnerNoStatus = getStoreOwnerNoMessage();
+  */
   const joinSubmit = (e) => {
     e.preventDefault();
     setIsSubmitted(true);
@@ -343,10 +372,10 @@ const ManagerSignup = () => {
       !memberPwRe ||
       !member.memberEmail ||
       !member.memberPhone.trim() ||
-      !member.storeOwnerNo.trim() ||
-      !member.storeName.trim() ||
-      !member.memberName.trim() ||
-      !member.openingDate.trim();
+      !store.storeName.trim() ||
+      !member.memberName.trim();
+    //!member.storeOwnerNo.trim() ||
+    //!member.openingDate.trim();
     if (
       hasEmpty ||
       idStatus.isError ||
@@ -354,10 +383,10 @@ const ManagerSignup = () => {
       pwReStatus.isError ||
       emailStatus.isError ||
       phoneStatus.isError ||
-      storeOwnerNoStatus.isError ||
       storeNameStatus.isError ||
-      memberNameStatus.isError ||
-      openingDateStatus.isError
+      memberNameStatus.isError
+      //storeOwnerNoStatus.isError ||
+      //openingDateStatus.isError
     ) {
       Swal.fire({
         icon: "warning",
@@ -365,7 +394,11 @@ const ManagerSignup = () => {
       });
       return;
     }
-    const submitData = { ...member, memberGrade: 2 };
+    const submitData = {
+      ...member,
+      ...store,
+      memberGrade: 2,
+    };
     axios
       .post(
         `${import.meta.env.VITE_BACKSERVER}/member/signupManager`,
@@ -387,6 +420,7 @@ const ManagerSignup = () => {
       });
   };
 
+  /*
   const [showCalendar, setShowCalendar] = useState(false);
   const handleDateChange = (date) => {
     const year = date.getFullYear();
@@ -395,7 +429,7 @@ const ManagerSignup = () => {
     setMember({ ...member, openingDate: `${year}-${month}-${day}` });
     setShowCalendar(false);
   };
-
+*/
   return (
     <div
       className="signup-screen-container"
@@ -593,7 +627,8 @@ const ManagerSignup = () => {
               </div>
             </div>
 
-            {/* 사업자 번호 */}
+            {/* 
+            사업자 번호 
             <div className="signup-field-group">
               <label className="signup-label">사업자 번호</label>
               <div className="signup-input-area">
@@ -623,6 +658,7 @@ const ManagerSignup = () => {
                 </p>
               </div>
             </div>
+            */}
 
             {/* 상호명 */}
             <div className="signup-field-group">
@@ -631,7 +667,7 @@ const ManagerSignup = () => {
                 <input
                   type="text"
                   name="storeName"
-                  value={member.storeName}
+                  value={store.storeName}
                   onChange={inputMember}
                   className="signup-input-underline"
                   placeholder="상호명을 입력하세요"
@@ -664,7 +700,8 @@ const ManagerSignup = () => {
               </div>
             </div>
 
-            {/* 🌟 개업일자 (달력이 폼을 깨지 않도록 position 설정) */}
+            {/*
+             🌟 개업일자 (달력이 폼을 깨지 않도록 position 설정) 
             <div className="signup-field-group">
               <label className="signup-label">개업일자</label>
               <div className="signup-input-area">
@@ -696,7 +733,7 @@ const ManagerSignup = () => {
                     }}
                   />
 
-                  {/* 달력 팝업 */}
+                  
                   {showCalendar && (
                     <div
                       style={{
@@ -732,6 +769,7 @@ const ManagerSignup = () => {
                 </p>
               </div>
             </div>
+            */}
 
             {/* 가입 버튼 */}
             <button type="submit" className="signup-btn">

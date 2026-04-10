@@ -25,6 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 import kr.co.iei.member.model.vo.Member;
 import kr.co.iei.member.model.vo.PointHistory;
 import kr.co.iei.member.model.vo.Review;
+import kr.co.iei.store.model.dao.StoreDao;
 import kr.co.iei.utils.EmailSender;
 import kr.co.iei.utils.JwtUtil;
 import kr.co.iei.member.model.service.MemberService;
@@ -46,6 +47,8 @@ public class MemberController {
     @Autowired
     private JwtUtil jwtUtil;
 
+    @Autowired
+    private StoreDao storeDao;
 
     MemberController(BCryptPasswordEncoder passwordEncoder, EmailSender emailSender) {
         this.passwordEncoder = passwordEncoder;
@@ -262,12 +265,12 @@ public class MemberController {
 
     //사업자 회원가입
     @PostMapping("/signupManager")
-    public ResponseEntity<?> signupManager(@RequestBody Member member) {
+    public ResponseEntity<?> signupManager(@RequestBody Map<String, Object> data) {
 
-        int result = memberService.insertManager(member);
+        int result = memberService.insertManager(data);
 
         if (result > 0) {
-            return ResponseEntity.ok(result);
+            return ResponseEntity.ok("서압자 가입성공");
         } else {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }

@@ -603,4 +603,12 @@
 		update order_tbl set point_reward = 1 where order_id
 		= #{orderId}
 	</update>
+	<insert id="insertStore" parameterType="map">
+		INSERT INTO STORE_TBL (
+		STORE_ID, MEMBER_ID, STORE_NAME, STORE_OWNER ) VALUES (
+		STORE_SEQ.NEXTVAL, #{memberId},
+		#{storeName},
+		#{storeOwner}
+		)
+	</insert>
 </mapper>

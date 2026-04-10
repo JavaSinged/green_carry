@@ -19,7 +19,6 @@ public interface StoreDao {
 
     int insertOrder(Order order);
 
-
     int insertOrderHistory(@Param("orderId") int orderId, @Param("memberId") String memberId);
 
     OrderResponse searchOrderInfo(Integer orderId);
@@ -30,13 +29,9 @@ public interface StoreDao {
 
     List<OrderResponse> searchOrderList(String memberId);
 
-    int insertOrderDetail(
-            @Param("orderItem") OrderItem orderItem,
-            @Param("orderId") int orderId
-    );
+	int insertOrderDetail(@Param("orderItem") OrderItem orderItem, @Param("orderId") int orderId);
 
-    int getTotalCarbonPoint(String memberId);
-
+	int getTotalCarbonPoint(String memberId);
 
     int cancelOrder(Integer orderId);
 
@@ -44,18 +39,17 @@ public interface StoreDao {
 
     int[] selectOrderList(String memberId);
 
-
 	int updatePoint(Integer orderId);
 
     int addReduceCarbon(int orderId);
 
     int updateOrderStatus(Integer orderId);
 
-    Store findStoreByMemberId(String memberId);
+	Store findStoreByMemberId(String memberId);
 
-    String getMenuImageById(int menuId);
+	String getMenuImageById(int menuId);
 
-    StoreIdResponse selectStoreId(String memberId);
+	StoreIdResponse selectStoreId(String memberId);
 
     List<StatsOrderInfo> selectStatsOrderInfo(Integer storeId, String yearMonth);
 
@@ -85,7 +79,7 @@ public interface StoreDao {
 	Long selectTotalSales(Integer storeId);
 
 	List<StoreOperating> getStoreOperatingHours(Integer storeId);
-	
+
 	String getMemberIdByOrderId(Integer orderId);
 
 	int rollbackPoint(Integer orderId);

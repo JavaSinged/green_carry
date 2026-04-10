@@ -19,6 +19,7 @@ import kr.co.iei.member.model.dao.MemberDao;
 import kr.co.iei.member.model.vo.Member;
 import kr.co.iei.member.model.vo.PointHistory;
 import kr.co.iei.member.model.vo.Review;
+import kr.co.iei.store.model.dao.StoreDao;
 import kr.co.iei.utils.EmailSender;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
@@ -33,6 +34,9 @@ public class MemberService {
 
     @Autowired
     private EmailSender emailSender;
+    
+    @Autowired
+    private StoreDao storeDao;
 
     public Member loginMember(Member member) {
         // 1. 아이디 + 등급으로 DB 조회
@@ -183,19 +187,25 @@ public class MemberService {
 		return result;
 	}
 
-    @Transactional
-    public int insertManager(Member member) {
-        String memberPw = member.getMemberPw();
-        System.out.println(memberPw);
-        String encPw = passwordEncoder.encode(memberPw);
-        System.out.println(encPw);
-        member.setMemberPw(encPw);
-        int result = memberDao.insertManager(member);
-        System.out.println(member);
+	@Transactional
+	public int insertManager(Map<String, Object> data) {
+	    // 1. 비밀번호 암호화 (Map에서 꺼내서 다시 덮어쓰기)
+	    String memberPw = (String) data.get("memberPw");
+	    String encPw = passwordEncoder.encode(memberPw);
+	    data.put("memberPw", encPw); // 암호화된 비번으로 교체
 
+	    // 2. 회원 테이블(member_tbl) insert
+	    // 주의: mapper에서 #{memberId}, #{memberPw} 등 key값으로 매칭됩니다.
+	    int memberResult = memberDao.insertManager(data);
 
-        return result;
-    }
+	    // 3. 매장 테이블(store_tbl) insert
+	    // 리액트에서 보낸 storeName, storeOwner가 data에 들어있음!
+	    int storeResult = storeDao.insertStore(data);
+
+	    // 4. 둘 다 성공해야 가입 성공(1) 아니면 실패(0)
+	    // 한 곳이라도 에러 나면 @Transactional 덕분에 전체 롤백됩니다.
+	    return (memberResult > 0 && storeResult > 0) ? 1 : 0;
+	}
 
     public Member storeDupCheck(String storeOwnerNo) {
         Member member = memberDao.storeDupCheck(storeOwnerNo);
