@@ -1,6 +1,7 @@
 package kr.co.iei.member.model.dao;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -33,7 +34,7 @@ public interface MemberDao {
 
 	int insertUser(Member member);
 
-	int insertManager(Member member);
+	int insertManager(Map<String, Object> data);
 
 	Member storeDupCheck(String storeOwnerNo);
 

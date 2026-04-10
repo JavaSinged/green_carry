@@ -164,10 +164,9 @@ public class StoreController {
 		int result = storeService.insertReviewComment(payload);
 
 		if (result > 0) {
-			String customerId= storeService.getMemberIdByOrderId(Integer.parseInt(payload.get("orderId").toString())); 
-			
+			String customerId = storeService.getMemberIdByOrderId(Integer.parseInt(payload.get("orderId").toString()));
 
-			String message = "작성하신 리뷰에 답글이 달렸습니다."; 
+			String message = "작성하신 리뷰에 답글이 달렸습니다.";
 			String navUrl = "/mypage/user/reviews";
 			notificationService.sendNotification(customerId, "orderUpdate", message, navUrl);
 			return ResponseEntity.ok("답글이 등록되었습니다.");
@@ -196,16 +195,14 @@ public class StoreController {
 			// orderId로 memberId를 직접 조회합니다.
 			// storeService에 getMemberIdByOrderId 메서드를 하나 만드세요.
 			String memberId = storeService.getMemberIdByOrderId(orderId);
-			
+
 			// 1. 현재 시간을 타임스탬프(숫자)로 가져오기
-			long timestamp = System.currentTimeMillis(); 
+			long timestamp = System.currentTimeMillis();
 
 			// 2. 리액트가 원하는 "ORDER_ID_TIMESTAMP" 형식으로 조립
 			// 제공해주신 예시: ORDER_370_1775788200000
-			
-			String navUrl = String.format("/checkoutPage?orderId=ORDER_%d_%d", orderId, timestamp);
 
-			
+			String navUrl = String.format("/checkoutPage?orderId=ORDER_%d_%d", orderId, timestamp);
 
 			// 3. 알림 대상(4, 5, 9번 상태)이면 알림 발송
 			if (memberId != null && (status == 2 || status == 4 || status == 5 || status == 9)) {
@@ -225,20 +222,12 @@ public class StoreController {
 		} else {
 			return ResponseEntity.internalServerError().body("상태 변경 실패");
 		}
-	
-        // 서비스 호출 (상태값과 예상 시간을 넘겨줍니다)
-        int result = storeService.changeOrderStatus(orderId, status, expectedTime);
-        
-        if (result > 0) {
-            return ResponseEntity.ok("상태 변경 성공");
-        } else {
-            return ResponseEntity.internalServerError().body("상태 변경 실패");
-        }
-    }
-    
-    @PatchMapping("/updatePoint/{orderId}")
-    public ResponseEntity<?> updatePoint(@PathVariable Integer orderId){
-    	int result = storeService.updatePoint(orderId);
-    	return ResponseEntity.ok(result);
-    }
+
+	}
+
+	@PatchMapping("/updatePoint/{orderId}")
+	public ResponseEntity<?> updatePoint(@PathVariable Integer orderId) {
+		int result = storeService.updatePoint(orderId);
+		return ResponseEntity.ok(result);
+	}
 }

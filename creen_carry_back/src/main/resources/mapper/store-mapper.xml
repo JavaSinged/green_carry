@@ -555,36 +555,44 @@
 	</select>
 	<update id="rollbackPoint" parameterType="int">
 		UPDATE member_tbl m
-		SET (
+		SET
+		(
 		member_point,
 		total_carbon_reduce
 		) = (
 		SELECT
-		m.member_point + o.used_point - o.get_point,
-		GREATEST(m.total_carbon_reduce - (o.get_point / 1000.0), 0)
+		m.member_point +
+		o.used_point - o.get_point,
+		GREATEST(m.total_carbon_reduce -
+		(o.get_point / 1000.0), 0)
 		FROM order_tbl o
-		WHERE o.member_id = m.member_id
+		WHERE o.member_id =
+		m.member_id
 		AND o.order_id = #{orderId}
 		)
 		WHERE EXISTS (
 		SELECT 1
-		FROM order_tbl o
+		FROM
+		order_tbl o
 		WHERE o.member_id = m.member_id
 		AND o.order_id = #{orderId}
 		)
 	</update>
 
 
-<select id="getStoreOperatingHours" parameterType="int" resultType="operating">
-    SELECT 
-        day_of_week AS dayOfWeek,
-        open_time AS openTime,
-        close_time AS closeTime,
-        is_day_off AS isDayOff
-    FROM operating_hours_tbl
-    WHERE store_id = #{storeId}
-    ORDER BY DECODE(day_of_week, 'MON', 1, 'TUE', 2, 'WED', 3, 'THU', 4, 'FRI', 5, 'SAT', 6, 'SUN', 7)
-</select>
+	<select id="getStoreOperatingHours" parameterType="int"
+		resultType="operating">
+		SELECT
+		day_of_week AS dayOfWeek,
+		open_time AS openTime,
+		close_time AS closeTime,
+		is_day_off AS isDayOff
+		FROM operating_hours_tbl
+		WHERE store_id = #{storeId}
+		ORDER BY DECODE(day_of_week, 'MON', 1,
+		'TUE', 2, 'WED', 3, 'THU', 4, 'FRI',
+		5, 'SAT', 6, 'SUN', 7)
+	</select>
 
 	<select id="getMemberIdByOrderId" resultType="string">
 		SELECT member_id
@@ -598,4 +606,13 @@
 		order_status = 9
 		WHERE order_id = #{orderId}
 	</update>
+
+	<insert id="insertStore" parameterType="map">
+		INSERT INTO STORE_TBL (
+		STORE_ID, MEMBER_ID, STORE_NAME, STORE_OWNER ) VALUES (
+		STORE_SEQ.NEXTVAL, #{memberId},
+		#{storeName},
+		#{storeOwner}
+		)
+	</insert>
 </mapper>
