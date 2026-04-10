@@ -34,7 +34,11 @@ const OrderPage = () => {
 
   // 탄소 절감량 계산
   const totalCarbon = Math.floor(
-    cartList.reduce((sum, item) => sum + item.totalCarbon, 0),
+    cartList.reduce(
+      (sum, item) =>
+        sum + (item.reusableAppliedCarbon * item.quantity + item.optionCarbon),
+      0,
+    ),
   );
 
   useEffect(() => {

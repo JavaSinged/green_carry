@@ -225,5 +225,20 @@ public class StoreController {
 		} else {
 			return ResponseEntity.internalServerError().body("상태 변경 실패");
 		}
-	}
+	
+        // 서비스 호출 (상태값과 예상 시간을 넘겨줍니다)
+        int result = storeService.changeOrderStatus(orderId, status, expectedTime);
+        
+        if (result > 0) {
+            return ResponseEntity.ok("상태 변경 성공");
+        } else {
+            return ResponseEntity.internalServerError().body("상태 변경 실패");
+        }
+    }
+    
+    @PatchMapping("/updatePoint/{orderId}")
+    public ResponseEntity<?> updatePoint(@PathVariable Integer orderId){
+    	int result = storeService.updatePoint(orderId);
+    	return ResponseEntity.ok(result);
+    }
 }
