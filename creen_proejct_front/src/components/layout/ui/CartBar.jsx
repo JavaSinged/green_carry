@@ -35,7 +35,7 @@ export default function CartBar() {
             {totalPrice.toLocaleString()}원 결제하기
           </span>
           <span className={styles.carbon_text}>
-            🌱 탄소 절감 {totalCarbon}g
+            🌱 탄소 절감 {Math.floor(totalCarbon)}g
           </span>
         </div>
 

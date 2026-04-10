@@ -13,12 +13,44 @@ export default function StoreDetail() {
   const mapElement = useRef(null);
   const [mapLoaded, setMapLoaded] = useState(false);
 
+  // 요일 영어 -> 한글 매핑
+  const dayMap = {
+    mon: '월요일',
+    tue: '화요일',
+    wed: '수요일',
+    thu: '목요일',
+    fri: '금요일',
+    sat: '토요일',
+    sun: '일요일',
+  };
+
+  // 주차 숫자 -> 한글 매핑
+  const weekMap = {
+    0: '매주',
+    1: '매월 첫번째',
+    2: '매월 두번째',
+    3: '매월 세번째',
+    4: '매월 네번째',
+  };
+
+  const dayOrder = {
+    mon: 1,
+    tue: 2,
+    wed: 3,
+    thu: 4,
+    fri: 5,
+    sat: 6,
+    sun: 7,
+  };
+
   const [operatingHours, setOperatingHours] = useState([]);
+
   useEffect(() => {
     if (!storeId) return;
 
     // 1. 매장 상세 정보 가져오기 (이름, 주소 등)
-    axios.get(`${import.meta.env.VITE_BACKSERVER}/stores/${storeId}`)
+    axios
+      .get(`${import.meta.env.VITE_BACKSERVER}/stores/${storeId}`)
       .then((res) => {
         console.log('매장 상세 정보:', res.data);
         setStoreInfo(res.data); // 여기에 매장 객체 저장
@@ -30,10 +62,25 @@ export default function StoreDetail() {
       });
 
     // 2. 운영시간/휴무일 리스트 가져오기
-    axios.get(`${import.meta.env.VITE_BACKSERVER}/stores/${storeId}/hours`)
+    axios
+      .get(`${import.meta.env.VITE_BACKSERVER}/stores/${storeId}/hours`)
       .then((res) => {
         console.log('운영시간 리스트:', res.data);
-        setOperatingHours(res.data); // ★ 중요: setStoreInfo가 아니라 setOperatingHours에 저장!
+
+        // 🌟 받아온 배열을 요일 순서대로 정렬
+        const sortedHours = [...res.data].sort((a, b) => {
+          // 만약 weekOfMonth가 0인 기본 영업시간을 우선하고 싶다면 이 로직을 활용하세요
+          if (a.weekOfMonth !== b.weekOfMonth) {
+            return a.weekOfMonth - b.weekOfMonth;
+          }
+          // 요일 순서대로 정렬
+          return (
+            dayOrder[a.dayOfWeek.toLowerCase()] -
+            dayOrder[b.dayOfWeek.toLowerCase()]
+          );
+        });
+
+        setOperatingHours(sortedHours);
       })
       .catch((err) => {
         console.error('운영시간 로딩 실패:', err);
@@ -126,25 +173,40 @@ export default function StoreDetail() {
               <th>운영시간</th>
               <td>
                 {operatingHours
-                  .filter(h => h.isDayOff === "N")
-                  .map(h => (
-                    <div key={h.dayOfWeek}>{h.dayOfWeek} - {h.openTime} ~ {h.closeTime}</div>
+                  .filter((h) => h.isDayOff === 'N')
+                  .map((h) => (
+                    <div key={h.dayOfWeek}>
+                      {/* 요일을 한글로 변환하여 표시 */}
+                      {dayMap[h.dayOfWeek?.toLowerCase()] || h.dayOfWeek} :{' '}
+                      {h.openTime} ~ {h.closeTime}
+                    </div>
                   ))}
               </td>
             </tr>
             <tr>
               <th>휴무일</th>
-              {/*y인 날들 출력*/}
               <td>
                 {(() => {
-                  const dayOffList = operatingHours.filter(h => h.isDayOff === 'Y');
+                  const dayOffList = operatingHours.filter(
+                    (h) => h.isDayOff === 'Y',
+                  );
 
                   if (dayOffList.length > 0) {
-                    return dayOffList.map(h => h.dayOfWeek).join(', ');
+                    return dayOffList
+                      .map((h) => {
+                        const weekPrefix = weekMap[h.weekOfMonth] || '';
+                        const dayText =
+                          dayMap[h.dayOfWeek?.toLowerCase()] || h.dayOfWeek;
+                        return `${weekPrefix} ${dayText}`;
+                      })
+                      .join(', ');
                   }
-                  if (operatingHours.length < 7) {
+
+                  // 운영 데이터가 7개 미만이면 정보 부족으로 판단
+                  if (operatingHours.length < 7 && operatingHours.length > 0) {
                     return '직접 문의';
                   }
+
                   return '연중무휴';
                 })()}
               </td>

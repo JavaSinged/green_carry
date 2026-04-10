@@ -27,22 +27,47 @@ const CheckoutPage = () => {
   const orderId = paymentOrderId ? Number(paymentOrderId.split("_")[1]) : null;
   const [storeName, setStoreName] = useState("");
 
-  // 상태 관리를 위한 State
   const [orderState, setOrderState] = useState(0);
   const [rawOrderStatus, setRawOrderStatus] = useState(0);
   const [orderDate, setOrderDate] = useState("");
-  const [confirmDate, setConfirmDate] = useState(""); // 🌟 [추가] 주문 수락 시각
+  const [confirmDate, setConfirmDate] = useState("");
   const [totalCarbon, setTotalCarbon] = useState(0);
   const [deliveryType, setDeliveryType] = useState(0);
 
-  // 예상 시간(분) 및 카운트다운 텍스트 상태
   const [expectedTime, setExpectedTime] = useState(null);
   const [remainingTimeText, setRemainingTimeText] = useState("시간 계산 중...");
   const [targetArrivalTime, setTargetArrivalTime] = useState("--:--");
+  const isFirst = useRef(true);
+
+  // 🌟 [추가/수정] 포인트 최신화 로직을 함수로 분리 (재사용을 위해)
+  const fetchLatestPoint = async () => {
+    const memberId = localStorage.getItem("memberId");
+    if (!memberId) return;
+
+    try {
+      const res = await axios.get(
+        `${import.meta.env.VITE_BACKSERVER}/member/${memberId}`,
+      );
+      const latestPoint = res.data.memberPoint || 0;
+
+      // 1. 로컬 스토리지 업데이트
+      localStorage.setItem("memberPoint", latestPoint);
+
+      // 2. 전역 컨텍스트 업데이트 (Header 등 즉시 반영)
+      if (user) {
+        setUser({ ...user, memberPoint: latestPoint });
+      }
+
+      // 3. 다른 탭이나 컴포넌트 감지용 이벤트 발생
+      window.dispatchEvent(new Event("storage"));
+      console.log("포인트 동기화 완료:", latestPoint);
+    } catch (err) {
+      console.error("최신 포인트 갱신 실패:", err);
+    }
+  };
 
   const fetchOrderDetails = () => {
     if (!orderId) return;
-
     axios
       .get(`${import.meta.env.VITE_BACKSERVER}/stores/order/${orderId}`)
       .then((res) => {
@@ -56,10 +81,9 @@ const CheckoutPage = () => {
         const status = res.data.orderStatus ?? 0;
         setRawOrderStatus(status);
         setOrderDate(res.data.orderDate);
-        setConfirmDate(res.data.confirmDate); // 🌟 [추가] 서버에서 수락 시각 받아오기
+        setConfirmDate(res.data.confirmDate);
         setTotalCarbon(res.data.totalReduceCarbon);
         setCompleteDate(res.data.completeDate);
-
         setExpectedTime(res.data.expectedTime ?? null);
 
         if (status === 9 || status < 2) {
@@ -77,60 +101,39 @@ const CheckoutPage = () => {
     axios
       .patch(`${import.meta.env.VITE_BACKSERVER}/stores/updatePoint/${orderId}`)
       .then((res) => {
-        console.log(res);
+        console.log("포인트 업데이트 API 호출 성공");
       })
       .catch((err) => {
         console.log(err);
       });
   };
+
   useEffect(() => {
     clearCart();
     fetchOrderDetails();
-    updatePoint(orderId);
-
     const intervalId = setInterval(() => {
       fetchOrderDetails();
     }, 5000);
-
     return () => clearInterval(intervalId);
   }, [orderId]);
 
   useEffect(() => {
-    const fetchLatestPoint = async () => {
-      const memberId = localStorage.getItem("memberId");
-      if (!memberId) return;
+    if (!isFirst.current) return;
+    isFirst.current = false;
+    updatePoint(orderId);
+  }, []);
 
-      try {
-        // 1. 백엔드에서 결제가 모두 반영된 "최신 진짜 포인트"를 가져옵니다.
-        const res = await axios.get(
-          `${import.meta.env.VITE_BACKSERVER}/member/${memberId}`,
-        );
-        const latestPoint = res.data.memberPoint || 0;
-
-        // 2. 로컬 스토리지 업데이트 (새로고침 대비)
-        localStorage.setItem("memberPoint", latestPoint);
-
-        // 3. 전역 컨텍스트 업데이트 (화면 즉시 반영)
-        if (user) {
-          setUser({ ...user, memberPoint: latestPoint });
-        }
-      } catch (err) {
-        console.error("최신 포인트 갱신 실패:", err);
-      }
-    };
-
-    // 페이지가 열리면 즉시 최신 포인트를 동기화!
+  // 페이지 진입 시 포인트 동기화
+  useEffect(() => {
     fetchLatestPoint();
   }, []);
 
-  // 🌟 [핵심 로직] 주문 수락 시각 기준 카운트다운 타이머
   useEffect(() => {
     if (rawOrderStatus === 5 && completeDate) {
-      setTargetArrivalTime(completeDate.split(" ")[1]); // 시:분만 추출
+      setTargetArrivalTime(completeDate.split(" ")[1]);
       setRemainingTimeText("이용해 주셔서 감사합니다!");
       return;
     }
-    // 1. 주문이 수락되지 않았거나(confirmDate 없음), 취소/완료 상태면 타이머 중단
     if (
       !confirmDate ||
       !expectedTime ||
@@ -145,41 +148,34 @@ const CheckoutPage = () => {
       return;
     }
 
-    // 2. 날짜 객체 생성 (SQL 포맷 공백을 'T'로 치환하여 브라우저 호환성 확보)
     const safeConfirmDate = confirmDate.replace(" ", "T");
     const targetDate = new Date(safeConfirmDate);
-
-    // 3. 수락 시각에 사장님이 설정한 예상 시간(분) 더하기
     targetDate.setMinutes(targetDate.getMinutes() + Number(expectedTime));
 
-    // 4. 도착 예정 시각 텍스트 세팅 (HH:MM)
     const h = String(targetDate.getHours()).padStart(2, "0");
     const m = String(targetDate.getMinutes()).padStart(2, "0");
     setTargetArrivalTime(`${h}:${m}`);
 
-    // 5. 1초마다 남은 시간을 계산하는 함수
     const updateTimer = () => {
       const now = new Date();
       const diffMs = targetDate.getTime() - now.getTime();
-
-      // 시간이 다 됐을 때 처리
       if (diffMs <= 0) {
         setRemainingTimeText(
           deliveryType === 1 ? "픽업할 시간이에요! 🏃‍♂️" : "곧 도착합니다! 🛵",
         );
         return;
       }
-
       const diffMins = Math.floor(diffMs / 60000);
       const diffSecs = Math.floor((diffMs % 60000) / 1000);
       setRemainingTimeText(`${diffMins}분 ${diffSecs}초 남음`);
     };
 
-    updateTimer(); // 즉시 실행
+    updateTimer();
     const timerId = setInterval(updateTimer, 1000);
-    return () => clearInterval(timerId); // 컴포넌트 언마운트 시 클리어
+    return () => clearInterval(timerId);
   }, [confirmDate, expectedTime, rawOrderStatus, deliveryType]);
 
+  // 🌟 [수정] 주문 취소 시 포인트 최신화 함수 호출 추가
   const cancelOrder = () => {
     Swal.fire({
       title: "주문 취소",
@@ -196,10 +192,13 @@ const CheckoutPage = () => {
             `${import.meta.env.VITE_BACKSERVER}/stores/order/${orderId}/status`,
             { status: 9 },
           )
-          .then(() => {
+          .then(async () => {
+            // ✅ 취소 성공 직후 최신 포인트 정보를 다시 가져와서 화면과 로컬스토리지를 갱신!
+            await fetchLatestPoint();
+
             Swal.fire(
               "취소 완료",
-              "주문이 정상적으로 취소되었습니다.",
+              "주문이 정상적으로 취소되었으며 포인트가 복구되었습니다.",
               "success",
             ).then(() => {
               navigate("/mypage/user/orderList");
@@ -214,9 +213,10 @@ const CheckoutPage = () => {
   };
 
   useEffect(() => {
-    const total = orderList.reduce((sum, item) => {
-      return sum + Number(item.price ?? 0) * Number(item.quantity ?? 0);
-    }, 0);
+    const total = orderList.reduce(
+      (sum, item) => sum + Number(item.price ?? 0) * Number(item.quantity ?? 0),
+      0,
+    );
     setOrderAmount(total);
   }, [orderList]);
 
@@ -274,16 +274,14 @@ const CheckoutPage = () => {
       return "사장님이 주문을 확인했습니다. 곧 조리가 시작됩니다.";
     if (status === 3)
       return "맛있게 음식을 조리하고 있습니다. 조금만 기다려주세요 🍳";
-    if (status === 4) {
+    if (status === 4)
       return isPickup
         ? "음식이 준비되었습니다! 매장으로 방문해 주세요 🏃‍♂️"
         : "기사님이 배달을 출발했습니다! 곧 도착합니다 🛵";
-    }
-    if (status === 5) {
+    if (status === 5)
       return isPickup
         ? "픽업이 완료되었습니다. 맛있게 드세요! 😋"
         : "배달이 완료되었습니다. 맛있게 드세요! 😋";
-    }
     return "주문 상태를 확인하고 있습니다.";
   };
 
@@ -297,13 +295,11 @@ const CheckoutPage = () => {
           >
             {rawOrderStatus === 9 ? "✕" : "✓"}
           </div>
-
           <h1 className={styles.completeTitle}>
             {rawOrderStatus === 9
               ? "주문이 취소되었습니다."
               : "주문이 완료되었습니다!"}
           </h1>
-
           <p className={styles.completeDesc}>
             {rawOrderStatus === 9
               ? "결제하신 금액은 카드사에 따라 영업일 기준 2~3일 내로 환불될 예정입니다."
@@ -311,7 +307,6 @@ const CheckoutPage = () => {
                 ? "매장 방문 픽업을 선택해 주셔서 감사합니다."
                 : "친환경 배달을 선택해 주셔서 감사합니다."}
           </p>
-
           <button
             className={styles.orderCheckBtn}
             onClick={() => navigate("/mypage/user/orderList")}
@@ -326,7 +321,6 @@ const CheckoutPage = () => {
 
         <section className={styles.statusCard}>
           <h2 className={styles.sectionTitle}>실시간 주문 현황</h2>
-
           <div className={styles.progressWrapper}>
             <div className={styles.progressBar}>
               <div
@@ -338,7 +332,6 @@ const CheckoutPage = () => {
                 <span className={styles.seed}>🌱</span>
               </div>
             </div>
-
             <div className={styles.progressSteps}>
               {[
                 "주문 접수",
@@ -348,9 +341,7 @@ const CheckoutPage = () => {
               ].map((label, index) => (
                 <div key={index} className={styles.step}>
                   <div
-                    className={`${styles.circle} ${
-                      orderState >= index ? styles.active : ""
-                    }`}
+                    className={`${styles.circle} ${orderState >= index ? styles.active : ""}`}
                   />
                   <p
                     className={
@@ -363,7 +354,6 @@ const CheckoutPage = () => {
               ))}
             </div>
           </div>
-
           <p className={styles.statusMessage}>
             {getStatusMessage(rawOrderStatus, isPickup)}
           </p>
@@ -381,7 +371,6 @@ const CheckoutPage = () => {
                   </h3>
                 </div>
               </div>
-
               <div className={styles.mapBox}>
                 <div className={styles.mapWrapper}>
                   {!mapLoaded && (
@@ -392,10 +381,8 @@ const CheckoutPage = () => {
                   <div ref={mapElement} className={styles.map} />
                 </div>
               </div>
-
               <div className={styles.arrivalRow}>
                 <div className={styles.arrivalLeft}>
-                  {/* 🌟 완료 시 아이콘에도 불이 들어오도록 필터 효과 추가 */}
                   <span
                     className={styles.smallIcon}
                     style={{
@@ -407,16 +394,10 @@ const CheckoutPage = () => {
                           : "none",
                     }}
                   ></span>
-
                   <span
                     style={{
                       color: rawOrderStatus === 5 ? "#2f8f46" : "#333",
                       fontWeight: rawOrderStatus === 5 ? "bold" : "500",
-                      textShadow:
-                        rawOrderStatus === 5
-                          ? "0 0 5px rgba(47, 143, 70, 0.3)"
-                          : "none",
-                      transition: "all 0.3s ease",
                     }}
                   >
                     {rawOrderStatus === 5
@@ -428,7 +409,6 @@ const CheckoutPage = () => {
                         : "도착 예정 시간"}
                   </span>
                 </div>
-
                 <div
                   style={{
                     display: "flex",
@@ -457,7 +437,6 @@ const CheckoutPage = () => {
           <aside className={styles.rightColumn}>
             <div className={styles.orderInfoCard}>
               <h3 className={styles.rightTitle}>주문 내역</h3>
-
               {orderDate && (
                 <p style={{ fontSize: "14px", color: "#666", margin: "5px 0" }}>
                   주문 일시 : {orderDate}
@@ -475,7 +454,6 @@ const CheckoutPage = () => {
                   주문 승인 : {confirmDate}
                 </p>
               )}
-
               <div className={styles.orderList}>
                 <OrderListMap orderList={orderList} />
                 <div className={styles.orderRow}>
@@ -491,9 +469,7 @@ const CheckoutPage = () => {
                   <span>- {usedPoint.toLocaleString()} 원</span>
                 </div>
               </div>
-
               <div className={styles.divider}></div>
-
               <div className={styles.totalRow}>
                 <span>총 결제 금액</span>
                 <strong
@@ -540,7 +516,6 @@ const CheckoutPage = () => {
             >
               주문 목록 보기
             </button>
-
             {(rawOrderStatus === 0 || rawOrderStatus === 1) && (
               <button className={styles.secondaryBtn} onClick={cancelOrder}>
                 주문 취소
@@ -555,24 +530,21 @@ const CheckoutPage = () => {
 
 export default CheckoutPage;
 
-const OrderListMap = ({ orderList }) => {
-  return orderList.map((cart, index) => (
+// 하단 컴포넌트들은 동일
+const OrderListMap = ({ orderList }) =>
+  orderList.map((cart, index) => (
     <OrderItemList key={`orderList-${index}`} cart={cart} />
   ));
-};
-
-const OrderItemList = ({ cart }) => {
-  return (
-    <div>
-      <div className={`${styles.orderRow} ${styles.order_price}`}>
-        <span>
-          {cart.menuName} * {cart.quantity}
-        </span>
-        <span>{(cart.price * cart.quantity).toLocaleString()}원</span>
-      </div>
-      {cart.optionString && (
-        <p className={styles.option_list}>{cart.optionString}</p>
-      )}
+const OrderItemList = ({ cart }) => (
+  <div>
+    <div className={`${styles.orderRow} ${styles.order_price}`}>
+      <span>
+        {cart.menuName} * {cart.quantity}
+      </span>
+      <span>{(cart.price * cart.quantity).toLocaleString()}원</span>
     </div>
-  );
-};
+    {cart.optionString && (
+      <p className={styles.option_list}>{cart.optionString}</p>
+    )}
+  </div>
+);
