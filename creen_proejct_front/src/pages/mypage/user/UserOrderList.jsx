@@ -1,13 +1,15 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState, useContext } from "react";
 import axios from "axios";
 import styles from "./UserOrderList.module.css";
 import ReviewModal from "../../../components/layout/ReviewModal";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../../../context/AuthContext"; // 🌟 AuthContext 경로 확인 필수!
 
 const UserOrderListPage = () => {
   const backHost = import.meta.env.VITE_BACKSERVER;
   const navigate = useNavigate();
+  const { user, setUser } = useContext(AuthContext); // 🌟 전역 유저 상태 제어
   const [orderList, setOrderList] = useState([]);
   const memberId = localStorage.getItem("memberId");
 
@@ -22,14 +24,14 @@ const UserOrderListPage = () => {
     .toISOString()
     .split("T")[0];
 
-  // 🌟 [추가] 페이지네이션 상태
+  // 페이지네이션 상태
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5; // 한 페이지에 보여줄 주문 개수 (원하는 대로 수정 가능)
+  const itemsPerPage = 5;
 
   const fetchOrders = () => {
     if (!memberId) return;
     axios
-      .get(`${import.meta.env.VITE_BACKSERVER}/stores/orders/${memberId}`)
+      .get(`${backHost}/stores/orders/${memberId}`)
       .then((res) => {
         setOrderList(Array.isArray(res.data) ? res.data : []);
       })
@@ -41,25 +43,21 @@ const UserOrderListPage = () => {
 
   useEffect(() => {
     fetchOrders();
-
     const intervalId = setInterval(() => {
       fetchOrders();
     }, 5000);
-
-    return () => {
-      clearInterval(intervalId);
-    };
+    return () => clearInterval(intervalId);
   }, [memberId]);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [currentPage]);
 
-  // 🌟 [추가] 필터 날짜가 변경되면 무조건 1페이지로 이동
   useEffect(() => {
     setCurrentPage(1);
   }, [startDate, endDate]);
 
+  // 🌟 주문 취소 및 실시간 포인트 복구 로직
   const cancelOrder = (orderId) => {
     Swal.fire({
       title: "주문 취소",
@@ -72,19 +70,36 @@ const UserOrderListPage = () => {
     }).then((result) => {
       if (result.isConfirmed) {
         axios
-          .patch(
-            `${import.meta.env.VITE_BACKSERVER}/stores/order/${orderId}/status`,
-            {
-              status: 9,
-            },
-          )
+          .patch(`${backHost}/stores/order/${orderId}/status`, { status: 9 })
           .then(() => {
-            Swal.fire(
-              "취소 완료",
-              "주문이 정상적으로 취소되었습니다.",
-              "success",
-            );
-            fetchOrders();
+            // ✅ 취소 성공 후 서버에서 최신 포인트 정보 조회
+            axios
+              .get(`${backHost}/member/${memberId}`)
+              .then((memberRes) => {
+                const latestPoint = memberRes.data.memberPoint;
+
+                // 1. 로컬스토리지 갱신 (새로고침 시 유지용)
+                localStorage.setItem("memberPoint", latestPoint);
+
+                // 2. 🌟 핵심: 전역 상태 업데이트 (Header 등 실시간 반영)
+                if (user) {
+                  setUser({ ...user, memberPoint: latestPoint });
+                }
+
+                // 3. 다른 탭을 위한 이벤트 발생
+                window.dispatchEvent(new Event("storage"));
+
+                Swal.fire(
+                  "취소 완료",
+                  "주문이 취소되었으며 포인트가 복구되었습니다.",
+                  "success",
+                );
+                fetchOrders(); // 주문 목록 새로고침
+              })
+              .catch((err) => {
+                console.error("포인트 동기화 실패:", err);
+                fetchOrders();
+              });
           })
           .catch((err) => {
             console.error(err);
@@ -96,26 +111,22 @@ const UserOrderListPage = () => {
 
   const filteredAndSortedOrders = useMemo(() => {
     let filtered = [...orderList];
-
     if (startDate) {
       filtered = filtered.filter(
         (order) => new Date(order.orderDate) >= new Date(startDate),
       );
     }
-
     if (endDate) {
       const end = new Date(endDate);
       end.setHours(23, 59, 59, 999);
       filtered = filtered.filter((order) => new Date(order.orderDate) <= end);
     }
-
     return filtered.sort(
       (a, b) =>
         new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime(),
     );
   }, [orderList, startDate, endDate]);
 
-  // 🌟 [추가] 현재 페이지에 해당하는 주문들만 잘라내기 로직
   const totalPages = Math.ceil(filteredAndSortedOrders.length / itemsPerPage);
   const currentOrders = filteredAndSortedOrders.slice(
     (currentPage - 1) * itemsPerPage,
@@ -136,13 +147,12 @@ const UserOrderListPage = () => {
   const resetFilter = () => {
     setStartDate("");
     setEndDate("");
-    setCurrentPage(1); // 🌟 [추가] 초기화 시 1페이지로
+    setCurrentPage(1);
   };
 
   const goToCheckoutPage = (order) => {
     const tossStyleOrderId = `ORDER_${order.orderId}_${new Date().getTime()}`;
     const amount = order.totalPrice || 0;
-
     navigate(`/checkoutPage?orderId=${tossStyleOrderId}&amount=${amount}`);
   };
 
@@ -182,7 +192,6 @@ const UserOrderListPage = () => {
       </div>
 
       <div className={styles.orderListWrap}>
-        {/* 🌟 [수정] filteredAndSortedOrders 대신 currentOrders로 매핑 */}
         {currentOrders.length > 0 ? (
           currentOrders.map((order, index) => {
             const isCompleted = order.orderStatus === 5;
@@ -196,16 +205,12 @@ const UserOrderListPage = () => {
               (now.getTime() - orderDateObj.getTime()) / (1000 * 60 * 60 * 24);
             const isWithin3Days = diffDays <= 3;
 
-            const itemKey = order.orderId
-              ? `order-${order.orderId}`
-              : `idx-${index}`;
-
             return (
               <div
-                key={itemKey}
+                key={order.orderId || index}
                 className={`${styles.orderCard} ${isCanceled ? styles.canceledCard : ""}`}
-                onClick={() => goToCheckoutPage(order)}
-                style={{ cursor: "pointer" }}
+                onClick={() => !isCanceled && goToCheckoutPage(order)}
+                style={{ cursor: isCanceled ? "default" : "pointer" }}
               >
                 {isCanceled && (
                   <div className={styles.canceledWatermark}>취소된 주문</div>
@@ -215,7 +220,7 @@ const UserOrderListPage = () => {
                   <div className={styles.leftInfo}>
                     <img
                       src={
-                        order.menuImage
+                        order.storeThumb
                           ? `${backHost}/${order.storeThumb}`
                           : "/img/no-image.png"
                       }
@@ -266,11 +271,11 @@ const UserOrderListPage = () => {
                             openReviewModal(order);
                           }}
                         >
-                          리뷰 작성 (3일 이내)
+                          리뷰 작성
                         </button>
                       ) : (
                         <button className={styles.reviewBtnDisabled} disabled>
-                          작성 기한 만료
+                          기한 만료
                         </button>
                       ))}
                   </div>
@@ -294,25 +299,12 @@ const UserOrderListPage = () => {
                       {order.storeAddress || "정보 없음"}
                     </p>
                   </div>
-                  <div className={styles.infoBlock}>
-                    <p className={styles.infoTitle}>
-                      {order.deliveryType === 1 ? "수령 방식" : "배달 주소"}
-                    </p>
-                    <p className={styles.addressText}>
-                      {order.deliveryType === 1
-                        ? "매장 방문 픽업"
-                        : order.deliveryAddress}
-                    </p>
-                  </div>
                 </div>
 
                 <div className={styles.carbonBox}>
                   <div className={styles.carbonText}>
                     <p className={styles.carbonLabel}>
                       이 주문으로 절감한 탄소량
-                    </p>
-                    <p className={styles.carbonDesc}>
-                      친환경 포장재 및 로컬 배송/픽업
                     </p>
                   </div>
                   <div className={styles.carbonValueWrap}>
@@ -337,7 +329,6 @@ const UserOrderListPage = () => {
         )}
       </div>
 
-      {/* 🌟 [추가] 페이지네이션 UI (총 페이지가 1보다 클 때만 렌더링) */}
       {totalPages > 1 && (
         <div className={styles.pagination}>
           <button
@@ -345,25 +336,26 @@ const UserOrderListPage = () => {
             onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
             disabled={currentPage === 1}
           >
-            &lt;
+            {" "}
+            &lt;{" "}
           </button>
-
           {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
             <button
               key={page}
               className={`${styles.pageBtn} ${currentPage === page ? styles.activePage : ""}`}
               onClick={() => setCurrentPage(page)}
             >
-              {page}
+              {" "}
+              {page}{" "}
             </button>
           ))}
-
           <button
             className={styles.pageBtn}
             onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
             disabled={currentPage === totalPages}
           >
-            &gt;
+            {" "}
+            &gt;{" "}
           </button>
         </div>
       )}
@@ -398,13 +390,10 @@ const getOrderStatusText = (status, deliveryType) => {
 const formatDate = (dateString) => {
   if (!dateString) return "";
   const date = new Date(dateString);
-
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, "0");
   const day = String(date.getDate()).padStart(2, "0");
-
   const hours = String(date.getHours()).padStart(2, "0");
   const minutes = String(date.getMinutes()).padStart(2, "0");
-
   return `${year}-${month}-${day} ${hours}:${minutes}`;
 };
