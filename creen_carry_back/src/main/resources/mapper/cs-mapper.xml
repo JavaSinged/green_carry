@@ -78,7 +78,10 @@
         </where>
         ORDER BY faq_no ASC
     </select>
-
+	
+	<select id="getMemberIdByQnaId">
+		select member_id from qna_tbl where qna_no = #{qnaNo}
+	</select>
 
 
 </mapper>

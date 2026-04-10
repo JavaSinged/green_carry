@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
 import styles from "./HeaderNotification.module.css";
+import { useNavigate } from "react-router-dom";
 
 const HeaderNotification = () => {
   const [unreadCount, setUnreadCount] = useState(0);
@@ -9,7 +10,7 @@ const HeaderNotification = () => {
   const [memberId, setMemberId] = useState(null);
   const backHost = import.meta.env.VITE_BACKSERVER;
   const dropdownRef = useRef(null);
-
+  const navigate = useNavigate();
   useEffect(() => {
     const saved = localStorage.getItem("memberId");
     if (saved) setMemberId(saved);
@@ -23,10 +24,13 @@ const HeaderNotification = () => {
     );
 
     eventSource.addEventListener("orderUpdate", (event) => {
+      const data = JSON.parse(event.data);
+
       setUnreadCount((prev) => prev + 1);
       setNotifications((prev) => [
         {
-          message: event.data,
+          message: data.message,
+          navUrl: data.navUrl,
           time: new Date().toLocaleTimeString([], {
             hour: "2-digit",
             minute: "2-digit",
@@ -39,6 +43,13 @@ const HeaderNotification = () => {
     eventSource.onerror = () => eventSource.close();
     return () => eventSource.close();
   }, [memberId, backHost]);
+
+  const handleNotiClick = (navUrl) => {
+    if (navUrl) {
+      navigate(navUrl); // 해당 페이지로 이동
+      setIsOpen(false); // 드롭다운 닫기
+    }
+  };
 
   const handleIconClick = () => {
     setUnreadCount(0);
@@ -74,7 +85,12 @@ const HeaderNotification = () => {
           <div className={styles.noti_list}>
             {notifications.length > 0 ? (
               notifications.map((noti, idx) => (
-                <div key={idx} className={styles.noti_item}>
+                <div
+                  key={idx}
+                  className={styles.noti_item}
+                  onClick={() => handleNotiClick(noti.navUrl)}
+                  style={{ cursor: "pointer" }}
+                >
                   <p className={styles.noti_msg}>{noti.message}</p>
                   <span className={styles.noti_time}>{noti.time}</span>
                 </div>

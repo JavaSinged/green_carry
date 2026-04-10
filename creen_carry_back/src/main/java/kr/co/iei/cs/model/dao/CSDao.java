@@ -24,4 +24,6 @@ public interface CSDao {
     int updateAnswer(Qna qna);
 
 	List<FaqManager> selectAllListManagerFaq(FaqManager faqManager);
+
+	String getMemberIdByQnaId(int qna);
 }

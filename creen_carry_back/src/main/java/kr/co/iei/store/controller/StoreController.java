@@ -164,6 +164,12 @@ public class StoreController {
 		int result = storeService.insertReviewComment(payload);
 
 		if (result > 0) {
+			String customerId= storeService.getMemberIdByOrderId(Integer.parseInt(payload.get("orderId").toString())); 
+			
+
+			String message = "작성하신 리뷰에 답글이 달렸습니다."; 
+			String navUrl = "/mypage/user/reviews";
+			notificationService.sendNotification(customerId, "orderUpdate", message, navUrl);
 			return ResponseEntity.ok("답글이 등록되었습니다.");
 		} else {
 			return ResponseEntity.internalServerError().body("답글 등록 실패");
@@ -187,9 +193,19 @@ public class StoreController {
 		int result = storeService.changeOrderStatus(orderId, status, expectedTime);
 
 		if (result > 0) {
-			// 2. 🔥 여기서 마법 시작! orderId로 memberId를 직접 조회합니다.
+			// orderId로 memberId를 직접 조회합니다.
 			// storeService에 getMemberIdByOrderId 메서드를 하나 만드세요.
 			String memberId = storeService.getMemberIdByOrderId(orderId);
+			
+			// 1. 현재 시간을 타임스탬프(숫자)로 가져오기
+			long timestamp = System.currentTimeMillis(); 
+
+			// 2. 리액트가 원하는 "ORDER_ID_TIMESTAMP" 형식으로 조립
+			// 제공해주신 예시: ORDER_370_1775788200000
+			
+			String navUrl = String.format("/checkoutPage?orderId=ORDER_%d_%d", orderId, timestamp);
+
+			
 
 			// 3. 알림 대상(4, 5, 9번 상태)이면 알림 발송
 			if (memberId != null && (status == 2 || status == 4 || status == 5 || status == 9)) {
@@ -203,7 +219,7 @@ public class StoreController {
 				else if (status == 9)
 					message = "주문이 취소되었습니다. 다시 확인 부탁드립니다.";
 
-				notificationService.sendNotification(memberId, "orderUpdate", message);
+				notificationService.sendNotification(memberId, "orderUpdate", message, navUrl);
 			}
 			return ResponseEntity.ok("상태 변경 성공");
 		} else {

@@ -3,40 +3,44 @@ package kr.co.iei.notification.model.service; // 이 경로가 실제 폴더 구
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class NotificationService {
 
-    private final Map<String, SseEmitter> emitters = new ConcurrentHashMap<>();
+	private final Map<String, SseEmitter> emitters = new ConcurrentHashMap<>();
 
-    public SseEmitter subscribe(String memberId) {
-        SseEmitter emitter = new SseEmitter(60 * 60 * 1000L); 
-        
-        emitters.put(memberId, emitter);
+	public SseEmitter subscribe(String memberId) {
+		SseEmitter emitter = new SseEmitter(60 * 60 * 1000L);
 
-        emitter.onCompletion(() -> emitters.remove(memberId));
-        emitter.onTimeout(() -> emitters.remove(memberId));
-        emitter.onError((e) -> emitters.remove(memberId));
+		emitters.put(memberId, emitter);
 
-        try {
-            emitter.send(SseEmitter.event().name("connect").data("connected!"));
-        } catch (IOException e) {
-            emitters.remove(memberId);
-        }
+		emitter.onCompletion(() -> emitters.remove(memberId));
+		emitter.onTimeout(() -> emitters.remove(memberId));
+		emitter.onError((e) -> emitters.remove(memberId));
 
-        return emitter;
-    }
+		try {
+			emitter.send(SseEmitter.event().name("connect").data("connected!"));
+		} catch (IOException e) {
+			emitters.remove(memberId);
+		}
 
-    public void sendNotification(String memberId, String eventName, String message) {
-        SseEmitter emitter = emitters.get(memberId);
-        if (emitter != null) {
-            try {
-                emitter.send(SseEmitter.event().name(eventName).data(message));
-            } catch (IOException e) {
-                emitters.remove(memberId); 
-            }
-        }
-    }
+		return emitter;
+	}
+
+	public void sendNotification(String memberId, String eventName, String message, String navUrl) {
+		SseEmitter emitter = emitters.get(memberId);
+		Map<String, Object> data = new HashMap<>();
+		data.put("message", message);
+		data.put("navUrl", navUrl);
+		if (emitter != null) {
+			try {
+				emitter.send(SseEmitter.event().name(eventName).data(data));
+			} catch (IOException e) {
+				emitters.remove(memberId);
+			}
+		}
+	}
 }

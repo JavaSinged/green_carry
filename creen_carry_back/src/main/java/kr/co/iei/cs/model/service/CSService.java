@@ -55,4 +55,9 @@ public class CSService {
 		List<FaqManager> list = csDao.selectAllListManagerFaq(faqManager);
 		return list;
 	}
+
+	public String getMemberIdByQnaId(int qna) {
+		String memberId = csDao.getMemberIdByQnaId(qna);
+		return memberId;
+	}
 }
