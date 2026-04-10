@@ -19,13 +19,12 @@
 
 	<select id="findStoreById" parameterType="int"
 		resultType="store">
-		SELECT
-		store_id AS storeId,
+		SELECT store_id AS storeId,
 		member_id AS memberId,
-		store_name
-		AS storeName,
+		store_name AS storeName,
 		store_address AS storeAddress,
-		store_phone AS storePhone,
+		store_phone AS
+		storePhone,
 		store_intro AS storeIntro,
 		store_owner AS storeOwner,
 		store_owner_address AS storeOwnerAddress,
@@ -34,23 +33,21 @@
 		store_owner_no AS storeOwnerNo,
 		store_category AS
 		storeCategory,
-		(SELECT NVL(AVG(review_rating), 0)
-		FROM review_tbl r
-		WHERE r.store_id = s.store_id) AS storeRating,
+		store_rating AS storeRating,
 		latitude AS LATITUDE,
 		longitude AS LONGITUDE,
-		store_thumb AS storeThumb
-		FROM STORE_TBL s
-		WHERE
-		s.store_id = #{storeId}
+		store_thumb AS storeThumb,
+		TO_CHAR(opening_date, 'YYYY-MM-DD') AS openingDate
+		FROM STORE_TBL
+		WHERE store_id = #{storeId}
 	</select>
 
 	<select id="findStoreByMemberId" resultType="store">
-		select store_id from
-		store_tbl
-		where member_id = (select member_id from member_tbl
-		where
-		member_id = #{memberId})
+		select store_id
+		from store_tbl
+		where member_id = (select member_id
+		from member_tbl
+		where member_id = #{memberId})
 	</select>
 
 	<select id="selectAllMenu" resultType="menu">
@@ -65,8 +62,7 @@
 		menu_status
 		FROM MENU_TBL
 		WHERE store_id = #{storeId}
-		ORDER BY
-		menu_category ASC, menu_id ASC
+		ORDER BY menu_category ASC, menu_id ASC
 	</select>
 
 	<select id="getMenuOptions" parameterType="long"
@@ -74,15 +70,12 @@
 		SELECT o.option_no,
 		o.option_type,
 		o.option_name,
-		o.option_price,
-		o.option_carbon
+		o.option_price
 		FROM OPTION_TBL o
-		JOIN MENU_OPTION_MAP
-		mom ON o.option_no
+		JOIN MENU_OPTION_MAP mom ON o.option_no
 		= mom.option_no
 		WHERE mom.menu_id = #{menuId}
-		ORDER BY
-		o.option_type
+		ORDER BY o.option_type
 		ASC, o.option_no ASC
 	</select>
 
@@ -155,8 +148,7 @@
 		option_string,
 		total_carbon,
 		quantity)
-		SELECT
-		ORDER_DETAIL_SEQ.NEXTVAL,
+		SELECT ORDER_DETAIL_SEQ.NEXTVAL,
 		#{orderId},
 		m.menu_id,
 		#{orderItem.price},
@@ -187,8 +179,7 @@
 		od.quantity,
 		od.price,
 		od.option_string AS optionString
-		FROM order_detail
-		od
+		FROM order_detail od
 		JOIN menu_tbl m
 		ON od.menu_id = m.menu_id
 		WHERE od.order_id =
@@ -198,8 +189,7 @@
 
 	<select id="searchOrderInfo" parameterType="int"
 		resultType="orderResponse">
-		SELECT
-		s.store_name AS storeName,
+		SELECT s.store_name AS storeName,
 		s.store_thumb AS
 		storeThumb,
 		o.order_id AS orderId,
@@ -224,8 +214,7 @@
 		orderStatus,
 		TO_CHAR(olm.reg_date, 'YYYY-MM-DD
 		HH24:MI') AS orderDate
-		FROM
-		order_tbl o
+		FROM order_tbl o
 		JOIN store_tbl s ON o.store_id =
 		s.store_id
 		JOIN member_tbl m ON
@@ -233,8 +222,7 @@
 		JOIN
 		order_list_map olm ON o.order_id =
 		olm.order_id
-		WHERE
-		o.order_id =
+		WHERE o.order_id =
 		#{orderId}
 	</select>
 
@@ -247,8 +235,7 @@
 
 	<select id="searchOrderList" parameterType="string"
 		resultType="orderResponse">
-		SELECT
-		o.order_id AS orderId,
+		SELECT o.order_id AS orderId,
 		o.store_id AS storeId,
 		s.store_name AS storeName,
 		s.store_thumb AS storeThumb,
@@ -286,8 +273,7 @@
 		m.member_addr AS
 		deliveryAddress
 
-		FROM
-		order_tbl o
+		FROM order_tbl o
 		JOIN store_tbl s ON o.store_id =
 		s.store_id
 		JOIN
@@ -297,34 +283,23 @@
 		o.member_id = m.member_id
 
 		-- 상세 합산 서브쿼리
-		JOIN (
-		SELECT
-		order_id,
+		JOIN (SELECT order_id,
 		SUM(quantity) AS totalCount,
 		SUM(price * quantity) AS
 		totalPrice,
 		SUM(total_carbon * quantity) AS orderCarbon
-		FROM
-		order_detail
-		GROUP BY
-		order_id
-		) od_sum ON o.order_id = od_sum.order_id
+		FROM order_detail
+		GROUP BY order_id) od_sum ON o.order_id = od_sum.order_id
 
 		-- 대표 메뉴 서브쿼리
-		JOIN (
-		SELECT od1.*
+		JOIN (SELECT od1.*
 		FROM order_detail od1
-		JOIN (
-		SELECT
-		order_id,
+		JOIN (SELECT order_id,
 		MIN(order_detail_id) AS min_detail_id
 		FROM order_detail
-		GROUP
-		BY
-		order_id
-		) x ON od1.order_id = x.order_id AND od1.order_detail_id =
-		x.min_detail_id
-		) od_first ON o.order_id = od_first.order_id
+		GROUP BY order_id) x ON od1.order_id = x.order_id AND od1.order_detail_id =
+		x.min_detail_id) od_first
+		ON o.order_id = od_first.order_id
 
 		JOIN
 		menu_tbl md ON od_first.menu_id = md.menu_id
@@ -335,26 +310,21 @@
 	</select>
 
 	<insert id="insertReviewComment" parameterType="reviewComment">
-		INSERT INTO
-		review_comment_tbl (
-		order_id,
+		INSERT INTO review_comment_tbl (order_id,
 		store_id,
 		member_id,
 		review_comment_content,
-		review_comment_date
-		) VALUES (
-		#{orderId},
+		review_comment_date)
+		VALUES (#{orderId},
 		#{storeId},
 		#{memberId},
 		#{reviewCommentContent},
-		SYSDATE
-		)
+		SYSDATE)
 	</insert>
 
 	<select id="selectStoreReviews" parameterType="int"
 		resultType="storeReviewResponse">
-		SELECT
-		r.order_id AS orderId,
+		SELECT r.order_id AS orderId,
 		r.review_rating AS
 		reviewRating,
 		TO_CHAR(r.review_date, 'YYYY-MM-DD HH24:MI') AS
@@ -362,7 +332,8 @@
 		r.review_content AS reviewContent,
 		r.review_thumb AS
 		reviewThumb,
-		m.member_id AS memberId, m.member_thumb AS memberProfile,
+		m.member_id AS memberId,
+		m.member_thumb AS memberProfile,
 
 		rc.review_comment_content AS
 		reviewCommentContent,
@@ -370,11 +341,9 @@
 		HH24:MI') AS
 		reviewCommentDate,
 
-		(SELECT
-		md.menu_name
+		(SELECT md.menu_name
 		FROM order_detail od
-		JOIN menu_tbl
-		md ON od.menu_id =
+		JOIN menu_tbl md ON od.menu_id =
 		md.menu_id
 		WHERE od.order_id = r.order_id
 		AND ROWNUM =
@@ -383,8 +352,7 @@
 		FROM review_tbl r
 		JOIN member_tbl m ON r.member_id =
 		m.member_id
-		LEFT
-		JOIN review_comment_tbl rc ON r.order_id = rc.order_id
+		LEFT JOIN review_comment_tbl rc ON r.order_id = rc.order_id
 		WHERE r.store_id
 		= #{storeId}
 		ORDER BY r.review_date DESC
@@ -392,8 +360,7 @@
 
 	<select id="getOrdersByStoreId" parameterType="int"
 		resultType="orderResponse">
-		SELECT
-		o.order_id AS orderId,
+		SELECT o.order_id AS orderId,
 		o.store_id AS storeId,
 		s.store_name AS storeName,
 		s.store_thumb AS storeThumb,
@@ -422,41 +389,33 @@
 		s.store_address AS storeAddress,
 		m.member_addr AS deliveryAddress
 
-		FROM
-		order_tbl o
+		FROM order_tbl o
 		JOIN store_tbl s ON o.store_id = s.store_id
 		JOIN
 		order_list_map olm ON o.order_id = olm.order_id
 		JOIN member_tbl m ON
 		o.member_id = m.member_id
 
-		JOIN (
-		SELECT order_id,
+		JOIN (SELECT order_id,
 		SUM(quantity) AS
 		totalCount,
 		SUM(price * quantity) AS totalPrice,
 		SUM(total_carbon *
 		quantity) AS orderCarbon
 		FROM order_detail
-		GROUP BY
-		order_id
-		) od_sum ON
+		GROUP BY order_id) od_sum ON
 		o.order_id = od_sum.order_id
 
-		JOIN (
-		SELECT od1.*
+		JOIN (SELECT od1.*
 		FROM order_detail od1
-		JOIN (
-		SELECT order_id, MIN(order_detail_id) AS
+		JOIN (SELECT order_id,
+		MIN(order_detail_id) AS
 		min_detail_id
-		FROM
-		order_detail
-		GROUP BY order_id
-		) x ON od1.order_id =
+		FROM order_detail
+		GROUP BY order_id) x ON od1.order_id =
 		x.order_id AND
 		od1.order_detail_id =
-		x.min_detail_id
-		) od_first ON
+		x.min_detail_id) od_first ON
 		o.order_id =
 		od_first.order_id
 
@@ -474,8 +433,8 @@
 		<if test="status == 2">
 			, confirm_date = SYSDATE
 		</if>
-		<if test="status == 5">, complete_date = SYSDATE </if>
-		<if test="expectedTime != null">, expected_time = #{expectedTime} </if>
+		<if test="status == 5">, complete_date = SYSDATE</if>
+		<if test="expectedTime != null">, expected_time = #{expectedTime}</if>
 		WHERE order_id = #{orderId}
 	</update>
 
@@ -546,8 +505,7 @@
 		to_char(olm.reg_date, 'yyyy-mm')
 		order by sale_month
 	</select>
-
-
+	
 	<select id="selectTotalSales" resultType="Long">
 		select sum(price *
 		quantity) from order_detail where order_id in (select order_id from
@@ -555,36 +513,29 @@
 	</select>
 	<update id="rollbackPoint" parameterType="int">
 		UPDATE member_tbl m
-		SET (
+		SET
+		(
 		member_point,
 		total_carbon_reduce
 		) = (
 		SELECT
-		m.member_point + o.used_point - o.get_point,
-		GREATEST(m.total_carbon_reduce - (o.get_point / 1000.0), 0)
+		m.member_point +
+		o.used_point - o.get_point,
+		GREATEST(m.total_carbon_reduce -
+		(o.get_point / 1000.0), 0)
 		FROM order_tbl o
-		WHERE o.member_id = m.member_id
+		WHERE o.member_id =
+		m.member_id
 		AND o.order_id = #{orderId}
 		)
 		WHERE EXISTS (
 		SELECT 1
-		FROM order_tbl o
+		FROM
+		order_tbl o
 		WHERE o.member_id = m.member_id
 		AND o.order_id = #{orderId}
 		)
 	</update>
-
-
-<select id="getStoreOperatingHours" parameterType="int" resultType="operating">
-    SELECT 
-        day_of_week AS dayOfWeek,
-        open_time AS openTime,
-        close_time AS closeTime,
-        is_day_off AS isDayOff
-    FROM operating_hours_tbl
-    WHERE store_id = #{storeId}
-    ORDER BY DECODE(day_of_week, 'MON', 1, 'TUE', 2, 'WED', 3, 'THU', 4, 'FRI', 5, 'SAT', 6, 'SUN', 7)
-</select>
 
 	<select id="getMemberIdByOrderId" resultType="string">
 		SELECT member_id
@@ -598,4 +549,54 @@
 		order_status = 9
 		WHERE order_id = #{orderId}
 	</update>
+
+	<select id="getStoreOperatingHours" parameterType="int"
+		resultType="operating">
+		SELECT day_of_week AS dayOfWeek,
+		open_time AS openTime,
+		close_time AS closeTime,
+		is_day_off AS isDayOff,
+		week_of_month AS weekOfMonth
+		FROM operating_hours_tbl
+		WHERE store_id = #{storeId}
+		ORDER BY DECODE(day_of_week, 'MON', 1, 'TUE', 2, 'WED', 3, 'THU', 4, 'FRI',
+		5, 'SAT', 6, 'SUN', 7)
+	</select>
+
+	<!-- 가게 정보 수정 -->
+	<update id="updateStore" parameterType="storeSaveRequest">
+		UPDATE STORE_TBL
+		SET STORE_NAME = #{storeName},
+		STORE_INTRO = #{storeIntro},
+		STORE_PHONE = #{storePhone},
+		STORE_OWNER_NO = #{storeOwnerNo},
+		STORE_ORIGIN_INFO = #{storeOriginInfo},
+		STORE_CATEGORY = #{storeCategory},
+		STORE_ADDRESS = #{storeAddress}
+		WHERE STORE_ID = #{storeId}
+	</update>
+
+	<delete id="deleteOperatingHours"
+		parameterType="java.lang.Integer">
+		DELETE
+		FROM OPERATING_HOURS_TBL
+		WHERE STORE_ID = #{storeId}
+	</delete>
+
+	<insert id="insertOperatingHours" parameterType="operatingHours">
+		INSERT INTO OPERATING_HOURS_TBL (HOUR_ID,
+		STORE_ID,
+		DAY_OF_WEEK,
+		OPEN_TIME,
+		CLOSE_TIME,
+		IS_DAY_OFF,
+		WEEK_OF_MONTH)
+		VALUES (OPERATING_HOURS_SEQ.NEXTVAL,
+		#{storeId},
+		#{dayOfWeek},
+		#{openTime},
+		#{closeTime},
+		#{isDayOff},
+		#{weekOfMonth})
+	</insert>
 </mapper>

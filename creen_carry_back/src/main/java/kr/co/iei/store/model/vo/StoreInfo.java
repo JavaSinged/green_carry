@@ -1,20 +1,16 @@
 package kr.co.iei.store.model.vo;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.apache.ibatis.type.Alias;
 
 import java.util.List;
 
-import org.apache.ibatis.type.Alias;
-
 @NoArgsConstructor
 @AllArgsConstructor
+@Alias("storeInfo")
 @Data
-@Alias("store")
-public class Store {
+public class StoreInfo {
     private Integer storeId;
-    private String memberId;
     private String storeName;
     private String storeAddress;
     private String storePhone;
@@ -24,14 +20,9 @@ public class Store {
     private String storeOriginInfo;
     private String storeOwnerNo;
     private String storeCategory;
-    private Double storeRating;
     private Double latitude;
     private Double longitude;
-    private String storeThumb;
-    private String openingDate;
-    private Long totalSale;
-    private List<SaleMonth> SaleMonth;
-    private int reviewCount;
+    private String openingDate; // YYYY-MM-DD 형식의 문자열
 
     // 영업시간 및 휴무일 리스트
     private List<StoreOperating> operatingHours;
