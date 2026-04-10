@@ -178,7 +178,7 @@ public class StoreController {
 			String memberId = storeService.getMemberIdByOrderId(orderId);
 
 			// 3. 알림 대상(4, 5, 9번 상태)이면 알림 발송
-			if (memberId != null && (status == 3 || status == 4 || status == 5 || status == 9)) {
+			if (memberId != null && (status == 2 || status == 4 || status == 5 || status == 9)) {
 				String message = "";
 				if(status == 2)
 					message = "주문이 접수되었습니다. 약 "+expectedTime+"분 뒤 조리가 완료됩니다.";

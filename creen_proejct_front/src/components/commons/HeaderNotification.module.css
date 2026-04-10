@@ -1,21 +1,25 @@
-/* 장바구니 wrap과 똑같은 스타일 */
 .noti_icon_wrap {
   position: relative;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 24px; /* 아이콘 크기에 맞춤 */
-  height: 24px; /* 아이콘 크기에 맞춤 */
-  margin-right: 5px; /* 아이콘 간격 조절 */
+  width: 30px; /* 아이콘 크기와 동일하게 */
+  height: 30px; /* 아이콘 크기와 동일하게 */
+  margin-right: 15px; /* 옆 아이콘과의 간격 */
 }
 
-/* 장바구니 badge와 똑같은 스타일 */
+.bell_icon {
+  font-size: 30px !important;
+  color: white !important;
+  display: block;
+}
+
 .noti_badge {
   position: absolute;
   top: -8px;
   right: -8px;
-  background-color: #ff4757; /* 장바구니와 동일한 레드 */
+  background-color: #ff4757;
   color: white;
   font-size: 10px;
   font-weight: bold;
@@ -29,19 +33,18 @@
   z-index: 10;
 }
 
-/* --- 여기서부터는 종 아래로 뜨는 알림창 스타일 --- */
-
 .noti_dropdown {
   position: absolute;
-  top: 35px; /* 아이콘 바로 아래 위치 */
-  right: 0; /* 오른쪽 끝 맞춤 */
+  top: 35px;
+  right: 0;
   width: 260px;
   background-color: white;
   border: 1px solid #ddd;
   border-radius: 8px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
   z-index: 1000;
-  padding: 10px;
+  padding: 12px;
+  cursor: default; /* 창 안에서는 화살표 커서 */
 }
 
 .noti_header {
@@ -50,7 +53,7 @@
   color: #333;
   padding-bottom: 8px;
   border-bottom: 1px solid #eee;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
   display: block;
 }
 
@@ -59,8 +62,9 @@
   overflow-y: auto;
 }
 
+/* 알림 아이템 스타일 */
 .noti_item {
-  padding: 8px 0;
+  padding: 10px 0;
   border-bottom: 1px solid #f9f9f9;
 }
 
@@ -72,19 +76,20 @@
   margin: 0;
   font-size: 13px;
   color: #444;
-  line-height: 1.4;
+  line-height: 1.5;
+  word-break: break-all;
 }
 
 .noti_time {
   font-size: 11px;
   color: #aaa;
   display: block;
-  margin-top: 3px;
+  margin-top: 4px;
 }
 
 .empty_msg {
-  padding: 20px 0;
+  padding: 30px 0;
   text-align: center;
-  font-size: 12px;
+  font-size: 13px;
   color: #999;
 }
