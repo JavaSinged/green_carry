@@ -206,6 +206,8 @@ public class StoreService {
         int setPoint = storeDao.updatePoint(orderId);
         if (setPoint != 1) {
             throw new RuntimeException("포인트 적립/사용 처리 실패");
+        }else {
+        	storeDao.pointReward(orderId);
         }
 
         // 4. 탄소 절감량(명예 점수) 누적 업데이트

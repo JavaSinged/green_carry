@@ -39,7 +39,7 @@ const CheckoutPage = () => {
   const [expectedTime, setExpectedTime] = useState(null);
   const [remainingTimeText, setRemainingTimeText] = useState("시간 계산 중...");
   const [targetArrivalTime, setTargetArrivalTime] = useState("--:--");
-
+  const isFirst = useRef(true);
   const fetchOrderDetails = () => {
     if (!orderId) return;
 
@@ -86,7 +86,6 @@ const CheckoutPage = () => {
   useEffect(() => {
     clearCart();
     fetchOrderDetails();
-    updatePoint(orderId);
 
     const intervalId = setInterval(() => {
       fetchOrderDetails();
@@ -95,6 +94,13 @@ const CheckoutPage = () => {
     return () => clearInterval(intervalId);
   }, [orderId]);
 
+  useEffect(() => {
+    if (!isFirst.current) return;
+
+    isFirst.current = false;
+
+    updatePoint(orderId);
+  }, []);
   useEffect(() => {
     const fetchLatestPoint = async () => {
       const memberId = localStorage.getItem("memberId");

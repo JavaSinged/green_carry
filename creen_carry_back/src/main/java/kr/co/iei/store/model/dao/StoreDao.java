@@ -106,4 +106,6 @@ public interface StoreDao {
 
 	int rollbackPoint(Integer orderId);
 
+	void pointReward(Integer orderId);
+
 }
