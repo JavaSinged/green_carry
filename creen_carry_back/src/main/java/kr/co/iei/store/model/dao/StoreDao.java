@@ -62,7 +62,7 @@ public interface StoreDao {
 	int[] selectOrderList(String memberId);
 
 
-	int updatePoint(Order order);
+	int updatePoint(Integer orderId);
 
 	int addReduceCarbon(int orderId);
 
@@ -98,7 +98,6 @@ public interface StoreDao {
 
 	int changeOrderStatus(Integer orderId, int status, Integer expectedTime);
 
-
 	Map<String, Object> selectStoreReviewStats(int storeId);
 
 	int insertReviewComment(Map<String, Object> payload);
@@ -108,5 +107,7 @@ public interface StoreDao {
 	List<StoreOperating> getStoreOperatingHours(Integer storeId);
 	
 	String getMemberIdByOrderId(Integer orderId);
+
+	int rollbackPoint(Integer orderId);
 
 }

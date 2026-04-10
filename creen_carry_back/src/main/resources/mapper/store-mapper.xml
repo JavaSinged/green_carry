@@ -77,10 +77,12 @@
 		o.option_price,
 		o.option_carbon
 		FROM OPTION_TBL o
-		JOIN MENU_OPTION_MAP mom ON o.option_no
+		JOIN MENU_OPTION_MAP
+		mom ON o.option_no
 		= mom.option_no
 		WHERE mom.menu_id = #{menuId}
-		ORDER BY o.option_type
+		ORDER BY
+		o.option_type
 		ASC, o.option_no ASC
 	</select>
 
@@ -110,10 +112,22 @@
 	</insert>
 
 	<update id="updatePoint">
-		UPDATE member_tbl
-		SET member_point = member_point +
-		#{getPoint} - #{usedPoint}
-		WHERE member_id = #{memberId}
+		UPDATE member_tbl m
+		SET m.member_point =
+		m.member_point + (
+		SELECT o.get_point - o.used_point
+		FROM order_tbl o
+		WHERE o.order_id = #{orderId}
+		AND o.member_id = m.member_id
+		)
+		WHERE
+		EXISTS (
+		SELECT 1
+		FROM order_tbl o
+		WHERE o.order_id = #{orderId}
+		AND
+		o.member_id = m.member_id
+		)
 	</update>
 
 	<update id="addReduceCarbon">
@@ -539,6 +553,26 @@
 		quantity) from order_detail where order_id in (select order_id from
 		order_tbl where store_id = #{storeId})
 	</select>
+	<update id="rollbackPoint" parameterType="int">
+		UPDATE member_tbl m
+		SET (
+		member_point,
+		total_carbon_reduce
+		) = (
+		SELECT
+		m.member_point + o.used_point - o.get_point,
+		GREATEST(m.total_carbon_reduce - (o.get_point / 1000.0), 0)
+		FROM order_tbl o
+		WHERE o.member_id = m.member_id
+		AND o.order_id = #{orderId}
+		)
+		WHERE EXISTS (
+		SELECT 1
+		FROM order_tbl o
+		WHERE o.member_id = m.member_id
+		AND o.order_id = #{orderId}
+		)
+	</update>
 
 
 <select id="getStoreOperatingHours" parameterType="int" resultType="operating">
@@ -558,4 +592,10 @@
 		WHERE order_id = #{orderId}
 	</select>
 
+	<update id="cancelOrder" parameterType="int">
+		UPDATE order_tbl
+		SET
+		order_status = 9
+		WHERE order_id = #{orderId}
+	</update>
 </mapper>

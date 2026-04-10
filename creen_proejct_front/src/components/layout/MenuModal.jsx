@@ -58,12 +58,12 @@ export default function MenuModal({
 
   // 탄소 계산
   const menuCarbon = Number(menuData?.menuCarbon || 0) * 1000;
-  const baseCarbon = (menuCarbon - menuCarbon * optionCarbonRateSum) * quantity;
+  const baseCarbon = menuCarbon - menuCarbon * optionCarbonRateSum;
   const reusableAppliedCarbon = reusable
     ? baseCarbon + baseCarbon * 0.5
     : baseCarbon;
-
-  const totalCarbon = reusableAppliedCarbon + selectedEcoCount * 20;
+  const totalCarbon = reusableAppliedCarbon * quantity + selectedEcoCount * 20;
+  const optionCarbon = Number(selectedEcoCount * 20);
 
   // 모달 열릴 때 초기화 및 옵션 조회
   useEffect(() => {
@@ -150,11 +150,11 @@ export default function MenuModal({
       quantity,
       totalPrice,
       unitPrice,
-      totalCarbon,
+      reusableAppliedCarbon,
+      optionCarbon,
       options: selectedOptions,
       menuImage: menuData.menuImage,
     };
-
     addToCart(cartItem);
     setStoreId(Number(currentStoreId));
     setStoreName(currentStoreName);

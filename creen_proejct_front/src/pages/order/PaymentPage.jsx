@@ -67,8 +67,14 @@ const PaymentPage = () => {
   const deliveryType = deliveryPrice === 0 ? 1 : deliveryPrice === 1000 ? 2 : 3;
   const deliveryCarbon = deliveryType === 3 ? 0 : 300;
   const totalCarbon =
-    cartList.reduce((sum, item) => sum + (item.carbonSaved || 0), 0) +
-    deliveryCarbon;
+    Math.floor(
+      cartList.reduce(
+        (sum, item) =>
+          sum +
+          (item.reusableAppliedCarbon * item.quantity + item.optionCarbon),
+        0,
+      ),
+    ) + deliveryCarbon;
 
   // 🌟 최종 결제 금액 (실시간 계산)
   const totalPrice = itemPrice + deliveryPrice - ecoPoint;
@@ -112,7 +118,6 @@ const PaymentPage = () => {
       );
 
       const savedOrderId = response.data;
-
       // 2. 토스페이먼츠 호출
       const tossPayments = await loadTossPayments(
         import.meta.env.VITE_TOSS_CLIENT_KEY,
@@ -136,6 +141,7 @@ const PaymentPage = () => {
         failUrl: `${window.location.origin}/payment/fail`,
         customerName: memberId,
       });
+      ///이구간이 결제 완료된 구간
 
       // Zustand 스토어에 사용 포인트 기록 (필요 시)
       setUsingEcoPoint(ecoPoint);
@@ -144,7 +150,6 @@ const PaymentPage = () => {
       alert("결제 처리 중 오류가 발생했습니다.");
     }
   };
-
   // 포인트 입력 핸들러
   const handlePointChange = (e) => {
     const value = e.target.value.replace(/[^0-9]/g, "");

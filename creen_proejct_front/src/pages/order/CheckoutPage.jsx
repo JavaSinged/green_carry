@@ -73,9 +73,20 @@ const CheckoutPage = () => {
       });
   };
 
+  const updatePoint = (orderId) => {
+    axios
+      .patch(`${import.meta.env.VITE_BACKSERVER}/stores/updatePoint/${orderId}`)
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
   useEffect(() => {
     clearCart();
     fetchOrderDetails();
+    updatePoint(orderId);
 
     const intervalId = setInterval(() => {
       fetchOrderDetails();
