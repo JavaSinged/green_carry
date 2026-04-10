@@ -25,5 +25,5 @@ public class StoreInfo {
     private String openingDate; // YYYY-MM-DD 형식의 문자열
 
     // 영업시간 및 휴무일 리스트
-    private List<OperatingHours> operatingHours;
+    private List<StoreOperating> operatingHours;
 }

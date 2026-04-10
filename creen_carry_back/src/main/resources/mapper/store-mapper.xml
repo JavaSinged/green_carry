@@ -480,13 +480,15 @@
     </delete>
 
     <insert id="insertOperatingHours" parameterType="operatingHours">
-        INSERT INTO OPERATING_HOURS_TBL (STORE_ID,
+        INSERT INTO OPERATING_HOURS_TBL (HOUR_ID,
+                                         STORE_ID,
                                          DAY_OF_WEEK,
                                          OPEN_TIME,
                                          CLOSE_TIME,
                                          IS_DAY_OFF,
                                          WEEK_OF_MONTH)
-        VALUES (#{storeId},
+        VALUES (OPERATING_HOURS_SEQ.NEXTVAL,
+                #{storeId},
                 #{dayOfWeek},
                 #{openTime},
                 #{closeTime},

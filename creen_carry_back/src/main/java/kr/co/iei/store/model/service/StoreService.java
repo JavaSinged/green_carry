@@ -244,11 +244,11 @@ public class StoreService {
 
     private int parseWeekMonth(String val) {
         return switch (val) {
-            case "week3" -> 1; // 첫째주
-            case "week4" -> 2; // 둘째주
-            case "week5" -> 3; // 셋째주
-            case "week6" -> 4; // 넷째주
-            default -> 0; // week(매주), week2(격주-별도 로직 필요)
+            case "week1" -> 1; // 첫째주
+            case "week2" -> 2; // 둘째주
+            case "week3" -> 3; // 셋째주
+            case "week4" -> 4; // 넷째주
+            default -> 0; // week(매주)
         };
     }
 

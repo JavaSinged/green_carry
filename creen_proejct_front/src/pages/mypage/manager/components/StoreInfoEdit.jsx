@@ -12,6 +12,7 @@ import { AuthContext } from '../../../../context/AuthContext';
 export default function StoreInfoEdit() {
   const { user } = useContext(AuthContext) || {};
   const storeId = user?.storeId || null;
+
   const [formData, setFormData] = useState({
     storeName: '',
     storeIntro: '',
@@ -117,35 +118,20 @@ export default function StoreInfoEdit() {
 
   const restWeekMonthOpts = [
     { value: 'week', label: '매주' },
-    { value: 'week2', label: '격주' },
-    { value: 'month', label: '매월' },
-    { value: 'week3', label: '매월 첫번째' },
-    { value: 'week4', label: '매월 두번째' },
-    { value: 'week5', label: '매월 세번째' },
-    { value: 'week6', label: '매월 네번째' },
+    { value: 'week1', label: '매월 첫번째' },
+    { value: 'week2', label: '매월 두번째' },
+    { value: 'week3', label: '매월 세번째' },
+    { value: 'week4', label: '매월 네번째' },
   ];
 
-  // 🌟 DB WEEK_OF_MONTH 저장을 위한 매핑 객체
-  const weekMonthMapping = {
-    week: 0,
-    week2: 1,
-    month: 2,
-    week3: 3,
-    week4: 4,
-    week5: 5,
-    week6: 6,
-  };
-
-  // 🌟 DB WEEK_OF_MONTH 역매핑 객체 (불러올 때 사용)
   const reverseWeekMonthMapping = {
     0: 'week',
-    1: 'week2',
-    2: 'month',
+    1: 'week1',
+    2: 'week2',
     3: 'week3',
     4: 'week4',
-    5: 'week5',
-    6: 'week6',
   };
+
   const restDayOpts = [
     { value: 'mon', label: '월요일' },
     { value: 'tue', label: '화요일' },
@@ -172,10 +158,8 @@ export default function StoreInfoEdit() {
       fullAddress += extraAddress !== '' ? ` (${extraAddress})` : '';
     }
 
-    // 🌟 1. input에 들어갈 포맷: (우편번호) 기본주소 + " " (뒤에 상세주소 입력하라고 공백 추가)
     const combinedAddress = `(${data.zonecode}) ${fullAddress} `;
 
-    // 🌟 2. 상세주소가 안 붙은 순수 fullAddress로 위경도 미리 구해놓기
     naver.maps.Service.geocode({ query: fullAddress }, (status, response) => {
       if (
         status === naver.maps.Service.Status.OK &&
@@ -189,7 +173,6 @@ export default function StoreInfoEdit() {
           longitude: parseFloat(result.x),
         }));
       } else {
-        // 혹시 실패하더라도 주소 텍스트는 들어가야 함
         setFormData((prev) => ({ ...prev, storeAddress: combinedAddress }));
         alert('주소에 해당하는 위치(위/경도)를 찾을 수 없습니다.');
       }
@@ -219,18 +202,30 @@ export default function StoreInfoEdit() {
 
     if (name === 'storePhone') {
       const nums = value.replace(/\D/g, '');
-      if (nums.length <= 3) formattedValue = nums;
-      else if (nums.length <= 7)
-        formattedValue = `${nums.slice(0, 3)}-${nums.slice(3)}`;
-      else
-        formattedValue = `${nums.slice(0, 3)}-${nums.slice(3, 7)}-${nums.slice(7, 11)}`;
+      if (nums.startsWith('02')) {
+        if (nums.length <= 2) formattedValue = nums;
+        else if (nums.length <= 5)
+          formattedValue = `${nums.slice(0, 2)}-${nums.slice(2)}`;
+        else if (nums.length <= 9)
+          formattedValue = `${nums.slice(0, 2)}-${nums.slice(2, 5)}-${nums.slice(5)}`;
+        else
+          formattedValue = `${nums.slice(0, 2)}-${nums.slice(2, 6)}-${nums.slice(6, 10)}`;
+      } else {
+        if (nums.length <= 3) formattedValue = nums;
+        else if (nums.length <= 6)
+          formattedValue = `${nums.slice(0, 3)}-${nums.slice(3)}`;
+        else if (nums.length <= 10)
+          formattedValue = `${nums.slice(0, 3)}-${nums.slice(3, 6)}-${nums.slice(6)}`;
+        else
+          formattedValue = `${nums.slice(0, 3)}-${nums.slice(3, 7)}-${nums.slice(7, 11)}`;
+      }
     } else if (name === 'businessNumber') {
-      const nums = value.replace(/\D/g, '');
+      const nums = value.replace(/\D/g, '').slice(0, 10);
       if (nums.length <= 3) formattedValue = nums;
       else if (nums.length <= 5)
         formattedValue = `${nums.slice(0, 3)}-${nums.slice(3)}`;
       else
-        formattedValue = `${nums.slice(0, 3)}-${nums.slice(3, 5)}-${nums.slice(5, 10)}`;
+        formattedValue = `${nums.slice(0, 3)}-${nums.slice(3, 5)}-${nums.slice(5)}`;
     }
 
     setFormData((prev) => ({ ...prev, [name]: formattedValue }));
@@ -272,7 +267,6 @@ export default function StoreInfoEdit() {
     );
   };
 
-  // 🌟 컴포넌트 마운트 시 데이터 불러오기 로직
   useEffect(() => {
     if (!storeId) return;
 
@@ -292,7 +286,6 @@ export default function StoreInfoEdit() {
           const parsedZip = addrMatch ? addrMatch[1] : '';
           const parsedAddr = addrMatch ? addrMatch[2] : data.storeAddress || '';
 
-          // ✅ 기본 폼 데이터 세팅
           setFormData({
             storeName: data.storeName || '',
             storeIntro: data.storeIntro || '',
@@ -310,11 +303,8 @@ export default function StoreInfoEdit() {
 
           if (data.storeCategory) setActiveCategory(data.storeCategory);
 
-          // ✅ 영업시간 파싱
           if (data.operatingHours && data.operatingHours.length > 0) {
             const fetchedRestDays = [];
-
-            // 기본 diffTimes 틀 복사 (초기값 유지)
             let fetchedDiffTimes = [
               {
                 day: 'mon',
@@ -381,12 +371,9 @@ export default function StoreInfoEdit() {
               },
             ];
 
-            // ✅ weekOfMonth가 0인 일반 영업일만 추출
             const normalHours = data.operatingHours.filter(
               (h) => h.weekOfMonth === 0,
             );
-
-            // ✅ weekOfMonth > 0인 정기 휴무일 추출
             const restHours = data.operatingHours.filter(
               (h) => h.isDayOff === 'Y' && h.weekOfMonth > 0,
             );
@@ -400,7 +387,6 @@ export default function StoreInfoEdit() {
               });
             });
 
-            // ✅ 일반 영업일 데이터로 diffTimes 업데이트
             normalHours.forEach((timeInfo) => {
               const dayKey = timeInfo.dayOfWeek?.toLowerCase();
               const diffIndex = fetchedDiffTimes.findIndex(
@@ -432,7 +418,6 @@ export default function StoreInfoEdit() {
 
             setRestDays(fetchedRestDays);
 
-            // ✅ 7개가 다 있고 모두 같은 시간이면 'same', 아니면 'diff'
             const openHours = normalHours.filter((h) => h.isDayOff === 'N');
             const allSame =
               normalHours.length === 7 &&
@@ -459,7 +444,6 @@ export default function StoreInfoEdit() {
                 setSameTime({ startH: sH, startM: sM, endH: eH, endM: eM });
               }
             } else {
-              // ✅ diff 모드: DB에 없는 요일은 초기값(09:00~22:00 영업) 유지
               setHoursType('diff');
               setDiffTimes(fetchedDiffTimes);
             }
@@ -479,11 +463,10 @@ export default function StoreInfoEdit() {
 
     if (!formData.storeName.trim()) return alert('가게명을 입력해주세요.');
     if (!formData.storeIntro.trim()) return alert('가게 소개를 입력해주세요.');
-    if (formData.storePhone.length < 12)
-      return alert('올바른 가게 번호(13자리)를 입력해주세요.');
+    if (formData.storePhone.length < 9)
+      return alert('올바른 가게 번호(9자리 이상)를 입력해주세요.');
     if (!formData.storeAddress.trim())
       return alert('가게 주소를 입력해주세요.');
-    // 위경도 값이 없으면 (주소 검색을 제대로 안 했거나 에러가 난 경우) 방어 로직
     if (!formData.latitude || !formData.longitude)
       return alert('주소 검색을 통해 정확한 위치를 설정해주세요.');
     if (formData.businessNumber.length !== 12)
@@ -492,73 +475,38 @@ export default function StoreInfoEdit() {
     if (!formData.storeOriginInfo.trim())
       return alert('원산지 정보를 입력해주세요.');
 
-    // 1. 전체 주소 조합
-    // const fullStoreAddress = `(${formData.storeAddrCode}) ${formData.storeAddr} ${formData.storeAddrDetail}`;
-
-    // 2. 영업시간 + 휴무일 통합 리스트 만들기 (operating_hours_tbl 용)
-    const operatingHoursList = [];
-
-    // [기본 영업시간 세팅]
-    if (hoursType === 'same') {
-      const days = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
-      days.forEach((day) => {
-        operatingHoursList.push({
-          dayOfWeek: day,
-          openTime: is24h ? '00:00' : `${sameTime.startH}:${sameTime.startM}`,
-          closeTime: is24h ? '23:59' : `${sameTime.endH}:${sameTime.endM}`,
-          isDayOff: 'N',
-          weekOfMonth: 0, // 매일 영업은 기본 0
-        });
-      });
-    } else {
-      diffTimes.forEach((item) => {
-        operatingHoursList.push({
-          dayOfWeek: item.day,
-          openTime: item.isOpen ? `${item.startH}:${item.startM}` : '',
-          closeTime: item.isOpen ? `${item.endH}:${item.endM}` : '',
-          isDayOff: item.isOpen ? 'N' : 'Y',
-          weekOfMonth: 0,
-        });
-      });
-    }
-
-    // [휴무일 세팅] 추가된 정기 휴무일도 객체로 만들어서 넣습니다.
-    restDays.forEach((rd) => {
-      operatingHoursList.push({
-        dayOfWeek: rd.day,
-        openTime: '',
-        closeTime: '',
-        isDayOff: 'Y',
-        weekOfMonth: weekMonthMapping[rd.weekMonth], // 0~6 숫자로 변환
-      });
-    });
-
     try {
-      // 🌟 3. 백엔드 DB 컬럼명에 매칭되는 DTO 키값으로 Payload 재구성
+      // 🌟 [핵심 변경 사항]
+      // 백엔드는 operatingHours 배열이 아닌 hoursInfo 객체를 원합니다.
+      // 프론트엔드의 상태 그대로를 백엔드 구조에 일치시켜 넘깁니다.
       const payload = {
-        // store_tbl 대응
         storeId: storeId,
         storeName: formData.storeName,
-        storeAddress: formData.storeAddress, // 우편번호 + 주소 + 상세주소
+        storeAddress: formData.storeAddress,
         storePhone: formData.storePhone,
         storeIntro: formData.storeIntro,
-        storeOwner: '', // 받아오는 값이 없으니 빈 문자열 처리
-        storeOwnerAddress: formData.storeAddress, // 일단 동일하게 처리
         storeOriginInfo: formData.storeOriginInfo,
         storeOwnerNo: formData.businessNumber,
         storeCategory: activeCategory,
+        // DB 테이블에는 없지만 DTO에 추가하실 거라면 그대로 넘김
         latitude: formData.latitude,
         longitude: formData.longitude,
-        openingDate: formData.openDate, // 이미 YYYY-MM-DD 형태의 문자열임
+        openingDate: formData.openDate,
 
-        // operating_hours_tbl 대응을 위한 리스트
-        operatingHours: operatingHoursList,
+        hoursInfo: {
+          hoursType: hoursType, // "same" or "diff"
+          is24h: is24h, // boolean 형태 (백엔드 private boolean is24h; 에 대응)
+          sameTime: sameTime, // { startH: '09', startM: '00', endH: '22', endM: '00' }
+          diffTimes: diffTimes, // 배열
+          restDays: restDays, // 배열
+        },
       };
 
       const response = await axios.post(
         `${import.meta.env.VITE_BACKSERVER}/stores/update`,
         payload,
       );
+
       if (response.status === 200 || response.data === 'SUCCESS') {
         alert('정보 변경이 완료되었습니다.');
       }
@@ -612,7 +560,7 @@ export default function StoreInfoEdit() {
               value={formData.storePhone}
               onChange={handleInputChange}
               className={styles.inputBase}
-              placeholder="010-0000-0000"
+              placeholder="02-000-0000 또는 010-0000-0000"
               maxLength={13}
             />
           </div>
@@ -625,9 +573,9 @@ export default function StoreInfoEdit() {
             <div className={styles.addressTopRow}>
               <input
                 type="text"
-                name="storeAddress" // 🌟 통합된 name 사용
+                name="storeAddress"
                 value={formData.storeAddress}
-                onChange={handleInputChange} // 🌟 사용자가 뒤에 상세주소를 이어서 타이핑할 수 있게 함
+                onChange={handleInputChange}
                 placeholder="(우편번호) 주소를 검색하고 상세주소를 이어서 입력하세요"
                 className={styles.inputBase}
               />
@@ -658,7 +606,7 @@ export default function StoreInfoEdit() {
           </div>
         </div>
 
-        {/* 🌟 개업일자 (직접 제어하는 달력 팝업 방식) */}
+        {/* 🌟 개업일자 */}
         <div className={styles.formRow}>
           <label className={styles.label}>개업일자</label>
           <div className={styles.inputWrap}>
@@ -674,7 +622,7 @@ export default function StoreInfoEdit() {
                 type="text"
                 name="openDate"
                 value={formData.openDate || ''}
-                className={styles.inputBase} // 기존 스타일 유지
+                className={styles.inputBase}
                 placeholder="YYYY-MM-DD"
                 readOnly
                 onClick={() => setShowCalendar(!showCalendar)}
@@ -696,7 +644,7 @@ export default function StoreInfoEdit() {
                   style={{
                     position: 'absolute',
                     top: '100%',
-                    left: '0', // 오른쪽 정렬을 원하면 right: "0"
+                    left: '0',
                     zIndex: 100,
                     marginTop: '5px',
                     borderRadius: '12px',
