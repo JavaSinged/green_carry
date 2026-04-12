@@ -138,7 +138,7 @@ const UserReviewList = () => {
                       ? review.reviewThumb.startsWith("/")
                         ? `${backHost}${review.reviewThumb}`
                         : `${backHost}/uploads/review/${review.reviewThumb}`
-                      : "/img/no-image.png"
+                      : "/image/no-image.png"
                   }
                   alt="리뷰사진"
                   className={styles.review_img}

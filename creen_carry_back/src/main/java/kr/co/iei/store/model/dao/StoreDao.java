@@ -87,4 +87,6 @@ public interface StoreDao {
     void insertOperatingHours(StoreOperating dto);
 	void pointReward(Integer orderId);
 
+	int insertStore(Map<String, Object> data);
+
 }
