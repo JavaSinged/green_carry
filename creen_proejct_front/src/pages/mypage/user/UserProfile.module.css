@@ -372,16 +372,6 @@
   vertical-align: middle;
 }
 
-/* 🌟 포인트 부호별 색상 디테일 */
-.plus_point {
-  color: #2e7d32; /* 초록색 (적립) */
-  font-weight: 600;
-}
-
-.minus_point {
-  color: #555; /* 회색 (사용) */
-}
-
 /* 취소로 인한 회수 (-) */
 .point_refund_minus {
   color: #999;
@@ -391,7 +381,9 @@
 /* 취소로 인한 복구 (+) */
 .point_refund_plus {
   color: #0288d1; /* 파란색 (복구됨을 강조) */
+  font-size: 0.9rem;
   font-weight: 600;
+  line-height: 1.2;
 }
 
 .store_name_row {

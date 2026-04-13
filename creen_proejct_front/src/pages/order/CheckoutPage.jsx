@@ -39,6 +39,15 @@ const CheckoutPage = () => {
   const [targetArrivalTime, setTargetArrivalTime] = useState("--:--");
   const isFirst = useRef(true);
 
+  useEffect(() => {
+    const hasRefreshed = sessionStorage.getItem(`refreshed_${orderId}`);
+
+    if (!hasRefreshed && orderId) {
+      sessionStorage.setItem(`refreshed_${orderId}`, "true");
+      window.location.reload();
+    }
+  }, [orderId]);
+
   // 🌟 [추가/수정] 포인트 최신화 로직을 함수로 분리 (재사용을 위해)
   const fetchLatestPoint = async () => {
     const memberId = localStorage.getItem("memberId");
