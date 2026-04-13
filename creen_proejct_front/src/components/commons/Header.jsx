@@ -18,6 +18,7 @@ import { AuthContext } from "../../context/AuthContext";
 import useCartStore from "../../store/useCartStore";
 
 export default function Header() {
+  const clearCart = useCartStore((state) => state.clearCart);
   const navigate = useNavigate();
   const { isLogin, user, logout, isLoading } = useContext(AuthContext);
   const backHost = import.meta.env.VITE_BACKSERVER;
@@ -56,6 +57,7 @@ export default function Header() {
   };
 
   const handleLogoutClick = () => {
+    clearCart();
     fireStyledSwal(
       "success",
       "로그아웃 완료",
