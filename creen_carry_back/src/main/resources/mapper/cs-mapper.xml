@@ -20,13 +20,20 @@
     </select>
 
     <select id="selectMyInquiry" resultType="qna">
-        SELECT * FROM qna_tbl
-        <where>
-            <if test="memberId != null and memberId != ''">
-                member_id = #{memberId}
-            </if>
-        </where>
-        ORDER BY qna_no DESC
+        SELECT 
+	        Q.QNA_NO,
+	        Q.MEMBER_ID,
+	        Q.QNA_TITLE,
+	        Q.QNA_CONTENT,
+	        Q.QNA_ANSWER,
+	        Q.QNA_STATUS,
+	        Q.QNA_DATE,
+	        M.MEMBER_GRADE  FROM QNA_TBL Q
+  		JOIN MEMBER_TBL M ON Q.MEMBER_ID = M.MEMBER_ID
+        <if test="memberId != null">
+      		WHERE Q.MEMBER_ID = #{memberId}
+    	</if>
+   		ORDER BY Q.QNA_NO DESC
     </select>
 
     <insert id="insertQna">

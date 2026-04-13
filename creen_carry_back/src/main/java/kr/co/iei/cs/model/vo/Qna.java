@@ -18,5 +18,6 @@ public class Qna {
 	private String qnaAnswer;
 	private Integer qnaStatus;
 	private String qnaDate;
+	private Integer memberGrade;
 	
 }

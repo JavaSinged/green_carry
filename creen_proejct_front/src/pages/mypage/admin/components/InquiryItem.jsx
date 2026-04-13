@@ -9,6 +9,12 @@ export default function InquiryItem({
   onToggle,
   onAnswerSuccess,
 }) {
+  const getMemberGrade = (memberGrade) => {
+    if (memberGrade === 1) return "개인고객";
+    if (memberGrade === 2) return "사업자";
+    return "미분류";
+  };
+
   const [answerInput, setAnswerInput] = useState("");
   const isExpanded = expandedId === inq.qnaNo;
 
@@ -29,7 +35,7 @@ export default function InquiryItem({
         {
           qnaNo: inq.qnaNo,
           qnaAnswer: answerInput,
-        }
+        },
       );
 
       Swal.fire({
@@ -68,6 +74,11 @@ export default function InquiryItem({
           <span className={styles.itemTitle}>{inq.qnaTitle}</span>
         </div>
         <div className={styles.itemMeta}>
+          <span
+            className={`${styles.gradeBadge} ${inq.memberGrade === 1 ? styles.personal : styles.business}`}
+          >
+            {getMemberGrade(inq.memberGrade)}
+          </span>
           <span>{inq.memberId}</span>
           <span className={styles.itemDate}>
             {new Date(inq.qnaDate).toLocaleDateString()}
