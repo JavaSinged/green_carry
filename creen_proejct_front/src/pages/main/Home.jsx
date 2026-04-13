@@ -281,12 +281,10 @@ export default function Home() {
                       alt={store.storeName}
                       style={{ objectFit: "cover" }}
                     />
-                    {isLogin ? (
+                    {isLogin && user?.memberGrade === 1 && (
                       <div className={styles.card_badge}>
                         {formatTime(numericDist)}
                       </div>
-                    ) : (
-                      ""
                     )}
                   </div>
                   <div className={styles.card_info}>
