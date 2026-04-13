@@ -60,7 +60,8 @@ export default function MenuModal({
   const menuCarbon = Number(menuData?.menuCarbon || 0) * 1000;
   const baseCarbon = menuCarbon - menuCarbon * optionCarbonRateSum;
   const reusableAppliedCarbon = reusable ? baseCarbon * 0.5 : 0;
-  const totalCarbon = reusableAppliedCarbon * quantity + selectedEcoCount * 20;
+  const totalCarbon =
+    (baseCarbon - reusableAppliedCarbon) * quantity - selectedEcoCount * 20;
   const optionCarbon = Number(selectedEcoCount * 20);
 
   // 모달 열릴 때 초기화 및 옵션 조회
@@ -356,7 +357,7 @@ export default function MenuModal({
           </div>
 
           <div className={styles.summary_row}>
-            <span className={styles.summary_label}>총 예상 탄소 절감량</span>
+            <span className={styles.summary_label}>총 예상 탄소 배출량</span>
             <span className={styles.carbon_total}>
               {totalCarbon.toFixed(1)}g CO2e
             </span>
