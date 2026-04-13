@@ -653,5 +653,13 @@
 		=
 		#{orderId}
 	</update>
+	
+	<select id="getStoreLocation" resultType="Store">
+		select 
+			latitude,
+			longitude
+		from store_tbl
+		where store_id = #{storeId}
+	</select>
 
 </mapper>

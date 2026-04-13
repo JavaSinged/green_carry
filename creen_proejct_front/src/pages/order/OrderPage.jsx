@@ -29,7 +29,10 @@ const OrderPage = () => {
   const [realTotal, setRealTotal] = useState(0);
   const [deliveryType, setDeliveryType] = useState(1);
   const [num, setNum] = useState(0);
-
+  const [storeLat, setStoreLat] = useState(0);
+  const [storeLong, setStoreLong] = useState(0);
+  const lat2 = localStorage.LATITUDE;
+  const lon2 = localStorage.LONGITUDE;
   // 장바구니 비어있음 여부 체크
   const isCartEmpty = !cartList || cartList.length === 0;
 
@@ -41,7 +44,18 @@ const OrderPage = () => {
       0,
     ),
   );
-
+  useEffect(() => {
+    axios
+      .get(`${import.meta.env.VITE_BACKSERVER}/stores/location/${storeId}`)
+      .then((res) => {
+        console.log(res.data);
+        setStoreLat(res.data.latitude);
+        setStoreLong(res.data.longitude);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, []);
   useEffect(() => {
     setNum(deliveryType === 1 ? 0 : deliveryType === 2 ? 1000 : 3000);
   }, [deliveryType]);
@@ -50,6 +64,27 @@ const OrderPage = () => {
     // 주문 추가 로직
   };
 
+  const getDistance = (storeLat, storeLong, lat2, lon2) => {
+    const R = 6371; // 지구 반지름 (km)
+
+    const dLat = (lat2 - storeLat) * (Math.PI / 180);
+    const dLon = (lon2 - storeLong) * (Math.PI / 180);
+
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(storeLat * (Math.PI / 180)) *
+        Math.cos(lat2 * (Math.PI / 180)) *
+        Math.sin(dLon / 2) *
+        Math.sin(dLon / 2);
+
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+    return R * c; // km
+  };
+  const distance = getDistance(storeLat, storeLong, lat2, lon2);
+  console.log(distance);
+  console.log("store:", storeLat, storeLong);
+  console.log("user:", lat2, lon2);
   return (
     <div className={styles.pageWrapper}>
       <main className={styles.mainContainer}>

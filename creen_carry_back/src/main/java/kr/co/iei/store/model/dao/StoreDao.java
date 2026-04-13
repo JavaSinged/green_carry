@@ -89,4 +89,6 @@ public interface StoreDao {
 
 	int insertStore(Map<String, Object> data);
 
+	Store getStoreLocation(Integer storeId);
+
 }

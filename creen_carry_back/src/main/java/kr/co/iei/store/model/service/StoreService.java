@@ -305,4 +305,9 @@ public class StoreService {
         return storeInfo;
     }
 
+	public Store getStoreLocation(Integer storeId) {
+		Store store = storeDao.getStoreLocation(storeId);
+		return store;
+	}
+
 }
