@@ -62,6 +62,7 @@ export default function Home() {
   const [selectedCategory, setSelectedCategory] = useState("인기맛집");
   const [searchTerm, setSearchTerm] = useState("");
   const [storeList, setStoreList] = useState([]);
+  const { isLogin } = useContext(AuthContext);
 
   // 1. 🌟 숫자 거리 계산 함수 (철저한 방어 로직 추가)
   const getNumericDistance = (storeLat, storeLng) => {
@@ -103,7 +104,7 @@ export default function Home() {
   };
 
   const formatDistance = (distance) => {
-    if (distance === null) return "위치 미설정";
+    if (distance === null) return;
     return distance < 1
       ? `${Math.round(distance * 1000)}m`
       : `${distance.toFixed(1)}km`;
@@ -280,9 +281,13 @@ export default function Home() {
                       alt={store.storeName}
                       style={{ objectFit: "cover" }}
                     />
-                    <div className={styles.card_badge}>
-                      {formatTime(numericDist)}
-                    </div>
+                    {isLogin ? (
+                      <div className={styles.card_badge}>
+                        {formatTime(numericDist)}
+                      </div>
+                    ) : (
+                      ""
+                    )}
                   </div>
                   <div className={styles.card_info}>
                     <h3 className={styles.store_name}>{store.storeName}</h3>
