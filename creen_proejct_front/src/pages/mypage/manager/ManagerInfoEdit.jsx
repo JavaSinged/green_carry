@@ -29,6 +29,7 @@ export default function ManagerInfoEdit() {
   const [profileData, setProfileData] = useState({
     memberName: "",
     memberPhone: "",
+    memberGrade: 1,
   });
   const [profileImg, setProfileImg] = useState(null);
   const [previewImg, setPreviewImg] = useState(null);
@@ -57,6 +58,7 @@ export default function ManagerInfoEdit() {
           setProfileData({
             memberName: res.data.memberName || "",
             memberPhone: res.data.memberPhone || "",
+            memberGrade: res.data.memberGrade || 1,
           });
           if (res.data.memberThumb) setPreviewImg(res.data.memberThumb);
           setLoading(false);
@@ -95,6 +97,7 @@ export default function ManagerInfoEdit() {
     formData.append("memberId", user.memberId);
     formData.append("memberName", profileData.memberName);
     formData.append("memberPhone", profileData.memberPhone);
+    formData.append("memberGrade", profileData.memberGrade);
     if (profileImg) {
       formData.append("uploadFile", profileImg);
     }
@@ -125,7 +128,7 @@ export default function ManagerInfoEdit() {
         setIsEditingProfile(false);
       }
     } catch (err) {
-      Swal.fire("에러", "수정 중 오류 발생", "error");
+      Swal.fire("에러", "수정 중 오류 발생", err);
     }
   };
 

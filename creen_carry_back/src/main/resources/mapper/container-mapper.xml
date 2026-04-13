@@ -5,19 +5,16 @@
 <mapper namespace="kr.co.iei.container.model.dao.ContainerDao">
 
     <insert id="insertContainer">
-        INSERT INTO CARBON_DEFINITION_TBL (
-            PRODUCT_ID, 
-            PRODUCT_MATERIAL, 
-            PRODUCT_EMISSIONS, 
-            PRODUCT_DESC, 
-            PRODUCT_IMG
-        ) VALUES (
-            (SELECT NVL(MAX(PRODUCT_ID), 0) + 1 FROM CARBON_DEFINITION_TBL), 
-            #{productName}, 
-            #{productEmissions}, 
-            #{productDesc}, 
-            #{productImg}
-        )
+        INSERT INTO CARBON_DEFINITION_TBL (PRODUCT_ID,
+                                           PRODUCT_MATERIAL,
+                                           PRODUCT_EMISSIONS,
+                                           PRODUCT_DESC,
+                                           PRODUCT_IMG)
+        VALUES ((SELECT NVL(MAX(PRODUCT_ID), 0) + 1 FROM CARBON_DEFINITION_TBL),
+                #{productName},
+                #{productEmissions},
+                #{productDesc},
+                #{productImg})
     </insert>
 
 </mapper>

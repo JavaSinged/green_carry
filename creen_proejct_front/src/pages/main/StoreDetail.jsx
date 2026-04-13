@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import styles from './StoreDetail.module.css';
 
 export default function StoreDetail() {
-  const location = useLocation();
-  const storeId = location.state?.storeId || 1;
+  const { id } = useParams();
+  const storeId = id ? Number(id) : 0;
 
   const [storeInfo, setStoreInfo] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -101,8 +101,8 @@ export default function StoreDetail() {
     if (!mapLoaded || !mapElement.current || !storeInfo) return;
     const { naver } = window;
 
-    const lat = storeInfo.LATITUDE || 37.497952;
-    const lng = storeInfo.LONGITUDE || 127.027619;
+    const lat = storeInfo.latitude || 37.497952;
+    const lng = storeInfo.longitude || 127.027619;
 
     const location = new naver.maps.LatLng(lat, lng);
 

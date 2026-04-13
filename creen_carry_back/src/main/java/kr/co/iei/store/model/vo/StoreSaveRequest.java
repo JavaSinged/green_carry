@@ -22,5 +22,8 @@ public class StoreSaveRequest {
     private String storeOriginInfo;
     private String storeCategory;
     private String storeAddress;
+    private String storeOwnerAddress;
+    private Double latitude;
+    private Double longitude;
     private HoursInfo hoursInfo; // 프론트에서 보낸 시간 정보 객체
 }

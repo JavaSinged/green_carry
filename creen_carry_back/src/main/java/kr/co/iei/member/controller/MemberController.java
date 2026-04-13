@@ -177,19 +177,20 @@ public class MemberController {
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
-
     }
 
     //유저 정보업데이트
     @PostMapping("/updateProfile")
     public ResponseEntity<?> updateProfile(@RequestParam String memberId, @RequestParam String memberName,
                                            @RequestParam String memberPhone,
+                                           @RequestParam Integer memberGrade,
                                            @RequestParam(value = "uploadFile", required = false) MultipartFile uploadFile) {
 
         Member member = new Member();
         member.setMemberId(memberId);
         member.setMemberName(memberName);
         member.setMemberPhone(memberPhone);
+        member.setMemberGrade(memberGrade);
 
         if (uploadFile != null && !uploadFile.isEmpty()) {
             try {

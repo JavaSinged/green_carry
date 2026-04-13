@@ -117,7 +117,6 @@ export default function StoreInfoEdit() {
   ];
 
   const restWeekMonthOpts = [
-    { value: 'week', label: '매주' },
     { value: 'week1', label: '매월 첫번째' },
     { value: 'week2', label: '매월 두번째' },
     { value: 'week3', label: '매월 세번째' },
@@ -207,17 +206,29 @@ export default function StoreInfoEdit() {
         else if (nums.length <= 5)
           formattedValue = `${nums.slice(0, 2)}-${nums.slice(2)}`;
         else if (nums.length <= 9)
-          formattedValue = `${nums.slice(0, 2)}-${nums.slice(2, 5)}-${nums.slice(5)}`;
+          formattedValue = `${nums.slice(0, 2)}-${nums.slice(
+            2,
+            5,
+          )}-${nums.slice(5)}`;
         else
-          formattedValue = `${nums.slice(0, 2)}-${nums.slice(2, 6)}-${nums.slice(6, 10)}`;
+          formattedValue = `${nums.slice(0, 2)}-${nums.slice(
+            2,
+            6,
+          )}-${nums.slice(6, 10)}`;
       } else {
         if (nums.length <= 3) formattedValue = nums;
         else if (nums.length <= 6)
           formattedValue = `${nums.slice(0, 3)}-${nums.slice(3)}`;
         else if (nums.length <= 10)
-          formattedValue = `${nums.slice(0, 3)}-${nums.slice(3, 6)}-${nums.slice(6)}`;
+          formattedValue = `${nums.slice(0, 3)}-${nums.slice(
+            3,
+            6,
+          )}-${nums.slice(6)}`;
         else
-          formattedValue = `${nums.slice(0, 3)}-${nums.slice(3, 7)}-${nums.slice(7, 11)}`;
+          formattedValue = `${nums.slice(0, 3)}-${nums.slice(
+            3,
+            7,
+          )}-${nums.slice(7, 11)}`;
       }
     } else if (name === 'businessNumber') {
       const nums = value.replace(/\D/g, '').slice(0, 10);
@@ -225,7 +236,9 @@ export default function StoreInfoEdit() {
       else if (nums.length <= 5)
         formattedValue = `${nums.slice(0, 3)}-${nums.slice(3)}`;
       else
-        formattedValue = `${nums.slice(0, 3)}-${nums.slice(3, 5)}-${nums.slice(5)}`;
+        formattedValue = `${nums.slice(0, 3)}-${nums.slice(3, 5)}-${nums.slice(
+          5,
+        )}`;
     }
 
     setFormData((prev) => ({ ...prev, [name]: formattedValue }));
@@ -387,6 +400,7 @@ export default function StoreInfoEdit() {
               });
             });
 
+            // 🌟 1. 항상 모든 요일의 세팅값을 만듭니다 (0 패딩 포함)
             normalHours.forEach((timeInfo) => {
               const dayKey = timeInfo.dayOfWeek?.toLowerCase();
               const diffIndex = fetchedDiffTimes.findIndex(
@@ -401,8 +415,14 @@ export default function StoreInfoEdit() {
                   edM = '00';
 
                 if (isOpen && timeInfo.openTime && timeInfo.closeTime) {
-                  [stH, stM] = timeInfo.openTime.split(':');
-                  [edH, edM] = timeInfo.closeTime.split(':');
+                  const [rawStH, rawStM] = timeInfo.openTime.split(':');
+                  const [rawEdH, rawEdM] = timeInfo.closeTime.split(':');
+
+                  // 혹시라도 DB에 "9:0" 처럼 들어가있다면 Select Box 바인딩이 안 되므로 강제로 "09:00" 포맷을 맞춤
+                  stH = rawStH?.padStart(2, '0') || '09';
+                  stM = rawStM?.padStart(2, '0') || '00';
+                  edH = rawEdH?.padStart(2, '0') || '22';
+                  edM = rawEdM?.padStart(2, '0') || '00';
                 }
 
                 fetchedDiffTimes[diffIndex] = {
@@ -416,6 +436,8 @@ export default function StoreInfoEdit() {
               }
             });
 
+            // 🌟 2. 조건에 상관없이 무조건 diffTimes와 restDays를 덮어씌웁니다. (토글할 때를 대비)
+            setDiffTimes(fetchedDiffTimes);
             setRestDays(fetchedRestDays);
 
             const openHours = normalHours.filter((h) => h.isDayOff === 'N');
@@ -441,11 +463,17 @@ export default function StoreInfoEdit() {
               } else {
                 const [sH, sM] = firstOpen.split(':');
                 const [eH, eM] = firstClose.split(':');
-                setSameTime({ startH: sH, startM: sM, endH: eH, endM: eM });
+                // sameTime에도 0 패딩을 강제로 맞춥니다.
+                setSameTime({
+                  startH: sH.padStart(2, '0'),
+                  startM: sM.padStart(2, '0'),
+                  endH: eH.padStart(2, '0'),
+                  endM: eM.padStart(2, '0'),
+                });
               }
             } else {
               setHoursType('diff');
-              setDiffTimes(fetchedDiffTimes);
+              // diffTimes는 이미 위에서 세팅했으므로 생략해도 됩니다.
             }
           }
         }
@@ -476,9 +504,16 @@ export default function StoreInfoEdit() {
       return alert('원산지 정보를 입력해주세요.');
 
     try {
-      // 🌟 [핵심 변경 사항]
-      // 백엔드는 operatingHours 배열이 아닌 hoursInfo 객체를 원합니다.
-      // 프론트엔드의 상태 그대로를 백엔드 구조에 일치시켜 넘깁니다.
+      // 🌟 체크 해제된 요일들을 수집 (매주 휴무인 요일들)
+      const closedDays = diffTimes
+        .filter((item) => !item.isOpen)
+        .map((item) => item.day);
+
+      // 🌟 restDays에서 매주 휴무인 요일 제거 (중복 방지)
+      const filteredRestDays = restDays.filter(
+        (rd) => !closedDays.includes(rd.day),
+      );
+
       const payload = {
         storeId: storeId,
         storeName: formData.storeName,
@@ -488,17 +523,17 @@ export default function StoreInfoEdit() {
         storeOriginInfo: formData.storeOriginInfo,
         storeOwnerNo: formData.businessNumber,
         storeCategory: activeCategory,
-        // DB 테이블에는 없지만 DTO에 추가하실 거라면 그대로 넘김
+        storeOwnerAddress: formData.storeAddress,
         latitude: formData.latitude,
         longitude: formData.longitude,
         openingDate: formData.openDate,
 
         hoursInfo: {
-          hoursType: hoursType, // "same" or "diff"
-          is24h: is24h, // boolean 형태 (백엔드 private boolean is24h; 에 대응)
-          sameTime: sameTime, // { startH: '09', startM: '00', endH: '22', endM: '00' }
-          diffTimes: diffTimes, // 배열
-          restDays: restDays, // 배열
+          hoursType: hoursType,
+          is24h: is24h,
+          sameTime: sameTime,
+          diffTimes: diffTimes,
+          restDays: filteredRestDays, // 🌟 필터링된 restDays 사용
         },
       };
 
@@ -788,7 +823,7 @@ export default function StoreInfoEdit() {
                       disabled={is24h}
                     >
                       {renderTimeOptions(23)}
-                    </select>{' '}
+                    </select>
                     시
                     <select
                       className={styles.timeSelect}
@@ -799,7 +834,7 @@ export default function StoreInfoEdit() {
                       disabled={is24h}
                     >
                       {renderTimeOptions(50, 10)}
-                    </select>{' '}
+                    </select>
                     분
                   </div>
                   <div className={styles.timeInputRow}>

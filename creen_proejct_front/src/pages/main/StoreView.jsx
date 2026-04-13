@@ -153,7 +153,11 @@ export default function StoreView() {
             </div>
           </div>
 
-          <Link to={`/storeDetail/${storeId}`} className={styles.store_link}>
+          <Link
+            to={`/storeDetail/${storeId}`}
+            state={{ storeId: storeId }}
+            className={styles.store_link}
+          >
             가게 정보, 원산지 정보 {">"}
           </Link>
           <p className={styles.store_desc}>{storeInfo.storeIntro}</p>
@@ -176,7 +180,9 @@ export default function StoreView() {
             {categories.map((cat) => (
               <button
                 key={cat}
-                className={`${styles.filter_btn} ${selectedCategory === cat ? styles.active : ""}`}
+                className={`${styles.filter_btn} ${
+                  selectedCategory === cat ? styles.active : ""
+                }`}
                 onClick={() => setSelectedCategory(cat)}
               >
                 {cat}

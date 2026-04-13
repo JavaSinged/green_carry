@@ -171,6 +171,10 @@ public class MemberService {
     @Transactional
     public int updateProfile(Member member) {
         int result = memberDao.updateProfile(member);
+
+        if(member.getMemberGrade() == 2){
+            result = memberDao.updateStoreOwner(member);
+        }
         return result;
 
 	}

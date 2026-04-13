@@ -234,6 +234,7 @@ public class StoreController {
     //    ------------------- 매장 수정 로직 ----------------------
     @PostMapping("/update")
     public ResponseEntity<String> updateStore(@RequestBody StoreSaveRequest request) {
+		System.out.println(request);
         try {
             storeService.updateStoreInfoAndHours(request);
             return ResponseEntity.ok("SUCCESS");
@@ -245,7 +246,6 @@ public class StoreController {
 
     @GetMapping("/info/{storeId}")
     public ResponseEntity<Store> getStoreInfo(@PathVariable Integer storeId) {
-        System.out.println("/info/{storeId} 호출");
         Store storeInfo = storeService.getStoreInfo(storeId);
 
         // 데이터가 없는 경우 404 Not Found 또는 빈 객체 반환 등을 처리할 수 있습니다.
