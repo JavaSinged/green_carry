@@ -72,15 +72,6 @@
 		FROM member_tbl
 	</select>
 
-
-
-
-
-
-
-
-
-
 	<insert id="insertUser">
 		INSERT INTO MEMBER_TBL (
 		MEMBER_ID, MEMBER_PW,
