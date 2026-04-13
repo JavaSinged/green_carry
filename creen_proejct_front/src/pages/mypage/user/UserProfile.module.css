@@ -317,3 +317,19 @@
   font-size: 0.9rem;
   color: #333;
 }
+.activePage {
+  background-color: #2f8f46; /* 메인 에코 초록색 */
+  color: white;
+  border-color: #2f8f46;
+  font-weight: bold;
+}
+
+.activePage:hover {
+  background-color: #267a39;
+}
+
+/* 이전/다음 버튼이 비활성화되었을 때 */
+.pageBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}

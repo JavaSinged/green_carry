@@ -28,7 +28,6 @@ const UserProfile = () => {
 
   const backHost = import.meta.env.VITE_BACKSERVER;
 
-  // 🌟 [수정] 페이지네이션 상태
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
@@ -230,25 +229,33 @@ const UserProfile = () => {
                   {totalPages > 1 && (
                     <div className={styles.pagination}>
                       <button
+                        className={styles.pageBtn}
                         onClick={() =>
-                          setCurrentPage((prev) => Math.max(prev - 1, 1))
+                          setCurrentPage((p) => Math.max(1, p - 1))
                         }
                         disabled={currentPage === 1}
-                        className={styles.pageBtn}
                       >
                         &lt;
                       </button>
-                      <span className={styles.pageInfo}>
-                        {currentPage} / {totalPages}
-                      </span>
+
+                      {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                        (page) => (
+                          <button
+                            key={page}
+                            className={`${styles.pageBtn} ${currentPage === page ? styles.activePage : ""}`}
+                            onClick={() => setCurrentPage(page)}
+                          >
+                            {page}
+                          </button>
+                        ),
+                      )}
+
                       <button
+                        className={styles.pageBtn}
                         onClick={() =>
-                          setCurrentPage((prev) =>
-                            Math.min(prev + 1, totalPages),
-                          )
+                          setCurrentPage((p) => Math.min(totalPages, p + 1))
                         }
                         disabled={currentPage === totalPages}
-                        className={styles.pageBtn}
                       >
                         &gt;
                       </button>
