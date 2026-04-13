@@ -252,7 +252,8 @@
 		TO_CHAR(m.reg_date, 'YYYY-MM-DD') AS orderDate,
 		o.get_point AS
 		getPoint,
-		o.used_point AS usedPoint
+		o.used_point AS usedPoint,
+		o.order_status
 		FROM order_tbl o
 		JOIN
 		order_list_map m ON o.order_id = m.order_id

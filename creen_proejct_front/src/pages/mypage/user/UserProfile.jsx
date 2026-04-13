@@ -199,31 +199,53 @@ const UserProfile = () => {
               {/* 🌟 [수정] pointHistory 대신 currentHistoryItems로 매핑 */}
               {currentHistoryItems.length > 0 ? (
                 <>
-                  {currentHistoryItems.map((item) => (
-                    <div key={item.orderId} className={styles.history_item}>
-                      <div className={styles.history_left}>
-                        <StorefrontIcon className={styles.store_icon} />
-                        <div>
-                          <div>{item.storeName}</div>
-                          <div className={styles.history_date}>
-                            {item.orderDate}
+                  {currentHistoryItems.map((item) => {
+                    const isCancel = item.orderStatus === 9;
+
+                    return (
+                      <div key={item.orderId} className={styles.history_item}>
+                        <div className={styles.history_left}>
+                          <StorefrontIcon className={styles.store_icon} />
+                          <div>
+                            <div>{item.storeName}</div>
+                            <div className={styles.history_date}>
+                              {item.orderDate}
+                            </div>
                           </div>
                         </div>
+
+                        <div className={styles.history_right}>
+                          {/* 적립 포인트 */}
+                          {item.getPoint > 0 && (
+                            <span
+                              className={
+                                isCancel
+                                  ? styles.minus_point
+                                  : styles.plus_point
+                              }
+                            >
+                              {isCancel ? "-" : "+"}
+                              {item.getPoint.toLocaleString()}P
+                            </span>
+                          )}
+
+                          {/* 사용 포인트 */}
+                          {item.usedPoint > 0 && (
+                            <span
+                              className={
+                                isCancel
+                                  ? styles.plus_point
+                                  : styles.minus_point
+                              }
+                            >
+                              {isCancel ? "+" : "-"}
+                              {item.usedPoint.toLocaleString()}P
+                            </span>
+                          )}
+                        </div>
                       </div>
-                      <div className={styles.history_right}>
-                        {item.getPoint > 0 && (
-                          <span className={styles.plus_point}>
-                            +{item.getPoint.toLocaleString()}P
-                          </span>
-                        )}
-                        {item.usedPoint > 0 && (
-                          <span className={styles.minus_point}>
-                            -{item.usedPoint.toLocaleString()}P
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
 
                   {/* 🌟 [추가] 페이지네이션 UI */}
                   {totalPages > 1 && (
