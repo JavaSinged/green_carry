@@ -1,4 +1,4 @@
-import { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { AuthContext } from "../../../context/AuthContext";
 import styles from "./UserProfile.module.css";
 import Diversity1Icon from "@mui/icons-material/Diversity1";
@@ -13,15 +13,12 @@ import axios from "axios";
 const UserProfile = () => {
   const { user } = useContext(AuthContext);
 
-  // 🌟 1. 에코 포인트 (쓰면 깎이는 돈 - 로컬스토리지 연동)
   const [point, setPoint] = useState(() => {
     const savedPoint = localStorage.getItem("memberPoint");
     return savedPoint ? Number(savedPoint) : 0;
   });
 
-  // 🌟 2. 누적 탄소 절감량 (절대 안 깎이는 명예 점수 - 서버에서 가져옴)
   const [totalCarbon, setTotalCarbon] = useState(0);
-
   const [communityPoint, setCommunityPoint] = useState(0);
   const [pointHistory, setPointHistory] = useState([]);
 
@@ -31,10 +28,25 @@ const UserProfile = () => {
 
   const backHost = import.meta.env.VITE_BACKSERVER;
 
-  const toggleEco = () => setOpenEco(!openEco);
-  const toggleHistory = () => setOpenHistory(!openHistory);
+  // 🌟 [수정] 페이지네이션 상태
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
 
-  // 등급 계산 로직
+  // 🌟 [추가] 현재 페이지에 보여줄 내역 계산
+  const totalPages = Math.ceil(pointHistory.length / itemsPerPage);
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentHistoryItems = pointHistory.slice(
+    indexOfFirstItem,
+    indexOfLastItem,
+  );
+
+  const toggleEco = () => setOpenEco(!openEco);
+  const toggleHistory = () => {
+    setOpenHistory(!openHistory);
+    if (!openHistory) setCurrentPage(1); // 닫았다 열 때 1페이지로 초기화 (선택사항)
+  };
+
   const getEcoGrade = (currentCarbon) => {
     if (currentCarbon < 1000) return { name: "꼬마 씨앗 🌰", next: 1000 };
     if (currentCarbon < 3000) return { name: "파릇파릇 새싹 🌱", next: 3000 };
@@ -43,11 +55,9 @@ const UserProfile = () => {
     return { name: "울창한 숲 🌲", next: null };
   };
 
-  // 🌟 3. 내 등급은 '보유 포인트'가 아니라 '누적 탄소량' 기준으로 계산!
   const myGradeInfo = getEcoGrade(totalCarbon);
 
   useEffect(() => {
-    // AuthContext의 user 객체가 변동되면 보유 포인트 최신화
     if (user?.memberPoint !== undefined) {
       setPoint(user.memberPoint);
     }
@@ -58,20 +68,17 @@ const UserProfile = () => {
           const token = localStorage.getItem("accessToken");
           const config = { headers: { Authorization: `Bearer ${token}` } };
 
-          // 🌟 4. 누적 탄소 절감량은 깎이면 안되므로 서버에서 진짜 누적값을 가져옵니다.
           const carbonRes = await axios.get(`${backHost}/member/total-carbon`, {
             params: { memberId: user.memberId },
             ...config,
           });
           setTotalCarbon(Math.floor(carbonRes.data * 1000));
 
-          // 커뮤니티 포인트
           const commRes = await axios.get(
             `${backHost}/member/community-carbon`,
           );
           setCommunityPoint(commRes.data);
 
-          // 내역 리스트
           const historyRes = await axios.get(
             `${backHost}/member/point-history/${user.memberId}`,
             config,
@@ -85,7 +92,6 @@ const UserProfile = () => {
     fetchUserData();
   }, [user, backHost]);
 
-  // 🌟 5. 경험치 바(게이지)도 누적 탄소량 기준으로 차오르게 수정!
   useEffect(() => {
     const targetPoint = 10000;
     const calculatedPercent = Math.min((totalCarbon / targetPoint) * 100, 100);
@@ -144,8 +150,7 @@ const UserProfile = () => {
               ></div>
             </div>
             <div className={styles.gauge_info}>
-              <span>🌳 나무 {(totalCarbon / 6600).toFixed(2)} 그루 상당</span>{" "}
-              {/* 🌟 누적량 기준 */}
+              <span>🌳 나무 {(totalCarbon / 6600).toFixed(2)} 그루 상당</span>
             </div>
           </div>
         </section>
@@ -154,8 +159,7 @@ const UserProfile = () => {
       <section className={styles.right_sub}>
         <div className={styles.my_point}>
           <span>에코 포인트</span>
-          <p>보유 포인트 : {point.toLocaleString()}P</p>{" "}
-          {/* 🌟 보유 포인트 표시 */}
+          <p>보유 포인트 : {point.toLocaleString()}P</p>
         </div>
 
         <div className={styles.collapse_wrapper}>
@@ -193,32 +197,64 @@ const UserProfile = () => {
           </div>
           <Collapse in={openHistory} timeout="auto" unmountOnExit>
             <div className={styles.history_list}>
-              {pointHistory.length > 0 ? (
-                pointHistory.map((item) => (
-                  <div key={item.orderId} className={styles.history_item}>
-                    <div className={styles.history_left}>
-                      <StorefrontIcon className={styles.store_icon} />
-                      <div>
-                        <div>{item.storeName}</div>
-                        <div className={styles.history_date}>
-                          {item.orderDate}
+              {/* 🌟 [수정] pointHistory 대신 currentHistoryItems로 매핑 */}
+              {currentHistoryItems.length > 0 ? (
+                <>
+                  {currentHistoryItems.map((item) => (
+                    <div key={item.orderId} className={styles.history_item}>
+                      <div className={styles.history_left}>
+                        <StorefrontIcon className={styles.store_icon} />
+                        <div>
+                          <div>{item.storeName}</div>
+                          <div className={styles.history_date}>
+                            {item.orderDate}
+                          </div>
                         </div>
                       </div>
+                      <div className={styles.history_right}>
+                        {item.getPoint > 0 && (
+                          <span className={styles.plus_point}>
+                            +{item.getPoint.toLocaleString()}P
+                          </span>
+                        )}
+                        {item.usedPoint > 0 && (
+                          <span className={styles.minus_point}>
+                            -{item.usedPoint.toLocaleString()}P
+                          </span>
+                        )}
+                      </div>
                     </div>
-                    <div className={styles.history_right}>
-                      {item.getPoint > 0 && (
-                        <span className={styles.plus_point}>
-                          +{item.getPoint.toLocaleString()}P
-                        </span>
-                      )}
-                      {item.usedPoint > 0 && (
-                        <span className={styles.minus_point}>
-                          -{item.usedPoint.toLocaleString()}P
-                        </span>
-                      )}
+                  ))}
+
+                  {/* 🌟 [추가] 페이지네이션 UI */}
+                  {totalPages > 1 && (
+                    <div className={styles.pagination}>
+                      <button
+                        onClick={() =>
+                          setCurrentPage((prev) => Math.max(prev - 1, 1))
+                        }
+                        disabled={currentPage === 1}
+                        className={styles.pageBtn}
+                      >
+                        &lt;
+                      </button>
+                      <span className={styles.pageInfo}>
+                        {currentPage} / {totalPages}
+                      </span>
+                      <button
+                        onClick={() =>
+                          setCurrentPage((prev) =>
+                            Math.min(prev + 1, totalPages),
+                          )
+                        }
+                        disabled={currentPage === totalPages}
+                        className={styles.pageBtn}
+                      >
+                        &gt;
+                      </button>
                     </div>
-                  </div>
-                ))
+                  )}
+                </>
               ) : (
                 <div
                   style={{
