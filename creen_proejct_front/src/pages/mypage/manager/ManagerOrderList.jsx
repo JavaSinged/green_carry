@@ -7,6 +7,9 @@ const ManagerOrderList = () => {
   const [orderList, setOrderList] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  const [expandedOrderId, setExpandedOrderId] = useState(null);
+  const [orderDetailsData, setOrderDetailsData] = useState({});
+
   // 페이지네이션 상태
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
@@ -56,6 +59,31 @@ const ManagerOrderList = () => {
         console.error(err);
         Swal.fire("오류", "상태 변경에 실패했습니다.", "error");
       });
+  };
+  const toggleOrderDetails = async (orderId) => {
+    // 이미 열려있으면 닫기
+    if (expandedOrderId === orderId) {
+      setExpandedOrderId(null);
+      return;
+    }
+
+    // 열기
+    setExpandedOrderId(orderId);
+
+    // 한 번도 안 불러왔던 데이터면 서버에서 가져오기
+    if (!orderDetailsData[orderId]) {
+      try {
+        const res = await axios.get(
+          `${import.meta.env.VITE_BACKSERVER}/stores/order/${orderId}`,
+        );
+        setOrderDetailsData((prev) => ({
+          ...prev,
+          [orderId]: res.data.items || [],
+        }));
+      } catch (err) {
+        console.error("상세 메뉴 불러오기 실패:", err);
+      }
+    }
   };
 
   // 🌟 주문 상태 업데이트 로직 (시간 설정 포함)
@@ -229,6 +257,45 @@ const ManagerOrderList = () => {
                       {order.menuName}{" "}
                       {order.extraCount > 0 && `외 ${order.extraCount}건`}
                     </h3>
+
+                    {/* 🌟 여기에 상세 메뉴 토글 버튼과 리스트가 추가되었습니다 */}
+                    {order.extraCount > 0 && (
+                      <div className={styles.detailToggleWrap}>
+                        <button
+                          className={styles.detailToggleBtn}
+                          onClick={() => toggleOrderDetails(order.orderId)}
+                        >
+                          {expandedOrderId === order.orderId
+                            ? "상세메뉴 닫기 ▲"
+                            : "상세메뉴 보기 ▼"}
+                        </button>
+
+                        {expandedOrderId === order.orderId &&
+                          orderDetailsData[order.orderId] && (
+                            <ul className={styles.subMenuList}>
+                              {orderDetailsData[order.orderId].map(
+                                (item, idx) => (
+                                  <li
+                                    key={idx}
+                                    className={
+                                      isCanceled ? styles.strikeThrough : ""
+                                    }
+                                  >
+                                    - {item.menuName}{" "}
+                                    <strong style={{ color: "#2f8f46" }}>
+                                      {item.quantity}개
+                                    </strong>
+                                    {item.optionString
+                                      ? ` (${item.optionString})`
+                                      : ""}
+                                  </li>
+                                ),
+                              )}
+                            </ul>
+                          )}
+                      </div>
+                    )}
+
                     <p className={styles.price}>
                       결제금액:{" "}
                       <strong

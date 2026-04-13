@@ -318,3 +318,42 @@
   opacity: 0.4;
   cursor: not-allowed;
 }
+.detailToggleWrap {
+  margin: 5px 0 10px 0;
+}
+
+.detailToggleBtn {
+  background: none;
+  border: none;
+  color: #666;
+  font-size: 0.85rem;
+  font-weight: bold;
+  padding: 0;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.detailToggleBtn:hover {
+  color: #2f8f46;
+}
+
+/* 세부 메뉴 리스트 스타일 */
+.subMenuList {
+  list-style: none;
+  padding: 10px;
+  margin: 8px 0 0 0;
+  background-color: #f5f7f5;
+  border-left: 3px solid #2f8f46;
+  border-radius: 4px;
+}
+
+.subMenuList li {
+  font-size: 0.85rem;
+  color: #444;
+  margin-bottom: 6px;
+  line-height: 1.4;
+}
+
+.subMenuList li:last-child {
+  margin-bottom: 0;
+}
