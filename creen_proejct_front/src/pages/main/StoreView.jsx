@@ -136,7 +136,7 @@ export default function StoreView() {
             <div className={styles.store_rating_box}>
               <StarIcon className={styles.star_icon} />
               <span className={styles.rating_num}>
-                {storeInfo.storeRating?.toFixed(1)}
+                {(storeInfo.storeRating || 0).toFixed(1)}
               </span>
 
               <span className={styles.review_count_text}>

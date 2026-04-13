@@ -6,16 +6,19 @@
 	<select id="selectAllStore">
 		SELECT s.*,
 		(SELECT NVL(AVG(review_rating), 0)
-		FROM review_tbl r
+		FROM
+		review_tbl r
 		WHERE r.store_id = s.store_id) AS storeRating,
-		(SELECT COUNT(*)
+		(SELECT
+		COUNT(*)
 		FROM review_tbl r
 		WHERE r.store_id = s.store_id) AS reviewCount
 		FROM store_tbl s
 		WHERE EXISTS (
 		SELECT 1
 		FROM menu_tbl m
-		WHERE m.store_id = s.store_id
+		WHERE m.store_id
+		= s.store_id
 		)
 	</select>
 
@@ -25,31 +28,31 @@
 		member_id AS memberId,
 		store_name AS storeName,
 		store_address AS storeAddress,
-		store_phone AS
-		storePhone,
+		store_phone AS storePhone,
 		store_intro AS storeIntro,
 		store_owner AS storeOwner,
 		store_owner_address AS storeOwnerAddress,
-		store_origin_info AS
-		storeOriginInfo,
+		store_origin_info AS storeOriginInfo,
 		store_owner_no AS storeOwnerNo,
-		store_category AS
-		storeCategory,
-		store_rating AS storeRating,
+		store_category AS storeCategory,
+		(SELECT NVL(AVG(review_rating), 0)
+		FROM review_tbl r
+		WHERE r.store_id = s.store_id) AS storeRating,
 		latitude AS LATITUDE,
 		longitude AS LONGITUDE,
 		store_thumb AS storeThumb,
 		TO_CHAR(opening_date, 'YYYY-MM-DD') AS openingDate
-		FROM STORE_TBL
-		WHERE store_id = #{storeId}
+		FROM STORE_TBL s WHERE store_id = #{storeId}
 	</select>
 
 	<select id="findStoreByMemberId" resultType="store">
 		select store_id
-		from store_tbl
+		from
+		store_tbl
 		where member_id = (select member_id
 		from member_tbl
-		where member_id = #{memberId})
+		where
+		member_id = #{memberId})
 	</select>
 
 	<select id="selectAllMenu" resultType="menu">
@@ -64,7 +67,8 @@
 		menu_status
 		FROM MENU_TBL
 		WHERE store_id = #{storeId}
-		ORDER BY menu_category ASC, menu_id ASC
+		ORDER BY
+		menu_category ASC, menu_id ASC
 	</select>
 
 	<select id="getMenuOptions" parameterType="long"
@@ -108,25 +112,31 @@
 
 	<update id="updatePoint">
 		UPDATE member_tbl m
-		SET m.member_point = m.member_point + (SELECT o.get_point - o.used_point
+		SET m.member_point =
+		m.member_point + (SELECT o.get_point - o.used_point
 		FROM order_tbl o
 		WHERE o.order_id = #{orderId}
 		AND o.member_id = m.member_id
-		AND o.point_reward = 0)
+		AND
+		o.point_reward = 0)
 		WHERE EXISTS (SELECT 1
 		FROM order_tbl o
-		WHERE o.order_id = #{orderId}
+		WHERE
+		o.order_id = #{orderId}
 		AND o.member_id = m.member_id
-		AND o.point_reward = 0)
+		AND o.point_reward
+		= 0)
 	</update>
 
 	<update id="addReduceCarbon">
 		UPDATE member_tbl
 		SET total_carbon_reduce =
 		NVL(total_carbon_reduce, 0) + (SELECT NVL(get_point, 0) / 1000
-		FROM order_tbl
+		FROM
+		order_tbl
 		WHERE order_id = #{orderId})
-		WHERE member_id = (SELECT member_id
+		WHERE member_id = (SELECT
+		member_id
 		FROM order_tbl
 		WHERE order_id = #{orderId})
 	</update>
@@ -139,7 +149,8 @@
 		option_string,
 		total_carbon,
 		quantity)
-		SELECT ORDER_DETAIL_SEQ.NEXTVAL,
+		SELECT
+		ORDER_DETAIL_SEQ.NEXTVAL,
 		#{orderId},
 		m.menu_id,
 		#{orderItem.price},
@@ -170,7 +181,8 @@
 		od.quantity,
 		od.price,
 		od.option_string AS optionString
-		FROM order_detail od
+		FROM order_detail
+		od
 		JOIN menu_tbl m
 		ON od.menu_id = m.menu_id
 		WHERE od.order_id =
@@ -205,7 +217,8 @@
 		orderStatus,
 		TO_CHAR(olm.reg_date, 'YYYY-MM-DD
 		HH24:MI') AS orderDate
-		FROM order_tbl o
+		FROM order_tbl
+		o
 		JOIN store_tbl s ON o.store_id =
 		s.store_id
 		JOIN member_tbl m ON
@@ -274,21 +287,25 @@
 		o.member_id = m.member_id
 
 		-- 상세 합산 서브쿼리
-		JOIN (SELECT order_id,
+		JOIN (SELECT
+		order_id,
 		SUM(quantity) AS totalCount,
 		SUM(price * quantity) AS
 		totalPrice,
 		SUM(total_carbon * quantity) AS orderCarbon
-		FROM order_detail
+		FROM
+		order_detail
 		GROUP BY order_id) od_sum ON o.order_id = od_sum.order_id
 
 		-- 대표 메뉴 서브쿼리
 		JOIN (SELECT od1.*
 		FROM order_detail od1
-		JOIN (SELECT order_id,
+		JOIN (SELECT
+		order_id,
 		MIN(order_detail_id) AS min_detail_id
 		FROM order_detail
-		GROUP BY order_id) x ON od1.order_id = x.order_id AND od1.order_detail_id =
+		GROUP
+		BY order_id) x ON od1.order_id = x.order_id AND od1.order_detail_id =
 		x.min_detail_id) od_first
 		ON o.order_id = od_first.order_id
 
@@ -301,7 +318,8 @@
 	</select>
 
 	<insert id="insertReviewComment" parameterType="reviewComment">
-		INSERT INTO review_comment_tbl (order_id,
+		INSERT INTO
+		review_comment_tbl (order_id,
 		store_id,
 		member_id,
 		review_comment_content,
@@ -334,16 +352,19 @@
 
 		(SELECT md.menu_name
 		FROM order_detail od
-		JOIN menu_tbl md ON od.menu_id =
+		JOIN
+		menu_tbl md ON od.menu_id =
 		md.menu_id
 		WHERE od.order_id = r.order_id
 		AND ROWNUM =
 		1) AS menuName
 
 		FROM review_tbl r
-		JOIN member_tbl m ON r.member_id =
+		JOIN member_tbl m ON
+		r.member_id =
 		m.member_id
-		LEFT JOIN review_comment_tbl rc ON r.order_id = rc.order_id
+		LEFT JOIN review_comment_tbl rc ON r.order_id
+		= rc.order_id
 		WHERE r.store_id
 		= #{storeId}
 		ORDER BY r.review_date DESC
@@ -380,7 +401,8 @@
 		s.store_address AS storeAddress,
 		m.member_addr AS deliveryAddress
 
-		FROM order_tbl o
+		FROM
+		order_tbl o
 		JOIN store_tbl s ON o.store_id = s.store_id
 		JOIN
 		order_list_map olm ON o.order_id = olm.order_id
@@ -402,7 +424,8 @@
 		JOIN (SELECT order_id,
 		MIN(order_detail_id) AS
 		min_detail_id
-		FROM order_detail
+		FROM
+		order_detail
 		GROUP BY order_id) x ON od1.order_id =
 		x.order_id AND
 		od1.order_detail_id =
@@ -440,12 +463,14 @@
 
 	<select id="selectStoreId" resultType="storeIdResponse">
 		SELECT store_id
-		FROM store_tbl
+		FROM
+		store_tbl
 		WHERE member_id = #{memberId}
 	</select>
 
 	<select id="selectStatsOrderInfo" resultType="statsOrderInfo">
-		SELECT o.DELIVERY_TYPE AS deliveryType,
+		SELECT
+		o.DELIVERY_TYPE AS deliveryType,
 		SUM(od.PRICE * od.QUANTITY) AS
 		seriesAmount
 		FROM order_list_map m
@@ -453,16 +478,19 @@
 		o.order_id
 
 		JOIN order_detail od ON o.order_id = od.order_id
-		WHERE o.store_id = #{storeId}
+		WHERE
+		o.store_id = #{storeId}
 		AND o.order_status = 5
 		AND TO_CHAR(m.reg_date,
 		'YYYY-MM') = #{yearMonth}
 		GROUP BY o.delivery_type
-		ORDER BY o.delivery_type ASC
+		ORDER BY
+		o.delivery_type ASC
 	</select>
 
 	<select id="selectStoreReviewStats" resultType="map">
-		SELECT NVL(AVG(review_rating), 0) AS "avgRating",
+		SELECT
+		NVL(AVG(review_rating), 0) AS "avgRating",
 		COUNT(*) AS "totalCount",
 		COUNT(CASE WHEN review_rating = 5 THEN 1 END) AS "star5",
 		COUNT(CASE
@@ -490,7 +518,8 @@
 		join order_list_map olm on
 		o.order_id = olm.order_id
 		where o.store_id = #{storeId}
-		group by to_char(olm.reg_date, 'yyyy-mm')
+		group by
+		to_char(olm.reg_date, 'yyyy-mm')
 		order by sale_month
 	</select>
 
@@ -499,13 +528,15 @@
 		quantity)
 		from order_detail
 		where order_id in (select order_id
-		from order_tbl
+		from
+		order_tbl
 		where store_id = #{storeId})
 	</select>
 
 	<update id="rollbackPoint" parameterType="int">
 		UPDATE member_tbl m
-		SET (
+		SET
+		(
 		member_point,
 		total_carbon_reduce
 		) = (SELECT m.member_point +
@@ -517,7 +548,8 @@
 		m.member_id
 		AND o.order_id = #{orderId})
 		WHERE EXISTS (SELECT 1
-		FROM order_tbl o
+		FROM
+		order_tbl o
 		WHERE o.member_id = m.member_id
 		AND o.order_id = #{orderId})
 	</update>
@@ -530,7 +562,8 @@
 
 	<update id="cancelOrder" parameterType="int">
 		UPDATE order_tbl
-		SET order_status = 9
+		SET
+		order_status = 9
 		WHERE order_id = #{orderId}
 	</update>
 
@@ -540,11 +573,14 @@
 		open_time AS openTime,
 		close_time AS closeTime,
 		is_day_off AS isDayOff,
-		week_of_month AS weekOfMonth
+		week_of_month AS
+		weekOfMonth
 		FROM operating_hours_tbl
 		WHERE store_id = #{storeId}
-		ORDER BY DECODE(day_of_week, 'MON', 1, 'TUE', 2, 'WED', 3, 'THU', 4, 'FRI',
-		5, 'SAT', 6, 'SUN', 7)
+		ORDER BY
+		DECODE(day_of_week, 'MON', 1, 'TUE', 2, 'WED', 3, 'THU', 4, 'FRI',
+		5,
+		'SAT', 6, 'SUN', 7)
 	</select>
 
 
@@ -562,35 +598,42 @@
 	<!-- 가게 정보 수정 -->
 	<update id="updateStore" parameterType="storeSaveRequest">
 		UPDATE STORE_TBL
-		SET STORE_NAME = #{storeName},
+		SET
+		STORE_NAME = #{storeName},
 		STORE_INTRO = #{storeIntro},
-		STORE_PHONE = #{storePhone},
+		STORE_PHONE =
+		#{storePhone},
 		STORE_OWNER_NO = #{storeOwnerNo},
-		STORE_ORIGIN_INFO = #{storeOriginInfo},
+		STORE_ORIGIN_INFO =
+		#{storeOriginInfo},
 		STORE_OWNER_ADDRESS = #{storeOwnerAddress},
 		STORE_CATEGORY = #{storeCategory},
 		STORE_ADDRESS = #{storeAddress},
 		LATITUDE = #{latitude},
 		LONGITUDE = #{longitude}
-		WHERE STORE_ID = #{storeId}
+		WHERE STORE_ID =
+		#{storeId}
 	</update>
 
 	<delete id="deleteOperatingHours"
 		parameterType="java.lang.Integer">
 		DELETE
 		FROM OPERATING_HOURS_TBL
-		WHERE STORE_ID = #{storeId}
+		WHERE STORE_ID =
+		#{storeId}
 	</delete>
 
 	<insert id="insertOperatingHours" parameterType="operatingHours">
-		INSERT INTO OPERATING_HOURS_TBL (HOUR_ID,
+		INSERT INTO
+		OPERATING_HOURS_TBL (HOUR_ID,
 		STORE_ID,
 		DAY_OF_WEEK,
 		OPEN_TIME,
 		CLOSE_TIME,
 		IS_DAY_OFF,
 		WEEK_OF_MONTH)
-		VALUES (OPERATING_HOURS_SEQ.NEXTVAL,
+		VALUES
+		(OPERATING_HOURS_SEQ.NEXTVAL,
 		#{storeId},
 		#{dayOfWeek},
 		#{openTime},
@@ -603,7 +646,8 @@
 		update order_tbl
 		set point_reward = 1
 		where order_id
-		= #{orderId}
+		=
+		#{orderId}
 	</update>
 
 </mapper>
