@@ -47,7 +47,7 @@ const ManagerReviewComment = () => {
 
   return (
     <div className={styles.page}>
-      <h2 className={styles.pageTitle}>리뷰 관리 📝</h2>
+      <h2 className={styles.pageTitle}>리뷰 관리</h2>
 
       <div className={styles.reviewList}>
         {reviews.length === 0 ? (
