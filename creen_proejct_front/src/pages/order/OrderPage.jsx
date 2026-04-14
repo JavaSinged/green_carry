@@ -23,7 +23,7 @@ const OrderPage = () => {
   const setSuperTotalPrice = useCartStore((state) => state.setSuperTotalPrice);
   const setDeilveryPrice = useCartStore((state) => state.setDeilveryPrice);
   const { increaseQuantity, decreaseQuantity } = useCartStore();
-
+  const setFinalCarbon = useCartStore((state) => state.setFinalCarbon);
   // 상태 관리
   const [selectedRide, setSelectedRide] = useState("pickup");
   const [realTotal, setRealTotal] = useState(0);
@@ -35,6 +35,7 @@ const OrderPage = () => {
   const lon2 = localStorage.LONGITUDE;
   // 장바구니 비어있음 여부 체크
   const isCartEmpty = !cartList || cartList.length === 0;
+  const Co2PerKm = 80;
 
   // 탄소 절감량 계산
   const totalCarbon = Math.floor(
@@ -60,10 +61,6 @@ const OrderPage = () => {
     setNum(deliveryType === 1 ? 0 : deliveryType === 2 ? 1000 : 3000);
   }, [deliveryType]);
 
-  const addOrder = () => {
-    // 주문 추가 로직
-  };
-
   const getDistance = (storeLat, storeLong, lat2, lon2) => {
     const R = 6371; // 지구 반지름 (km)
 
@@ -82,9 +79,32 @@ const OrderPage = () => {
     return R * c; // km
   };
   const distance = getDistance(storeLat, storeLong, lat2, lon2);
-  console.log(distance);
-  console.log("store:", storeLat, storeLong);
-  console.log("user:", lat2, lon2);
+  const formatTime = (distance) => {
+    if (distance === null) {
+      return {
+        bike: "주소지를 확인해주세요",
+        motor: "주소지를 확인해주세요",
+      };
+    }
+
+    // 자전거 시간 (기존 로직 유지)
+    const bikeTime = 15 + distance * 6;
+
+    // 오토바이 시간 (자전거의 1/3)
+    const motorTime = 15 + (distance * 6) / 3;
+
+    // 5분 단위 반올림
+    const bikeRounded = Math.round(bikeTime / 5) * 5;
+    const motorRounded = Math.round(motorTime / 5) * 5;
+
+    return {
+      bike: `${bikeRounded}분`,
+      motor: `${motorRounded}분`,
+    };
+  };
+  const finalCarbon =
+    totalCarbon +
+    (deliveryType === 3 ? 0 : Math.round(distance) * Co2PerKm * 2);
   return (
     <div className={styles.pageWrapper}>
       <main className={styles.mainContainer}>
@@ -136,7 +156,7 @@ const OrderPage = () => {
             <section className={styles.rightSection}>
               <div className={styles.card_ride}>
                 <h3>배달방식</h3>
-
+                <p>탄소 절감량은 왕복으로 계산됩니다.</p>
                 <div
                   className={`${styles.miniCard} ${selectedRide === "pickup" ? styles.selected : ""}`}
                   onClick={() => {
@@ -148,7 +168,7 @@ const OrderPage = () => {
                   <p>픽업</p>
                   <p className={styles.feeText}>배달비 0원</p>
                   <div className={styles.carbonBadge}>
-                    <p>🌱1km당 탄소 -150g</p>
+                    <p>🌱1km당 탄소 -{Co2PerKm * 2}g</p>
                   </div>
                 </div>
 
@@ -162,9 +182,9 @@ const OrderPage = () => {
                   <DirectionsBikeIcon />
                   <p>도보 / 자전거</p>
                   <p className={styles.feeText}>1,000원</p>
-                  <span>예상 배달 시간 30분</span>
+                  <span>예상 배달 시간 {formatTime(distance).bike}</span>
                   <div className={styles.carbonBadge}>
-                    <p>🌱1km당 탄소 -150g</p>
+                    <p>🌱1km당 탄소 -{Co2PerKm * 2}g</p>
                   </div>
                 </div>
 
@@ -178,7 +198,7 @@ const OrderPage = () => {
                   <TwoWheelerIcon />
                   <p>오토바이</p>
                   <p className={styles.feeText}>3,000원</p>
-                  <span>예상 배달 시간 25분</span>
+                  <span>예상 배달 시간 {formatTime(distance).motor}</span>
                 </div>
 
                 <div className={styles.ecoInfoContainer}>
@@ -189,19 +209,15 @@ const OrderPage = () => {
                   <div className={styles.ecoList}>
                     <div className={styles.ecoItem}>
                       <span>이동 거리:</span>
-                      <span>3km</span>
+                      <span>{distance.toFixed(2)}km</span>
                     </div>
                     <div className={styles.ecoItem}>
                       <span>탄소 절감:</span>
-                      <span>
-                        {totalCarbon + (deliveryType === 3 ? 0 : 300)}g
-                      </span>
+                      <span>{finalCarbon}g</span>
                     </div>
                     <div className={styles.ecoItem}>
                       <span>적립 예정:</span>
-                      <span>
-                        {totalCarbon + (deliveryType === 3 ? 0 : 300)} 포인트
-                      </span>
+                      <span>{finalCarbon} 포인트</span>
                     </div>
                   </div>
                 </div>
@@ -210,9 +226,9 @@ const OrderPage = () => {
               <div
                 className={styles.payButton}
                 onClick={() => {
-                  addOrder();
                   setSuperTotalPrice(realTotal);
                   setDeilveryPrice(num);
+                  setFinalCarbon(finalCarbon);
                   navigate("/paymentPage");
                 }}
               >

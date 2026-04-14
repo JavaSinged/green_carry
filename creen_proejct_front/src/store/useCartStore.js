@@ -10,7 +10,7 @@ const useCartStore = create(
       usingEcoPoint: 0,
       storeName: "",
       storeId: 0,
-
+      finalCarbon: 0,
       addToCart: (item) =>
         set((state) => ({
           cart: [...state.cart, item],
@@ -37,7 +37,7 @@ const useCartStore = create(
       setUsingEcoPoint: (price) => set({ usingEcoPoint: price }),
       setStoreName: (storeName) => set({ storeName: storeName }),
       setStoreId: (storeId) => set({ storeId: storeId }),
-
+      setFinalCarbon: (finalCarbon) => set({ finalCarbon: finalCarbon }),
       getTotalSavedCarbon: () =>
         Math.round(
           get().cart.reduce((sum, item) => sum + (item.savedCarbon || 0), 0),
