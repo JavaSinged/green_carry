@@ -380,6 +380,7 @@
 		s.store_thumb AS storeThumb,
 		o.order_status
 		AS orderStatus,
+		o.delivery_address AS deliveryAddress,
 		o.get_point AS getPoint,
 		o.review_status AS
 		reviewStatus,

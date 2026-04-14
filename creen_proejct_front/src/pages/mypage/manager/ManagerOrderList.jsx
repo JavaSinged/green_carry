@@ -24,6 +24,7 @@ const ManagerOrderList = () => {
       .get(`${import.meta.env.VITE_BACKSERVER}/stores/orders/owner/${storeId}`)
       .then((res) => {
         setOrderList(Array.isArray(res.data) ? res.data : []);
+        console.log("🚀 ~ fetchStoreOrders ~ res.data:", res.data);
       })
       .catch((err) => {
         console.error("주문 내역 불러오기 실패:", err);

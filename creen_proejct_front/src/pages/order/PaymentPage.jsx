@@ -160,7 +160,7 @@ const PaymentPage = () => {
         <div className={styles["payment-top-text"]}>
           <button
             className={styles["back-btn"]}
-            onClick={() => navigate("/shoppingCart")}
+            onClick={() => navigate("/orderPage")}
           >
             장바구니로 돌아가기
           </button>
@@ -176,7 +176,7 @@ const PaymentPage = () => {
                   <RoomIcon />
                   <h2>배송정보</h2>
                 </div>
-                <button
+                {/* <button
                   className={styles["text-btn"]}
                   onClick={() =>
                     navigate("/mypage/user/profile", {
@@ -185,7 +185,7 @@ const PaymentPage = () => {
                   }
                 >
                   주소 변경
-                </button>
+                </button> */}
               </div>
               <div className={styles["form-group"]}>
                 <label>배송 주소</label>
