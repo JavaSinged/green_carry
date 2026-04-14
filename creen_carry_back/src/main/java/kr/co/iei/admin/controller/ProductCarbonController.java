@@ -11,7 +11,9 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import kr.co.iei.admin.model.service.ProductCarbonService;
 import kr.co.iei.admin.model.vo.ProductCarbon;
@@ -43,16 +45,19 @@ public class ProductCarbonController {
 	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("FAIL");
 	    }
 	}	
-	
-	
-	@PostMapping("/register")
-	public ResponseEntity<String> register(@ModelAttribute ProductCarbon product){
-		Integer result = productCarbonService.saveContainer(product);
+	@PostMapping("/update")
+	public ResponseEntity<?> updateCarbon(
+		@ModelAttribute ProductCarbon product,
+		@RequestParam(value="uploadFile", required = false) MultipartFile uploadFile){
+		
+		//서비스 요청하기
+		Integer result = productCarbonService.updateProduct(product, uploadFile);
 		
 		if(result > 0) {
-			return ResponseEntity.ok("SUCCESS");
-		}else {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("FAIL");
-		}
+			return ResponseEntity.ok("수정 성공");
+	}else {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("수정실패");
+	}
+		
 	}
 }
