@@ -599,6 +599,7 @@ export default function StoreInfoEdit() {
 
       if (response.status === 200 || response.data === "SUCCESS") {
         alert("정보 변경이 완료되었습니다.");
+        window.location.reload();
       }
     } catch (error) {
       console.error("저장 실패", error);
