@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import styles from "./ManagerOrderList.module.css";
 import Swal from "sweetalert2";
+import RefreshIcon from "@mui/icons-material/Refresh";
 
 const ManagerOrderList = () => {
   const [orderList, setOrderList] = useState([]);
@@ -207,7 +208,7 @@ const ManagerOrderList = () => {
   return (
     <div className={styles.page}>
       <div className={styles.headerArea}>
-        <h2 className={styles.pageTitle}>📦 매장 주문 관리</h2>
+        <h2 className={styles.pageTitle}>매장 주문 관리</h2>
         <button
           className={styles.refreshBtn}
           onClick={() => {
@@ -215,7 +216,7 @@ const ManagerOrderList = () => {
             setCurrentPage(1);
           }}
         >
-          새로고침 🔄
+          새로고침 <RefreshIcon />
         </button>
       </div>
 

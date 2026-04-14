@@ -1,7 +1,9 @@
 .page {
   padding: 30px;
-  background-color: #f8f9fa;
+  margin: 0 auto;
+  background-color: #fff;
   min-height: 100vh;
+  padding: 0;
 }
 
 .pageTitle {
@@ -9,6 +11,7 @@
   font-weight: 800;
   color: #222;
   margin-bottom: 8px;
+  margin-top: 0;
 }
 
 .pageDesc {

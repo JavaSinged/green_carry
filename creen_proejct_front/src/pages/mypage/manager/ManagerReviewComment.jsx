@@ -101,7 +101,7 @@ const ManagerReviewComment = () => {
 
   return (
     <div className={styles.page}>
-      <h2 className={styles.pageTitle}>고객 리뷰 관리 📝</h2>
+      <h2 className={styles.pageTitle}>고객 리뷰 관리</h2>
       <p className={styles.pageDesc}>
         고객님의 소중한 리뷰에 따뜻한 답글을 남겨주세요.
       </p>
