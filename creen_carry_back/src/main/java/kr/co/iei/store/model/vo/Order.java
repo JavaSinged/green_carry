@@ -23,4 +23,5 @@ public class Order {
 	private List<OrderItem> items;
 	private Integer expectedTime;
 	private int reviewStatus;
+	private String deliveryAddress;
 }

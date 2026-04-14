@@ -99,7 +99,8 @@
 		used_point,
 		get_point,
 		order_status,
-		delivery_type
+		delivery_type,
+		delivery_address
 		) VALUES (
 		#{orderId},
 		#{memberId},
@@ -107,7 +108,8 @@
 		#{usedPoint},
 		#{getPoint},
 		0,
-		#{deliveryType}
+		#{deliveryType},
+		#{deliveryAddress}
 		)
 	</insert>
 
@@ -275,8 +277,7 @@
 		ELSE 2000
 		END AS deliveryPrice,
 		s.store_address AS storeAddress,
-		m.member_addr AS
-		deliveryAddress
+		o.delivery_Address AS deliveryAddress
 
 		FROM order_tbl o
 		JOIN store_tbl s ON o.store_id =

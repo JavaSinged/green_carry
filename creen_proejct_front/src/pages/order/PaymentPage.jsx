@@ -61,6 +61,7 @@ const PaymentPage = () => {
   const [itemPrice] = useState(superTotalPrice);
   const cartList = useCartStore((state) => state.cart);
   const memberId = localStorage.getItem("memberId");
+  const memberAddr = localStorage.getItem("memberAddr");
   const storeId = useCartStore((state) => state.storeId);
 
   // 배달 타입 및 탄소 계산
@@ -98,6 +99,7 @@ const PaymentPage = () => {
       usedPoint: ecoPoint,
       deliveryType: deliveryType,
       reviewStatus: 0,
+      deliveryAddress: memberAddr,
       items: cartList.map((item) => ({
         menuId: Number(item.menuId),
         quantity: item.quantity,
