@@ -271,7 +271,7 @@ const UserOrderListPage = () => {
                             openReviewModal(order);
                           }}
                         >
-                          리뷰 작성
+                          리뷰 작성 (3일 이내)
                         </button>
                       ) : (
                         <button className={styles.reviewBtnDisabled} disabled>
