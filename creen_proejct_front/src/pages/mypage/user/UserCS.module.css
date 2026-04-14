@@ -265,7 +265,7 @@
 .submit_btn {
   display: block;
   width: 240px;
-  margin: 40px auto;
+  margin: 0px auto;
   padding: 15px;
   background-color: var(--color-brand);
   color: white;

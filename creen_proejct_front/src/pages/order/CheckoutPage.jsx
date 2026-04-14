@@ -105,18 +105,21 @@ const CheckoutPage = () => {
   const fetchLatestPoint = async () => {
     const memberId = localStorage.getItem("memberId");
     if (!memberId) return;
+
     try {
       const res = await axios.get(
         `${import.meta.env.VITE_BACKSERVER}/member/${memberId}`,
       );
       const latestPoint = res.data.memberPoint || 0;
+
       localStorage.setItem("memberPoint", latestPoint);
-      if (user) {
-        setUser({ ...user, memberPoint: latestPoint });
-      }
-      window.dispatchEvent(new Event("storage"));
+
+      setUser((prevUser) => ({
+        ...prevUser,
+        memberPoint: latestPoint,
+      }));
     } catch (err) {
-      console.error("최신 포인트 갱신 실패:", err);
+      console.error("포인트 갱신 실패:", err);
     }
   };
 
