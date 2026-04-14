@@ -141,16 +141,18 @@ const ManagerReviewComment = () => {
                   </p>
                   <p className={styles.content}>{review.reviewContent}</p>
 
-                  {review.reviewThumb && (
-                    <img
-                      src={`${import.meta.env.VITE_BACKSERVER}${review.reviewThumb.startsWith("/") ? "" : "/uploads/review/"}${review.reviewThumb}`}
-                      alt="리뷰사진"
-                      className={styles.reviewImg}
-                      onError={(e) => {
-                        e.target.src = "/image/no-image.png";
-                      }}
-                    />
-                  )}
+                  <img
+                    src={
+                      review.reviewThumb
+                        ? `${import.meta.env.VITE_BACKSERVER}${review.reviewThumb.startsWith("/") ? "" : "/uploads/review/"}${review.reviewThumb}`
+                        : "/image/no-image.png" //
+                    }
+                    alt="리뷰사진"
+                    className={styles.reviewImg}
+                    onError={(e) => {
+                      e.target.src = "/image/no-image.png";
+                    }}
+                  />
                 </div>
 
                 <div className={styles.bossSection}>
