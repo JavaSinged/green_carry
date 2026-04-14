@@ -187,14 +187,16 @@ public class StoreService {
         // 이 부분은 상세 내역 저장 여부와 상관없이 주문이 성공했다면 실행되어야 합니다.
         int setPoint = storeDao.updatePoint(orderId);
         if (setPoint != 1) {
-            throw new RuntimeException("포인트 적립/사용 처리 실패");
+            System.out.println("포인트 적립/사용 처리 실패");
+            return 0;
         }else {
         	storeDao.pointReward(orderId);
+        	storeDao.addReduceCarbon(orderId);
+    		return setPoint;
         }
 
         // 4. 탄소 절감량(명예 점수) 누적 업데이트
-        storeDao.addReduceCarbon(orderId);
-		return setPoint;
+        
 	}
 
     public List<OrderResponse> getOrdersByStoreId(Integer storeId) {

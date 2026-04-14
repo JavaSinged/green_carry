@@ -10,11 +10,17 @@ const CheckoutPage = () => {
   const { clearCart } = useCartStore();
   const { user, setUser } = useContext(AuthContext);
   const cartList = useCartStore((state) => state.cart);
+  const [storeId, setStoreId] = useState(0);
   const navigate = useNavigate();
   const location = useLocation();
   const mapElement = useRef(null);
   const [mapLoaded, setMapLoaded] = useState(false);
-  const STORE_INFO = { lat: 37.497952, lng: 127.027619 }; // 매장 좌표
+  const [storeLat, setStoreLat] = useState(0);
+  const [storeLong, setStoreLong] = useState(0);
+  const STORE_INFO = {
+    lat: storeLat,
+    lng: storeLong,
+  }; // 매장 좌표
   const [orderList, setOrderList] = useState([]);
   const [usedPoint, setUsedPoint] = useState(0);
   const [getPoint, setGetPoint] = useState(0);
@@ -132,6 +138,7 @@ const CheckoutPage = () => {
         setTotalCarbon(res.data.totalReduceCarbon);
         setCompleteDate(res.data.completeDate);
         setExpectedTime(res.data.expectedTime ?? null);
+        setStoreId(res.data.storeId);
 
         if (status === 9 || status < 2) {
           setOrderState(-1);
@@ -143,7 +150,17 @@ const CheckoutPage = () => {
         console.error("주문 정보 갱신 실패:", err);
       });
   };
-
+  useEffect(() => {
+    axios
+      .get(`${import.meta.env.VITE_BACKSERVER}/stores/location/${storeId}`)
+      .then((res) => {
+        setStoreLat(res.data.latitude);
+        setStoreLong(res.data.longitude);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, [storeId]);
   const updatePoint = (orderId) => {
     axios
       .patch(`${import.meta.env.VITE_BACKSERVER}/stores/updatePoint/${orderId}`)
