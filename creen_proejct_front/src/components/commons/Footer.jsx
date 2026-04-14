@@ -15,6 +15,8 @@ export default function Footer() {
       return "/mypage/user/userCS"; // 일반 유저
     } else if (grade === 2) {
       return "/mypage/manager/managerCS"; // 관리자/매니저
+    } else {
+      return "/mypage/user/userCS";
     }
   };
 
