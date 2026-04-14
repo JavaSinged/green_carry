@@ -175,48 +175,79 @@
 }
 .pagination {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
-  gap: 8px;
-  margin-top: 32px;
-  margin-bottom: 20px;
+  margin-top: 24px;
 }
 
-.pageBtn {
-  width: 36px;
-  height: 36px;
+.page_btn_nav {
+  display: flex;
+  align-items: center;
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text-main);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.page_btn_nav:hover:not(:disabled) {
+  background-color: #f9f9f9;
+}
+
+.page_btn_nav:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.page_numbers {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.page_num {
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  width: 32px;
+  height: 32px;
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: white;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  font-size: 15px;
-  font-weight: 500;
-  color: #333;
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text-main);
   cursor: pointer;
-  transition: all 0.2s ease;
 }
 
-.pageBtn:hover:not(:disabled) {
-  background-color: #f5f5f5;
-  border-color: #ccc;
+.page_num:hover {
+  background-color: #f9f9f9;
 }
 
-/* 현재 선택된 페이지 버튼 */
-.activePage {
-  background-color: #2f8f46; /* 메인 에코 초록색 */
-  color: white;
-  border-color: #2f8f46;
+.page_num.active {
+  border: 1px solid var(--color-brand);
+  color: var(--color-brand);
+  background-color: var(--color-surface);
+  font-weight: 600;
+}
+
+.page_dots {
+  color: var(--text-sub);
+}
+
+.timerBadge {
+  display: inline-flex;
+  align-items: center;
+  background-color: #fff1f2; /* 연한 분홍/빨강 배경 */
+  color: #ff4757; /* 강조 폰트색 */
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 13px;
   font-weight: bold;
-}
-
-.activePage:hover {
-  background-color: #267a39;
-}
-
-/* 이전/다음 버튼이 비활성화되었을 때 */
-.pageBtn:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
+  margin-right: 8px;
+  border: 1px solid #ffccd2;
 }
