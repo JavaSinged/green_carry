@@ -202,6 +202,7 @@
 		o.used_point AS usedPoint,
 		m.total_carbon_reduce AS totalReduceCarbon,
 		o.get_point AS getPoint,
+		o.delivery_address AS deliveryAddress,
 		o.expected_time AS expectedTime,
 		TO_CHAR(o.confirm_date, 'YYYY-MM-DD
 		HH24:MI:SS') AS confirmDate,
