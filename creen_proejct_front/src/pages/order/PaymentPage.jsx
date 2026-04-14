@@ -8,6 +8,7 @@ import useCartStore from "../../store/useCartStore";
 import axios from "axios";
 import { loadTossPayments } from "@tosspayments/tosspayments-sdk";
 import { AuthContext } from "../../context/AuthContext";
+import Swal from "sweetalert2";
 
 const PaymentPage = () => {
   //user 가져오기
@@ -141,7 +142,17 @@ const PaymentPage = () => {
       setUsingEcoPoint(ecoPoint);
     } catch (error) {
       console.error("결제 중 에러 발생:", error);
-      alert("결제 처리 중 오류가 발생했습니다.");
+      if (totalPrice === 0) {
+        Swal.fire({
+          icon: "info",
+          text: "최소결제 금액은 1원 이상이어야 합니다. 사용 포인트를 조정해주세요",
+        });
+      } else {
+        Swal.fire({
+          icon: "error",
+          text: "결제 처리 중 오류가 발생했습니다.",
+        });
+      }
     }
   };
   // 포인트 입력 핸들러
