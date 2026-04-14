@@ -417,6 +417,11 @@ const CheckoutPage = () => {
                         ? "픽업 예정 시간"
                         : "도착 예정 시간"}
                   </span>
+                  {rawOrderStatus === 5 && completeDate && (
+                    <span style={{ color: "#2f8f46", fontWeight: "bold" }}>
+                      {completeDate}
+                    </span>
+                  )}
                 </div>
                 <div
                   style={{
