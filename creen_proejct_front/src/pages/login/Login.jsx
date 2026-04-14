@@ -234,6 +234,7 @@ const Login = () => {
           localStorage.setItem("memberName", loginUser.memberName);
           localStorage.setItem("memberGrade", loginUser.memberGrade);
           localStorage.setItem("memberThumb", loginUser.memberThumb);
+          localStorage.setItem("memberAddr", loginUser.memberAddr);
           localStorage.setItem("LATITUDE", loginUser.latitude);
           localStorage.setItem("LONGITUDE", loginUser.longitude);
 
