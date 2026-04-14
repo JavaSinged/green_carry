@@ -141,7 +141,11 @@ const PaymentPage = () => {
       setUsingEcoPoint(ecoPoint);
     } catch (error) {
       console.error("결제 중 에러 발생:", error);
-      alert("결제 처리 중 오류가 발생했습니다.");
+      if (totalPrice === 0) {
+        alert("최소결제 금액은 1원 이상이어야 합니다.");
+      } else {
+        alert("결제 처리 중 오류가 발생했습니다.");
+      }
     }
   };
   // 포인트 입력 핸들러
