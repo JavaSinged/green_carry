@@ -199,31 +199,75 @@ const UserProfile = () => {
               {/* 🌟 [수정] pointHistory 대신 currentHistoryItems로 매핑 */}
               {currentHistoryItems.length > 0 ? (
                 <>
-                  {currentHistoryItems.map((item) => (
-                    <div key={item.orderId} className={styles.history_item}>
-                      <div className={styles.history_left}>
-                        <StorefrontIcon className={styles.store_icon} />
-                        <div>
-                          <div>{item.storeName}</div>
-                          <div className={styles.history_date}>
-                            {item.orderDate}
+                  {currentHistoryItems.map((item) => {
+                    const isCancelled = item.orderStatus === 9;
+
+                    return (
+                      <div
+                        key={item.orderId}
+                        className={`${styles.history_item} ${isCancelled ? styles.item_cancelled : ""}`}
+                      >
+                        <div className={styles.history_left}>
+                          {/* 취소된 경우 아이콘 색상도 변경 */}
+                          <StorefrontIcon
+                            className={`${styles.store_icon} ${isCancelled ? styles.icon_cancelled : ""}`}
+                          />
+                          <div>
+                            <div className={styles.store_name_row}>
+                              <strong
+                                className={
+                                  isCancelled ? styles.text_cancelled : ""
+                                }
+                              >
+                                {item.storeName}
+                              </strong>
+                              {isCancelled && (
+                                <span className={styles.cancel_badge}>
+                                  결제취소
+                                </span>
+                              )}
+                              <div className={styles.orderIdRow}>
+                                &nbsp;&nbsp;(주문번호 :{item.orderId})
+                              </div>
+                            </div>
+                            <div className={styles.history_date}>
+                              {item.orderDate}
+                            </div>
                           </div>
                         </div>
+
+                        <div className={styles.history_right}>
+                          {/* 적립 포인트 로직 */}
+                          {item.getPoint > 0 && (
+                            <span
+                              className={
+                                isCancelled
+                                  ? styles.point_refund_minus
+                                  : styles.plus_point
+                              }
+                            >
+                              {isCancelled ? "-" : "+"}
+                              {item.getPoint.toLocaleString()}P
+                            </span>
+                          )}
+
+                          {/* 사용 포인트 로직 */}
+                          {item.usedPoint > 0 && (
+                            <span
+                              className={
+                                isCancelled
+                                  ? styles.point_refund_plus
+                                  : styles.minus_point
+                              }
+                            >
+                              {isCancelled ? "+" : "-"}
+                              {item.usedPoint.toLocaleString()}P
+                            </span>
+                          )}
+                        </div>
                       </div>
-                      <div className={styles.history_right}>
-                        {item.getPoint > 0 && (
-                          <span className={styles.plus_point}>
-                            +{item.getPoint.toLocaleString()}P
-                          </span>
-                        )}
-                        {item.usedPoint > 0 && (
-                          <span className={styles.minus_point}>
-                            -{item.usedPoint.toLocaleString()}P
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
 
                   {/* 🌟 [추가] 페이지네이션 UI */}
                   {totalPages > 1 && (

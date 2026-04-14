@@ -329,7 +329,7 @@
 /* 전체 컨테이너: 이전 - 숫자들 - 다음 버튼을 양 끝으로 배치 */
 .pagination {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   margin-top: 24px;
 }

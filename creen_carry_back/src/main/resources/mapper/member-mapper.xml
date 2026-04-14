@@ -252,6 +252,7 @@
 		TO_CHAR(m.reg_date, 'YYYY-MM-DD') AS orderDate,
 		o.get_point AS
 		getPoint,
+		o.order_status,
 		o.used_point AS usedPoint
 		FROM order_tbl o
 		JOIN

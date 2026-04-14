@@ -27,6 +27,7 @@ import org.springframework.http.MediaType;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -285,5 +286,11 @@ public class StoreController {
         }
 
         return ResponseEntity.ok(storeInfo);
+    }
+    
+    @GetMapping("/location/{storeId}")
+    public ResponseEntity<?> getStoreLocation(@PathVariable Integer storeId){
+    	Store store = storeService.getStoreLocation(storeId);
+    	return ResponseEntity.ok(store);
     }
 }

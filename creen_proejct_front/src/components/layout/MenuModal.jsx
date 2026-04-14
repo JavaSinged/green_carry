@@ -58,11 +58,12 @@ export default function MenuModal({
 
   // 탄소 계산
   const menuCarbon = Number(menuData?.menuCarbon || 0) * 1000;
-
-  const baseCarbon = menuCarbon - menuCarbon * optionCarbonRateSum;
-  const reusableAppliedCarbon = reusable ? baseCarbon * 0.5 : 0;
-  const totalCarbon = reusableAppliedCarbon * quantity + selectedEcoCount * 20;
+  const baseCarbon = menuCarbon + menuCarbon * optionCarbonRateSum;
+  const reusableAppliedCarbon = reusable ? baseCarbon * 0.3 : 0;
+  const totalCarbon =
+    (baseCarbon - reusableAppliedCarbon) * quantity - selectedEcoCount * 20;
   const optionCarbon = Number(selectedEcoCount * 20);
+  const totalCarbonReduction = baseCarbon * quantity - totalCarbon;
 
   // 모달 열릴 때 초기화 및 옵션 조회
   useEffect(() => {
@@ -74,6 +75,7 @@ export default function MenuModal({
       axios
         .get(`${backHost}/stores/${menuData.menuId}/options`)
         .then((res) => {
+          console.log("옵션 데이터 원본:", res.data);
           setOptionList(res.data);
 
           const defaultSize = res.data.find((o) => o.optionType === 1);
@@ -341,7 +343,7 @@ export default function MenuModal({
         </div>
 
         <div className={styles.footer}>
-          <div className={styles.summary_row}>
+          <div className={styles.summary_rows}>
             <span className={styles.summary_label}>수량</span>
             <div className={styles.quantity_control}>
               <RemoveIcon
@@ -357,10 +359,18 @@ export default function MenuModal({
           </div>
 
           <div className={styles.summary_row}>
-            <span className={styles.summary_label}>총 예상 탄소 절감량</span>
-            <span className={styles.carbon_total}>
-              {totalCarbon.toFixed(1)}g CO2e
-            </span>
+            <div className={styles.summary_con}>
+              <span className={styles.summary_label}>총 예상 탄소 배출량</span>
+              <span className={styles.carbon_total}>
+                {totalCarbon.toFixed(1)}g CO2e
+              </span>
+            </div>
+            <div className={styles.summary_con}>
+              <span className={styles.summary_label}>총 예상 탄소 절감량</span>
+              <span className={styles.carbon_total}>
+                {totalCarbonReduction.toFixed(1)}g CO2e
+              </span>
+            </div>
           </div>
 
           <button className={styles.submit_btn} onClick={handleAddToCart}>

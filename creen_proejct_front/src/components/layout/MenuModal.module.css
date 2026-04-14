@@ -200,7 +200,19 @@ input:checked + .slider:before {
   gap: 15px;
 }
 
+.summary_con {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}
 .summary_row {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.summary_rows {
   display: flex;
   justify-content: space-between;
   align-items: center;

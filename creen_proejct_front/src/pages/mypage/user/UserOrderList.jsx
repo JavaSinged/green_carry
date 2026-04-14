@@ -299,6 +299,12 @@ const UserOrderListPage = () => {
                       {order.storeAddress || "정보 없음"}
                     </p>
                   </div>
+                  <div className={styles.infoBlock}>
+                    <p className={styles.infoTitle}>배달 위치</p>
+                    <p className={styles.addressText}>
+                      {order.deliveryAddress || "정보 없음"}
+                    </p>
+                  </div>
                 </div>
 
                 <div className={styles.carbonBox}>

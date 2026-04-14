@@ -335,3 +335,61 @@
   opacity: 0.4;
   cursor: not-allowed;
 }
+/* 기본 아이템 스타일 (기존 유지하되 아래 내용 추가) */
+.history_item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  border-bottom: 1px solid #f0f0f0;
+  transition: all 0.2s ease;
+}
+
+/* 🌟 취소된 아이템 전체 배경 처리 */
+.item_cancelled {
+  background-color: #fcfcfc; /* 아주 연한 회색 배경 */
+}
+
+/* 🌟 취소선 및 텍스트 흐리게 */
+.text_cancelled {
+  text-decoration: line-through;
+  color: #999 !important;
+}
+
+.icon_cancelled {
+  color: #ccc !important;
+}
+
+/* 🌟 취소 배지 스타일 */
+.cancel_badge {
+  background-color: #ffebee;
+  color: #ef5350;
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-left: 8px;
+  font-weight: bold;
+  vertical-align: middle;
+}
+
+/* 취소로 인한 회수 (-) */
+.point_refund_minus {
+  color: #999;
+  text-decoration: line-through;
+}
+
+/* 취소로 인한 복구 (+) */
+.point_refund_plus {
+  color: #0288d1; /* 파란색 (복구됨을 강조) */
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+.orderIdRow {
+  font-size: 12px;
+  color: var(--text-sub);
+}
+.store_name_row {
+  display: flex;
+  align-items: center;
+}

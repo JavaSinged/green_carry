@@ -126,7 +126,8 @@ export default function AdminContainerList() {
                     />
                     <SearchIcon className={styles.search_icon} />
                 </div>
-                <select><FilterAltOutlinedIcon />필터</select>
+                <FilterAltOutlinedIcon />
+                <select>필터</select>
                 <span> <AddIcon />추가</span>
             </div>
 
