@@ -245,3 +245,106 @@
 .pageNumber:hover:not(.activePage) {
   background-color: #f0f0f0;
 }
+.storeHeader {
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+}
+
+.storeTag {
+  background-color: #f0f4ff; /* 연한 블루 계열로 메뉴명 배지와 차별화 */
+  color: #3b5bdb;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 700;
+  border: 1px solid #dbe4ff;
+  display: inline-block;
+  letter-spacing: -0.3px;
+}
+
+/* 기존 bossTitle 부분에 가게 이름을 쓸 경우를 위한 보정 */
+.bossTitle {
+  font-weight: 700;
+  color: #2f8f46;
+  margin-bottom: 10px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.filter_row {
+  display: flex;
+  justify-content: flex-end; /* 우측 정렬 */
+  gap: 12px;
+  margin-bottom: 25px;
+  align-items: center;
+  background: #f9fdfa; /* 아주 연한 초록빛 배경 */
+  padding: 15px 20px;
+  border-radius: 15px;
+  border: 1px solid #e8f5e9;
+}
+
+.filter_row input[type="date"] {
+  border: 1.5px solid #246337;
+  border-radius: 20px;
+  padding: 6px 15px;
+  color: #246337;
+  outline: none;
+  font-family: inherit;
+  font-size: 0.9rem;
+  background-color: white;
+}
+
+/* 필터 내 조회 버튼 (기존 delete_btn 스타일 계승) */
+.filter_submit_btn {
+  background: #246337;
+  color: white;
+  border: none;
+  padding: 7px 20px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.filter_submit_btn:hover {
+  background: #1b4a29;
+}
+
+/* 필터 내 초기화 버튼 (기존 pageBtn 스타일 계승) */
+.filter_reset_btn {
+  background-color: white;
+  border: 1.5px solid #ddd;
+  padding: 6px 15px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.filter_reset_btn:hover {
+  background-color: #f5f5f5;
+  border-color: #ccc;
+}
+
+/* 날짜 사이 물결 기호 */
+.date_separator {
+  font-weight: bold;
+  color: #246337;
+  font-size: 1.1rem;
+}
+
+/* --- 추가 보정 (메뉴/날짜 정보 우측 정렬 유지) --- */
+.menu_detail,
+.order_date {
+  font-size: 13px;
+  color: #888;
+  margin-left: 15px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}

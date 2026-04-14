@@ -20,6 +20,8 @@ public class StoreReviewResponse {
     private String reviewContent;
     private String reviewThumb;
     private String menuName; // 주문한 메뉴 이름
+    private String storeName;
+    private Integer storeId;
 
     // 사장님 답글 정보
     private String reviewCommentContent;
