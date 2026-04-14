@@ -1,17 +1,19 @@
 .page_container {
-  min-height: 100vh;
-  padding: 40px 20px;
-  background-color: #f8f9fa; /* 연한 그레이 배경으로 카드 부각 */
-  font-family: var(--font-body);
+  background-color: var(--color-bg);
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 30px;
+  width: 100%;
+  box-sizing: border-box;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
 }
 
 .edit_box {
   max-width: 850px;
   margin: 0 auto;
   background: var(--color-bg);
-  padding: 40px;
+  padding: 0px;
   border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
 }
 
 .main_title {
