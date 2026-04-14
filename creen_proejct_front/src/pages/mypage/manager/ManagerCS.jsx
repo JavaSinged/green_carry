@@ -127,7 +127,6 @@ const FAQSection = ({ searchKeyword, setSearchKeyword }) => {
         },
       })
       .then((res) => {
-        console.log(res);
         setFaqList(res.data);
       })
       .catch((err) => {
@@ -481,7 +480,6 @@ const AnswerSection = ({ user, setSearchKeyword }) => {
         params: { memberId: user.memberId },
       })
       .then((res) => {
-        console.log(res);
         setInquiryList(res.data);
       })
       .catch((err) => {
