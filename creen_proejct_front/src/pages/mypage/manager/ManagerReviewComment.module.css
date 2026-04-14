@@ -207,46 +207,70 @@
 }
 .pagination {
   display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 24px;
+}
+
+.page_btn_nav {
+  display: flex;
+  align-items: center;
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text-main);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.page_btn_nav:hover:not(:disabled) {
+  background-color: #f9f9f9;
+}
+
+.page_btn_nav:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.page_numbers {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.page_num {
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  width: 32px;
+  height: 32px;
+  display: flex;
   justify-content: center;
   align-items: center;
-  gap: 10px;
-  margin-top: 40px;
-  padding-bottom: 20px;
-}
-
-.pageBtn {
-  padding: 8px 12px;
-  border: 1px solid #ddd;
-  background-color: #fff;
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text-main);
   cursor: pointer;
-  border-radius: 5px;
-  transition: 0.2s;
 }
 
-.pageBtn:disabled {
-  background-color: #f5f5f5;
-  cursor: not-allowed;
-  color: #ccc;
+.page_num:hover {
+  background-color: #f9f9f9;
 }
 
-.pageNumber {
-  padding: 8px 14px;
-  border: 1px solid #ddd;
-  background-color: #fff;
-  cursor: pointer;
-  border-radius: 5px;
-  font-weight: bold;
+.page_num.active {
+  border: 1px solid var(--color-brand);
+  color: var(--color-brand);
+  background-color: var(--color-surface);
+  font-weight: 600;
 }
 
-.activePage {
-  background-color: #2e7d32; /* 앱의 포인트 컬러(예: 초록색) */
-  color: #fff;
-  border-color: #2e7d32;
+.page_dots {
+  color: var(--text-sub);
 }
 
-.pageNumber:hover:not(.activePage) {
-  background-color: #f0f0f0;
-}
 .storeHeader {
   margin-bottom: 16px;
   display: flex;

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import styles from "../manager/ManagerReviewComment.module.css";
 import axios from "axios";
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 
 const ManagerReviewComment = () => {
   const [reviews, setReviews] = useState([]); // 전체 리뷰 데이터
@@ -14,6 +16,15 @@ const ManagerReviewComment = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
+  const handlePrevPage = () => {
+    if (currentPage > 1) setCurrentPage(currentPage - 1);
+  };
+  const handleNextPage = () => {
+    if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+  };
+  const handlePageClick = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
   const fetchReviews = async () => {
     try {
       const backHost = import.meta.env.VITE_BACKSERVER;
@@ -161,33 +172,33 @@ const ManagerReviewComment = () => {
             {/* 페이지네이션 */}
             <div className={styles.pagination}>
               <button
-                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                className={styles.page_btn_nav}
+                onClick={handlePrevPage}
                 disabled={currentPage === 1}
-                className={styles.pageBtn}
               >
-                {" "}
-                &lt;{" "}
+                <ChevronLeftIcon fontSize="small" /> 이전
               </button>
 
-              {[...Array(totalPages)].map((_, i) => (
-                <button
-                  key={i + 1}
-                  onClick={() => setCurrentPage(i + 1)}
-                  className={`${styles.pageNumber} ${currentPage === i + 1 ? styles.activePage : ""}`}
-                >
-                  {i + 1}
-                </button>
-              ))}
+              <div className={styles.page_numbers}>
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                  (page) => (
+                    <button
+                      key={page}
+                      className={`${styles.page_num} ${currentPage === page ? styles.active : ""}`}
+                      onClick={() => handlePageClick(page)}
+                    >
+                      {String(page).padStart(2, "0")}
+                    </button>
+                  ),
+                )}
+              </div>
 
               <button
-                onClick={() =>
-                  setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-                }
-                disabled={currentPage === totalPages}
-                className={styles.pageBtn}
+                className={styles.page_btn_nav}
+                onClick={handleNextPage}
+                disabled={currentPage === totalPages || totalPages === 0}
               >
-                {" "}
-                &gt;{" "}
+                다음 <ChevronRightIcon fontSize="small" />
               </button>
             </div>
           </>

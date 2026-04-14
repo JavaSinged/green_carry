@@ -284,57 +284,11 @@
 }
 .pagination {
   display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 8px;
-  margin-top: 32px;
-  margin-bottom: 20px;
-}
-
-.pageBtn {
-  width: 36px;
-  height: 36px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: white;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  font-size: 15px;
-  font-weight: 500;
-  color: #333;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-/* 현재 선택된 페이지 버튼 */
-.activePage {
-  background-color: #2f8f46; /* 메인 에코 초록색 */
-  color: white;
-  border-color: #2f8f46;
-  font-weight: bold;
-}
-
-.activePage:hover {
-  background-color: #267a39;
-}
-
-/* 이전/다음 버튼이 비활성화되었을 때 (1페이지거나 마지막 페이지일 때) */
-.pageBtn:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-/*////////페이지네이션영역*/
-/* 전체 컨테이너: 이전 - 숫자들 - 다음 버튼을 양 끝으로 배치 */
-.pagination {
-  display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
   margin-top: 24px;
 }
 
-/* 이전/다음 네비게이션 버튼 */
 .page_btn_nav {
   display: flex;
   align-items: center;
@@ -349,24 +303,21 @@
   transition: all 0.2s;
 }
 
-.page_btn_nav:hover {
+.page_btn_nav:hover:not(:disabled) {
   background-color: #f9f9f9;
 }
 
-/* 버튼이 비활성화(disabled) 되었을 때의 처리 (추가 권장) */
 .page_btn_nav:disabled {
-  cursor: not-allowed;
   opacity: 0.5;
+  cursor: not-allowed;
 }
 
-/* 숫자 버튼들을 감싸는 영역 */
 .page_numbers {
   display: flex;
   align-items: center;
   gap: 6px;
 }
 
-/* 개별 숫자 버튼 */
 .page_num {
   background: white;
   border: 1px solid #e0e0e0;
@@ -386,13 +337,17 @@
   background-color: #f9f9f9;
 }
 
-/* 현재 활성화된(선택된) 페이지 숫자 스타일 */
 .page_num.active {
-  border: 1px solid var(--color-brand); /* 브랜드 컬러 적용 */
+  border: 1px solid var(--color-brand);
   color: var(--color-brand);
   background-color: var(--color-surface);
   font-weight: 600;
 }
+
+.page_dots {
+  color: var(--text-sub);
+}
+
 .timerBadge {
   display: inline-flex;
   align-items: center;
