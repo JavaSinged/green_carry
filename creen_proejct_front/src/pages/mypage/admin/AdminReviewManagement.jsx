@@ -108,7 +108,7 @@ const ManagerReviewComment = () => {
 
                 {/* 사장님 답글 영역 */}
                 <div className={styles.bossSection}>
-                  {review.reviewCommentContent ? (
+                  {review.reviewCommentContent && (
                     <div className={styles.replyCompleted}>
                       <p className={styles.bossTitle}>↳ 사장님 답글</p>
                       <p className={styles.replyContent}>
@@ -118,30 +118,11 @@ const ManagerReviewComment = () => {
                         {review.reviewCommentDate}
                       </span>
                     </div>
-                  ) : (
-                    <div className={styles.replyForm}>
-                      <p className={styles.bossTitle}>↳ 답글 작성</p>
-                      <div className={styles.inputWrap}>
-                        <textarea
-                          className={styles.textarea}
-                          placeholder="고객님께 감사 인사를 남겨주세요. (최소 5자)"
-                          value={replyInputs[review.orderId] || ""}
-                          onChange={(e) =>
-                            handleInputChange(review.orderId, e.target.value)
-                          }
-                        />
-                        <button
-                          className={styles.submitBtn}
-                          onClick={() => submitReply(review.orderId)}
-                        >
-                          등록
-                        </button>
-                      </div>
-                    </div>
                   )}
                 </div>
               </div>
             ))}
+            {/* ⬆️ 여기가 누락되어 있었습니다! (reviewCard div 닫기 & map 함수 닫기) */}
 
             {/* 🌟 페이지네이션 UI 추가 */}
             <div className={styles.pagination}>

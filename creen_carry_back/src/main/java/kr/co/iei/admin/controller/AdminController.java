@@ -1,5 +1,6 @@
 package kr.co.iei.admin.controller;
 
+import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -31,27 +32,44 @@ public class AdminController {
 
 	@GetMapping("/api/sales/stats")
 	public ResponseEntity<?> getSalesStats() {
-		// 1. DB에서 12개의 로우를 가져옴 (전기 6개 + 당기 6개 순서)
 		List<Map<String, Object>> list = adminService.selectMonthlySales();
 
-		// 2. 결과 담을 그릇
 		List<Long> pastSeries = new ArrayList<>();
 		List<Long> currentSeries = new ArrayList<>();
 		List<String> categories = new ArrayList<>();
 
-		for (int i = 0; i < list.size(); i++) {
-			// total_sales 값 가져오기 (오라클 숫자 타입 대응)
-			long sales = Long.parseLong(String.valueOf(list.get(i).get("TOTAL_SALES")));
-			String month = String.valueOf(list.get(i).get("MONTHLY")).substring(5) + "월";
+		// 1. 기준이 되는 과/현재 'YYYY-MM' 목록 만들기 (빈 값은 0으로 세팅)
+		List<String> targetCurrent = new ArrayList<>();
+		List<String> targetPast = new ArrayList<>();
+		YearMonth now = YearMonth.now();
 
+		for (int i = 5; i >= 0; i--) {
+			YearMonth ym = now.minusMonths(i);
+			targetCurrent.add(ym.toString());             // 예: "2026-04"
+			targetPast.add(ym.minusYears(1).toString());  // 예: "2025-04"
+			categories.add(String.format("%02d월", ym.getMonthValue())); // 예: "04월"
 
-			if (i < 6) {
-				// 앞의 6개는 전기(작년) 데이터
-				pastSeries.add(sales);
-			} else {
-				// 뒤의 6개는 당기(올해) 데이터
-				currentSeries.add(sales);
-				categories.add(month); // X축 라벨은 당기 기준으로 생성
+			// 데이터가 없는 달을 대비해 기본값 0 셋팅
+			currentSeries.add(0L);
+			pastSeries.add(0L);
+		}
+
+		// 2. DB에서 가져온 데이터를 '날짜' 기준으로 찾아서 진짜 값 덮어쓰기
+		for (Map<String, Object> map : list) {
+			String dbMonth = String.valueOf(map.get("MONTHLY")); // DB에서 온 "2026-04"
+			long sales = Long.parseLong(String.valueOf(map.get("TOTAL_SALES")));
+
+			// 현재(당기) 배열에 자리가 있는지 확인
+			int currIdx = targetCurrent.indexOf(dbMonth);
+			if (currIdx != -1) {
+				currentSeries.set(currIdx, sales);
+				continue;
+			}
+
+			// 과거(전기) 배열에 자리가 있는지 확인
+			int pastIdx = targetPast.indexOf(dbMonth);
+			if (pastIdx != -1) {
+				pastSeries.set(pastIdx, sales);
 			}
 		}
 
@@ -65,26 +83,39 @@ public class AdminController {
 
 	@GetMapping("/api/point/stats")
 	public ResponseEntity<?> getPointStats() {
-		// 1. DB에서 12개의 로우를 가져옴 (전기 6개 + 당기 6개 순서)
 		List<Map<String, Object>> list = adminService.selectMonthlyPoint();
 
-		// 2. 결과 담을 그릇
 		List<Integer> pastSeries = new ArrayList<>();
 		List<Integer> currentSeries = new ArrayList<>();
 		List<String> categories = new ArrayList<>();
 
-		for (int i = 0; i < list.size(); i++) {
-			// total_point 값 가져오기 (오라클 숫자 타입 대응)
-			int point = Integer.parseInt(String.valueOf(list.get(i).get("TOTAL_POINT")));
-			String month = String.valueOf(list.get(i).get("MONTHLY")).substring(5) + "월";
+		List<String> targetCurrent = new ArrayList<>();
+		List<String> targetPast = new ArrayList<>();
+		YearMonth now = YearMonth.now();
 
-			if (i < 6) {
-				// 앞의 6개는 전기(작년) 데이터
-				pastSeries.add(point);
-			} else {
-				// 뒤의 6개는 당기(올해) 데이터
-				currentSeries.add(point);
-				categories.add(month); // X축 라벨은 당기 기준으로 생성
+		for (int i = 5; i >= 0; i--) {
+			YearMonth ym = now.minusMonths(i);
+			targetCurrent.add(ym.toString());
+			targetPast.add(ym.minusYears(1).toString());
+			categories.add(String.format("%02d월", ym.getMonthValue()));
+
+			currentSeries.add(0);
+			pastSeries.add(0);
+		}
+
+		for (Map<String, Object> map : list) {
+			String dbMonth = String.valueOf(map.get("MONTHLY"));
+			int point = Integer.parseInt(String.valueOf(map.get("TOTAL_POINT")));
+
+			int currIdx = targetCurrent.indexOf(dbMonth);
+			if (currIdx != -1) {
+				currentSeries.set(currIdx, point);
+				continue;
+			}
+
+			int pastIdx = targetPast.indexOf(dbMonth);
+			if (pastIdx != -1) {
+				pastSeries.set(pastIdx, point);
 			}
 		}
 

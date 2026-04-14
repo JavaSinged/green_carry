@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import styles from './ManagerMenuEdit.module.css';
+import { useEffect, useState } from "react";
+import styles from "./ManagerMenuEdit.module.css";
 import {
   SearchIcon,
   X,
@@ -10,9 +10,9 @@ import {
   Minus,
   Camera,
   RefreshCw,
-} from 'lucide-react';
-import { useNavigate, useParams } from 'react-router-dom';
-import axios from 'axios';
+} from "lucide-react";
+import { useNavigate, useParams } from "react-router-dom";
+import axios from "axios";
 
 const ManagerMenuEdit = () => {
   const navigate = useNavigate();
@@ -20,20 +20,20 @@ const ManagerMenuEdit = () => {
 
   // --- [State] 기본 정보 ---
   const [menu, setMenu] = useState({
-    menuName: '',
-    menuInfo: '',
+    menuName: "",
+    menuInfo: "",
     menuImage: null,
-    menuPrice: '',
-    menuCategory: '메인',
+    menuPrice: "",
+    menuCategory: "메인",
     menuStatus: 1,
   });
 
   // 사진 미리보기용 URL
-  const [previewUrl, setPreviewUrl] = useState('');
+  const [previewUrl, setPreviewUrl] = useState("");
 
   // --- [State] 용기 설정 ---
   const [containerMaster, setContainerMaster] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [isListOpen, setIsListOpen] = useState(false);
   const [selectedContainers, setSelectedContainers] = useState([]);
 
@@ -44,11 +44,11 @@ const ManagerMenuEdit = () => {
   const [newOptions, setNewOptions] = useState([]);
 
   // 옵션 추가 시 상태
-  const [tempSize, setTempSize] = useState({ name: '', price: '', carbon: '' });
+  const [tempSize, setTempSize] = useState({ name: "", price: "", carbon: "" });
   const [tempGeneral, setTempGeneral] = useState({
-    name: '',
-    price: '',
-    carbon: '',
+    name: "",
+    price: "",
+    carbon: "",
   });
 
   const [openSections, setOpenSections] = useState({
@@ -66,11 +66,11 @@ const ManagerMenuEdit = () => {
   useEffect(() => {
     if (
       storeId === null ||
-      storeId === '' ||
+      storeId === "" ||
       menuId === null ||
-      storeId === ''
+      storeId === ""
     ) {
-      navigate('/mypage/manager/menus');
+      navigate("/mypage/manager/menus");
     }
 
     console.log(storeId, menuId);
@@ -83,7 +83,7 @@ const ManagerMenuEdit = () => {
       .then((res) => {
         setContainerMaster(res.data);
       })
-      .catch((err) => console.error('용기 데이터 로드 실패', err));
+      .catch((err) => console.error("용기 데이터 로드 실패", err));
 
     // 3. 수정 모드 데이터 로드
     if (menuId) {
@@ -136,8 +136,8 @@ const ManagerMenuEdit = () => {
   // --- [Handlers] 기본 입력 및 파일 ---
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    if (name === 'menuPrice')
-      setMenu({ ...menu, [name]: value.replace(/[^0-9]/g, '') });
+    if (name === "menuPrice")
+      setMenu({ ...menu, [name]: value.replace(/[^0-9]/g, "") });
     else setMenu({ ...menu, [name]: value });
   };
 
@@ -155,7 +155,7 @@ const ManagerMenuEdit = () => {
 
   const addContainer = (target) => {
     if (selectedContainers.find((c) => c.productId === target.productId))
-      return alert('이미 추가된 용기입니다.');
+      return alert("이미 추가된 용기입니다.");
 
     setSelectedContainers([
       ...selectedContainers,
@@ -166,7 +166,7 @@ const ManagerMenuEdit = () => {
         emissions: target.productEmissions || 0,
       },
     ]);
-    setSearchTerm('');
+    setSearchTerm("");
     setIsListOpen(false);
   };
 
@@ -174,7 +174,7 @@ const ManagerMenuEdit = () => {
   const handleSave = () => {
     // 필수값 검사 (가격, 이름 등)
     if (!menu.menuName || !menu.menuPrice) {
-      alert('메뉴 이름과 가격은 필수 입력 항목입니다!');
+      alert("메뉴 이름과 가격은 필수 입력 항목입니다!");
       return;
     }
 
@@ -182,25 +182,25 @@ const ManagerMenuEdit = () => {
     const backHost = import.meta.env.VITE_BACKSERVER;
 
     // 빈칸 방어: 값이 없으면 기본값으로 세팅해서 에러 방지
-    formData.append('menuName', menu.menuName || '');
-    formData.append('menuInfo', menu.menuInfo || '');
-    formData.append('menuPrice', menu.menuPrice ? Number(menu.menuPrice) : 0);
-    formData.append('menuCategory', menu.menuCategory || '메인');
+    formData.append("menuName", menu.menuName || "");
+    formData.append("menuInfo", menu.menuInfo || "");
+    formData.append("menuPrice", menu.menuPrice ? Number(menu.menuPrice) : 0);
+    formData.append("menuCategory", menu.menuCategory || "메인");
     formData.append(
-      'menuStatus',
+      "menuStatus",
       menu.menuStatus !== undefined ? menu.menuStatus : 1,
     );
-    formData.append('storeId', storeId || 1);
+    formData.append("storeId", storeId || 1);
     formData.append(
-      'menuCarbon',
+      "menuCarbon",
       totalCarbonEmission ? Number(totalCarbonEmission) : 0,
     );
 
     // 배열 데이터 안전하게 전송
-    formData.append('optionIds', JSON.stringify(selectedOptionIds || []));
-    formData.append('newOptions', JSON.stringify(newOptions || []));
+    formData.append("optionIds", JSON.stringify(selectedOptionIds || []));
+    formData.append("newOptions", JSON.stringify(newOptions || []));
     formData.append(
-      'containerMap',
+      "containerMap",
       JSON.stringify(
         selectedContainers.map((c) => ({
           productId: c.productId,
@@ -211,25 +211,25 @@ const ManagerMenuEdit = () => {
 
     // 파일 전송
     if (menu.menuImage instanceof File) {
-      formData.append('menuImage', menu.menuImage);
+      formData.append("menuImage", menu.menuImage);
     }
 
-    const method = 'post';
+    const method = "post";
     const url = menuId ? `/menus/${storeId}/${menuId}` : `/menus/${storeId}`;
 
     axios({
       method,
       url: `${backHost}${url}`,
       data: formData,
-      headers: { 'Content-Type': 'multipart/form-data' },
+      headers: { "Content-Type": "multipart/form-data" },
     })
       .then(() => {
-        alert('저장되었습니다.');
+        alert("저장되었습니다.");
         navigate(-1);
       })
       .catch((err) => {
         console.error(err);
-        alert('저장 중 오류가 발생했습니다. 자바 콘솔 창을 확인해주세요!');
+        alert("저장 중 오류가 발생했습니다. 자바 콘솔 창을 확인해주세요!");
       });
   };
 
@@ -243,25 +243,25 @@ const ManagerMenuEdit = () => {
         setMenu((prev) => ({ ...prev, menuStatus: nextStatus }));
         alert(
           nextStatus === 1
-            ? '판매중으로 변경되었습니다.'
-            : '판매중지로 변경되었습니다.',
+            ? "판매중으로 변경되었습니다."
+            : "판매중지로 변경되었습니다.",
         );
       })
-      .catch(() => alert('상태 변경에 실패했습니다.'));
+      .catch(() => alert("상태 변경에 실패했습니다."));
   };
 
   const handleDelete = () => {
     if (
-      !window.confirm('메뉴를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.')
+      !window.confirm("메뉴를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.")
     )
       return;
     axios
       .delete(`${import.meta.env.VITE_BACKSERVER}/menus/${menuId}`)
       .then(() => {
-        alert('메뉴가 삭제되었습니다.');
+        alert("메뉴가 삭제되었습니다.");
         navigate(-1);
       })
-      .catch(() => alert('삭제에 실패했습니다.'));
+      .catch(() => alert("삭제에 실패했습니다."));
   };
 
   const generalList = allOptions.filter((o) => o.optionType === 2);
@@ -271,7 +271,7 @@ const ManagerMenuEdit = () => {
     <div className={styles.page_container}>
       <div className={styles.edit_box}>
         <h2 className={styles.main_title}>
-          {menuId ? '메뉴 수정하기' : '새 메뉴 등록'}
+          {menuId ? "메뉴 수정하기" : "새 메뉴 등록"}
         </h2>
 
         <div className={styles.top_content}>
@@ -302,17 +302,17 @@ const ManagerMenuEdit = () => {
             <div className={styles.input_row}>
               <label
                 style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
                 }}
               >
                 <span>용기 설정</span>
                 <span
                   style={{
-                    fontSize: '0.85rem',
-                    color: '#10b981',
-                    fontWeight: 'bold',
+                    fontSize: "0.85rem",
+                    color: "#10b981",
+                    fontWeight: "bold",
                   }}
                 >
                   예상 총 탄소 배출량: {totalCarbonEmission.toFixed(2)} kg
@@ -453,13 +453,13 @@ const ManagerMenuEdit = () => {
 
               <label htmlFor="menu-file" className={styles.browse_button}>
                 {previewUrl ? <RefreshCw size={16} /> : <Upload size={16} />}
-                {previewUrl ? ' 사진 변경하기' : ' 사진 올리기'}
+                {previewUrl ? " 사진 변경하기" : " 사진 올리기"}
               </label>
               <input
                 id="menu-file"
                 type="file"
                 accept="image/*"
-                style={{ display: 'none' }}
+                style={{ display: "none" }}
                 onChange={handleFileChange}
               />
             </div>
@@ -469,9 +469,9 @@ const ManagerMenuEdit = () => {
         <h3 className={styles.sub_title}>옵션 설정</h3>
 
         {[
-          { t: '사이즈 옵션', k: 'size', l: [] },
-          { t: '일반 옵션', k: 'general', l: generalList },
-          { t: '에코포인트 옵션', k: 'eco', l: ecoList },
+          { t: "사이즈 옵션", k: "size", l: [] },
+          { t: "일반 옵션", k: "general", l: generalList },
+          { t: "에코포인트 옵션", k: "eco", l: ecoList },
         ].map((sec, idx) => (
           <div className={styles.accordion_group} key={sec.k}>
             <div
@@ -483,7 +483,7 @@ const ManagerMenuEdit = () => {
                 })
               }
             >
-              <span>{sec.t}</span>{' '}
+              <span>{sec.t}</span>{" "}
               {openSections[sec.k] ? (
                 <ChevronUp size={20} />
               ) : (
@@ -492,16 +492,16 @@ const ManagerMenuEdit = () => {
             </div>
             {openSections[sec.k] && (
               <div className={styles.group_body}>
-                {sec.k !== 'eco' && (
+                {sec.k !== "eco" && (
                   <div className={styles.add_form}>
                     <input
                       placeholder="이름"
                       maxLength={30}
                       value={
-                        sec.k === 'size' ? tempSize.name : tempGeneral.name
+                        sec.k === "size" ? tempSize.name : tempGeneral.name
                       }
                       onChange={(e) =>
-                        sec.k === 'size'
+                        sec.k === "size"
                           ? setTempSize({ ...tempSize, name: e.target.value })
                           : setTempGeneral({
                               ...tempGeneral,
@@ -512,11 +512,11 @@ const ManagerMenuEdit = () => {
                     <input
                       placeholder="가격"
                       value={
-                        sec.k === 'size' ? tempSize.price : tempGeneral.price
+                        sec.k === "size" ? tempSize.price : tempGeneral.price
                       }
                       onChange={(e) => {
-                        const val = e.target.value.replace(/[^0-9]/g, '');
-                        sec.k === 'size'
+                        const val = e.target.value.replace(/[^0-9]/g, "");
+                        sec.k === "size"
                           ? setTempSize({ ...tempSize, price: val })
                           : setTempGeneral({ ...tempGeneral, price: val });
                       }}
@@ -524,23 +524,23 @@ const ManagerMenuEdit = () => {
                     <input
                       type="number"
                       step="0.01"
-                      placeholder="탄소량(kg)"
-                      style={{ width: '80px' }}
+                      placeholder="탄소량"
+                      style={{ width: "80px" }}
                       value={
-                        sec.k === 'size' ? tempSize.carbon : tempGeneral.carbon
+                        sec.k === "size" ? tempSize.carbon : tempGeneral.carbon
                       }
                       onChange={(e) => {
                         const val = e.target.value;
-                        sec.k === 'size'
+                        sec.k === "size"
                           ? setTempSize({ ...tempSize, carbon: val })
                           : setTempGeneral({ ...tempGeneral, carbon: val });
                       }}
                     />
                     <button
                       onClick={() => {
-                        const cur = sec.k === 'size' ? tempSize : tempGeneral;
-                        if (!cur.name || !cur.price || cur.carbon === '')
-                          return alert('이름, 가격, 탄소량을 모두 입력하세요.');
+                        const cur = sec.k === "size" ? tempSize : tempGeneral;
+                        if (!cur.name || !cur.price || cur.carbon === "")
+                          return alert("이름, 가격, 탄소량을 모두 입력하세요.");
 
                         setNewOptions([
                           ...newOptions,
@@ -552,16 +552,16 @@ const ManagerMenuEdit = () => {
                             isNew: true,
                           },
                         ]);
-                        sec.k === 'size'
-                          ? setTempSize({ name: '', price: '', carbon: '' })
-                          : setTempGeneral({ name: '', price: '', carbon: '' });
+                        sec.k === "size"
+                          ? setTempSize({ name: "", price: "", carbon: "" })
+                          : setTempGeneral({ name: "", price: "", carbon: "" });
                       }}
                     >
                       추가
                     </button>
                   </div>
                 )}
-                {sec.k === 'eco' && (
+                {sec.k === "eco" && (
                   <div className={styles.eco_fixed_box}>
                     <label className={styles.check_item}>
                       <input
@@ -574,7 +574,7 @@ const ManagerMenuEdit = () => {
                               : [...prev, 5],
                           )
                         }
-                      />{' '}
+                      />{" "}
                       <strong>기본 반찬 안 받기</strong>
                     </label>
                     <label className={styles.check_item}>
@@ -588,17 +588,17 @@ const ManagerMenuEdit = () => {
                               : [...prev, 6],
                           )
                         }
-                      />{' '}
+                      />{" "}
                       <strong>일회용품 안 받기</strong>
                     </label>
                   </div>
                 )}
                 <div
                   className={
-                    sec.k === 'size' ? styles.badge_wrap : styles.checkbox_grid
+                    sec.k === "size" ? styles.badge_wrap : styles.checkbox_grid
                   }
                 >
-                  {sec.k === 'size' ? (
+                  {sec.k === "size" ? (
                     <>
                       {existingOptions
                         .filter((o) => o.optionType === 1)
@@ -607,8 +607,8 @@ const ManagerMenuEdit = () => {
                             key={`ex-size-${o.optionNo}`}
                             className={styles.opt_badge}
                           >
-                            {o.optionName} (+{o.optionPrice}원 / 🌿{' '}
-                            {o.optionCarbon || 0}kg){' '}
+                            {o.optionName} (+{o.optionPrice}원 / 🌿{" "}
+                            {o.optionCarbon || 0}){" "}
                             <X
                               size={12}
                               onClick={() => {
@@ -632,8 +632,8 @@ const ManagerMenuEdit = () => {
                             key={`new-size-${i}`}
                             className={styles.opt_badge}
                           >
-                            {o.optionName} (+{o.optionPrice}원 / 🌿{' '}
-                            {o.optionCarbon}kg){' '}
+                            {o.optionName} (+{o.optionPrice}원 / 🌿{" "}
+                            {o.optionCarbon}){" "}
                             <X
                               size={12}
                               onClick={() =>
@@ -660,18 +660,18 @@ const ManagerMenuEdit = () => {
                                   : [...prev, o.optionNo],
                               )
                             }
-                          />{' '}
-                          {o.optionName}{' '}
-                          {o.optionPrice > 0 ? `(+${o.optionPrice})` : ''}
+                          />{" "}
+                          {o.optionName}{" "}
+                          {o.optionPrice > 0 ? `(+${o.optionPrice})` : ""}
                         </label>
                       ))
                   )}
                 </div>
 
-                {sec.k === 'general' && (
+                {sec.k === "general" && (
                   <div
                     className={styles.badge_wrap}
-                    style={{ marginTop: '12px' }}
+                    style={{ marginTop: "12px" }}
                   >
                     {existingOptions
                       .filter(
@@ -684,8 +684,8 @@ const ManagerMenuEdit = () => {
                           key={`ex-gen-${o.optionNo}`}
                           className={styles.opt_badge}
                         >
-                          {o.optionName} (+{o.optionPrice}원 / 🌿{' '}
-                          {o.optionCarbon || 0}kg){' '}
+                          {o.optionName} (+{o.optionPrice}원 / 🌿{" "}
+                          {o.optionCarbon || 0}){" "}
                           <X
                             size={12}
                             onClick={() => {
@@ -706,8 +706,8 @@ const ManagerMenuEdit = () => {
                       .filter((o) => o.optionType === 2)
                       .map((o, i) => (
                         <span key={`new-gen-${i}`} className={styles.opt_badge}>
-                          {o.optionName} (+{o.optionPrice}원 / 🌿{' '}
-                          {o.optionCarbon}kg){' '}
+                          {o.optionName} (+{o.optionPrice}원 / 🌿{" "}
+                          {o.optionCarbon}){" "}
                           <X
                             size={12}
                             onClick={() =>
@@ -733,10 +733,10 @@ const ManagerMenuEdit = () => {
                 menu.menuStatus === 1 ? styles.status_on : styles.status_off
               }
             >
-              {menu.menuStatus === 1 ? '● 판매중' : '● 판매중지'}
+              {menu.menuStatus === 1 ? "● 판매중" : "● 판매중지"}
             </span>
             <button className={styles.status_btn} onClick={handleStatusToggle}>
-              {menu.menuStatus === 1 ? '판매중지로 변경' : '판매중으로 변경'}
+              {menu.menuStatus === 1 ? "판매중지로 변경" : "판매중으로 변경"}
             </button>
           </div>
         )}
