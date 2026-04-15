@@ -170,7 +170,7 @@ export default function StoreView() {
         <div className={styles.store_image_wrap}>
           {storeInfo.storeThumb ? (
             <img
-              src={storeInfo.storeThumb}
+              src={storeInfo.storeImage}
               alt={storeInfo.storeName || "매장 이미지"}
               className={styles.store_main_img}
               onError={(e) => {
