@@ -275,7 +275,7 @@ export default function Home() {
                     <img
                       src={
                         store.storeThumb
-                          ? `${backHost}/${store.storeThumb}`
+                          ? `${store.storeThumb}`
                           : "/image/default_store.png"
                       }
                       alt={store.storeName}
