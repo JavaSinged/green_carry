@@ -33,6 +33,18 @@
 }
 
 /* 2. 전역 변수 설정 (폰트 + 컬러) */
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  overflow-x: hidden;
+}
 :root {
   /* 폰트 시스템 수정 */
   --font-logo: "Gaegu", cursive;
