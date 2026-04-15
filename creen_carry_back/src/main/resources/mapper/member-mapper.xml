@@ -131,8 +131,10 @@
 	</update>
 
 	<select id="getTotalCarbonPoint" parameterType="string"
-		resultType="Double">
-		SELECT NVL(total_carbon_reduce, 0)
+		resultType="Member">
+		SELECT 
+		member_point,
+		total_carbon_reduce
 		FROM member_tbl
 		WHERE member_id = #{memberId}
 	</select>
