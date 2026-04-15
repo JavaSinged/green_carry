@@ -434,9 +434,8 @@ const ManagerOrderList = () => {
                     display="flex"
                     alignItems="center" // 세로 가운데 정렬
                     gap={2} // 사진과 텍스트 사이 간격
-                    p={0.2} // 안쪽 여백
                     sx={{
-                      backgroundColor: isItemCanceled ? "#f9f9f9" : "#fff", // 취소된 건은 배경색 살짝 다르게
+                      backgroundColor: isItemCanceled ? "#f9f9f9" : "#fff",
                       borderRadius: "8px",
                       border: "1px solid #eee",
                     }}
@@ -450,11 +449,11 @@ const ManagerOrderList = () => {
                         height: 60,
                         filter: isItemCanceled
                           ? "grayscale(100%) opacity(60%)"
-                          : "none", // 취소된 건은 흑백+투명도 처리
+                          : "none",
                       }}
                     />
 
-                    {/* 메뉴 정보 */}
+                    {/* 메뉴 정보 (이름, 옵션) */}
                     <Box flex={1}>
                       <Typography
                         fontWeight="bold"
@@ -482,22 +481,26 @@ const ManagerOrderList = () => {
                       )}
                     </Box>
 
-                    {/* 수량 */}
-                    <Typography
-                      component="span"
-                      fontWeight="bold"
-                      variant="h6"
-                      sx={{
-                        ml: 1,
-                        textDecoration: isItemCanceled
-                          ? "line-through"
-                          : "none",
-                        minWidth: "40px", // 영역 확보
-                        textAlign: "right",
-                      }}
+                    {/* ✨ 우측 정보 (수량 + 가격 세로 배치) */}
+                    <Box
+                      display="flex"
+                      flexDirection="column"
+                      alignItems="flex-end"
+                      minWidth="80px"
                     >
-                      {item.quantity}개
-                    </Typography>
+                      <Typography component="span" variant="h6" fontSize="13px">
+                        {item.quantity}개
+                      </Typography>
+                      <Typography
+                        variant="subtitle2"
+                        component="span"
+                        fontSize="16px"
+                        fontWeight="bold"
+                      >
+                        {/* item.price 값이 있다고 가정하고 콤마(,) 포맷 적용 */}
+                        {item.price ? Number(item.price).toLocaleString() : 0}원
+                      </Typography>
+                    </Box>
                   </Box>
                 );
               })}
