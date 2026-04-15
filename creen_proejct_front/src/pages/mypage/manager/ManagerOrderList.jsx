@@ -434,7 +434,7 @@ const ManagerOrderList = () => {
                     display="flex"
                     alignItems="center" // 세로 가운데 정렬
                     gap={2} // 사진과 텍스트 사이 간격
-                    p={1.5} // 안쪽 여백
+                    p={0.2} // 안쪽 여백
                     sx={{
                       backgroundColor: isItemCanceled ? "#f9f9f9" : "#fff", // 취소된 건은 배경색 살짝 다르게
                       borderRadius: "8px",
@@ -446,8 +446,8 @@ const ManagerOrderList = () => {
                       src={item.menuImage}
                       variant="rounded" // 모서리 둥근 사각형
                       sx={{
-                        width: 70,
-                        height: 70,
+                        width: 60,
+                        height: 60,
                         filter: isItemCanceled
                           ? "grayscale(100%) opacity(60%)"
                           : "none", // 취소된 건은 흑백+투명도 처리
