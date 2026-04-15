@@ -71,7 +71,7 @@ const UserProfile = () => {
             params: { memberId: user.memberId },
             ...config,
           });
-          setTotalCarbon(Math.floor(carbonRes.data * 1000));
+          setTotalCarbon(Math.floor(carbonRes.data.totalCarbonReduce * 1000));
 
           const commRes = await axios.get(
             `${backHost}/member/community-carbon`,

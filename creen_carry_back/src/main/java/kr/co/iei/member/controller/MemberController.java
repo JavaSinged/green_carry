@@ -291,7 +291,7 @@ public class MemberController {
 	@GetMapping("/total-carbon")
 	// @CrossOrigin(origins = "http://localhost:5173")
 	public ResponseEntity<?> getTotalCarbon(@RequestParam String memberId) {
-		Double totalPoint = memberService.getTotalCarbonPoint(memberId);
+		Member totalPoint = memberService.getTotalCarbonPoint(memberId);
 		return ResponseEntity.ok(totalPoint);
 	}
 

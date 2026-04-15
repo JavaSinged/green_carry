@@ -241,7 +241,7 @@ public class MemberService {
 		memberDao.deleteMember(memberId);
 	}
 
-	public Double getTotalCarbonPoint(String memberId) {
+	public Member getTotalCarbonPoint(String memberId) {
 		return memberDao.getTotalCarbonPoint(memberId);
 	}
 
