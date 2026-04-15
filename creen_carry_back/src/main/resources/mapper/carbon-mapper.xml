@@ -13,33 +13,24 @@
         ORDER BY 1
     </select>
 
-    <insert id="insertContainer" parameterType="productCarbon">
-        insert into carbon_definition_tbl (
-            product_id, 
-            product_material, 
-            product_emissions, 
-            product_desc, 
-            product_img
-        ) values (
-            product_seq.nextval, 
-            #{productMaterial}, 
-            #{productEmissions}, 
-            #{productDesc}, 
-            #{productImg}
-        )
-    </insert>
+    <insert id="insertCarbonProduct">
+    insert into carbon_definition_tbl
+    values (
+        product_seq.nextval, 
+        #{product.productMaterial},   #{product.productEmissions},  #{product.productImg},        #{product.productDesc}         )
+</insert>
 
-    <update id="updateContainer" parameterType="productCarbon">
-        update carbon_definition_tbl
-        set 
-            product_material = #{productMaterial},
-            product_emissions = #{productEmissions},
-            product_desc = #{productDesc}
-            <if test="productImg != null">
-                , product_img = #{productImg}
-            </if>
-        where product_id = #{productId}
-    </update>
+<update id="updateCarbonProduct">
+    update
+    		carbon_definition_tbl
+    	set
+    		product_material = #{product.productMaterial},
+        	product_emissions = #{product.productEmissions},
+        	product_desc = #{product.productDesc}
+        <if test="product.productImg != null">
+            , product_img = #{product.productImg}
+        </if>
+    where product_id = #{product.productId} </update>
 
     <delete id="deleteCarbon" parameterType="java.lang.Integer">
         delete FROM carbon_definition_tbl 

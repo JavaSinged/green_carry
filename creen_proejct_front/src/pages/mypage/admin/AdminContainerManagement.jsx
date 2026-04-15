@@ -5,6 +5,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import api from '../../../utils/accessToken';
 import Swal from 'sweetalert2';
+import axios from 'axios';
 
 const AdminContainerManagement = () => {
   //용기
@@ -34,8 +35,6 @@ const AdminContainerManagement = () => {
   const { productId } = useParams();
 
 
-
-
   // 버튼 누를 때 작동
   const onUploadBtnClick = () => {
     fileInput.current.click();
@@ -53,17 +52,28 @@ const AdminContainerManagement = () => {
   // 파일 첨부 취소
   const onRemoveFile = (e) => {
     e.stopPropagation();
-
     if (previewImg) {
       URL.revokeObjectURL(previewImg);
     }
-
     setFileName("");
     setFileSize(0);
     setUploadFile(null);
     setPreviewImg("");
     if (fileInput.current) fileInput.current.value = "";
   };
+
+  useEffect(() => {
+
+    if (productId == "new") {
+
+      setProductName(""),
+        setKgValue(""),
+        setDescription(""),
+        setPreviewImg(""),
+        setUploadFile(null);
+    } else {
+    }
+  }, [productId]);
 
   // 공통 파일 저장 로직
   const handleSaveFile = (file) => {
@@ -110,24 +120,31 @@ const AdminContainerManagement = () => {
   const handleSaveSubmit = async () => {
     if (!productName) return Swal.fire("알림", "용기 이름을 입력해주세요.", "warning");
     if (!kgValue) return Swal.fire("알림", "용기 탄소 배출량을 입력해주세요.", "warning");
+
     const formData = new FormData();
-    if (productId) {
-      formData.append("productId", productId);
+    console.log("보낼 ID:", productId)
+
+    if (productId && productId !== "new") {
+      formData.append("productId", parseInt(productId, 10));
     }
-    formData.append("productName", productName);
-    formData.append("productEmissions", kgValue);
+
+    formData.append("productMaterial", productName);
+    const cleanValue = kgValue.toString().replace(/[^0-9.]/g, "");
+    formData.append("productEmissions", kgValue || "0");
     formData.append("productDesc", description);
 
-    if (uploadFile) formData.append("uploadFile", uploadFile);
-
+    if (uploadFile) {
+      formData.append("uploadFile", uploadFile);
+    }
     try {
-      const response = await api.post("/admin/container/register", formData, {
+      const response = await api.post("/carbon-list/update", formData, {
         headers: { "Content-Type": "multipart/form-data" }
       });
 
-      if (response.status === 200 && response.data === "SUCCESS") {
+      if (response.data === "SUCCESS") {
         Swal.fire("성공!", "용기 정보가 저장되었습니다.", "success").then(() => {
           navigate("/mypage/admin/containers");
+
           setProductName("");
           setKgValue("");
           setDescription("");
@@ -136,13 +153,16 @@ const AdminContainerManagement = () => {
           setUploadFile(null);
         });
       } else {
-        Swal.fire("실패", "등록에 실패했습니다.", "error");
+        console.log("서버가 보낸 실제 값:", response.data);
+        Swal.fire("실패", `서버 대답: ${response.data}`, "error");
       }
     } catch (err) {
       console.error(err);
       Swal.fire("에러", "서버 통신 오류", "error");
     }
   };
+
+
 
   return (
     <div>

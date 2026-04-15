@@ -4,7 +4,6 @@ import SearchIcon from "@mui/icons-material/Search";
 import UnfoldMoreIcon from "@mui/icons-material/UnfoldMore";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import FilterAltOutlinedIcon from '@mui/icons-material/FilterAltOutlined';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from "@mui/icons-material/Edit";
 import ClearIcon from '@mui/icons-material/Clear';
@@ -12,7 +11,6 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 import api from "../../../utils/accessToken";
-import { Select } from "@mui/material";
 
 export default function AdminContainerList() {
     const navigate = useNavigate();
@@ -38,9 +36,7 @@ export default function AdminContainerList() {
             })
             .catch((err) => console.log("데이터 불러오기 실패: ", err));
     }, []);
-    // 🗑️ 삭제 실행 함수
     const handleDelete = (productId) => {
-        // 1. 실수로 지우지 않게 경고창 띄우기
         Swal.fire({
             title: '정말 삭제하시겠습니까?',
             text: "삭제하면 데이터를 복구할 수 없습니다!",
@@ -126,9 +122,9 @@ export default function AdminContainerList() {
                     />
                     <SearchIcon className={styles.search_icon} />
                 </div>
-                <FilterAltOutlinedIcon />
-                <select>필터</select>
-                <span> <AddIcon />추가</span>
+                <div onClick={() => navigate(`/mypage/admin/containers/detail/new`)} className={styles.addPage} >
+                    <span className={styles.AddIconText}> <AddIcon />추가</span>
+                </div>
             </div>
 
             <div className={styles.table_wrap}>
@@ -138,8 +134,8 @@ export default function AdminContainerList() {
                             <th className={styles.col_left} onClick={() => handleSort("productMaterial")}>
                                 용기 이름 <UnfoldMoreIcon className={styles.sort_icon} />
                             </th>
-                            <th onClick={() => handleSort("productMaterial")}>
-                                카테고리 <UnfoldMoreIcon className={styles.sort_icon} />
+                            <th onClick={() => handleSort("productDesc")}>
+                                용기 설명 <UnfoldMoreIcon className={styles.sort_icon} />
                             </th>
                             <th onClick={() => handleSort("productEmissions")}>
                                 1개 당 탄소 배출량(g) <UnfoldMoreIcon className={styles.sort_icon} />
@@ -156,7 +152,9 @@ export default function AdminContainerList() {
                                             <img
                                                 src={
                                                     carbon.productImg
-                                                        ? `${backHost}${carbon.productImg.startsWith('/') ? '' : '/'}${carbon.productImg}`
+                                                        ? carbon.productImg.includes("/uploads/")
+                                                            ? `${backHost}${carbon.productImg}`
+                                                            : `${backHost}/upload/container/${carbon.productImg}`
                                                         : "/image/default_container.png"
                                                 }
                                                 alt="용기 이미지"
@@ -169,10 +167,11 @@ export default function AdminContainerList() {
                                     </div>
                                 </td>
                                 <td>
-                                    <span className={styles.badge}>{carbon.productMaterial}</span>
+                                    <span className={styles.badge}>{carbon.productDesc}</span>
                                 </td>
                                 <td>{carbon.productEmissions} g</td>
                                 <td className={styles.iconContain}>
+                                    {/*수정*/}
                                     <button
                                         className={styles.edit_btn}
                                         onClick={() => navigate(`/mypage/admin/containers/detail/${carbon.productId}`, {
@@ -181,6 +180,7 @@ export default function AdminContainerList() {
                                     >
                                         <EditIcon className={styles.edit_icon} />
                                     </button>
+
                                     <button
                                         className={styles.delete_btn}
                                         onClick={() => handleDelete(carbon.productId)}

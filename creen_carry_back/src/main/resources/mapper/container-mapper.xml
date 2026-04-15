@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<!-- namespace에 ContainerDao 경로를 정확히 맞춰주었습니다 -->
+
 <mapper namespace="kr.co.iei.container.model.dao.ContainerDao">
 
     <insert id="insertContainer">
