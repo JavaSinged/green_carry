@@ -73,7 +73,7 @@ export default function StoreReviewPage() {
                     <img
                       src={
                         review.memberProfile
-                          ? `${backHost}${review.memberProfile}`
+                          ? `${review.memberProfile}`
                           : "/image/default-user.png"
                       }
                       alt="u"
@@ -103,20 +103,12 @@ export default function StoreReviewPage() {
                   🍴 주문메뉴: {review.menuName}
                 </p>
                 <div className={styles.content_wrap}>
-                  {review.reviewThumb && (
-                    <img
-                      src={
-                        review.reviewThumb.startsWith("/")
-                          ? `${backHost}${review.reviewThumb}`
-                          : `${backHost}/uploads/review/${review.reviewThumb}`
-                      }
-                      alt="리뷰사진"
-                      className={styles.review_img}
-                      onError={(e) => {
-                        e.target.src = "/image/no-image.png";
-                      }}
-                    />
-                  )}
+                  <img
+                    src={review.reviewThumb || "/image/no-image.png"}
+                    className={styles.review_img}
+                    alt="리뷰 이미지"
+                  />
+
                   <p className={styles.text}>{review.reviewContent}</p>
                 </div>
               </div>
