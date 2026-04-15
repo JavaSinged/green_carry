@@ -376,7 +376,11 @@ const AdminStoreManagementDetail = () => {
                 <Typography variant="subtitle1" fontWeight="bold">
                   총 결제 금액
                 </Typography>
-                <Typography variant="h6" color="primary.main" fontWeight="bold">
+                <Typography
+                  variant="h6"
+                  color="var(--color-brand)"
+                  fontWeight="bold"
+                >
                   {selectedOrder?.totalPrice?.toLocaleString()}원
                 </Typography>
               </Box>

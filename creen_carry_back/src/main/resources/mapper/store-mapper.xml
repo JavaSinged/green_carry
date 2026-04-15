@@ -187,6 +187,7 @@
 		resultType="orderItem">
 		SELECT od.menu_id AS menuId,
 		m.menu_name AS menuName,
+		m.menu_image AS menuImage,
 		od.quantity,
 		od.price,
 		od.option_string AS optionString
