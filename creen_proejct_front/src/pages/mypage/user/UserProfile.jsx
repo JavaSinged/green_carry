@@ -59,6 +59,25 @@ const UserProfile = () => {
   const myGradeInfo = getEcoGrade(totalCarbon);
 
   useEffect(() => {
+    // 포인트 동기화 함수
+    const syncPoint = () => {
+      const savedPoint = localStorage.getItem("memberPoint");
+      if (savedPoint) {
+        // 컴포넌트 내부의 point state를 업데이트
+        setPoint(Number(savedPoint));
+      }
+    };
+
+    // 'pointUpdated' 이벤트 리스너 등록
+    window.addEventListener("pointUpdated", syncPoint);
+
+    return () => {
+      // 컴포넌트가 사라질 때 리스너 제거 (메모리 누수 방지)
+      window.removeEventListener("pointUpdated", syncPoint);
+    };
+  }, []);
+
+  useEffect(() => {
     if (user?.memberPoint !== undefined) {
       setPoint(user.memberPoint);
     }

@@ -427,5 +427,12 @@ public class MemberController {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("회원 정보를 찾을 수 없습니다.");
 		}
 	}
+	
+	@GetMapping("/point/{memberId}")
+    public ResponseEntity<?> getMemberPoint(@PathVariable String memberId) {
+        // DB에서 해당 유저의 현재 포인트를 가져옵니다.
+        int currentPoint = memberService.getPointByMemberId(memberId);
+        return ResponseEntity.ok(currentPoint); 
+    }
 
 }

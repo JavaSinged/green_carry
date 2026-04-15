@@ -67,4 +67,6 @@ public interface MemberDao {
 	String getEnrollDate(String memberId);
 
     int updateStoreOwner(Member member);
+
+	int getPointByMemberId(String memberId);
 }

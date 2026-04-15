@@ -27,12 +27,14 @@
 	<update id="resetPassword">
 		UPDATE MEMBER_TBL
 		SET MEMBER_PW = #{memberPw}
-		WHERE MEMBER_ID = #{memberId}
+		WHERE
+		MEMBER_ID = #{memberId}
 	</update>
 
 	<select id="checkMember" resultType="int">
 		SELECT COUNT(*)
-		FROM MEMBER_TBL
+		FROM
+		MEMBER_TBL
 		WHERE MEMBER_ID = #{memberId}
 		AND MEMBER_EMAIL =
 		#{memberEmail}
@@ -54,7 +56,8 @@
 		UPDATE member_tbl
 		SET
 		member_name = #{memberName},
-		member_phone = #{memberPhone}
+		member_phone =
+		#{memberPhone}
 		<if test="memberThumb != null">
 			, member_thumb = #{memberThumb}
 		</if>
@@ -64,7 +67,8 @@
 	<update id="updateStoreOwner">
 		UPDATE store_tbl
 		SET store_owner = #{memberName}
-		WHERE member_id = #{memberId}
+		WHERE
+		member_id = #{memberId}
 	</update>
 
 	<select id="selectAllMember" resultType="member">
@@ -132,7 +136,7 @@
 
 	<select id="getTotalCarbonPoint" parameterType="string"
 		resultType="Member">
-		SELECT 
+		SELECT
 		member_point,
 		total_carbon_reduce
 		FROM member_tbl
@@ -147,7 +151,8 @@
 
 	<update id="updateAddress" parameterType="member">
 		UPDATE MEMBER_TBL
-		SET MEMBER_ADDRCODE = #{memberAddrcode},
+		SET
+		MEMBER_ADDRCODE = #{memberAddrcode},
 		MEMBER_ADDR = #{memberAddr},
 		MEMBER_DETAIL_ADDR = #{memberDetailAddr},
 		LATITUDE = #{latitude},
@@ -157,21 +162,25 @@
 
 	<select id="checkActiveOrder" resultType="int">
 		select count(*)
-		from order_tbl
+		from
+		order_tbl
 		where member_id = #{memberId}
-		and order_status not in (0, 5, 9)
+		and order_status not in (0, 5,
+		9)
 	</select>
 
 	<select id="checkOrderOwner" resultType="int">
 		SELECT COUNT(*)
-		FROM order_tbl
+		FROM
+		order_tbl
 		WHERE order_id = #{orderId}
 		AND member_id = #{memberId}
 	</select>
 
 	<select id="isAlreadyReviewed" resultType="int">
 		SELECT COUNT(*)
-		FROM review_tbl
+		FROM
+		review_tbl
 		WHERE order_id = #{orderId}
 	</select>
 
@@ -216,9 +225,11 @@
 		m.member_thumb AS memberProfile,
 		s.store_name AS storeName,
 		(SELECT SUM(price * quantity)
-		FROM order_detail
+		FROM
+		order_detail
 		WHERE order_id = r.order_id) AS totalPrice,
-		(SELECT m2.menu_name
+		(SELECT
+		m2.menu_name
 		FROM order_detail od
 		JOIN menu_tbl m2 ON od.menu_id =
 		m2.menu_id
@@ -262,10 +273,12 @@
 		JOIN store_tbl s ON
 		o.store_id = s.store_id
 		WHERE o.member_id = #{memberId}
-		AND o.order_status > 0
+		AND
+		o.order_status > 0
 		AND m.reg_date
 		>= ADD_MONTHS(SYSDATE, -3)
-		AND (o.get_point > 0 OR o.used_point > 0)
+		AND
+		(o.get_point > 0 OR o.used_point > 0)
 		ORDER BY m.reg_date DESC
 	</select>
 
@@ -274,5 +287,15 @@
 		SELECT TO_CHAR(enroll_date, 'YYYY-MM-DD')
 		FROM member_tbl
 		WHERE member_id = #{memberId}
+	</select>
+
+	<select id="getPointByMemberId" parameterType="string"
+		resultType="int">
+		SELECT
+		member_point
+		FROM
+		member_tbl
+		WHERE
+		member_id = #{memberId}
 	</select>
 </mapper>
