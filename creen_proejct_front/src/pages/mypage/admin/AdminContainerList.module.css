@@ -51,18 +51,25 @@
   font-size: 20px !important;
   cursor: pointer;
 }
-
-/* 2. 테이블 영역 */
+.table td {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 .table_wrap {
   width: 100%;
-  overflow-x: auto;
+  overflow: auto;
+  border-collapse: collapse;
 }
 
 .table {
   width: 100%;
+  min-width: 800px;
   border-collapse: collapse;
   text-align: center;
   font-family: var(--font-body);
+  table-layout: fixed;
+  border-collapse: collapse;
 }
 
 .table th,
@@ -89,10 +96,21 @@
   width: 40px;
 }
 
-.col_left {
+.col_name {
   text-align: left !important;
 }
-
+.col_name {
+  width: 250px;
+}
+.col_desc {
+  width: 450px;
+}
+.col_emissions {
+  width: 200px;
+}
+.col_action {
+  width: 100px;
+}
 .sort_icon {
   font-size: 16px !important;
   vertical-align: middle;

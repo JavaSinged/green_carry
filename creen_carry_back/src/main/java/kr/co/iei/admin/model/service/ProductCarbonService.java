@@ -27,23 +27,37 @@ public class ProductCarbonService {
 	@Transactional
 	public Integer updateProduct(ProductCarbon product, MultipartFile uploadFile) {
 
-		String fileName = null;
-
 		if (uploadFile != null && !uploadFile.isEmpty()) {
+            
+            String originalFileName = uploadFile.getOriginalFilename();
+            
+            String ext = originalFileName.substring(originalFileName.lastIndexOf("."));
+            
+            String saveFileName = java.util.UUID.randomUUID().toString() + ext;
 
-			fileName = uploadFile.getOriginalFilename();
+            // 이미지 앞에 붙일 경로
+            product.setProductImg("/uploads/container/" + saveFileName);
 
-			product.setProductImg(fileName);
-		String savePath = "//192.168.31.26/project/upload/web/container/";
+            // 실제 파일이 저장될 물리적 경로
+            String savePath = "//192.168.31.26/project/upload/web/container/";
+            
+            try {
+                // 폴더가 없으면 생성
+                File folder = new File(savePath);
+                if (!folder.exists()) {
+                    folder.mkdirs();
+                }
+                
+                // 실제 파일 저장
+                uploadFile.transferTo(new File(savePath + saveFileName));
+            } catch (IOException e) {
+                e.printStackTrace();
+                
+                return 0; 
+            }
+        }
 
-		try {
-			uploadFile.transferTo(new File(savePath + fileName));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		}
-
-		if (product.getProductId() != null) {
+		if (product.getProductId() != null && product.getProductId() != 0) {
 			// 수정
 			return productCarbonDao.updateCarbonProduct(product, uploadFile);
 		} else {
