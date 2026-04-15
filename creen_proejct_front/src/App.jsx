@@ -51,7 +51,6 @@ import ManagerCS from "./pages/mypage/manager/ManagerCS";
 import AdminStoreManagementDetail from "./pages/mypage/admin/AdminStoreManagementDetail";
 import StoreReviewPage from "./pages/main/StoreReviewPage";
 import AdminContainerList from "./pages/mypage/admin/AdminContainerList";
-import { Analytics } from "@vercel/analytics/react";
 
 const BasicLayout = () => {
   return (
