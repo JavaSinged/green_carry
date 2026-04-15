@@ -461,6 +461,7 @@
 		md.menu_id
 
 		WHERE o.store_id = #{storeId}
+		AND o.order_status > 0
 		ORDER BY o.order_id DESC
 	</select>
 
