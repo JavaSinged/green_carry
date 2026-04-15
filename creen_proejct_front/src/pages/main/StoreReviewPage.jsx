@@ -27,7 +27,7 @@ export default function StoreReviewPage() {
       navigate(-1);
       return;
     }
-    //ㅎㅇ
+
     if (!API_BASE_URL) {
       setLoadError("서버 주소가 설정되지 않아 리뷰를 불러올 수 없습니다.");
       setIsLoading(false);
