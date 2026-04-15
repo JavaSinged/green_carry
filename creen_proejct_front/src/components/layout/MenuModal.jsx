@@ -134,8 +134,11 @@ export default function MenuModal({
         reverseButtons: true,
       }).then((result) => {
         if (result.isConfirmed) {
-          clearCart(); // 기존 장바구니 비우기
-          executeAdd(); // 여기서 실행하면 매장 정보도 이때 바뀜
+          clearCart();
+          executeAdd();
+        } else if (result.isDismissed) {
+          console.log("취소 버튼 클릭");
+          return;
         }
         // 취소(result.isDismissed) 시에는 아무 일도 일어나지 않음
       });

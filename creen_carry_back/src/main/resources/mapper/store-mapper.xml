@@ -686,6 +686,7 @@
 
 	<select id="getStoreLocation" resultType="Store">
 		select
+		store_name,
 		latitude,
 		longitude
 		from store_tbl

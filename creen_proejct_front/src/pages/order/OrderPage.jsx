@@ -19,7 +19,7 @@ const OrderPage = () => {
   const cartList = useCartStore((state) => state.cart);
   const clear = useCartStore((state) => state.clearCart);
   const storeId = useCartStore((state) => state.storeId);
-  const storeName = useCartStore((state) => state.storeName);
+  const [storeName, setStoreName] = useState("");
   const setSuperTotalPrice = useCartStore((state) => state.setSuperTotalPrice);
   const setDeliveryPrice = useCartStore((state) => state.setDeliveryPrice);
   const { increaseQuantity, decreaseQuantity } = useCartStore();
@@ -51,6 +51,7 @@ const OrderPage = () => {
       .then((res) => {
         setStoreLat(res.data.latitude);
         setStoreLong(res.data.longitude);
+        setStoreName(res.data.storeName);
       })
       .catch((err) => {
         console.log(err);
