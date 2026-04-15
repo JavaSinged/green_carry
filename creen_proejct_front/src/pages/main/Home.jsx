@@ -1,58 +1,58 @@
-import { useContext, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import axios from "axios";
-import styles from "./Home.module.css";
+import { useContext, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import styles from './Home.module.css';
 
-import { Swiper, SwiperSlide } from "swiper/react";
-import { Autoplay, Pagination, Navigation } from "swiper/modules";
-import "swiper/css";
-import "swiper/css/pagination";
-import "swiper/css/navigation";
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Autoplay, Pagination, Navigation } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/pagination';
+import 'swiper/css/navigation';
 
-import SearchIcon from "@mui/icons-material/Search";
-import StarIcon from "@mui/icons-material/Star";
-import StarHalfIcon from "@mui/icons-material/StarHalf";
-import StarOutlineIcon from "@mui/icons-material/StarOutline";
+import SearchIcon from '@mui/icons-material/Search';
+import StarIcon from '@mui/icons-material/Star';
+import StarHalfIcon from '@mui/icons-material/StarHalf';
+import StarOutlineIcon from '@mui/icons-material/StarOutline';
 
 // 이스터에그 컴포넌트
-import EcoLightSwitch from "../../components/Easter Egg/EcoLightSwitch";
-import EcoRider from "../../components/Easter Egg/EcoRider";
-import EcoClean from "../../components/Easter Egg/EcoClean";
-import EcoDrone from "../../components/Easter Egg/EcoDrone";
-import EcoRecycle from "../../components/Easter Egg/EcoRecycle";
-import EcoEarth from "../../components/Easter Egg/EcoEarth";
-import EcoFlood from "../../components/Easter Egg/EcoFlood";
-import { AuthContext } from "../../context/AuthContext";
+import EcoLightSwitch from '../../components/Easter Egg/EcoLightSwitch';
+import EcoRider from '../../components/Easter Egg/EcoRider';
+import EcoClean from '../../components/Easter Egg/EcoClean';
+import EcoDrone from '../../components/Easter Egg/EcoDrone';
+import EcoRecycle from '../../components/Easter Egg/EcoRecycle';
+import EcoEarth from '../../components/Easter Egg/EcoEarth';
+import EcoFlood from '../../components/Easter Egg/EcoFlood';
+import { AuthContext } from '../../context/AuthContext';
 
-const API_BASE_URL = import.meta.env.VITE_BACKSERVER?.trim() || "";
-const isBrowser = typeof window !== "undefined";
+const API_BASE_URL = import.meta.env.VITE_BACKSERVER?.trim() || '';
+const isBrowser = typeof window !== 'undefined';
 
 const banners = [
   {
-    title: "같이 효율적으로 소비하는 플랫폼",
-    img: "/image/banner/banner1.png",
+    title: '같이 효율적으로 소비하는 플랫폼',
+    img: '/image/banner/banner1.png',
   },
   {
-    title: "오늘도 그린하게, 지구를 구하는 한 끼",
-    img: "/image/banner/banner2.png",
+    title: '오늘도 그린하게, 지구를 구하는 한 끼',
+    img: '/image/banner/banner2.png',
   },
   {
-    title: "우리의 오늘이 지구의 내일이 됩니다",
-    img: "/image/banner/banner3.png",
+    title: '우리의 오늘이 지구의 내일이 됩니다',
+    img: '/image/banner/banner3.png',
   },
-  { img: "/image/banner/banner4.png" },
+  { img: '/image/banner/banner4.png' },
 ];
 
 const categories = [
-  { name: "인기맛집", img: "/image/category/bestFood.png" },
-  { name: "한식", img: "/image/category/Kfood.png" },
-  { name: "양식", img: "/image/category/wsFood.png" },
-  { name: "중식", img: "/image/category/chFood.png" },
-  { name: "일식", img: "/image/category/susi.png" },
-  { name: "피자", img: "/image/category/pizza.png" },
-  { name: "치킨", img: "/image/category/chicken.png" },
-  { name: "샐러드", img: "/image/category/salad.png" },
-  { name: "커피/디저트", img: "/image/category/dessert.png" },
+  { name: '인기맛집', img: '/image/category/bestFood.png' },
+  { name: '한식', img: '/image/category/Kfood.png' },
+  { name: '양식', img: '/image/category/wsFood.png' },
+  { name: '중식', img: '/image/category/chFood.png' },
+  { name: '일식', img: '/image/category/susi.png' },
+  { name: '피자', img: '/image/category/pizza.png' },
+  { name: '치킨', img: '/image/category/chicken.png' },
+  { name: '샐러드', img: '/image/category/salad.png' },
+  { name: '커피/디저트', img: '/image/category/dessert.png' },
 ];
 
 const getCoordinateValue = (value) => {
@@ -65,15 +65,15 @@ export default function Home() {
   const { user, isLogin } = useContext(AuthContext);
 
   const [isLoading, setLoading] = useState(true);
-  const [loadError, setLoadError] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("인기맛집");
-  const [searchTerm, setSearchTerm] = useState("");
+  const [loadError, setLoadError] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('인기맛집');
+  const [searchTerm, setSearchTerm] = useState('');
   const [storeList, setStoreList] = useState([]);
 
   // 1. 🌟 숫자 거리 계산 함수 (철저한 방어 로직 추가)
   const getNumericDistance = (storeLat, storeLng) => {
-    const fallbackLat = isBrowser ? localStorage.getItem("LATITUDE") : null;
-    const fallbackLng = isBrowser ? localStorage.getItem("LONGITUDE") : null;
+    const fallbackLat = isBrowser ? localStorage.getItem('LATITUDE') : null;
+    const fallbackLng = isBrowser ? localStorage.getItem('LONGITUDE') : null;
     const myLat = getCoordinateValue(user?.LATITUDE ?? fallbackLat);
     const myLng = getCoordinateValue(user?.LONGITUDE ?? fallbackLng);
 
@@ -100,14 +100,14 @@ export default function Home() {
   };
 
   const formatTime = (distance) => {
-    if (distance === null) return "계산 불가";
+    if (distance === null) return '계산 불가';
     const estimatedTime = 15 + distance * 6;
     const roundedTime = Math.round(estimatedTime / 5) * 5;
     return `${roundedTime}분`;
   };
 
   const formatDistance = (distance) => {
-    if (distance === null) return "거리 정보 없음";
+    if (distance === null) return '거리 정보 없음';
     return distance < 1
       ? `${Math.round(distance * 1000)}m`
       : `${distance.toFixed(1)}km`;
@@ -116,16 +116,16 @@ export default function Home() {
   // 🚀 서버 데이터 로드
   useEffect(() => {
     if (!API_BASE_URL) {
-      setLoadError("서버 주소가 설정되지 않아 매장 목록을 불러올 수 없습니다.");
+      setLoadError('서버 주소가 설정되지 않아 매장 목록을 불러올 수 없습니다.');
       setStoreList([]);
       setLoading(false);
-      console.error("VITE_BACKSERVER is not configured for the home page.");
+      console.error('VITE_BACKSERVER is not configured for the home page.');
       return;
     }
 
     let isMounted = true;
     setLoading(true);
-    setLoadError("");
+    setLoadError('');
 
     axios
       .get(`${API_BASE_URL}/stores`)
@@ -142,10 +142,10 @@ export default function Home() {
           return;
         }
 
-        console.error("데이터 로딩 에러:", err);
+        console.error('데이터 로딩 에러:', err);
         setStoreList([]);
         setLoadError(
-          "매장 목록을 불러오지 못했습니다. 잠시 후 다시 시도해주세요.",
+          '매장 목록을 불러오지 못했습니다. 잠시 후 다시 시도해주세요.',
         );
         setLoading(false);
       });
@@ -157,9 +157,9 @@ export default function Home() {
 
   // 🔍 검색, 카테고리, 그리고 거리(5km) 필터링
   const filteredStores = storeList.filter((store) => {
-    const storeName = String(store?.storeName ?? "");
+    const storeName = String(store?.storeName ?? '');
     const isCategoryMatch =
-      selectedCategory === "인기맛집" ||
+      selectedCategory === '인기맛집' ||
       store.storeCategory === selectedCategory;
 
     const isSearchMatch = storeName
@@ -185,20 +185,20 @@ export default function Home() {
     for (let i = 1; i <= 5; i++) {
       if (i <= Math.floor(score)) {
         stars.push(
-          <StarIcon key={i} sx={{ color: "#ffb300", fontSize: "1.2rem" }} />,
+          <StarIcon key={i} sx={{ color: '#ffb300', fontSize: '1.2rem' }} />,
         );
       } else if (i === Math.ceil(score) && score % 1 !== 0) {
         stars.push(
           <StarHalfIcon
             key={i}
-            sx={{ color: "#ffb300", fontSize: "1.2rem" }}
+            sx={{ color: '#ffb300', fontSize: '1.2rem' }}
           />,
         );
       } else {
         stars.push(
           <StarOutlineIcon
             key={i}
-            sx={{ color: "#ccc", fontSize: "1.2rem" }}
+            sx={{ color: '#ccc', fontSize: '1.2rem' }}
           />,
         );
       }
@@ -245,7 +245,7 @@ export default function Home() {
           {categories.map((item) => (
             <div
               key={item.name}
-              className={`${styles.category_item} ${selectedCategory === item.name ? styles.active : ""}`}
+              className={`${styles.category_item} ${selectedCategory === item.name ? styles.active : ''}`}
               onClick={() => setSelectedCategory(item.name)}
             >
               <div className={styles.category_img_circle}>
@@ -274,7 +274,7 @@ export default function Home() {
 
         <div className={styles.card_wrap}>
           {isLoading ? (
-            [1, 2, 3, 4].map((n) => (
+            [1, 2, 3].map((n) => (
               <div
                 key={n}
                 className={`${styles.card_item} ${styles.skeleton_card}`}
@@ -295,16 +295,16 @@ export default function Home() {
               const sLat = store.LATITUDE || store.latitude;
               const sLng = store.LONGITUDE || store.longitude;
               const numericDist = getNumericDistance(sLat, sLng);
-              const storeName = String(store?.storeName ?? "매장 이름 없음");
+              const storeName = String(store?.storeName ?? '매장 이름 없음');
               const storeCategory = String(
-                store?.storeCategory ?? "카테고리 없음",
+                store?.storeCategory ?? '카테고리 없음',
               );
               const storeRating = Number(store?.storeRating ?? 0);
               const reviewCount = Number(store?.reviewCount ?? 0);
               const storeThumb =
-                typeof store?.storeThumb === "string" && store.storeThumb.trim()
+                typeof store?.storeThumb === 'string' && store.storeThumb.trim()
                   ? store.storeThumb
-                  : "/image/default_store.png";
+                  : '/image/default_store.png';
 
               return (
                 <div
@@ -317,10 +317,10 @@ export default function Home() {
                       src={
                         store.storeThumb
                           ? `${store.storeThumb}`
-                          : "/image/default_store.png"
+                          : '/image/default_store.png'
                       }
                       alt={store.storeName}
-                      style={{ objectFit: "cover" }}
+                      style={{ objectFit: 'cover' }}
                     />
                     {isLogin && user?.memberGrade === 1 && (
                       <div className={styles.card_badge}>
