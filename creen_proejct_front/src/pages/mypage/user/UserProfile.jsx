@@ -294,6 +294,7 @@ const UserProfile = () => {
                   {totalPages > 1 && (
                     <div className={styles.pagination}>
                       <button
+                        className={styles.page_btn}
                         onClick={() => setCurrentPage(startPage - 1)}
                         disabled={startPage === 1}
                       >
@@ -311,6 +312,7 @@ const UserProfile = () => {
                         </button>
                       ))}
                       <button
+                        className={styles.page_btn}
                         onClick={() => setCurrentPage(endPage + 1)}
                         disabled={endPage === totalPages}
                       >
