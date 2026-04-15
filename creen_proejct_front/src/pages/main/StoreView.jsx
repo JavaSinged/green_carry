@@ -1,25 +1,26 @@
-import { useState, useEffect, useContext } from "react";
-import { Link, useParams, useNavigate } from "react-router-dom"; // 🌟 useParams로 주소창 ID 감지
+import { useContext, useEffect, useState } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
-import styles from "./StoreView.module.css";
 import SearchIcon from "@mui/icons-material/Search";
 import StarIcon from "@mui/icons-material/Star";
+import Swal from "sweetalert2";
+import styles from "./StoreView.module.css";
 import MenuModal from "../../components/layout/MenuModal";
 import CartBar from "../../components/layout/ui/CartBar";
 import useCartStore from "../../store/useCartStore";
 import { AuthContext } from "../../context/AuthContext";
-import Swal from "sweetalert2";
-export default function StoreView() {
-  const { id } = useParams(); // 🌟 URL 파라미터 (/storeView/3) 에서 '3'을 직접 추출
-  const navigate = useNavigate();
-  const backHost = import.meta.env.VITE_BACKSERVER;
 
-  // 🌟 주소창의 ID를 숫자로 변환 (이게 이 페이지의 절대적인 기준점입니다)
-  const storeId = id ? Number(id) : null;
+const API_BASE_URL = import.meta.env.VITE_BACKSERVER?.trim() || "";
+
+export default function StoreView() {
+  // 코덱스가 수정함: 매장/메뉴 로딩과 검색 필터를 배포 환경에서 안전하게 처리합니다.
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const storeId = Number(id);
 
   const [reviewCount, setReviewCount] = useState(0);
-
-  // 1. 가게 정보 상태
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
   const [storeInfo, setStoreInfo] = useState({
     storeId: "",
     storeIntro: "",
@@ -27,69 +28,104 @@ export default function StoreView() {
     storeThumb: "",
     storeRating: 0,
   });
-
-  // 2. 메뉴 정보 상태
   const [menuList, setMenuList] = useState([]);
   const [categories, setCategories] = useState(["전체"]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedMenu, setSelectedMenu] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState("전체");
   const [searchTerm, setSearchTerm] = useState("");
+
   const { isLogin } = useContext(AuthContext);
   const setGlobalStoreName = useCartStore((state) => state.setStoreName);
 
   useEffect(() => {
-    // 🌟 URL에 ID가 없으면 홈으로 보냅니다 (잘못된 접근 방지)
-    if (!id) {
+    if (!Number.isInteger(storeId) || storeId <= 0) {
       navigate("/");
       return;
     }
 
+    if (!API_BASE_URL) {
+      setLoadError("서버 주소가 설정되지 않아 매장 정보를 불러올 수 없습니다.");
+      setIsLoading(false);
+      console.error("VITE_BACKSERVER is not configured for StoreView.");
+      return;
+    }
+
+    let isMounted = true;
     window.scrollTo(0, 0);
+    setIsLoading(true);
+    setLoadError("");
 
-    // 🚀 [메뉴 로드]
-    axios
-      .get(`${backHost}/stores/${storeId}/menus`)
-      .then((res) => {
-        const activeMenus = res.data.filter((item) => item.menuStatus === 1);
+    Promise.allSettled([
+      axios.get(`${API_BASE_URL}/stores/${storeId}/menus`),
+      axios.get(`${API_BASE_URL}/stores/${storeId}`),
+      axios.get(`${API_BASE_URL}/stores/reviews/${storeId}`),
+    ]).then(([menuResult, storeResult, reviewResult]) => {
+      if (!isMounted) {
+        return;
+      }
+
+      if (menuResult.status === "fulfilled") {
+        const rawMenus = Array.isArray(menuResult.value.data)
+          ? menuResult.value.data
+          : [];
+        const activeMenus = rawMenus.filter((item) => item?.menuStatus === 1);
         setMenuList(activeMenus);
-        const uniqueCategories = [
+        setCategories([
           "전체",
-          ...new Set(activeMenus.map((item) => item.menuCategory)),
-        ];
-        setCategories(uniqueCategories);
-      })
-      .catch((err) => console.error("메뉴 로딩 실패:", err));
+          ...new Set(
+            activeMenus
+              .map((item) => item?.menuCategory)
+              .filter((category) => Boolean(category)),
+          ),
+        ]);
+      } else {
+        console.error("메뉴 로딩 실패:", menuResult.reason);
+        setMenuList([]);
+        setCategories(["전체"]);
+      }
 
-    // 🚀 [상점 정보 로드]
-    axios
-      .get(`${backHost}/stores/${storeId}`)
-      .then((res) => {
-        setStoreInfo({
-          storeId: res.data.storeId,
-          storeIntro: res.data.storeIntro,
-          storeName: res.data.storeName,
-          storeThumb: res.data.storeThumb,
-          storeRating: res.data.storeRating || 0,
-        });
-      })
-      .catch((err) => console.error("가게 로딩 실패:", err));
+      if (storeResult.status === "fulfilled") {
+        const nextStoreInfo = {
+          storeId: storeResult.value.data?.storeId ?? "",
+          storeIntro: storeResult.value.data?.storeIntro ?? "",
+          storeName: storeResult.value.data?.storeName ?? "",
+          storeThumb: storeResult.value.data?.storeThumb ?? "",
+          storeRating: Number(storeResult.value.data?.storeRating ?? 0),
+        };
 
-    // 🚀 [리뷰 개수 로드]
-    axios
-      .get(`${backHost}/stores/reviews/${storeId}`)
-      .then((res) => {
-        setReviewCount(res.data.length);
-      })
-      .catch((err) => console.error("리뷰 로딩 실패:", err));
-  }, [storeId, backHost, setGlobalStoreName, navigate, id]);
+        setStoreInfo(nextStoreInfo);
+        setGlobalStoreName(nextStoreInfo.storeName);
+      } else {
+        console.error("가게 로딩 실패:", storeResult.reason);
+        setLoadError("매장 정보를 불러오지 못했습니다.");
+      }
+
+      if (reviewResult.status === "fulfilled") {
+        const reviewList = Array.isArray(reviewResult.value.data)
+          ? reviewResult.value.data
+          : [];
+        setReviewCount(reviewList.length);
+      } else {
+        console.error("리뷰 로딩 실패:", reviewResult.reason);
+        setReviewCount(0);
+      }
+
+      setIsLoading(false);
+    });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [navigate, setGlobalStoreName, storeId]);
 
   const filteredMenu = menuList.filter((item) => {
     const isCategoryMatch =
       selectedCategory === "전체" || item.menuCategory === selectedCategory;
-    const isSearchMatch = item.menuName
+    const isSearchMatch = String(item?.menuName ?? "")
       .toLowerCase()
-      .includes(searchTerm.toLowerCase());
+      .includes(searchTerm.trim().toLowerCase());
+
     return isCategoryMatch && isSearchMatch;
   });
 
@@ -97,27 +133,27 @@ export default function StoreView() {
     if (isLogin) {
       setSelectedMenu(menu);
       setIsModalOpen(true);
-    } else {
-      Swal.fire({
-        title: "로그인 후 이용 가능합니다",
-        icon: "warning",
-      });
-      navigate("/login");
       return;
     }
+
+    Swal.fire({
+      title: "로그인 후 이용 가능합니다",
+      icon: "warning",
+    });
+    navigate("/login");
   };
+
   return (
     <div className={styles.page_container}>
-      {/* 상단: 상점 대표 정보 영역 */}
       <div className={styles.store_info_section}>
         <div className={styles.store_image_wrap}>
           {storeInfo.storeThumb ? (
             <img
               src={storeInfo.storeThumb}
-              alt={storeInfo.storeName}
+              alt={storeInfo.storeName || "매장 이미지"}
               className={styles.store_main_img}
               onError={(e) => {
-                e.target.style.display = "none";
+                e.currentTarget.style.display = "none";
               }}
             />
           ) : (
@@ -130,20 +166,17 @@ export default function StoreView() {
         <div className={styles.store_text_wrap}>
           <div className={styles.title_row}>
             <h2 className={styles.store_name}>
-              {storeInfo.storeName || "로딩 중..."}
+              {storeInfo.storeName || (isLoading ? "로딩 중..." : "매장 정보 없음")}
             </h2>
 
             <div className={styles.store_rating_box}>
               <StarIcon className={styles.star_icon} />
               <span className={styles.rating_num}>
-                {(storeInfo.storeRating || 0).toFixed(1)}
+                {Number(storeInfo.storeRating ?? 0).toFixed(1)}
               </span>
-
               <span className={styles.review_count_text}>
                 ({reviewCount.toLocaleString()})
               </span>
-
-              {/* 🌟 리뷰 보기 Link 수정: state 대신 storeId 직접 전달 권장 */}
               <Link
                 to={`/storeReviews/${storeId}`}
                 className={styles.review_count_link}
@@ -155,12 +188,14 @@ export default function StoreView() {
 
           <Link
             to={`/storeDetail/${storeId}`}
-            state={{ storeId: storeId }}
+            state={{ storeId }}
             className={styles.store_link}
           >
             가게 정보, 원산지 정보 {">"}
           </Link>
-          <p className={styles.store_desc}>{storeInfo.storeIntro}</p>
+          <p className={styles.store_desc}>
+            {storeInfo.storeIntro || loadError || "매장 소개가 없습니다."}
+          </p>
         </div>
       </div>
 
@@ -177,15 +212,15 @@ export default function StoreView() {
           </div>
 
           <div className={styles.filter_wrap}>
-            {categories.map((cat) => (
+            {categories.map((category) => (
               <button
-                key={cat}
+                key={category}
                 className={`${styles.filter_btn} ${
-                  selectedCategory === cat ? styles.active : ""
+                  selectedCategory === category ? styles.active : ""
                 }`}
-                onClick={() => setSelectedCategory(cat)}
+                onClick={() => setSelectedCategory(category)}
               >
-                {cat}
+                {category}
               </button>
             ))}
           </div>
@@ -202,15 +237,14 @@ export default function StoreView() {
                 {menu.menuImage ? (
                   <img
                     src={menu.menuImage}
-                    alt={menu.menuName}
+                    alt={menu.menuName || "메뉴 이미지"}
                     style={{
                       width: "100%",
                       height: "100%",
                       objectFit: "cover",
                     }}
                     onError={(e) => {
-                      e.target.src =
-                        "https://via.placeholder.com/150?text=No+Image";
+                      e.currentTarget.src = "/image/no-image.png";
                     }}
                   />
                 ) : (
@@ -218,9 +252,11 @@ export default function StoreView() {
                 )}
               </div>
               <div className={styles.menu_info}>
-                <span className={styles.menu_title}>{menu.menuName}</span>
+                <span className={styles.menu_title}>
+                  {menu.menuName || "메뉴 이름 없음"}
+                </span>
                 <p className={styles.menu_price}>
-                  {menu.menuPrice?.toLocaleString()}원
+                  {Number(menu.menuPrice ?? 0).toLocaleString()}원
                 </p>
                 {menu.menuInfo && (
                   <p className={styles.menu_desc}>{menu.menuInfo}</p>
@@ -229,7 +265,7 @@ export default function StoreView() {
             </div>
           ))}
 
-          {filteredMenu.length === 0 && (
+          {!isLoading && filteredMenu.length === 0 && (
             <div className={styles.empty_menu}>
               현재 주문 가능한 메뉴가 없습니다.
             </div>
@@ -237,12 +273,11 @@ export default function StoreView() {
         </div>
       </div>
 
-      {/* 🌟 [핵심] 모달에 현재 매장 ID를 전달할 때 URL에서 가져온 storeId를 직접 사용 */}
       <MenuModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         menuData={selectedMenu}
-        currentStoreId={Number(storeId)}
+        currentStoreId={storeId}
         currentStoreName={storeInfo.storeName}
       />
       <CartBar />

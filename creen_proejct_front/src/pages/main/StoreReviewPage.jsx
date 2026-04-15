@@ -1,53 +1,93 @@
-import React, { useState, useEffect } from "react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import styles from "./StoreReviewPage.module.css";
 import StarIcon from "@mui/icons-material/Star";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
+const API_BASE_URL = import.meta.env.VITE_BACKSERVER?.trim() || "";
+const isBrowser = typeof window !== "undefined";
+
 export default function StoreReviewPage() {
-  const { id } = useParams(); // 🌟 주소창의 번호를 읽어옴
+  // 코덱스가 수정함: 리뷰/매장 로딩과 페이지 이동을 배포 환경에서 더 안전하게 처리합니다.
+  const { id } = useParams();
   const storeId = Number(id);
-  const backHost = import.meta.env.VITE_BACKSERVER;
-  //const location = useLocation();
   const navigate = useNavigate();
-  //const storeId = location.state?.storeId;
 
   const [reviews, setReviews] = useState([]);
   const [storeName, setStoreName] = useState("");
-
-  // 🌟 [추가] 페이지네이션을 위한 상태
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const reviewsPerPage = 7; // 10개씩 보기
+
+  const reviewsPerPage = 7;
 
   useEffect(() => {
-    if (!storeId) {
+    if (!Number.isInteger(storeId) || storeId <= 0) {
       navigate(-1);
       return;
     }
 
-    axios
-      .get(`${backHost}/stores/${storeId}`)
-      .then((res) => setStoreName(res.data.storeName));
+    if (!API_BASE_URL) {
+      setLoadError("서버 주소가 설정되지 않아 리뷰를 불러올 수 없습니다.");
+      setIsLoading(false);
+      console.error("VITE_BACKSERVER is not configured for StoreReviewPage.");
+      return;
+    }
 
-    axios
-      .get(`${backHost}/stores/reviews/${storeId}`)
-      .then((res) => setReviews(res.data))
-      .catch((err) => console.error("리뷰 로드 실패", err));
-  }, [storeId, backHost, navigate]);
+    let isMounted = true;
+    setIsLoading(true);
+    setLoadError("");
 
-  // 🌟 [추가] 현재 페이지에 보여줄 리뷰 계산
+    Promise.allSettled([
+      axios.get(`${API_BASE_URL}/stores/${storeId}`),
+      axios.get(`${API_BASE_URL}/stores/reviews/${storeId}`),
+    ]).then(([storeResult, reviewResult]) => {
+      if (!isMounted) {
+        return;
+      }
+
+      if (storeResult.status === "fulfilled") {
+        setStoreName(String(storeResult.value.data?.storeName ?? ""));
+      } else {
+        console.error("매장명 로드 실패:", storeResult.reason);
+      }
+
+      if (reviewResult.status === "fulfilled") {
+        setReviews(Array.isArray(reviewResult.value.data) ? reviewResult.value.data : []);
+      } else {
+        console.error("리뷰 로드 실패:", reviewResult.reason);
+        setReviews([]);
+        setLoadError("리뷰를 불러오지 못했습니다. 잠시 후 다시 시도해주세요.");
+      }
+
+      setIsLoading(false);
+    });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [navigate, storeId]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [reviews.length]);
+
   const indexOfLastReview = currentPage * reviewsPerPage;
   const indexOfFirstReview = indexOfLastReview - reviewsPerPage;
   const currentReviews = reviews.slice(indexOfFirstReview, indexOfLastReview);
-
-  // 🌟 [추가] 총 페이지 수 계산
   const totalPages = Math.ceil(reviews.length / reviewsPerPage);
 
-  // 🌟 [추가] 페이지 변경 함수
   const handlePageChange = (pageNumber) => {
+    if (pageNumber < 1 || pageNumber > totalPages) {
+      return;
+    }
+
     setCurrentPage(pageNumber);
-    window.scrollTo({ top: 0, behavior: "smooth" }); // 페이지 이동 시 상단으로 부드럽게
+
+    if (isBrowser) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
   };
 
   return (
@@ -58,38 +98,42 @@ export default function StoreReviewPage() {
           className={styles.back_btn}
         />
         <h2>
-          {storeName} 리뷰 ({reviews.length})
+          {storeName || "매장"} 리뷰 ({reviews.length})
         </h2>
       </div>
 
       <div className={styles.review_list}>
-        {/* 🌟 reviews 대신 currentReviews를 사용합니다. */}
-        {currentReviews.length > 0 ? (
+        {isLoading ? (
+          <div className={styles.empty}>리뷰를 불러오는 중입니다...</div>
+        ) : loadError ? (
+          <div className={styles.empty}>{loadError}</div>
+        ) : currentReviews.length > 0 ? (
           currentReviews.map((review) => (
             <div key={review.orderId} className={styles.review_card}>
               <div className={styles.card_top}>
                 <div className={styles.user_info}>
                   <div className={styles.avatar}>
                     <img
-                      src={
-                        review.memberProfile
-                          ? `${review.memberProfile}`
-                          : "/image/default-user.png"
-                      }
-                      alt="u"
+                      src={review.memberProfile || "/image/default-user.png"}
+                      alt={`${review.memberId || "사용자"} 프로필`}
+                      onError={(e) => {
+                        e.currentTarget.src = "/image/default-user.png";
+                      }}
                     />
                   </div>
                   <div className={styles.user_text}>
-                    <span className={styles.user_id}>{review.memberId}</span>
-                    <span className={styles.date}>{review.reviewDate}</span>
+                    <span className={styles.user_id}>
+                      {review.memberId || "익명 사용자"}
+                    </span>
+                    <span className={styles.date}>{review.reviewDate || "-"}</span>
                   </div>
                 </div>
                 <div className={styles.rating}>
-                  {[...Array(5)].map((_, i) => (
+                  {[...Array(5)].map((_, index) => (
                     <StarIcon
-                      key={i}
+                      key={index}
                       className={
-                        i < review.reviewRating
+                        index < Number(review.reviewRating ?? 0)
                           ? styles.star_active
                           : styles.star_inactive
                       }
@@ -100,22 +144,27 @@ export default function StoreReviewPage() {
 
               <div className={styles.card_body}>
                 <p className={styles.menu_name}>
-                  🍴 주문메뉴: {review.menuName}
+                  🍶 주문메뉴: {review.menuName || "메뉴 정보 없음"}
                 </p>
                 <div className={styles.content_wrap}>
                   <img
                     src={review.reviewThumb || "/image/no-image.png"}
                     className={styles.review_img}
                     alt="리뷰 이미지"
+                    onError={(e) => {
+                      e.currentTarget.src = "/image/no-image.png";
+                    }}
                   />
 
-                  <p className={styles.text}>{review.reviewContent}</p>
+                  <p className={styles.text}>
+                    {review.reviewContent || "리뷰 내용이 없습니다."}
+                  </p>
                 </div>
               </div>
 
               {review.reviewCommentContent && (
                 <div className={styles.reply_box}>
-                  <p className={styles.reply_owner}>👨‍🍳 사장님 답글</p>
+                  <p className={styles.reply_owner}>💬 사장님 답글</p>
                   <p className={styles.reply_text}>
                     {review.reviewCommentContent}
                   </p>
@@ -128,7 +177,6 @@ export default function StoreReviewPage() {
         )}
       </div>
 
-      {/* 🌟 [추가] 페이지네이션 UI */}
       {reviews.length > reviewsPerPage && (
         <div className={styles.pagination}>
           <button
@@ -139,13 +187,15 @@ export default function StoreReviewPage() {
             이전
           </button>
 
-          {[...Array(totalPages)].map((_, i) => (
+          {[...Array(totalPages)].map((_, index) => (
             <button
-              key={i + 1}
-              onClick={() => handlePageChange(i + 1)}
-              className={`${styles.page_number} ${currentPage === i + 1 ? styles.active : ""}`}
+              key={index + 1}
+              onClick={() => handlePageChange(index + 1)}
+              className={`${styles.page_number} ${
+                currentPage === index + 1 ? styles.active : ""
+              }`}
             >
-              {i + 1}
+              {index + 1}
             </button>
           ))}
 
