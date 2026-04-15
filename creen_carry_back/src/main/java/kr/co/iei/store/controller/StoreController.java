@@ -4,42 +4,31 @@ import kr.co.iei.notification.model.service.NotificationService;
 import kr.co.iei.store.model.service.StoreService;
 import kr.co.iei.store.model.vo.Menu;
 import kr.co.iei.store.model.vo.MenuOption;
-import kr.co.iei.store.model.vo.MenuSaveRequest;
 import kr.co.iei.store.model.vo.Order;
-import kr.co.iei.store.model.vo.OrderItem;
-import kr.co.iei.store.model.vo.OrderListResponse;
 import kr.co.iei.store.model.vo.OrderResponse;
 import kr.co.iei.store.model.vo.StatsOrderInfo;
 import kr.co.iei.store.model.vo.Store;
-
 import kr.co.iei.store.model.vo.StoreIdResponse;
 import kr.co.iei.store.model.vo.StoreOperating;
+import kr.co.iei.store.model.vo.StoreSaveRequest;
 import kr.co.iei.store.model.vo.StoreReviewResponse;
-
-import org.apache.ibatis.type.Alias;
-import kr.co.iei.store.model.vo.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
-
-import org.springframework.http.MediaType;
-
-import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/stores")
 @CrossOrigin("*")
 public class StoreController {
+	private static final String STORE_IMAGE_FOLDER = "projet/upload/web/store";
 
 	@Autowired
 	private Cloudinary cloudinary;
@@ -48,6 +37,8 @@ public class StoreController {
 
 	@Autowired
 	private NotificationService notificationService;
+
+	// 코덱스가 수정함: 컨트롤러 입력 검증과 알림 분기를 단순화해 런타임 오류 가능성을 줄였습니다.
 
 	@GetMapping
 	public ResponseEntity<?> getStores() {
@@ -88,16 +79,20 @@ public class StoreController {
 
 	@PostMapping("/order")
 	public ResponseEntity<?> insertOrder(@RequestBody Order orderData) {
-		System.out.println(orderData);
 		int orderId = storeService.insertOrder(orderData);
-		String memberId = storeService.getStoreById(orderData.getStoreId()).getMemberId();
-		notificationService.sendNotification(memberId, "orderUpdate", "주문이 들어왔습니다.", "/mypage/manager/orders");
+		Store store = storeService.getStoreById(orderData.getStoreId());
+		if (orderId > 0 && store != null && store.getMemberId() != null) {
+			notificationService.sendNotification(store.getMemberId(), "orderUpdate", "주문이 들어왔습니다.", "/mypage/manager/orders");
+		}
 		return ResponseEntity.ok(orderId);
 	}
 
 	@GetMapping("/order/{orderId}")
 	public ResponseEntity<?> searchOrder(@PathVariable Integer orderId) {
 		OrderResponse orderResponse = storeService.searchOrder(orderId);
+		if (orderResponse == null) {
+			return ResponseEntity.notFound().build();
+		}
 		return ResponseEntity.ok(orderResponse);
 	}
 
@@ -115,7 +110,6 @@ public class StoreController {
 
 	@GetMapping(value = "/stats/order")
 	public ResponseEntity<?> selectStatsOrderInfo(@RequestParam Integer storeId, @RequestParam String yearMonth) {
-		System.out.println("주문 통계 요청 - 상점ID: " + storeId + ", 조회월: " + yearMonth);
 		List<StatsOrderInfo> list = storeService.selectStatsOrderInfo(storeId, yearMonth);
 		if (list != null && !list.isEmpty()) {
 			return ResponseEntity.ok(list);
@@ -158,11 +152,6 @@ public class StoreController {
 	public ResponseEntity<?> insertReviewComment(@RequestBody Map<String, Object> payload) {
 		// 1. 프론트에서 보낸 데이터 꺼내기 (reviewId, commentContent 등)
 		// 💡 VO(객체)를 따로 만드셨다면 @RequestBody ReviewCommentVO vo 형태로 받으셔도 됩니다.
-
-		System.out.println("사장님 답글 요청 데이터: " + payload);
-
-		// 2. 서비스 호출 (답글 저장 로직)
-		// 예: int result = storeService.insertReviewComment(payload);
 		int result = storeService.insertReviewComment(payload);
 
 		if (result > 0) {
@@ -210,7 +199,9 @@ public class StoreController {
 			if (memberId != null && (status == 2 || status == 4 || status == 5 || status == 9)) {
 				String message = "";
 				if (status == 2) {
-					message = "주문이 접수되었습니다. 약 " + expectedTime + "분 뒤 조리가 완료됩니다.";
+					message = expectedTime != null
+							? "주문이 접수되었습니다. 약 " + expectedTime + "분 뒤 조리가 완료됩니다."
+							: "주문이 접수되었습니다.";
 				}
 				else if (status == 4) {
 					message = "메뉴가 준비되었습니다! 픽업/배달을 확인해주세요.";
@@ -253,8 +244,7 @@ public class StoreController {
 		try {
 			// 1. Cloudinary 파일 저장 로직 적용
 			if (file != null && !file.isEmpty()) {
-				// Cloudinary 업로드 설정 (가게 이미지 경로: projet/upload/web/store)
-				Map uploadParams = ObjectUtils.asMap("folder", "projet/upload/web/store", "use_filename", true,
+				Map uploadParams = ObjectUtils.asMap("folder", STORE_IMAGE_FOLDER, "use_filename", true,
 						"unique_filename", true);
 
 				// Cloudinary로 업로드 실행
@@ -297,6 +287,9 @@ public class StoreController {
 	@GetMapping("/location/{storeId}")
 	public ResponseEntity<?> getStoreLocation(@PathVariable Integer storeId) {
 		Store store = storeService.getStoreLocation(storeId);
+		if (store == null) {
+			return ResponseEntity.notFound().build();
+		}
 		return ResponseEntity.ok(store);
 	}
 }

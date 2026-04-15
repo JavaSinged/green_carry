@@ -2,6 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="kr.co.iei.store.model.dao.StoreDao">
+	<!-- 코덱스가 수정함: resultType 불일치와 요일 정렬 안정성을 함께 보정했습니다. -->
 
 	<select id="selectAllStore">
 		SELECT s.*,
@@ -334,7 +335,7 @@
 		ORDER BY o.order_id DESC
 	</select>
 
-	<insert id="insertReviewComment" parameterType="reviewComment">
+	<insert id="insertReviewComment" parameterType="map">
 		INSERT INTO
 		review_comment_tbl (order_id,
 		store_id,
@@ -482,8 +483,7 @@
 
 	<select id="getMenuImageById" parameterType="int"
 		resultType="string">
-		SELECT menu_image,
-		menu_status
+		SELECT menu_image
 		FROM menu_tbl
 		WHERE menu_id =
 		#{menuId}
@@ -609,7 +609,7 @@
 		FROM operating_hours_tbl
 		WHERE store_id = #{storeId}
 		ORDER BY
-		DECODE(day_of_week, 'MON', 1, 'TUE', 2, 'WED', 3, 'THU', 4, 'FRI',
+		DECODE(UPPER(day_of_week), 'MON', 1, 'TUE', 2, 'WED', 3, 'THU', 4, 'FRI',
 		5,
 		'SAT', 6, 'SUN', 7)
 	</select>
