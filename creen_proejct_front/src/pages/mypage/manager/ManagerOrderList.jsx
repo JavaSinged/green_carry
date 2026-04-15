@@ -3,29 +3,43 @@ import axios from "axios";
 import styles from "./ManagerOrderList.module.css";
 import Swal from "sweetalert2";
 import RefreshIcon from "@mui/icons-material/Refresh";
+// 모달 관련 MUI 컴포넌트 추가
+import {
+  Modal,
+  Box,
+  Typography,
+  Divider,
+  IconButton,
+  CircularProgress,
+  Avatar, // ✨ 사진 표시용 아바타 추가
+} from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
 
 const ManagerOrderList = () => {
   const [orderList, setOrderList] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  const [expandedOrderId, setExpandedOrderId] = useState(null);
-  const [orderDetailsData, setOrderDetailsData] = useState({});
+  // 모달 상태 관리
+  const [openDetailModal, setOpenDetailModal] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [detailMenus, setDetailMenus] = useState([]);
+  const [isLoadingDetail, setIsLoadingDetail] = useState(false);
 
   // 페이지네이션 상태
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
   const storeId = localStorage.getItem("storeId");
+  const backHost = import.meta.env.VITE_BACKSERVER; // ✨ backHost 변수화
 
   const fetchStoreOrders = () => {
     if (!storeId) return;
     setIsLoading(true);
 
     axios
-      .get(`${import.meta.env.VITE_BACKSERVER}/stores/orders/owner/${storeId}`)
+      .get(`${backHost}/stores/orders/owner/${storeId}`)
       .then((res) => {
         setOrderList(Array.isArray(res.data) ? res.data : []);
-        console.log("🚀 ~ fetchStoreOrders ~ res.data:", res.data);
       })
       .catch((err) => {
         console.error("주문 내역 불러오기 실패:", err);
@@ -43,16 +57,13 @@ const ManagerOrderList = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [currentPage]);
 
-  // 🌟 공통 API 호출 함수
+  // 공통 API 호출 함수
   const requestStatusUpdate = (orderId, nextStatus, expectedTime = null) => {
     axios
-      .patch(
-        `${import.meta.env.VITE_BACKSERVER}/stores/order/${orderId}/status`,
-        {
-          status: nextStatus,
-          expectedTime: expectedTime, // 서버로 시간(분) 전송
-        },
-      )
+      .patch(`${backHost}/stores/order/${orderId}/status`, {
+        status: nextStatus,
+        expectedTime: expectedTime,
+      })
       .then(() => {
         Swal.fire("성공", "주문 상태가 변경되었습니다.", "success");
         fetchStoreOrders();
@@ -62,38 +73,52 @@ const ManagerOrderList = () => {
         Swal.fire("오류", "상태 변경에 실패했습니다.", "error");
       });
   };
-  const toggleOrderDetails = async (orderId) => {
-    // 이미 열려있으면 닫기
-    if (expandedOrderId === orderId) {
-      setExpandedOrderId(null);
-      return;
-    }
 
-    // 열기
-    setExpandedOrderId(orderId);
+  // 모달 열기 및 상세 데이터 로드
+  const handleOpenDetailModal = async (order) => {
+    setSelectedOrder(order);
+    setOpenDetailModal(true);
+    setIsLoadingDetail(true);
 
-    // 한 번도 안 불러왔던 데이터면 서버에서 가져오기
-    if (!orderDetailsData[orderId]) {
-      try {
-        const res = await axios.get(
-          `${import.meta.env.VITE_BACKSERVER}/stores/order/${orderId}`,
-        );
-        setOrderDetailsData((prev) => ({
-          ...prev,
-          [orderId]: res.data.items || [],
-        }));
-      } catch (err) {
-        console.error("상세 메뉴 불러오기 실패:", err);
-      }
+    try {
+      const res = await axios.get(`${backHost}/stores/order/${order.orderId}`);
+      // 기존 코드에 맞춰 res.data.items를 배열로 담습니다.
+      setDetailMenus(res.data.items || []);
+    } catch (err) {
+      console.error("상세 메뉴 불러오기 실패:", err);
+    } finally {
+      setIsLoadingDetail(false);
     }
   };
 
-  // 🌟 주문 상태 업데이트 로직 (시간 설정 포함)
+  // 모달 닫기
+  const handleCloseModal = () => {
+    setOpenDetailModal(false);
+    setSelectedOrder(null);
+    setDetailMenus([]);
+  };
+
+  // 모달 스타일
+  const modalStyle = {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    width: 480, // ✨ 사진이 들어가므로 너비를 약간 넓힘
+    maxHeight: "85vh", // 높이 약간 늘림
+    overflowY: "auto",
+    bgcolor: "background.paper",
+    borderRadius: 3,
+    boxShadow: 24,
+    p: 4,
+    outline: "none",
+  };
+
+  // 주문 상태 업데이트 로직 (시간 설정 포함)
   const updateOrderStatus = (orderId, currentStatus, deliveryType) => {
     const nextStatus = currentStatus + 1;
     const isPickup = deliveryType === 1;
 
-    // 1. 주문 수락 단계 (접수대기 -> 주문접수)
     if (currentStatus === 1) {
       Swal.fire({
         title: isPickup ? "예상 픽업 소요 시간" : "예상 배달 소요 시간",
@@ -107,7 +132,7 @@ const ManagerOrderList = () => {
         inputAttributes: {
           min: "5",
           max: "120",
-          step: "1", // 1분 단위 조절 가능
+          step: "1",
         },
         inputValue: 15,
         showCancelButton: true,
@@ -117,7 +142,6 @@ const ManagerOrderList = () => {
         didOpen: () => {
           const input = Swal.getInput();
           const output = Swal.getHtmlContainer().querySelector("#range-value");
-          // 슬라이더 조절 시 화면의 숫자를 실시간으로 변경
           input.addEventListener("input", () => {
             output.innerText = input.value;
           });
@@ -128,7 +152,6 @@ const ManagerOrderList = () => {
         }
       });
     } else {
-      // 2. 나머지 단계 (조리중, 배달중 등)
       let confirmMsg = "";
       if (currentStatus === 2) confirmMsg = "조리를 시작하시겠습니까?";
       else if (currentStatus === 3) {
@@ -168,12 +191,7 @@ const ManagerOrderList = () => {
     }).then((result) => {
       if (result.isConfirmed) {
         axios
-          .patch(
-            `${import.meta.env.VITE_BACKSERVER}/stores/order/${orderId}/status`,
-            {
-              status: 9,
-            },
-          )
+          .patch(`${backHost}/stores/order/${orderId}/status`, { status: 9 })
           .then(() => {
             Swal.fire("취소 완료", "주문이 취소되었습니다.", "success");
             fetchStoreOrders();
@@ -196,13 +214,17 @@ const ManagerOrderList = () => {
     currentPage * itemsPerPage,
   );
 
-  // 🌟 주소 마스킹 함수 (상세 주소 가리기)
   const maskAddress = (address) => {
     if (!address) return "주소 정보 없음";
     const parts = address.split(" ");
-    // 주소의 3번째 마디까지만 보여주고 이후는 마스킹 (예: 서울시 강남구 역삼동 ***)
     if (parts.length <= 3) return address;
     return `${parts[0]} ${parts[1]} ${parts[2]} ***`;
+  };
+
+  // ✨ 취소선 스타일을 컴포넌트 내부로 가져옴
+  const strikeThroughStyle = {
+    color: "text.disabled",
+    textDecoration: "line-through",
   };
 
   return (
@@ -260,45 +282,18 @@ const ManagerOrderList = () => {
                       {order.extraCount > 0 && `외 ${order.extraCount}건`}
                     </h3>
 
-                    {/* 🌟 여기에 상세 메뉴 토글 버튼과 리스트가 추가되었습니다 */}
+                    {/* 상세 메뉴 모달 띄우기 버튼으로 변경 */}
                     {order.extraCount > 0 && (
-                      <div className={styles.detailToggleWrap}>
-                        <button
-                          className={styles.detailToggleBtn}
-                          onClick={() => toggleOrderDetails(order.orderId)}
-                        >
-                          {expandedOrderId === order.orderId
-                            ? "상세메뉴 닫기 ▲"
-                            : "상세메뉴 보기 ▼"}
-                        </button>
-
-                        {expandedOrderId === order.orderId &&
-                          orderDetailsData[order.orderId] && (
-                            <ul className={styles.subMenuList}>
-                              {orderDetailsData[order.orderId].map(
-                                (item, idx) => (
-                                  <li
-                                    key={idx}
-                                    className={
-                                      isCanceled ? styles.strikeThrough : ""
-                                    }
-                                  >
-                                    - {item.menuName}{" "}
-                                    <strong style={{ color: "#2f8f46" }}>
-                                      {item.quantity}개
-                                    </strong>
-                                    {item.optionString
-                                      ? ` (${item.optionString})`
-                                      : ""}
-                                  </li>
-                                ),
-                              )}
-                            </ul>
-                          )}
-                      </div>
+                      <button
+                        className={styles.detailToggleBtn}
+                        onClick={() => handleOpenDetailModal(order)}
+                        style={{ marginTop: "8px", cursor: "pointer" }}
+                      >
+                        상세메뉴 보기
+                      </button>
                     )}
 
-                    <p className={styles.price}>
+                    <p className={styles.price} style={{ marginTop: "12px" }}>
                       결제금액:{" "}
                       <strong
                         className={isCanceled ? styles.strikeThrough : ""}
@@ -402,6 +397,154 @@ const ManagerOrderList = () => {
           </button>
         </div>
       )}
+
+      {/* 상세 주문 모달 UI 추가 */}
+      <Modal open={openDetailModal} onClose={handleCloseModal}>
+        <Box sx={modalStyle}>
+          {/* 헤더 부분 */}
+          <Box
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+            mb={2}
+          >
+            <Typography variant="h6" fontWeight="bold">
+              주문 상세 (No.{selectedOrder?.orderId})
+            </Typography>
+            <IconButton onClick={handleCloseModal}>
+              <CloseIcon />
+            </IconButton>
+          </Box>
+          <Divider sx={{ mb: 3 }} />
+
+          {/* 로딩 중일 때 스피너 표시 */}
+          {isLoadingDetail ? (
+            <Box display="flex" justifyContent="center" py={4}>
+              <CircularProgress />
+            </Box>
+          ) : (
+            <Box display="flex" flexDirection="column" gap={2}>
+              {/* ✨ 가져온 상세 메뉴 리스트 출력 (사진 추가 및 레이아웃 변경) */}
+              {detailMenus.map((item, idx) => {
+                const isItemCanceled = selectedOrder?.orderStatus === 9;
+
+                return (
+                  <Box
+                    key={idx}
+                    display="flex"
+                    alignItems="center" // 세로 가운데 정렬
+                    gap={2} // 사진과 텍스트 사이 간격
+                    p={0.2} // 안쪽 여백
+                    sx={{
+                      backgroundColor: isItemCanceled ? "#f9f9f9" : "#fff", // 취소된 건은 배경색 살짝 다르게
+                      borderRadius: "8px",
+                      border: "1px solid #eee",
+                    }}
+                  >
+                    {/* 메뉴 사진 (Avatar 활용) */}
+                    <Avatar
+                      src={item.menuImage}
+                      variant="rounded" // 모서리 둥근 사각형
+                      sx={{
+                        width: 60,
+                        height: 60,
+                        filter: isItemCanceled
+                          ? "grayscale(100%) opacity(60%)"
+                          : "none", // 취소된 건은 흑백+투명도 처리
+                      }}
+                    />
+
+                    {/* 메뉴 정보 */}
+                    <Box flex={1}>
+                      <Typography
+                        fontWeight="bold"
+                        sx={
+                          isItemCanceled
+                            ? strikeThroughStyle
+                            : { textDecoration: "none" }
+                        }
+                      >
+                        {item.menuName}
+                      </Typography>
+
+                      {item.optionString && (
+                        <Typography
+                          variant="body2"
+                          color="text.secondary"
+                          sx={
+                            isItemCanceled
+                              ? strikeThroughStyle
+                              : { textDecoration: "none" }
+                          }
+                        >
+                          옵션: {item.optionString}
+                        </Typography>
+                      )}
+                    </Box>
+
+                    {/* 수량 */}
+                    <Typography
+                      component="span"
+                      fontWeight="bold"
+                      variant="h6"
+                      sx={{
+                        ml: 1,
+                        textDecoration: isItemCanceled
+                          ? "line-through"
+                          : "none",
+                        minWidth: "40px", // 영역 확보
+                        textAlign: "right",
+                      }}
+                    >
+                      {item.quantity}개
+                    </Typography>
+                  </Box>
+                );
+              })}
+
+              {detailMenus.length === 0 && (
+                <Typography color="text.secondary" textAlign="center" py={3}>
+                  상세 메뉴 정보가 없습니다.
+                </Typography>
+              )}
+
+              <Divider sx={{ my: 2, borderColor: "#ccc" }} />
+
+              {/* 총 결제 금액 */}
+              <Box
+                display="flex"
+                justifyContent="space-between"
+                alignItems="center"
+                px={1}
+              >
+                <Typography variant="subtitle1" fontWeight="bold">
+                  총 결제 금액
+                </Typography>
+                <Typography
+                  variant="h5"
+                  color="var(--color-brand)"
+                  fontWeight="bold"
+                  sx={{
+                    color:
+                      selectedOrder?.orderStatus === 9
+                        ? "text.disabled"
+                        : "var(--color-brand)",
+                    textDecoration:
+                      selectedOrder?.orderStatus === 9
+                        ? "line-through"
+                        : "none",
+                  }}
+                >
+                  {selectedOrder?.orderStatus === 9
+                    ? "0"
+                    : selectedOrder?.totalPrice?.toLocaleString()}
+                  원
+                </Typography>
+              </Box>
+            </Box>
+          )}
+        </Box>
+      </Modal>
     </div>
   );
 };
