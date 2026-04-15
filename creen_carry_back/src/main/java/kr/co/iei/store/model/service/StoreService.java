@@ -151,7 +151,7 @@ public class StoreService {
 			//주문 취소시 포인트 롤백
 			int result1 = storeDao.rollbackPoint(orderId);
 		    int result2 = storeDao.cancelOrder(orderId);
-		    if(result1+result2 == 2) {
+		    if(result2 == 2) {
 		    	result = 1;
 		    }else {
 		    	result = 0;

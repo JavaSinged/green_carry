@@ -27,7 +27,7 @@ const HeaderNotification = () => {
     eventSource.addEventListener("orderUpdate", async (event) => {
       const data = JSON.parse(event.data);
 
-      if (data.message.includes("취소")) {
+      if (data.message.includes("취소") || data.message.includes("완료")) {
         try {
           const token = localStorage.getItem("accessToken");
           const res = await axios.get(`${backHost}/member/point/${memberId}`, {

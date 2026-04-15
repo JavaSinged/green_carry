@@ -190,11 +190,13 @@
 		m.menu_image AS menuImage,
 		od.quantity,
 		od.price,
-		od.option_string AS optionString
+		od.option_string AS
+		optionString
 		FROM order_detail
 		od
 		JOIN menu_tbl m
-		ON od.menu_id = m.menu_id
+		ON od.menu_id =
+		m.menu_id
 		WHERE od.order_id =
 		#{orderId}
 		ORDER BY od.order_detail_id
@@ -462,7 +464,8 @@
 
 		WHERE o.store_id = #{storeId}
 		AND o.order_status > 0
-		ORDER BY o.order_id DESC
+		ORDER BY
+		o.order_id DESC
 	</select>
 
 	<update id="changeOrderStatus">
@@ -564,23 +567,22 @@
 
 	<update id="rollbackPoint" parameterType="int">
 		UPDATE member_tbl m
-		SET
-		(
-		member_point,
-		total_carbon_reduce
-		) = (SELECT m.member_point +
-		o.used_point - o.get_point,
-		GREATEST(m.total_carbon_reduce -
-		(o.get_point / 1000.0), 0)
+		SET (member_point, total_carbon_reduce) = (
+		SELECT
+		m.member_point + o.used_point - o.get_point,
+		GREATEST(m.total_carbon_reduce - (o.get_point / 1000.0), 0)
 		FROM order_tbl o
-		WHERE o.member_id =
-		m.member_id
-		AND o.order_id = #{orderId})
-		WHERE EXISTS (SELECT 1
-		FROM
-		order_tbl o
 		WHERE o.member_id = m.member_id
-		AND o.order_id = #{orderId})
+		AND o.order_id = #{orderId}
+		AND o.point_reward = 1
+		)
+		WHERE EXISTS (
+		SELECT 1
+		FROM order_tbl o
+		WHERE o.member_id = m.member_id
+		AND o.order_id = #{orderId}
+		AND o.point_reward = 1 
+		)
 	</update>
 
 	<select id="getMemberIdByOrderId" resultType="string">
