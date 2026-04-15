@@ -17,4 +17,5 @@ public class PointHistory {
     private int getPoint;    
     private int usedPoint;
     private Integer orderStatus;
+    private int pointReward;
 }
