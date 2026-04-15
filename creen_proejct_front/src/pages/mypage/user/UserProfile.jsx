@@ -14,7 +14,7 @@ const UserProfile = () => {
   const { user } = useContext(AuthContext);
   const backHost = import.meta.env.VITE_BACKSERVER;
 
-  // 상태 관리
+  // 1. 상태 관리
   const [point, setPoint] = useState(() => {
     const savedPoint = localStorage.getItem("memberPoint");
     return savedPoint ? Number(savedPoint) : 0;
@@ -26,27 +26,25 @@ const UserProfile = () => {
   const [openHistory, setOpenHistory] = useState(false);
   const [progress, setProgress] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
+  const itemsPerPage = 5; // 한 페이지당 보여줄 내역 수
+  const pageGroupSize = 10; // 한번에 보여줄 페이지 번호 개수
 
-  // --- 페이지네이션 계산 시작 ---
-  const pageGroupSize = 10;
+  // 2. 페이지네이션 계산 로직 (순서 중요!)
   const filteredHistory = pointHistory.filter((item) => item.orderStatus >= 1);
   const totalPages = Math.ceil(filteredHistory.length / itemsPerPage) || 1;
 
-  // 1. 현재 페이지가 속한 그룹 계산 (순서 중요!)
+  // 현재 페이지가 속한 그룹 계산 (예: 1~10페이지는 1그룹)
   const currentGroup = Math.ceil(currentPage / pageGroupSize);
-
-  // 2. 현재 그룹의 시작 번호와 끝 번호 계산
   const startPage = (currentGroup - 1) * pageGroupSize + 1;
   const endPage = Math.min(startPage + pageGroupSize - 1, totalPages);
 
-  // 3. 화면에 뿌려줄 페이지 번호 배열 생성
+  // 페이지 번호 배열 생성
   const pageNumbers = [];
   for (let i = startPage; i <= endPage; i++) {
     pageNumbers.push(i);
   }
 
-  // 4. 현재 페이지에 보여줄 아이템 추출
+  // 현재 페이지에 보여줄 아이템 슬라이싱
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentHistoryItems = filteredHistory.slice(
@@ -54,7 +52,7 @@ const UserProfile = () => {
     indexOfLastItem,
   );
 
-  // 이벤트 핸들러
+  // 3. 이벤트 핸들러
   const toggleEco = () => setOpenEco(!openEco);
   const toggleHistory = () => {
     setOpenHistory(!openHistory);
@@ -70,72 +68,50 @@ const UserProfile = () => {
   };
   const myGradeInfo = getEcoGrade(totalCarbon);
 
-  /**
-   * 🌟 데이터 패칭 함수 (자동 새로고침용)
-   */
+  // 4. 데이터 패칭 함수
   const fetchUserData = useCallback(async () => {
     if (!user?.memberId) return;
     try {
       const token = localStorage.getItem("accessToken");
       const config = { headers: { Authorization: `Bearer ${token}` } };
 
-      // 1. 포인트 내역 가져오기
       const historyRes = await axios.get(
         `${backHost}/member/point-history/${user.memberId}`,
         config,
       );
       setPointHistory(historyRes.data);
 
-      // 2. 탄소 절감량 데이터 가져오기
       const carbonRes = await axios.get(`${backHost}/member/total-carbon`, {
         params: { memberId: user.memberId },
         ...config,
       });
       setTotalCarbon(Math.floor(carbonRes.data.totalCarbonReduce * 1000));
 
-      // 3. 커뮤니티 데이터 가져오기
       const commRes = await axios.get(`${backHost}/member/community-carbon`);
       setCommunityPoint(commRes.data);
 
-      console.log("실시간 데이터 새로고침 성공");
+      console.log("데이터 새로고침 성공");
     } catch (err) {
       console.error("데이터 동기화 실패", err);
     }
   }, [user?.memberId, backHost]);
 
-  /**
-   * 🌟 실시간 이벤트 리스너 설정
-   */
+  // 5. useEffect 훅
   useEffect(() => {
     const handleAutoUpdate = () => {
-      console.log("알림 감지: 화면 데이터를 갱신합니다.");
-
-      // 로컬 스토리지에 저장된 최신 포인트 즉시 반영
       const savedPoint = localStorage.getItem("memberPoint");
       if (savedPoint) setPoint(Number(savedPoint));
-
-      // 서버에서 내역 리스트 재호출 (자동 새로고침 효과)
       fetchUserData();
     };
-
     window.addEventListener("pointUpdated", handleAutoUpdate);
-
-    // 페이지 진입 시 초기 로드
     fetchUserData();
-
-    return () => {
-      window.removeEventListener("pointUpdated", handleAutoUpdate);
-    };
+    return () => window.removeEventListener("pointUpdated", handleAutoUpdate);
   }, [fetchUserData]);
 
-  // 프로필 진입 시 초기 포인트 설정
   useEffect(() => {
-    if (user?.memberPoint !== undefined) {
-      setPoint(user.memberPoint);
-    }
+    if (user?.memberPoint !== undefined) setPoint(user.memberPoint);
   }, [user]);
 
-  // 탄소 게이지 애니메이션
   useEffect(() => {
     const targetPoint = 10000;
     const calculatedPercent = Math.min((totalCarbon / targetPoint) * 100, 100);
@@ -143,6 +119,7 @@ const UserProfile = () => {
     return () => clearTimeout(timer);
   }, [totalCarbon]);
 
+  // 6. JSX 렌더링
   return (
     <div className={styles.right}>
       <div className={styles.user_grade}>
@@ -206,7 +183,6 @@ const UserProfile = () => {
           <p>보유 포인트 : {point.toLocaleString()}P</p>
         </div>
 
-        {/* 에코 포인트 설명 */}
         <div className={styles.collapse_wrapper}>
           <div className={styles.collapse_header} onClick={toggleEco}>
             <p>에코 포인트란?</p>
@@ -226,7 +202,6 @@ const UserProfile = () => {
           </Collapse>
         </div>
 
-        {/* 적립 내역 리스트 */}
         <div className={styles.collapse_wrapper}>
           <div className={styles.collapse_header} onClick={toggleHistory}>
             <p>
@@ -251,6 +226,7 @@ const UserProfile = () => {
                       item.orderStatus >= 1 && item.orderStatus <= 4;
                     const actualGetPoint =
                       isCancelled && item.pointReward === 0 ? 0 : item.getPoint;
+
                     return (
                       <div
                         key={item.orderId}
@@ -274,28 +250,14 @@ const UserProfile = () => {
                                   결제취소
                                 </span>
                               )}
-                              {/* ✨ 진행 중인 주문에 '적립 예정' 배지 추가 (선택 사항) */}
                               {isPending && (
-                                <span
-                                  className={styles.pending_badge}
-                                  style={{
-                                    fontSize: "0.7rem",
-                                    marginLeft: "5px",
-                                    color: "#2e7d32",
-                                    border: "1px solid #2e7d32",
-                                    padding: "1px 4px",
-                                    borderRadius: "4px",
-                                  }}
-                                >
+                                <span className={styles.pending_badge}>
                                   적립 예정
                                 </span>
                               )}
-                              <div className={styles.orderIdRow}>
-                                &nbsp;&nbsp;(주문번호 :{item.orderId})
-                              </div>
                             </div>
                             <div className={styles.history_date}>
-                              {item.orderDate}
+                              {item.orderDate} (주문번호:{item.orderId})
                             </div>
                           </div>
                         </div>
@@ -305,48 +267,35 @@ const UserProfile = () => {
                               적립 예정
                             </span>
                           ) : isCancelled && actualGetPoint === 0 ? (
-                            // ✨ 포인트 지급 전 취소된 경우
-                            <span
-                              className={styles.text_cancelled}
-                              style={{ fontSize: "0.9rem" }}
-                            >
+                            <span className={styles.text_cancelled}>
                               적립 취소
                             </span>
                           ) : (
-                            <>
-                              {/* 기존 포인트 표시 로직 */}
-                              {actualGetPoint > 0 && (
-                                <span
-                                  className={
-                                    isCancelled
-                                      ? styles.point_refund_minus
-                                      : styles.plus_point
-                                  }
-                                >
-                                  {isCancelled ? "-" : "+"}{" "}
-                                  {actualGetPoint.toLocaleString()}P
-                                </span>
-                              )}
-                              {/* ... usedPoint 로직 동일 */}
-                            </>
+                            <span
+                              className={
+                                isCancelled
+                                  ? styles.point_refund_minus
+                                  : styles.plus_point
+                              }
+                            >
+                              {isCancelled ? "-" : "+"}
+                              {actualGetPoint.toLocaleString()}P
+                            </span>
                           )}
                         </div>
                       </div>
                     );
                   })}
 
-                  {/* 페이지네이션 */}
+                  {/* 페이지네이션 버튼부 */}
                   {totalPages > 1 && (
                     <div className={styles.pagination}>
-                      {/* [이전] 버튼: 현재 그룹의 시작보다 하나 전 페이지로 이동 */}
                       <button
                         onClick={() => setCurrentPage(startPage - 1)}
                         disabled={startPage === 1}
                       >
                         이전
                       </button>
-
-                      {/* 계산된 pageNumbers만 출력 */}
                       {pageNumbers.map((number) => (
                         <button
                           key={number}
@@ -358,8 +307,6 @@ const UserProfile = () => {
                           {number}
                         </button>
                       ))}
-
-                      {/* [다음] 버튼: 현재 그룹의 끝보다 하나 다음 페이지로 이동 */}
                       <button
                         onClick={() => setCurrentPage(endPage + 1)}
                         disabled={endPage === totalPages}
