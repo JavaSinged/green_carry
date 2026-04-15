@@ -7,11 +7,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 @Service
 public class StoreService {
+    // 코덱스가 수정함: null 방어와 중복 로직 정리를 통해 store 서비스 안정성을 높였습니다.
     @Autowired
     private StoreDao storeDao;
 
@@ -21,8 +23,8 @@ public class StoreService {
         for (Store store : list) {
             List<SaleMonth> monthlySalesList = storeDao.selectMonthlySalesByStoreId(store.getStoreId());
             Long totalSales = storeDao.selectTotalSales(store.getStoreId());
-            store.setSaleMonth(monthlySalesList);
-            store.setTotalSale(totalSales);
+            store.setSaleMonth(monthlySalesList != null ? monthlySalesList : Collections.emptyList());
+            store.setTotalSale(totalSales != null ? totalSales : 0L);
         }
 
         return list;
@@ -73,9 +75,13 @@ public class StoreService {
     @Transactional
     public OrderResponse searchOrder(Integer orderId) {
         OrderResponse orderResponse = storeDao.searchOrderInfo(orderId);
+        if (orderResponse == null) {
+            return null;
+        }
+
         List<OrderItem> items = storeDao.searchOrderItems(orderId);
         if (orderResponse.getOrderStatus() == 0) {
-            int result = storeDao.updateOrderStatus(orderId);
+            storeDao.updateOrderStatus(orderId);
         }
         orderResponse.setItems(items);
         return orderResponse;
@@ -87,10 +93,7 @@ public class StoreService {
 
 
     public List<OrderResponse> searchOrderList(String memberId) {
-        List<OrderResponse> list = storeDao.searchOrderList(memberId);
-        System.out.println(list);
-        return list;
-
+        return storeDao.searchOrderList(memberId);
     }
 
     public Store getStoreByMemberId(String memberId) {
@@ -98,13 +101,11 @@ public class StoreService {
     }
 
     public String getMenuImageById(int menuId) {
-        String imagePath = storeDao.getMenuImageById(menuId);
-        return imagePath;
+        return storeDao.getMenuImageById(menuId);
     }
 
     public StoreIdResponse selectStoreId(String memberId) {
-        StoreIdResponse storeId = storeDao.selectStoreId(memberId);
-        return storeId;
+        return storeDao.selectStoreId(memberId);
     }
 
     public List<StatsOrderInfo> selectStatsOrderInfo(Integer storeId, String yearMonth) {
@@ -113,23 +114,10 @@ public class StoreService {
         if (list == null || list.isEmpty()) {
             return list;
         }
-        System.out.println("list확인: " + list);
         long totalAmount = list.stream().mapToLong(StatsOrderInfo::getSeriesAmount).sum();
-        System.out.println(totalAmount);// 결과 예시: 1,178,909
 
         for (StatsOrderInfo order : list) {
-            // 배달 수단 코드에 따라 이름(label) 설정 (프로젝트 규칙에 맞게 수정)
-            switch (order.getDeliveryType()) {
-                case 1:
-                    order.setLabel("포장");
-                    break;
-                case 2:
-                    order.setLabel("도보 & 자전거");
-                    break;
-                case 3:
-                    order.setLabel("오토바이");
-                    break;
-            }
+            order.setLabel(resolveDeliveryLabel(order.getDeliveryType()));
 
             // 퍼센트 계산 (총 금액 대비 비율)
             if (totalAmount > 0) {
@@ -141,79 +129,74 @@ public class StoreService {
             }
         }
         return list;
+    }
 
-
+    private String resolveDeliveryLabel(Integer deliveryType) {
+        return switch (deliveryType == null ? 0 : deliveryType) {
+            case 1 -> "포장";
+            case 2 -> "도보 & 자전거";
+            case 3 -> "오토바이";
+            default -> "기타";
+        };
     }
 
     @Transactional
 	public int changeOrderStatus(Integer orderId, int status, Integer expectedTime) {
-		int result;
-		if(status == 9) {
-			//주문 취소시 포인트 롤백
+		if (status == 9) {
+			// 코덱스가 수정함: 롤백 후 취소 결과만 반환해 취소 분기 흐름을 단순화합니다.
 			storeDao.rollbackPoint(orderId);
-		    int result2 = storeDao.cancelOrder(orderId);
-		    if(result2 > 0) {
-		    	result = 1;
-		    }else {
-		    	result = 0;
-		    }
-		}else {
-			//일반 주문 상태 변경
-			result = storeDao.changeOrderStatus(orderId, status, expectedTime);
+		    return storeDao.cancelOrder(orderId);
 		}
-		return result;
+
+		return storeDao.changeOrderStatus(orderId, status, expectedTime);
 	}
 
 	public Map<String, Object> selectStoreReviewStats(int storeId) {
-		Map<String, Object> stats = storeDao.selectStoreReviewStats(storeId);
-		return stats;
+		return storeDao.selectStoreReviewStats(storeId);
 	}
 
 	public int insertReviewComment(Map<String, Object> payload) {
-		int result = storeDao.insertReviewComment(payload);
-		return result;
+		if (payload == null || !payload.containsKey("orderId")) {
+			return 0;
+		}
+
+		return storeDao.insertReviewComment(payload);
     }
 	public List<StoreOperating> getStoreOperatingHours(Integer storeId) {
-
 		return storeDao.getStoreOperatingHours(storeId);
 	}
 
 	public String getMemberIdByOrderId(Integer orderId) {
-	    
 	    return storeDao.getMemberIdByOrderId(orderId);
 	}
 @Transactional
 	public int updatePoint(Integer orderId) {
-		// 3. 🌟 포인트 적립 및 사용 (가장 중요!)
-        // 이 부분은 상세 내역 저장 여부와 상관없이 주문이 성공했다면 실행되어야 합니다.
         int setPoint = storeDao.updatePoint(orderId);
         if (setPoint != 1) {
-            System.out.println("포인트 적립/사용 처리 실패");
             return 0;
-        }else {
-        	storeDao.pointReward(orderId);
-        	storeDao.addReduceCarbon(orderId);
-    		return setPoint;
         }
 
-        // 4. 탄소 절감량(명예 점수) 누적 업데이트
-        
+        // 코덱스가 수정함: 포인트 반영 성공 시에만 후속 적립/탄소 누적을 실행합니다.
+    	storeDao.pointReward(orderId);
+    	storeDao.addReduceCarbon(orderId);
+		return setPoint;
 	}
 
     public List<OrderResponse> getOrdersByStoreId(Integer storeId) {
-        List<OrderResponse> list = storeDao.getOrdersByStoreId(storeId);
-        return list;
-
+        return storeDao.getOrdersByStoreId(storeId);
     }
 
     public List<StoreReviewResponse> selectStoreReviews(Integer storeId) {
-        List<StoreReviewResponse> list = storeDao.selectStoreReviews(storeId);
-        return list;
+        return storeDao.selectStoreReviews(storeId);
     }
 
 
     @Transactional // 도중에 에러나면 롤백되도록 트랜잭션 처리
     public void updateStoreInfoAndHours(StoreSaveRequest req) {
+        if (req == null || req.getStoreId() == null) {
+            throw new IllegalArgumentException("storeId는 필수입니다.");
+        }
+
         // 1. STORE_TBL 정보 업데이트
         storeDao.updateStore(req);
 
@@ -223,6 +206,10 @@ public class StoreService {
         // 3. 새 영업시간 데이터 구성
         List<StoreOperating> hoursList = new ArrayList<>();
         HoursInfo hoursInfo = req.getHoursInfo();
+        if (hoursInfo == null || hoursInfo.getHoursType() == null) {
+            return;
+        }
+
         String[] allDays = {"mon", "tue", "wed", "thu", "fri", "sat", "sun"};
 
         // 3-1. 기본 영업시간 7일 세팅 (weekOfMonth = 0)
@@ -238,23 +225,28 @@ public class StoreService {
                     dto.setCloseTime("24:00");
                     dto.setIsDayOff("N");
                 } else {
-                    dto.setOpenTime(hoursInfo.getSameTime().get("startH") + ":" + hoursInfo.getSameTime().get("startM"));
-                    dto.setCloseTime(hoursInfo.getSameTime().get("endH") + ":" + hoursInfo.getSameTime().get("endM"));
-                    dto.setIsDayOff("N");
+                    Map<String, String> sameTime = hoursInfo.getSameTime();
+                    if (sameTime == null) {
+                        dto.setIsDayOff("Y");
+                    } else {
+                        dto.setOpenTime(sameTime.get("startH") + ":" + sameTime.get("startM"));
+                        dto.setCloseTime(sameTime.get("endH") + ":" + sameTime.get("endM"));
+                        dto.setIsDayOff("N");
+                    }
                 }
-            } else {
-                // 요일별 다름 (diff)
+            } else if (hoursInfo.getDiffTimes() != null) {
                 DiffTime diffDay = hoursInfo.getDiffTimes().stream()
-                        .filter(d -> d.getDay().equals(day)).findFirst().orElse(null);
+                        .filter(d -> day.equals(d.getDay())).findFirst().orElse(null);
 
                 if (diffDay != null && diffDay.isOpen()) {
                     dto.setOpenTime(diffDay.getStartH() + ":" + diffDay.getStartM());
                     dto.setCloseTime(diffDay.getEndH() + ":" + diffDay.getEndM());
                     dto.setIsDayOff("N");
                 } else {
-                    // 체크 해제된 요일은 정기 휴무
                     dto.setIsDayOff("Y");
                 }
+            } else {
+                dto.setIsDayOff("Y");
             }
             hoursList.add(dto);
         }
@@ -293,15 +285,10 @@ public class StoreService {
 
     // DAO의 매개변수가 Integer이므로 매개변수 타입을 Integer로 맞춥니다.
     public Store getStoreInfo(Integer storeId) {
-
-        // 1. 가게 기본 정보 조회 (mapper의 findStoreById 사용)
         Store storeInfo = storeDao.findStoreById(storeId);
 
         if (storeInfo != null) {
-            // 2. 해당 가게의 영업시간 및 휴무일 리스트 조회 (mapper의 getStoreOperatingHours 사용)
             List<StoreOperating> hoursList = storeDao.getStoreOperatingHours(storeId);
-
-            // 3. 가게 정보 객체에 영업시간 리스트 삽입
             storeInfo.setOperatingHours(hoursList);
         }
 
@@ -309,8 +296,7 @@ public class StoreService {
     }
 
 	public Store getStoreLocation(Integer storeId) {
-		Store store = storeDao.getStoreLocation(storeId);
-		return store;
+		return storeDao.getStoreLocation(storeId);
 	}
 
 }

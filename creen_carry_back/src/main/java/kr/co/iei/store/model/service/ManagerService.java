@@ -14,15 +14,14 @@ import org.springframework.web.multipart.MultipartFile;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 @Service
 public class ManagerService {
+	private static final String EMPTY_JSON_ARRAY = "[]";
 
 	@Autowired
 	private Cloudinary cloudinary;
@@ -41,11 +40,15 @@ public class ManagerService {
 
 	@Transactional
 	public int insertMenuAll(MenuSaveRequest request) {
+		// 코덱스가 수정함: 저장 실패 시 연관 데이터 저장을 건너뛰어 트랜잭션 경계를 명확히 했습니다.
 		// 🌟 1. DB 삽입 전, 사진 파일이 있다면 하드디스크에 저장하고 경로를 DTO에 세팅
 		saveImageFile(request);
 
 		// 2. 메뉴 기본 정보 삽입 (DB 컬럼에는 사진 경로 문자열이 들어감)
 		int result = managerDao.insertMenu(request);
+		if (result <= 0 || request.getMenuId() == null) {
+			return result;
+		}
 
 		// 3. 연관 데이터 저장
 		saveMenuRelations(request, request.getMenuId());
@@ -61,6 +64,9 @@ public class ManagerService {
 
 		// 2. 메뉴 기본 정보 업데이트
 		int result = managerDao.updateMenu(request);
+		if (result <= 0 || request.getMenuId() == null) {
+			return result;
+		}
 
 		// 3. 기존 연결(매핑) 데이터 일괄 삭제
 		managerDao.deleteMenuOptionMap(request.getMenuId());
@@ -106,8 +112,7 @@ public class ManagerService {
 
 		try {
 			// A. 기존 옵션 연결 (String "[1, 2, 3]" -> Long[] 변환)
-			if (request.getOptionIds() != null && !request.getOptionIds().isEmpty()
-					&& !request.getOptionIds().equals("[]")) {
+			if (hasJsonArrayContent(request.getOptionIds())) {
 				Long[] optionIdArray = mapper.readValue(request.getOptionIds(), Long[].class);
 				for (Long optionNo : optionIdArray) {
 					Map<String, Object> map = new HashMap<>();
@@ -118,8 +123,7 @@ public class ManagerService {
 			}
 
 			// B. 신규 생성 옵션 추가 및 연결 (String "[{...}]" -> MenuOption[] 변환)
-			if (request.getNewOptions() != null && !request.getNewOptions().isEmpty()
-					&& !request.getNewOptions().equals("[]")) {
+			if (hasJsonArrayContent(request.getNewOptions())) {
 				MenuOption[] newOptionArray = mapper.readValue(request.getNewOptions(), MenuOption[].class);
 				for (MenuOption opt : newOptionArray) {
 					managerDao.insertNewOption(opt); // 옵션 마스터 테이블 등록
@@ -132,8 +136,7 @@ public class ManagerService {
 			}
 
 			// C. 용기 매핑 (String "[{...}]" -> ContainerItem[] 변환)
-			if (request.getContainerMap() != null && !request.getContainerMap().isEmpty()
-					&& !request.getContainerMap().equals("[]")) {
+			if (hasJsonArrayContent(request.getContainerMap())) {
 				MenuSaveRequest.ContainerItem[] containerArray = mapper.readValue(request.getContainerMap(),
 						MenuSaveRequest.ContainerItem[].class);
 				for (MenuSaveRequest.ContainerItem item : containerArray) {
@@ -149,6 +152,10 @@ public class ManagerService {
 			e.printStackTrace();
 			throw new RuntimeException("연관 데이터(옵션/용기) 변환 중 오류가 발생했습니다.", e);
 		}
+	}
+
+	private boolean hasJsonArrayContent(String rawValue) {
+		return rawValue != null && !rawValue.isBlank() && !EMPTY_JSON_ARRAY.equals(rawValue.trim());
 	}
 
 	// [추가] 메뉴 단건 조회
