@@ -10,17 +10,19 @@ const CheckoutPage = () => {
   const { clearCart } = useCartStore();
   const { user, setUser } = useContext(AuthContext);
   const cartList = useCartStore((state) => state.cart);
+
   const [storeId, setStoreId] = useState(0);
   const navigate = useNavigate();
   const location = useLocation();
+
   const mapElement = useRef(null);
+  const mapRef = useRef(null);
+  const markerRef = useRef(null);
+
   const [mapLoaded, setMapLoaded] = useState(false);
   const [storeLat, setStoreLat] = useState(0);
   const [storeLong, setStoreLong] = useState(0);
-  const STORE_INFO = {
-    lat: storeLat,
-    lng: storeLong,
-  }; // 매장 좌표
+
   const [orderList, setOrderList] = useState([]);
   const [usedPoint, setUsedPoint] = useState(0);
   const [getPoint, setGetPoint] = useState(0);
@@ -28,11 +30,12 @@ const CheckoutPage = () => {
   const [completeDate, setCompleteDate] = useState("");
   const [orderAmount, setOrderAmount] = useState(0);
   const [finalPrice, setFinalPrice] = useState(0);
+
   const params = new URLSearchParams(location.search);
   const paymentOrderId = params.get("orderId");
   const orderId = paymentOrderId ? Number(paymentOrderId.split("_")[1]) : null;
-  const [storeName, setStoreName] = useState("");
 
+  const [storeName, setStoreName] = useState("");
   const [orderState, setOrderState] = useState(0);
   const [rawOrderStatus, setRawOrderStatus] = useState(0);
   const [orderDate, setOrderDate] = useState("");
@@ -45,7 +48,6 @@ const CheckoutPage = () => {
   const [targetArrivalTime, setTargetArrivalTime] = useState("--:--");
   const isFirst = useRef(true);
 
-  // 🌟 [추가 로직] 숫자 거리 계산 함수 (1km당 6분 적용용)
   const getNumericDistance = (storeLat, storeLng) => {
     const myLat = parseFloat(
       user?.LATITUDE || localStorage.getItem("LATITUDE"),
@@ -58,22 +60,22 @@ const CheckoutPage = () => {
 
     if (isNaN(myLat) || isNaN(myLng) || isNaN(sLat) || isNaN(sLng)) return null;
 
-    const R = 6371; // 지구 반지름 (km)
+    const R = 6371;
     const dLat = ((sLat - myLat) * Math.PI) / 180;
     const dLng = ((sLng - myLng) * Math.PI) / 180;
+
     const a =
       Math.sin(dLat / 2) * Math.sin(dLat / 2) +
       Math.cos((myLat * Math.PI) / 180) *
         Math.cos((sLat * Math.PI) / 180) *
         Math.sin(dLng / 2) *
         Math.sin(dLng / 2);
+
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     return R * c;
   };
 
   useEffect(() => {
-    // 브라우저 히스토리에 현재 상태를 하나 더 추가하여
-    // 뒤로가기를 눌렀을 때 이 페이지에 머물게 함
     window.history.pushState(null, null, window.location.href);
 
     const handlePopState = () => {
@@ -110,8 +112,8 @@ const CheckoutPage = () => {
       const res = await axios.get(
         `${import.meta.env.VITE_BACKSERVER}/member/${memberId}`,
       );
-      const latestPoint = res.data.memberPoint || 0;
 
+      const latestPoint = res.data.memberPoint || 0;
       localStorage.setItem("memberPoint", latestPoint);
 
       setUser((prevUser) => ({
@@ -125,6 +127,7 @@ const CheckoutPage = () => {
 
   const fetchOrderDetails = () => {
     if (!orderId) return;
+
     axios
       .get(`${import.meta.env.VITE_BACKSERVER}/stores/order/${orderId}`)
       .then((res) => {
@@ -132,16 +135,17 @@ const CheckoutPage = () => {
         setUsedPoint(Number(res.data.usedPoint ?? 0));
         setGetPoint(Number(res.data.getPoint ?? 0));
         setDeliveryPrice(Number(res.data.deliveryPrice ?? 0));
-        setStoreName(res.data.storeName);
-        setDeliveryType(res.data.deliveryType ?? 0);
-        const status = res.data.orderStatus ?? 0;
-        setRawOrderStatus(status);
-        setOrderDate(res.data.orderDate);
-        setConfirmDate(res.data.confirmDate);
-        setTotalCarbon(res.data.totalReduceCarbon);
-        setCompleteDate(res.data.completeDate);
+        setStoreName(res.data.storeName ?? "");
+        setDeliveryType(Number(res.data.deliveryType ?? 0));
+        setOrderDate(res.data.orderDate ?? "");
+        setConfirmDate(res.data.confirmDate ?? "");
+        setTotalCarbon(Number(res.data.totalReduceCarbon ?? 0));
+        setCompleteDate(res.data.completeDate ?? "");
         setExpectedTime(res.data.expectedTime ?? null);
-        setStoreId(res.data.storeId);
+        setStoreId(Number(res.data.storeId ?? 0));
+
+        const status = Number(res.data.orderStatus ?? 0);
+        setRawOrderStatus(status);
 
         if (status === 9 || status < 2) {
           setOrderState(-1);
@@ -153,18 +157,27 @@ const CheckoutPage = () => {
         console.error("주문 정보 갱신 실패:", err);
       });
   };
+
   useEffect(() => {
+    if (!storeId) return;
+
     axios
       .get(`${import.meta.env.VITE_BACKSERVER}/stores/location/${storeId}`)
       .then((res) => {
-        setStoreLat(res.data.latitude);
-        setStoreLong(res.data.longitude);
+        const lat = Number(res.data.latitude ?? 0);
+        const lng = Number(res.data.longitude ?? 0);
+
+        setStoreLat(lat);
+        setStoreLong(lng);
       })
       .catch((err) => {
-        console.log(err);
+        console.log("가게 좌표 조회 실패:", err);
       });
   }, [storeId]);
+
   const updatePoint = (orderId) => {
+    if (!orderId) return;
+
     axios
       .patch(`${import.meta.env.VITE_BACKSERVER}/stores/updatePoint/${orderId}`)
       .then(() => console.log("포인트 업데이트 API 호출 성공"))
@@ -174,29 +187,37 @@ const CheckoutPage = () => {
   useEffect(() => {
     clearCart();
     fetchOrderDetails();
+
     const intervalId = setInterval(() => {
       fetchOrderDetails();
     }, 5000);
+
     return () => clearInterval(intervalId);
   }, [orderId]);
 
   useEffect(() => {
+    if (!orderId) return;
     if (!isFirst.current) return;
+
     isFirst.current = false;
     updatePoint(orderId);
-  }, []);
+  }, [orderId]);
 
   useEffect(() => {
     fetchLatestPoint();
   }, []);
 
-  // 🌟 [수정 로직] 거리 계산을 포함한 도착 시간 타이머
   useEffect(() => {
     if (rawOrderStatus === 5 && completeDate) {
-      setTargetArrivalTime(completeDate.split(" ")[1]);
+      const timeText = completeDate.includes(" ")
+        ? completeDate.split(" ")[1]
+        : completeDate;
+
+      setTargetArrivalTime(timeText || "--:--");
       setRemainingTimeText("이용해 주셔서 감사합니다!");
       return;
     }
+
     if (
       !confirmDate ||
       !expectedTime ||
@@ -207,12 +228,12 @@ const CheckoutPage = () => {
       else if (rawOrderStatus === 5)
         setRemainingTimeText("이용해 주셔서 감사합니다!");
       else setRemainingTimeText("가게 수락 대기 중...");
+
       setTargetArrivalTime("--:--");
       return;
     }
 
-    // 거리 계산 및 배달 시간 산출 (1km당 6분)
-    const distance = getNumericDistance(STORE_INFO.lat, STORE_INFO.lng);
+    const distance = getNumericDistance(storeLat, storeLong);
     const travelTime = deliveryType === 1 ? 0 : Math.ceil((distance || 0) * 6);
     const totalMinutes = Number(expectedTime) + travelTime;
 
@@ -227,12 +248,14 @@ const CheckoutPage = () => {
     const updateTimer = () => {
       const now = new Date();
       const diffMs = targetDate.getTime() - now.getTime();
+
       if (diffMs <= 0) {
         setRemainingTimeText(
           deliveryType === 1 ? "픽업할 시간이에요! 🏃‍♂️" : "곧 도착합니다! 🛵",
         );
         return;
       }
+
       const diffMins = Math.floor(diffMs / 60000);
       const diffSecs = Math.floor((diffMs % 60000) / 1000);
       setRemainingTimeText(`${diffMins}분 ${diffSecs}초 남음`);
@@ -240,8 +263,18 @@ const CheckoutPage = () => {
 
     updateTimer();
     const timerId = setInterval(updateTimer, 1000);
+
     return () => clearInterval(timerId);
-  }, [confirmDate, expectedTime, rawOrderStatus, deliveryType]);
+  }, [
+    confirmDate,
+    expectedTime,
+    rawOrderStatus,
+    deliveryType,
+    completeDate,
+    storeLat,
+    storeLong,
+    user,
+  ]);
 
   const cancelOrder = () => {
     Swal.fire({
@@ -302,22 +335,37 @@ const CheckoutPage = () => {
         clearInterval(checkNaver);
       }
     }, 100);
+
     return () => clearInterval(checkNaver);
   }, []);
 
   useEffect(() => {
-    if (!mapLoaded || !mapElement.current) return;
+    if (!mapLoaded) return;
+    if (!mapElement.current) return;
+    if (!storeLat || !storeLong) return;
+    if (!window.naver || !window.naver.maps) return;
+
     const { naver } = window;
-    const location = new naver.maps.LatLng(STORE_INFO.lat, STORE_INFO.lng);
+    const position = new naver.maps.LatLng(storeLat, storeLong);
+
     try {
-      const map = new naver.maps.Map(mapElement.current, {
-        center: location,
-        zoom: 17,
-        zoomControl: true,
-      });
-      new naver.maps.Marker({
-        position: location,
-        map,
+      if (!mapRef.current) {
+        mapRef.current = new naver.maps.Map(mapElement.current, {
+          center: position,
+          zoom: 17,
+          zoomControl: true,
+        });
+      } else {
+        mapRef.current.setCenter(position);
+      }
+
+      if (markerRef.current) {
+        markerRef.current.setMap(null);
+      }
+
+      markerRef.current = new naver.maps.Marker({
+        position,
+        map: mapRef.current,
         icon: {
           content: `<div style="background:#1a1a2e; color:#fff; border-radius:50% 50% 50% 0; transform:rotate(-45deg); width:40px; height:40px; display:flex; align-items:center; justify-content:center; font-size:18px; box-shadow:0 2px 8px rgba(0,0,0,0.3);"><span style="transform:rotate(45deg)">🍽️</span></div>`,
           size: new naver.maps.Size(40, 40),
@@ -327,7 +375,7 @@ const CheckoutPage = () => {
     } catch (e) {
       console.error("지도 생성 중 에러:", e);
     }
-  }, [mapLoaded]);
+  }, [mapLoaded, storeLat, storeLong]);
 
   const isPickup = deliveryType === 1;
 
@@ -347,6 +395,7 @@ const CheckoutPage = () => {
       return isPickup
         ? "픽업이 완료되었습니다. 맛있게 드세요! 😋"
         : "배달이 완료되었습니다. 맛있게 드세요! 😋";
+
     return "주문 상태를 확인하고 있습니다.";
   };
 
@@ -360,11 +409,13 @@ const CheckoutPage = () => {
           >
             {rawOrderStatus === 9 ? "✕" : "✓"}
           </div>
+
           <h1 className={styles.completeTitle}>
             {rawOrderStatus === 9
               ? "주문이 취소되었습니다."
               : "주문이 완료되었습니다!"}
           </h1>
+
           <p className={styles.completeDesc}>
             {rawOrderStatus === 9
               ? "결제하신 금액은 카드사에 따라 영업일 기준 2~3일 내로 환불될 예정입니다."
@@ -372,12 +423,14 @@ const CheckoutPage = () => {
                 ? "매장 방문 픽업을 선택해 주셔서 감사합니다."
                 : "친환경 배달을 선택해 주셔서 감사합니다."}
           </p>
+
           <button
             className={styles.orderCheckBtn}
             onClick={() => navigate("/mypage/user/orderList")}
           >
             주문내역 확인
           </button>
+
           <p className={styles.orderNumber}>
             ECO-{orderDate ? orderDate.substring(0, 10).replace(/-/g, "") : ""}-
             {orderId}
@@ -386,6 +439,7 @@ const CheckoutPage = () => {
 
         <section className={styles.statusCard}>
           <h2 className={styles.sectionTitle}>실시간 주문 현황</h2>
+
           <div className={styles.progressWrapper}>
             <div className={styles.progressBar}>
               <div
@@ -397,6 +451,7 @@ const CheckoutPage = () => {
                 <span className={styles.seed}>🌱</span>
               </div>
             </div>
+
             <div className={styles.progressSteps}>
               {[
                 "주문 접수",
@@ -419,6 +474,7 @@ const CheckoutPage = () => {
               ))}
             </div>
           </div>
+
           <p className={styles.statusMessage}>
             {getStatusMessage(rawOrderStatus, isPickup)}
           </p>
@@ -436,6 +492,7 @@ const CheckoutPage = () => {
                   </h3>
                 </div>
               </div>
+
               <div className={styles.mapBox}>
                 <div className={styles.mapWrapper}>
                   {!mapLoaded && (
@@ -443,9 +500,15 @@ const CheckoutPage = () => {
                       지도를 불러오는 중입니다...
                     </div>
                   )}
+                  {mapLoaded && (!storeLat || !storeLong) && (
+                    <div className={styles.mapLoading}>
+                      가게 위치 정보를 불러오는 중입니다...
+                    </div>
+                  )}
                   <div ref={mapElement} className={styles.map} />
                 </div>
               </div>
+
               <div className={styles.arrivalRow}>
                 <div className={styles.arrivalLeft}>
                   <span
@@ -459,6 +522,7 @@ const CheckoutPage = () => {
                           : "none",
                     }}
                   ></span>
+
                   <span
                     style={{
                       color: rawOrderStatus === 5 ? "#2f8f46" : "#333",
@@ -475,6 +539,7 @@ const CheckoutPage = () => {
                           : "도착 예정 시간"
                         : "주문이 취소되었습니다."}
                   </span>
+
                   {rawOrderStatus === 5 && completeDate && (
                     <span style={{ color: "#2f8f46", fontWeight: "bold" }}>
                       {" "}
@@ -482,6 +547,7 @@ const CheckoutPage = () => {
                     </span>
                   )}
                 </div>
+
                 <div
                   style={{
                     display: "flex",
@@ -510,11 +576,13 @@ const CheckoutPage = () => {
           <aside className={styles.rightColumn}>
             <div className={styles.orderInfoCard}>
               <h3 className={styles.rightTitle}>주문 내역</h3>
+
               {orderDate && (
                 <p style={{ fontSize: "14px", color: "#666", margin: "5px 0" }}>
                   주문 일시 : {orderDate}
                 </p>
               )}
+
               {confirmDate && (
                 <p
                   style={{
@@ -527,22 +595,28 @@ const CheckoutPage = () => {
                   주문 승인 : {confirmDate}
                 </p>
               )}
+
               <div className={styles.orderList}>
                 <OrderListMap orderList={orderList} />
+
                 <div className={styles.orderRow}>
                   <span>상품 금액</span>
                   <span>{orderAmount.toLocaleString()} 원</span>
                 </div>
+
                 <div className={styles.orderRow}>
                   <span>{isPickup ? "포장 / 픽업" : "에코 딜리버리"}</span>
                   <span>{deliveryPrice.toLocaleString()} 원</span>
                 </div>
+
                 <div className={styles.orderRow}>
                   <span>에코포인트 사용</span>
                   <span>- {usedPoint.toLocaleString()} 원</span>
                 </div>
               </div>
+
               <div className={styles.divider}></div>
+
               <div className={styles.totalRow}>
                 <span>총 결제 금액</span>
                 <strong
@@ -562,6 +636,7 @@ const CheckoutPage = () => {
                 <span className={styles.smallIcon}></span>
                 <h3 className={styles.rightTitle}>환경 기여도</h3>
               </div>
+
               <div className={styles.ecoInnerBox}>
                 <p className={styles.ecoInnerTitle}>
                   이번 주문으로 절감한 탄소
@@ -571,10 +646,12 @@ const CheckoutPage = () => {
                   이번 주문으로 나무 가지 하나를 피웠습니다!
                 </p>
               </div>
+
               <div className={styles.ecoInfoRow}>
                 <span>에코 포인트 적립</span>
                 <strong>+{getPoint.toLocaleString()}p</strong>
               </div>
+
               <div className={styles.ecoInfoRow}>
                 <span>누적 탄소 절감량</span>
                 <strong>
@@ -589,6 +666,7 @@ const CheckoutPage = () => {
             >
               주문 목록 보기
             </button>
+
             {(rawOrderStatus === 0 || rawOrderStatus === 1) && (
               <button className={styles.secondaryBtn} onClick={cancelOrder}>
                 주문 취소
