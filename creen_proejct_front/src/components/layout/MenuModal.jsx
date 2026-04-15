@@ -370,7 +370,7 @@ export default function MenuModal({
           <div className={styles.summary_row}>
             <div className={styles.summary_con}>
               <span className={styles.summary_label}>총 예상 탄소 배출량</span>
-              <span className={styles.carbon_total}>
+              <span className={styles.carbon_total_red}>
                 {totalCarbon.toFixed(1)}g CO2e
               </span>
             </div>
