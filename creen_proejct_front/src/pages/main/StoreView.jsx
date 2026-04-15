@@ -201,7 +201,7 @@ export default function StoreView() {
               <div className={styles.menu_image}>
                 {menu.menuImage ? (
                   <img
-                    src={`${backHost}${menu.menuImage}`}
+                    src={menu.menuImage}
                     alt={menu.menuName}
                     style={{
                       width: "100%",
