@@ -29,6 +29,7 @@ const AdminStoreManagementDetail = () => {
   const filteredList = orderList.filter((item) =>
     item.storeName?.toLowerCase().includes(searchKeyword.toLowerCase()),
   );
+  console.log("🚀 ~ AdminStoreManagementDetail ~ filteredList:", filteredList);
   const totalPages = Math.ceil(orderList.length / itemsPerPage);
   const [pageGroup, setPageGroup] = useState(0);
   const pageLimit = 5;
@@ -191,7 +192,7 @@ const AdminStoreManagementDetail = () => {
                     <Box className={styles.infoBox}>
                       <img
                         src={
-                          `${backHost}${item.menuList?.[0]?.menuImage}` ||
+                          `${item.menuList?.[0]?.menuImage}` ||
                           "/image/default_menu.png"
                         }
                         className={styles.productImage}

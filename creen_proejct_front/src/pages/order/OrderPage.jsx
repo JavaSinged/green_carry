@@ -327,7 +327,7 @@ const CartItem = ({ cart, increaseQuantity, decreaseQuantity }) => {
             src={
               fetchedImage ||
               (cart.menuImage
-                ? `${backHost}${cart.menuImage}`
+                ? `${cart.menuImage}`
                 : "https://via.placeholder.com/150?text=No+Image")
             }
             alt={cart.name}
