@@ -84,6 +84,8 @@ public class StoreController {
 	public ResponseEntity<?> insertOrder(@RequestBody Order orderData) {
 		System.out.println(orderData);
 		int orderId = storeService.insertOrder(orderData);
+		String memberId = storeService.getStoreById(orderData.getStoreId()).getMemberId();
+		notificationService.sendNotification(memberId, "orderUpdate", "주문이 들어왔습니다.", "/mypage/manager/orders");
 		return ResponseEntity.ok(orderId);
 	}
 
