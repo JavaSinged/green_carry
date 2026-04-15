@@ -28,19 +28,25 @@ const UserProfile = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
-  // 페이지네이션 계산
+  // --- 페이지네이션 계산 시작 ---
   const pageGroupSize = 10;
-  // 현재 그룹의 시작 번호와 끝 번호 계산
+  const filteredHistory = pointHistory.filter((item) => item.orderStatus >= 1);
+  const totalPages = Math.ceil(filteredHistory.length / itemsPerPage) || 1;
+
+  // 1. 현재 페이지가 속한 그룹 계산 (순서 중요!)
+  const currentGroup = Math.ceil(currentPage / pageGroupSize);
+
+  // 2. 현재 그룹의 시작 번호와 끝 번호 계산
   const startPage = (currentGroup - 1) * pageGroupSize + 1;
   const endPage = Math.min(startPage + pageGroupSize - 1, totalPages);
 
-  // 화면에 뿌려줄 페이지 번호 배열 생성
+  // 3. 화면에 뿌려줄 페이지 번호 배열 생성
   const pageNumbers = [];
   for (let i = startPage; i <= endPage; i++) {
     pageNumbers.push(i);
   }
-  const filteredHistory = pointHistory.filter((item) => item.orderStatus >= 1);
-  const totalPages = Math.ceil(filteredHistory.length / itemsPerPage);
+
+  // 4. 현재 페이지에 보여줄 아이템 추출
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentHistoryItems = filteredHistory.slice(
