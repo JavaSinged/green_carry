@@ -324,7 +324,12 @@ const CartItem = ({ cart, increaseQuantity, decreaseQuantity }) => {
 
         <div className={styles.menuImageWrapper}>
           <img
-            src={cart.menuImage}
+            src={
+              fetchedImage ||
+              (cart.menuImage
+                ? `${backHost}${cart.menuImage}`
+                : "https://via.placeholder.com/150?text=No+Image")
+            }
             alt={cart.name}
             className={styles.menuImage}
             style={{ objectFit: "cover" }}

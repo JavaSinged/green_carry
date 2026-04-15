@@ -45,7 +45,7 @@ public interface MemberDao {
 
 	void deleteMember(String memberId);
 
-	Member getTotalCarbonPoint(String memberId);
+	Double getTotalCarbonPoint(String memberId);
 
 	Double getCommunityTotalCarbon();
 

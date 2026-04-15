@@ -70,18 +70,6 @@
 		ORDER BY o.order_id DESC
 	</select>
 
-	<select id="selectOrderDetailByOrderId" resultType="orderDetail">
-		SELECT
-		m.menu_name AS menuName,
-		m.menu_image AS menuImage,
-		d.quantity,
-		d.price,
-		d.option_string
-		FROM order_detail d
-		JOIN menu_tbl m ON d.menu_id = m.menu_id
-		WHERE d.order_id = #{orderId}
-	</select>
-
 
 	<select id="selectMenuListByOrderId" resultType="Menu">
 		SELECT
@@ -98,51 +86,37 @@
 	</select>
 	<select id="selectAllReview" resultType="StoreReviewResponse">
 		SELECT
-		r.member_id AS
-		memberId,
+		r.member_id AS memberId,
 		m.member_thumb AS memberProfile,
 		r.order_id AS orderId,
 		r.review_rating AS reviewRating,
-		TO_CHAR(r.review_date, 'yyyy-mm-dd')
-		AS reviewDate,
+		TO_CHAR(r.review_date, 'yyyy-mm-dd') AS reviewDate,
 		r.review_content AS reviewContent,
-		r.review_thumb AS
-		reviewThumb,
-		LISTAGG(o.menu_name, ', ') WITHIN GROUP (ORDER BY
-		o.menu_name) AS menuName,
-		rc.review_comment_content AS
-		reviewCommentContent,
-		TO_CHAR(rc.review_comment_date, 'yyyy-mm-dd') AS
-		reviewCommentDate,
+		r.review_thumb AS reviewThumb,
+		LISTAGG(o.menu_name, ', ') WITHIN GROUP (ORDER BY o.menu_name) AS menuName,
+		rc.review_comment_content AS reviewCommentContent,
+		TO_CHAR(rc.review_comment_date, 'yyyy-mm-dd') AS reviewCommentDate,
 		/* 🌟 가게 이름 추가 */
 		s.store_name AS storeName
-		FROM
-		review_tbl r
+		FROM review_tbl r
 		JOIN member_tbl m ON r.member_id = m.member_id
-		JOIN
-		order_detail od ON r.order_id = od.order_id
-		JOIN menu_tbl o ON
-		od.menu_id = o.menu_id
-		/* 🌟 가게 이름을 가져오기 위한 조인 (주문 테이블을 거쳐 상점 테이블 연결)
-		*/
+		JOIN order_detail od ON r.order_id = od.order_id
+		JOIN menu_tbl o ON od.menu_id = o.menu_id
+		/* 🌟 가게 이름을 가져오기 위한 조인 (주문 테이블을 거쳐 상점 테이블 연결) */
 		JOIN order_tbl ot ON r.order_id = ot.order_id
-		JOIN store_tbl s ON
-		ot.store_id = s.store_id
+		JOIN store_tbl s ON ot.store_id = s.store_id
 		LEFT JOIN (
-		SELECT order_id,
-		review_comment_content, review_comment_date
+		SELECT order_id, review_comment_content, review_comment_date
 		FROM (
 		SELECT
 		rc.*,
 		ROW_NUMBER() OVER (
 		PARTITION BY rc.order_id
-		ORDER BY
-		rc.review_comment_date DESC
+		ORDER BY rc.review_comment_date DESC
 		) AS rn
 		FROM review_comment_tbl rc
 		)
-		WHERE rn
-		= 1
+		WHERE rn = 1
 		) rc ON r.order_id = rc.order_id
 		GROUP BY
 		r.member_id,
@@ -156,7 +130,6 @@
 		rc.review_comment_date,
 		/* 🌟 GROUP BY에도 가게 이름 추가 */
 		s.store_name
-		ORDER
-		BY r.order_id DESC
+		ORDER BY r.order_id DESC
 	</select>
 </mapper>

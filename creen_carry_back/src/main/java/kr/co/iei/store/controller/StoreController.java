@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
+import org.springframework.http.MediaType;
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -28,12 +30,15 @@ import java.util.Map;
 @RequestMapping("/stores")
 @CrossOrigin("*")
 public class StoreController {
+
 	private static final String STORE_IMAGE_FOLDER = "projet/upload/web/store";
 
 	@Autowired
 	private Cloudinary cloudinary;
+
 	@Autowired
 	private StoreService storeService;
+
 
 	@Autowired
 	private NotificationService notificationService;
@@ -56,11 +61,11 @@ public class StoreController {
 		return ResponseEntity.ok(store);
 	}
 
-	@GetMapping("/member/{memberId}")
-	public ResponseEntity<?> getStoreByMemberId(@PathVariable String memberId) {
-		Store store = storeService.getStoreByMemberId(memberId);
-		return ResponseEntity.ok(store);
-	}
+    @GetMapping("/member/{memberId}")
+    public ResponseEntity<?> getStoreByMemberId(@PathVariable String memberId) {
+        Store store = storeService.getStoreByMemberId(memberId);
+        return ResponseEntity.ok(store);
+    }
 
 	@GetMapping("/{storeId}/menus")
 	public ResponseEntity<?> getMenuList(@PathVariable Long storeId) {
@@ -96,17 +101,17 @@ public class StoreController {
 		return ResponseEntity.ok(orderResponse);
 	}
 
-	@GetMapping("/orders/owner/{storeId}")
-	public ResponseEntity<?> getStoreOrders(@PathVariable Integer storeId) {
-		List<OrderResponse> list = storeService.getOrdersByStoreId(storeId);
-		return ResponseEntity.ok(list);
-	}
+    @GetMapping("/orders/owner/{storeId}")
+    public ResponseEntity<?> getStoreOrders(@PathVariable Integer storeId) {
+        List<OrderResponse> list = storeService.getOrdersByStoreId(storeId);
+        return ResponseEntity.ok(list);
+    }
 
-	@GetMapping("/orders/itemImg/{menuId}")
-	public ResponseEntity<String> getMenuImage(@PathVariable int menuId) {
-		String imagePath = storeService.getMenuImageById(menuId);
-		return ResponseEntity.ok(imagePath);
-	}
+    @GetMapping("/orders/itemImg/{menuId}")
+    public ResponseEntity<String> getMenuImage(@PathVariable int menuId) {
+        String imagePath = storeService.getMenuImageById(menuId);
+        return ResponseEntity.ok(imagePath);
+    }
 
 	@GetMapping(value = "/stats/order")
 	public ResponseEntity<?> selectStatsOrderInfo(@RequestParam Integer storeId, @RequestParam String yearMonth) {
@@ -220,26 +225,40 @@ public class StoreController {
 		} else {
 			return ResponseEntity.internalServerError().body("상태 변경 실패");
 		}
-	}
+    }
+    
+    @PatchMapping("/updatePoint/{orderId}")
+    public ResponseEntity<?> updatePoint(@PathVariable Integer orderId){
+    	int result = storeService.updatePoint(orderId);
+    	return ResponseEntity.ok(result);
+    }
 
+    // 매장 운영 정보 가져오기
+    @GetMapping("/{storeId}/hours")
+    public ResponseEntity<?> getStoreOperatingHours(@PathVariable Integer storeId) {
 
-	// 매장 운영 정보 가져오기
-	@GetMapping("/{storeId}/hours")
-	public ResponseEntity<?> getStoreOperatingHours(@PathVariable Integer storeId) {
+        List<StoreOperating> hours = storeService.getStoreOperatingHours(storeId);
 
-		List<StoreOperating> hours = storeService.getStoreOperatingHours(storeId);
+        if (hours == null || hours.isEmpty()) {
 
-		if (hours == null || hours.isEmpty()) {
+            return ResponseEntity.ok(List.of());
+        }
+        return ResponseEntity.ok(hours);
+    }
 
-			return ResponseEntity.ok(List.of());
-		}
-		return ResponseEntity.ok(hours);
-	}
+    //    ------------------- 매장 수정 로직 ----------------------
+    @PostMapping(value = "/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> updateStore(
+            @RequestPart("data") StoreSaveRequest request, 
+            @RequestPart(value = "file", required = false) MultipartFile file) {
 
-	// ------------------- 매장 수정 로직 ----------------------
-	@PostMapping(value = "/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public ResponseEntity<?> updateStore(@RequestPart("data") StoreSaveRequest request,
-			@RequestPart(value = "file", required = false) MultipartFile file) {
+        try {
+            // 1. 파일 저장 로직 (작성하신 예시 코드 방식 적용)
+            if (file != null && !file.isEmpty()) {
+                String savePath = "\\\\192.168.31.26\\project\\upload\\web\\store\\"; 
+                File folder = new File(savePath);
+                if (!folder.exists()) folder.mkdirs();
+
 
 		try {
 			// 1. Cloudinary 파일 저장 로직 적용
@@ -247,42 +266,42 @@ public class StoreController {
 				Map uploadParams = ObjectUtils.asMap("folder", STORE_IMAGE_FOLDER, "use_filename", true,
 						"unique_filename", true);
 
-				// Cloudinary로 업로드 실행
-				// (컨트롤러 상단에 @Autowired private Cloudinary cloudinary; 가 있어야 합니다)
-				Map uploadResult = cloudinary.uploader().upload(file.getBytes(), uploadParams);
+                String originalFileName = file.getOriginalFilename();
+                String extension = originalFileName.substring(originalFileName.lastIndexOf("."));
+                String saveFileName = UUID.randomUUID().toString() + extension;
 
-				// 업로드된 결과에서 전체 보안 URL(https) 추출
-				String storeThumb = (String) uploadResult.get("secure_url");
 
-				// DB에 저장할 경로를 Cloudinary URL로 세팅
-				request.setStoreThumb(storeThumb);
-			}
+                File dest = new File(savePath + saveFileName);
+                file.transferTo(dest);
 
-			// 2. 서비스 호출 (가게 정보 + 운영 시간 + 이미지 경로 업데이트)
-			storeService.updateStoreInfoAndHours(request);
+                // DB에 저장할 경로 설정 (request 객체에 담기)
+                String storeThumb = "uploads/store/" + saveFileName;
+                request.setStoreThumb(storeThumb); 
+            }
 
-			return ResponseEntity.ok("SUCCESS");
+            // 2. 서비스 호출 (가게 정보 + 운영 시간 + 이미지 경로 업데이트)
+            storeService.updateStoreInfoAndHours(request);
+            
+            return ResponseEntity.ok("SUCCESS");
 
-		} catch (IOException e) {
-			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("FILE_UPLOAD_ERROR");
-		} catch (Exception e) {
-			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("UPDATE_FAIL");
-		}
-	}
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("FILE_UPLOAD_ERROR");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("UPDATE_FAIL");
+        }
+    }
 
-	@GetMapping("/info/{storeId}")
-	public ResponseEntity<Store> getStoreInfo(@PathVariable Integer storeId) {
-		Store storeInfo = storeService.getStoreInfo(storeId);
+    @GetMapping("/info/{storeId}")
+    public ResponseEntity<Store> getStoreInfo(@PathVariable Integer storeId) {
+        Store storeInfo = storeService.getStoreInfo(storeId);
 
-		// 데이터가 없는 경우 404 Not Found 또는 빈 객체 반환 등을 처리할 수 있습니다.
-		if (storeInfo == null) {
-			return ResponseEntity.notFound().build();
-		}
+        // 데이터가 없는 경우 404 Not Found 또는 빈 객체 반환 등을 처리할 수 있습니다.
+        if (storeInfo == null) {
+            return ResponseEntity.notFound().build();
+        }
 
-		return ResponseEntity.ok(storeInfo);
-	}
 
 	@GetMapping("/location/{storeId}")
 	public ResponseEntity<?> getStoreLocation(@PathVariable Integer storeId) {

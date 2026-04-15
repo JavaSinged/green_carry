@@ -105,7 +105,7 @@ const ManagerMenuEdit = () => {
 
         // 🌟 기존 이미지가 있다면 서버 주소를 붙여서 미리보기 세팅
         if (imagePath) {
-          setPreviewUrl(imagePath);
+          setPreviewUrl(`${backHost}${imagePath}`);
         } else {
           // 혹시라도 경로가 안 왔을 경우를 위해 콘솔에 찍어보기
           console.warn(

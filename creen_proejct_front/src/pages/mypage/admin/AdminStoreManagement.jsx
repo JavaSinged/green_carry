@@ -154,7 +154,7 @@ export default function AdminStoreManagement() {
                       <img
                         src={
                           store.storeThumb
-                            ? `${store.storeThumb}`
+                            ? `${backHost}/${store.storeThumb}`
                             : "/image/default_store.png"
                         }
                       />

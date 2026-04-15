@@ -160,11 +160,11 @@ export default function Header() {
                 <div className={styles.profile_circle}>
                   {user?.memberThumb && user.memberThumb !== "null" ? (
                     <img
-                      src={user.memberThumb}
+                      src={`${backHost}${user.memberThumb}`}
                       alt="profile"
                       className={styles.profile_img}
                       onError={(e) => {
-                        e.target.src = "/image/default-user.png";
+                        e.target.src = "/path/to/default-user.png";
 
                         e.target.onerror = null;
                       }}

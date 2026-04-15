@@ -92,9 +92,9 @@ export default function Home() {
     const a =
       Math.sin(dLat / 2) * Math.sin(dLat / 2) +
       Math.cos((myLat * Math.PI) / 180) *
-        Math.cos((sLat * Math.PI) / 180) *
-        Math.sin(dLng / 2) *
-        Math.sin(dLng / 2);
+      Math.cos((sLat * Math.PI) / 180) *
+      Math.sin(dLng / 2) *
+      Math.sin(dLng / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     return R * c;
   };
@@ -310,8 +310,12 @@ export default function Home() {
                 >
                   <div className={styles.image_wrap}>
                     <img
-                      src={storeThumb}
-                      alt={storeName}
+                      src={
+                        store.storeThumb
+                          ? `${backHost}/${store.storeThumb}`
+                          : "/image/default_store.png"
+                      }
+                      alt={store.storeName}
                       style={{ objectFit: "cover" }}
                     />
                     {isLogin && user?.memberGrade === 1 && (

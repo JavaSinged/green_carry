@@ -187,7 +187,6 @@
 		resultType="orderItem">
 		SELECT od.menu_id AS menuId,
 		m.menu_name AS menuName,
-		m.menu_image AS menuImage,
 		od.quantity,
 		od.price,
 		od.option_string AS
@@ -689,7 +688,6 @@
 
 	<select id="getStoreLocation" resultType="Store">
 		select
-		store_name,
 		latitude,
 		longitude
 		from store_tbl

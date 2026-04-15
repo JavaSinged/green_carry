@@ -388,7 +388,11 @@ export default function UserInfoEdit() {
           >
             {previewImg ? (
               <img
-                src={previewImg.startsWith("blob:") ? previewImg : previewImg}
+                src={
+                  previewImg.startsWith("blob:")
+                    ? previewImg
+                    : `${backHost}${previewImg}`
+                }
                 alt="profile"
                 className={styles.profile_image}
               />

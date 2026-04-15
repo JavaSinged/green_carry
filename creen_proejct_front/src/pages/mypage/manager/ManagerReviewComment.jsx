@@ -143,7 +143,7 @@ const ManagerReviewComment = () => {
                     <img
                       src={
                         review.memberProfile
-                          ? `${review.memberProfile}`
+                          ? `${import.meta.env.VITE_BACKSERVER}${review.memberProfile}`
                           : "/image/default-user.png"
                       }
                       alt="profile"
@@ -169,7 +169,7 @@ const ManagerReviewComment = () => {
                   <img
                     src={
                       review.reviewThumb
-                        ? `${review.reviewThumb}`
+                        ? `${import.meta.env.VITE_BACKSERVER}${review.reviewThumb.startsWith("/") ? "" : "/uploads/review/"}${review.reviewThumb}`
                         : "/image/no-image.png" //
                     }
                     alt="리뷰사진"

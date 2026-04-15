@@ -17,5 +17,4 @@ public class OrderItem {
 	private Integer price;
 	private String optionString;
 	private Double totalcarbon;
-	private String menuImage;
 }
