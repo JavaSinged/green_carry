@@ -175,15 +175,6 @@ const CheckoutPage = () => {
       });
   }, [storeId]);
 
-  const updatePoint = (orderId) => {
-    if (!orderId) return;
-
-    axios
-      .patch(`${import.meta.env.VITE_BACKSERVER}/stores/updatePoint/${orderId}`)
-      .then(() => console.log("포인트 업데이트 API 호출 성공"))
-      .catch((err) => console.log(err));
-  };
-
   useEffect(() => {
     clearCart();
     fetchOrderDetails();
@@ -200,8 +191,7 @@ const CheckoutPage = () => {
     if (!isFirst.current) return;
 
     isFirst.current = false;
-    updatePoint(orderId);
-  }, [orderId]);
+  }, []);
 
   useEffect(() => {
     fetchLatestPoint();

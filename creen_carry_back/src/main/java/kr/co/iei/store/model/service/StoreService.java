@@ -145,13 +145,14 @@ public class StoreService {
 
     }
 
+    @Transactional
 	public int changeOrderStatus(Integer orderId, int status, Integer expectedTime) {
 		int result;
 		if(status == 9) {
 			//주문 취소시 포인트 롤백
-			int result1 = storeDao.rollbackPoint(orderId);
+			storeDao.rollbackPoint(orderId);
 		    int result2 = storeDao.cancelOrder(orderId);
-		    if(result1+result2 == 2) {
+		    if(result2 > 0) {
 		    	result = 1;
 		    }else {
 		    	result = 0;
