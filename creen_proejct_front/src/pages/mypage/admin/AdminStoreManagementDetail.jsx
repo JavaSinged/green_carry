@@ -192,7 +192,7 @@ const AdminStoreManagementDetail = () => {
                     <Box className={styles.infoBox}>
                       <img
                         src={
-                          `${backHost}${item.menuList?.[0]?.menuImage}` ||
+                          `${item.menuList?.[0]?.menuImage}` ||
                           "/image/default_menu.png"
                         }
                         className={styles.productImage}
