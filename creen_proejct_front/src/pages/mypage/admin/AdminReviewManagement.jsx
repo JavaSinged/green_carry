@@ -47,25 +47,26 @@ const ManagerReviewComment = () => {
   }, [currentPage]);
 
   // 🌟 날짜 필터링 적용 함수
-  const applyDateFilter = () => {
-    if (!startDate || !endDate) {
-      alert("시작일과 종료일을 모두 선택해주세요.");
-      return;
+  useEffect(() => {
+    if (startDate && endDate) {
+      if (startDate > endDate) {
+        alert("시작일이 종료일보다 클 수 없습니다.");
+        setEndDate(""); // 잘못된 선택 시 초기화
+        return;
+      }
+
+      const filtered = reviews.filter((review) => {
+        const rDate = review.reviewDate;
+        return rDate >= startDate && rDate <= endDate;
+      });
+
+      setFilteredReviews(filtered);
+      setCurrentPage(1);
+    } else if (!startDate && !endDate) {
+      // 두 날짜가 모두 비었을 때는 전체 데이터 보여주기 (초기화 대응)
+      setFilteredReviews(reviews);
     }
-
-    if (startDate > endDate) {
-      alert("시작일이 종료일보다 클 수 없습니다.");
-      return;
-    }
-
-    const filtered = reviews.filter((review) => {
-      const rDate = review.reviewDate; // "YYYY-MM-DD" 형식
-      return rDate >= startDate && rDate <= endDate;
-    });
-
-    setFilteredReviews(filtered);
-    setCurrentPage(1); // 필터 적용 시 1페이지로 이동
-  };
+  }, [startDate, endDate, reviews]); // 날짜나 원본 데이터가 바뀌면 실행
 
   // 🌟 필터 초기화
   const resetFilter = () => {
