@@ -65,7 +65,6 @@ export default function StoreView() {
     axios
       .get(`${backHost}/stores/${storeId}`)
       .then((res) => {
-        if (res.data.storeName) setGlobalStoreName(res.data.storeName);
         setStoreInfo({
           storeId: res.data.storeId,
           storeIntro: res.data.storeIntro,

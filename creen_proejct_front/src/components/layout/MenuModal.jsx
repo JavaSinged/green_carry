@@ -120,6 +120,7 @@ export default function MenuModal({
     const currentId = Number(currentStoreId);
     const savedId = Number(cartStoreId);
 
+    // 장바구니가 비어있지 않고, 저장된 매장 ID가 현재 매장 ID와 다를 때만 경고창
     if (cart.length > 0 && savedId !== 0 && savedId !== currentId) {
       Swal.fire({
         title: "장바구니에는 한 곳의 매장만 담을 수 있습니다.",
@@ -133,16 +134,18 @@ export default function MenuModal({
         reverseButtons: true,
       }).then((result) => {
         if (result.isConfirmed) {
-          clearCart();
-          executeAdd();
+          clearCart(); // 기존 장바구니 비우기
+          executeAdd(); // 여기서 실행하면 매장 정보도 이때 바뀜
         }
+        // 취소(result.isDismissed) 시에는 아무 일도 일어나지 않음
       });
     } else {
+      // 장바구니가 비어있거나 같은 매장일 때
       executeAdd();
     }
   };
 
-  // 실제 담기
+  // 2. 실제 장바구니에 데이터를 넣는 함수
   const executeAdd = () => {
     const cartItem = {
       id: Date.now(),
@@ -156,7 +159,10 @@ export default function MenuModal({
       options: selectedOptions,
       menuImage: menuData.menuImage,
     };
-    addToCart(cartItem);
+
+    addToCart(cartItem); // 메뉴 추가
+
+    // 🔥 중요: 매장 정보 업데이트를 반드시 "담기"가 확정된 이 순간에만 수행합니다.
     setStoreId(Number(currentStoreId));
     setStoreName(currentStoreName);
 
@@ -185,7 +191,7 @@ export default function MenuModal({
           <div className={styles.image_placeholder}>
             {menuData?.menuImage ? (
               <img
-                src={`${backHost}${menuData.menuImage}`}
+                src={menuData.menuImage}
                 alt={menuData.menuName}
                 style={{ width: "100%", height: "100%", objectFit: "contain" }}
                 onError={(e) => {
