@@ -545,9 +545,6 @@ const CheckoutPage = () => {
                     alignItems: "flex-end",
                   }}
                 >
-                  <strong className={styles.arrivalTime}>
-                    {rawOrderStatus === 9 ? "--:--" : targetArrivalTime}
-                  </strong>
                   <span
                     style={{
                       fontSize: "13px",
