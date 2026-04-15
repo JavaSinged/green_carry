@@ -51,6 +51,7 @@ import ManagerCS from "./pages/mypage/manager/ManagerCS";
 import AdminStoreManagementDetail from "./pages/mypage/admin/AdminStoreManagementDetail";
 import StoreReviewPage from "./pages/main/StoreReviewPage";
 import AdminContainerList from "./pages/mypage/admin/AdminContainerList";
+import { Analytics } from "@vercel/analytics/react";
 
 const BasicLayout = () => {
   return (
@@ -136,10 +137,7 @@ function App() {
                 ></Route>
                 <Route path="reviews" element={<AdminReviewManagement />} />
                 {/* 용기 리스트 */}
-                <Route
-                  path="containers"
-                  element={<AdminContainerList />}
-                />
+                <Route path="containers" element={<AdminContainerList />} />
                 {/* 용기 수정 */}
                 <Route
                   path="containers/detail/:productId"
