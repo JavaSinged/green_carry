@@ -282,62 +282,65 @@
   font-weight: bold;
 }
 
-.history_right {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  justify-content: center;
-  min-width: 80px;
-  gap: 2px;
-}
 .pagination {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 15px;
-  padding: 15px 0;
-  border-top: 1px solid #eee;
-}
-
-.pageBtn {
-  width: 36px;
-  height: 36px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: white;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  font-size: 15px;
-  font-weight: 500;
-  color: #333;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.pageInfo {
-  font-size: 0.9rem;
-  color: #333;
-}
-.activePage {
-  background-color: #2f8f46; /* 메인 에코 초록색 */
-  color: white;
-  border-color: #2f8f46;
-  font-weight: bold;
-}
-
-.activePage:hover {
-  background-color: #267a39;
-}
-
-/* 기본 아이템 스타일 (기존 유지하되 아래 내용 추가) */
-.history_item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 15px;
-  border-bottom: 1px solid #f0f0f0;
-  transition: all 0.2s ease;
+  margin-top: 24px;
+}
+
+.page_btn_nav {
+  display: flex;
+  align-items: center;
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text-main);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.page_btn_nav:hover:not(:disabled) {
+  background-color: #f9f9f9;
+}
+
+.page_numbers {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.page_num {
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text-main);
+  cursor: pointer;
+}
+
+.page_num:hover {
+  background-color: #f9f9f9;
+}
+
+.page_num.active {
+  border: 1px solid var(--color-brand);
+  color: var(--color-brand);
+  background-color: var(--color-surface);
+  font-weight: 600;
+}
+
+.page_dots {
+  color: var(--text-sub);
 }
 
 /* 🌟 취소된 아이템 전체 배경 처리 */
@@ -392,31 +395,4 @@
   color: #999;
   font-size: 0.9rem;
   font-weight: 500;
-}
-/* UserProfile.module.css */
-.pagination {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 5px; /* 버튼 사이 간격 좁게 */
-  margin: 20px 0;
-  flex-wrap: nowrap; /* 10개가 한 줄에 다 나오게 고정 */
-}
-
-.pagination button {
-  width: 30px; /* 버튼 크기 고정 */
-  height: 30px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 0;
-  font-size: 0.8rem;
-  border: 1px solid #eee;
-  background: #fff;
-}
-
-.activePage {
-  background-color: #2e7d32 !important;
-  color: white !important;
-  font-weight: bold;
 }
