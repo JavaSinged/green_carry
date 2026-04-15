@@ -339,6 +339,9 @@ public boolean deleteReview(int orderId) {
 	public String getEnrollDate(String memberId) {
 		return memberDao.getEnrollDate(memberId);
 	}
-
+	public int getPointByMemberId(String memberId) {
+		int currentPoint = memberDao.getPointByMemberId(memberId);
+		return currentPoint;
+	}
 
 }

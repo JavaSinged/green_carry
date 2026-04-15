@@ -203,14 +203,19 @@ public class StoreController {
 			// 3. 알림 대상(4, 5, 9번 상태)이면 알림 발송
 			if (memberId != null && (status == 2 || status == 4 || status == 5 || status == 9)) {
 				String message = "";
-				if (status == 2)
+				if (status == 2) {
 					message = "주문이 접수되었습니다. 약 " + expectedTime + "분 뒤 조리가 완료됩니다.";
-				else if (status == 4)
+				}
+				else if (status == 4) {
 					message = "메뉴가 준비되었습니다! 픽업/배달을 확인해주세요.";
-				else if (status == 5)
+				}
+				else if (status == 5) {
+					storeService.updatePoint(orderId);
 					message = "맛있게 드셨나요? 픽업/배달이 완료되었습니다. 🌿";
-				else if (status == 9)
+				}
+				else if (status == 9) {
 					message = "주문이 취소되었습니다. 다시 확인 부탁드립니다.";
+				}
 
 				notificationService.sendNotification(memberId, "orderUpdate", message, navUrl);
 			}

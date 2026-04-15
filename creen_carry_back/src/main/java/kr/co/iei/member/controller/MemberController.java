@@ -37,18 +37,8 @@ public class MemberController {
 
 
     private final EmailSender emailSender;
-
-
-    private final BCryptPasswordEncoder passwordEncoder;
-
-    @Autowired
-    private MemberService memberService;
-
-    @Autowired
-    private JwtUtil jwtUtil;
-
-    @Autowired
-    private StoreDao storeDao;
+@Autowired
+	private NotificationService notificationService;
 
     MemberController(BCryptPasswordEncoder passwordEncoder, EmailSender emailSender) {
         this.passwordEncoder = passwordEncoder;
@@ -183,7 +173,7 @@ public class MemberController {
     @PostMapping("/updateProfile")
     public ResponseEntity<?> updateProfile(@RequestParam String memberId, @RequestParam String memberName,
                                            @RequestParam String memberPhone,
-                                           @RequestParam Integer memberGrade,
+                                           @RequestParam(required = false) Integer memberGrade,
                                            @RequestParam(value = "uploadFile", required = false) MultipartFile uploadFile) {
 
         Member member = new Member();
@@ -191,23 +181,22 @@ public class MemberController {
         member.setMemberName(memberName);
         member.setMemberPhone(memberPhone);
         member.setMemberGrade(memberGrade);
+        
+        // NullPointerException(NPE) 방지: memberGrade가 null이면 기본값 1 세팅
+		member.setMemberGrade(memberGrade == null ? 1 : memberGrade);
 
         if (uploadFile != null && !uploadFile.isEmpty()) {
             try {
-                String savePath = "\\\\192.168.31.26\\project\\upload\\web\\member\\";
-                File folder = new File(savePath);
-                if (!folder.exists())
-                    folder.mkdirs();
+				Map uploadParams = ObjectUtils.asMap(
+				"folder", "projet/upload/web/member",
+				"use_filename", true,
+				"unique_filename", true
+				);
 
-                String originalFileName = uploadFile.getOriginalFilename();
-                String extension = originalFileName.substring(originalFileName.lastIndexOf("."));
-                String saveFileName = UUID.randomUUID().toString() + extension;
-
-                File dest = new File(savePath + saveFileName);
-                uploadFile.transferTo(dest);
-
-                String memberThumb = "/uploads/member/" + saveFileName;
-                member.setMemberThumb(memberThumb);
+				// 주입받은 cloudinary 인스턴스 사용
+				Map uploadResult = cloudinary.uploader().upload(uploadFile.getBytes(), uploadParams);
+				String memberThumb = (String) uploadResult.get("secure_url");
+				member.setMemberThumb(memberThumb);
 
             } catch (IOException e) {
                 e.printStackTrace();
@@ -361,6 +350,14 @@ public class MemberController {
 
             memberService.insertReview(review, uploadFile);
 
+            String memberId = storeService.getStoreById(review.getStoreId()).getMemberId();
+
+			notificationService.sendNotification(
+                memberId,
+                "orderUpdate",
+                "고객님으로부터 리뷰가 달렸습니다.",
+				"/mypage/manager/reviews");
+
             return ResponseEntity.ok("SUCCESS");
         } catch (RuntimeException e) {
             // 예외 발생 시 프론트의 catch(err) 부분으로 메시지 전달
@@ -418,5 +415,12 @@ public class MemberController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("회원 정보를 찾을 수 없습니다.");
         }
     }
+        @GetMapping("/point/{memberId}")
+    public ResponseEntity<?> getMemberPoint(@PathVariable String memberId) {
+        // DB에서 해당 유저의 현재 포인트를 가져옵니다.
+        int currentPoint = memberService.getPointByMemberId(memberId);
+        return ResponseEntity.ok(currentPoint); 
+    }
+
     
 }
