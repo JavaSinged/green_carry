@@ -26,7 +26,10 @@ import com.cloudinary.utils.ObjectUtils;
 import kr.co.iei.member.model.vo.Member;
 import kr.co.iei.member.model.vo.PointHistory;
 import kr.co.iei.member.model.vo.Review;
+import kr.co.iei.notification.model.service.NotificationService;
 import kr.co.iei.store.model.dao.StoreDao;
+import kr.co.iei.store.model.service.StoreService;
+import kr.co.iei.store.model.vo.Store;
 import kr.co.iei.utils.EmailSender;
 import kr.co.iei.utils.JwtUtil;
 import kr.co.iei.member.model.service.MemberService;
@@ -35,7 +38,6 @@ import kr.co.iei.member.model.service.MemberService;
 @RequestMapping("/member")
 @CrossOrigin(value = "*")
 public class MemberController {
-	
 
 	@Autowired
 	private Cloudinary cloudinary;
@@ -48,10 +50,16 @@ public class MemberController {
 	private MemberService memberService;
 
 	@Autowired
+	private StoreService storeService;
+
+	@Autowired
 	private JwtUtil jwtUtil;
 
 	@Autowired
 	private StoreDao storeDao;
+
+	@Autowired
+	private NotificationService notificationService;
 
 	MemberController(BCryptPasswordEncoder passwordEncoder, EmailSender emailSender) {
 		this.passwordEncoder = passwordEncoder;
@@ -181,44 +189,44 @@ public class MemberController {
 	}
 
 	// 🌟 [수정된 부분] 유저 정보 업데이트
-		@PostMapping("/updateProfile")
-		public ResponseEntity<?> updateProfile(@RequestParam String memberId, @RequestParam String memberName,
-				@RequestParam String memberPhone, @RequestParam(required = false) Integer memberGrade, // 400 에러 방지용
-																										// required=false
-				@RequestParam(value = "uploadFile", required = false) MultipartFile uploadFile) {
+	@PostMapping("/updateProfile")
+	public ResponseEntity<?> updateProfile(@RequestParam String memberId, @RequestParam String memberName,
+			@RequestParam String memberPhone, @RequestParam(required = false) Integer memberGrade, // 400 에러 방지용
+																									// required=false
+			@RequestParam(value = "uploadFile", required = false) MultipartFile uploadFile) {
 
-			Member member = new Member();
-			member.setMemberId(memberId);
-			member.setMemberName(memberName);
-			member.setMemberPhone(memberPhone);
+		Member member = new Member();
+		member.setMemberId(memberId);
+		member.setMemberName(memberName);
+		member.setMemberPhone(memberPhone);
 
-			// NullPointerException(NPE) 방지: memberGrade가 null이면 기본값 1 세팅
-			member.setMemberGrade(memberGrade == null ? 1 : memberGrade);
+		// NullPointerException(NPE) 방지: memberGrade가 null이면 기본값 1 세팅
+		member.setMemberGrade(memberGrade == null ? 1 : memberGrade);
 
-			if (uploadFile != null && !uploadFile.isEmpty()) {
-				try {
-					Map uploadParams = ObjectUtils.asMap("folder", "projet/upload/web/member", "use_filename", true,
-							"unique_filename", true);
+		if (uploadFile != null && !uploadFile.isEmpty()) {
+			try {
+				Map uploadParams = ObjectUtils.asMap("folder", "projet/upload/web/member", "use_filename", true,
+						"unique_filename", true);
 
-					// 주입받은 cloudinary 인스턴스 사용
-					Map uploadResult = cloudinary.uploader().upload(uploadFile.getBytes(), uploadParams);
-					String memberThumb = (String) uploadResult.get("secure_url");
-					member.setMemberThumb(memberThumb);
+				// 주입받은 cloudinary 인스턴스 사용
+				Map uploadResult = cloudinary.uploader().upload(uploadFile.getBytes(), uploadParams);
+				String memberThumb = (String) uploadResult.get("secure_url");
+				member.setMemberThumb(memberThumb);
 
-				} catch (IOException e) {
-					e.printStackTrace();
-					return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("FILE_UPLOAD_ERROR");
-				}
-			}
-
-			int result = memberService.updateProfile(member);
-
-			if (result > 0) {
-				return ResponseEntity.ok(member.getMemberThumb() != null ? member.getMemberThumb() : "SUCCESS_NO_IMAGE");
-			} else {
-				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("UPDATE_FAIL");
+			} catch (IOException e) {
+				e.printStackTrace();
+				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("FILE_UPLOAD_ERROR");
 			}
 		}
+
+		int result = memberService.updateProfile(member);
+
+		if (result > 0) {
+			return ResponseEntity.ok(member.getMemberThumb() != null ? member.getMemberThumb() : "SUCCESS_NO_IMAGE");
+		} else {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("UPDATE_FAIL");
+		}
+	}
 
 	// user아이디 중복체크
 	@GetMapping(value = "/exists")
@@ -353,6 +361,11 @@ public class MemberController {
 		try {
 
 			memberService.insertReview(review, uploadFile);
+
+			String memberId = storeService.getStoreById(review.getStoreId()).getMemberId();
+
+			notificationService.sendNotification(memberId, "orderUpdate", "고객님으로부터 리뷰가 달렸습니다.",
+					"/mypage/manager/reviews");
 
 			return ResponseEntity.ok("SUCCESS");
 		} catch (RuntimeException e) {
