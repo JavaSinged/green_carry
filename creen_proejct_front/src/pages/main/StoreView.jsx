@@ -114,7 +114,7 @@ export default function StoreView() {
         <div className={styles.store_image_wrap}>
           {storeInfo.storeThumb ? (
             <img
-              src={`${backHost}/${storeInfo.storeThumb}`}
+              src={`${storeInfo.storeThumb}`}
               alt={storeInfo.storeName}
               className={styles.store_main_img}
               onError={(e) => {
