@@ -27,18 +27,21 @@ const UserProfile = () => {
   const [progress, setProgress] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5; // 한 페이지당 보여줄 내역 수
-  const pageGroupSize = 10; // 한번에 보여줄 페이지 번호 개수
-
-  // 2. 페이지네이션 계산 로직 (순서 중요!)
+  const pageGroupSize = 10;
   const filteredHistory = pointHistory.filter((item) => item.orderStatus >= 1);
   const totalPages = Math.ceil(filteredHistory.length / itemsPerPage) || 1;
 
-  // 현재 페이지가 속한 그룹 계산 (예: 1~10페이지는 1그룹)
+  // 1. 현재 페이지가 몇 번째 그룹인지 계산 (예: 11페이지면 2그룹)
   const currentGroup = Math.ceil(currentPage / pageGroupSize);
+
+  // 2. 현재 그룹의 시작 번호 (1, 11, 21...)
   const startPage = (currentGroup - 1) * pageGroupSize + 1;
+
+  // 3. 현재 그룹의 끝 번호 (10, 20, 30... 단, 전체 페이지보다 클 순 없음)
+  // 이 부분이 16개가 아니라 10개에서 끊어주는 핵심 로직입니다!
   const endPage = Math.min(startPage + pageGroupSize - 1, totalPages);
 
-  // 페이지 번호 배열 생성
+  // 4. 배열에 넣을 때 'endPage'까지만 넣기
   const pageNumbers = [];
   for (let i = startPage; i <= endPage; i++) {
     pageNumbers.push(i);
