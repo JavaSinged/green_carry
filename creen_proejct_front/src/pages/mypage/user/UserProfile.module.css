@@ -302,6 +302,11 @@
   cursor: pointer;
   transition: all 0.2s;
 }
+.activePage {
+  background-color: #2f8f46; /* 사장님 페이지 테마색 */
+  color: white;
+  border-color: #2f8f46;
+}
 
 .page_btn_nav:hover:not(:disabled) {
   background-color: #f9f9f9;
