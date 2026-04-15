@@ -5,8 +5,9 @@ import UnfoldMoreIcon from "@mui/icons-material/UnfoldMore";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import AddIcon from '@mui/icons-material/Add';
+import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
 import EditIcon from "@mui/icons-material/Edit";
-import ClearIcon from '@mui/icons-material/Clear';
+import ClearIcon from "@mui/icons-material/Clear";
 import axios from "axios";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
@@ -23,19 +24,22 @@ export default function AdminContainerList() {
 
     const itemsPerPage = 6;
 
+    // 검색어 변경 시 페이지 1로 리셋
     useEffect(() => {
         setCurrentPage(1);
     }, [searchTerm]);
 
+    // 데이터 불러오기
     useEffect(() => {
         axios
             .get(`${backHost}/carbon-list`)
             .then((res) => {
-                console.log(res.data);
                 setCarbonList(res.data);
             })
             .catch((err) => console.log("데이터 불러오기 실패: ", err));
-    }, []);
+    }, [backHost]);
+
+    // 삭제 로직
     const handleDelete = (productId) => {
         Swal.fire({
             title: '정말 삭제하시겠습니까?',
@@ -63,6 +67,8 @@ export default function AdminContainerList() {
             }
         });
     };
+
+    // 정렬 핸들러
     const handleSort = (key) => {
         let direction = "asc";
         if (sortConfig.key === key && sortConfig.direction === "asc") {
@@ -71,19 +77,24 @@ export default function AdminContainerList() {
         setSortConfig({ key, direction });
     };
 
+    // 필터 및 정렬 통합 로직
     const getSortedCarbonList = () => {
+        // 1. 검색 필터링
         let items = carbonList.filter((carbon) => {
             if (!carbon.productMaterial) return false;
             return carbon.productMaterial.toLowerCase().includes(searchTerm.toLowerCase());
         });
+
+        // 2. 정렬
         items.sort((a, b) => {
-            // 소, 중, 대 정
             const getPoint = (name) => {
                 if (name.includes("(소)")) return 1;
                 if (name.includes("(중)")) return 2;
                 if (name.includes("(대)")) return 3;
                 return 9;
             };
+
+            // 이름 기준 정렬 (소/중/대 우선순위 적용)
             if (sortConfig.key === "productMaterial" || sortConfig.key === null) {
                 const pointA = getPoint(a.productMaterial);
                 const pointB = getPoint(b.productMaterial);
@@ -95,6 +106,8 @@ export default function AdminContainerList() {
                     ? a.productMaterial.localeCompare(b.productMaterial)
                     : b.productMaterial.localeCompare(a.productMaterial);
             }
+
+            // 기타 컬럼 정렬
             if (a[sortConfig.key] < b[sortConfig.key]) {
                 return sortConfig.direction === "asc" ? -1 : 1;
             }
@@ -103,11 +116,13 @@ export default function AdminContainerList() {
             }
             return 0;
         });
+
         return items;
-    }
+    };
 
     const sortedCarbonList = getSortedCarbonList();
 
+    // 페이지네이션 계산
     const totalPages = Math.ceil(sortedCarbonList.length / itemsPerPage);
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -123,18 +138,6 @@ export default function AdminContainerList() {
         setCurrentPage(pageNumber);
     };
 
-    //용기 소중대 구분
-    const sortedList = [...carbonList].sort((a, b) => {
-        const score = { "(소)": 1, "(중)": 2, "(대)": 3 };
-
-        const getPoint = (name) => {
-            if (name.includes("(소)")) return score["(소)"];
-            if (name.includes("(중)")) return score["(중)"];
-            if (name.includes("(대)")) return score["(대)"];
-            return 9;
-        };
-        return getPoint(a.productMaterial) - getPoint(b.productMaterial);
-    });
     return (
         <div className={styles.dashboard_container}>
             <div className={styles.header}>
@@ -149,8 +152,14 @@ export default function AdminContainerList() {
                     />
                     <SearchIcon className={styles.search_icon} />
                 </div>
+                <div className={styles.filter_area}>
+                    <FilterAltOutlinedIcon />
+                    <select className={styles.filter_select}>
+                        <option>전체 필터</option>
+                    </select>
+                </div>
                 <div onClick={() => navigate(`/mypage/admin/containers/detail/new`)} className={styles.addPage} >
-                    <span className={styles.AddIconText}> <AddIcon />추가</span>
+                    <span className={styles.AddIconText}> <AddIcon /> 추가</span>
                 </div>
             </div>
 
@@ -192,12 +201,13 @@ export default function AdminContainerList() {
                                         </div>
                                     </div>
                                 </td>
-                                <td>
-                                    {carbon.productDesc && carbon.productDesc.trim() !== "" && (<span className={styles.badge}>{carbon.productDesc}</span>)}
+                                <td className={styles.col_desc}>
+                                    {carbon.productDesc && carbon.productDesc.trim() !== "" && (
+                                        <span className={styles.badge}>{carbon.productDesc}</span>
+                                    )}
                                 </td>
-                                <td>{carbon.productEmissions} g</td>
+                                <td className={styles.col_emissions}>{carbon.productEmissions} g</td>
                                 <td className={styles.iconContain}>
-                                    {/*수정*/}
                                     <button
                                         className={styles.edit_btn}
                                         onClick={() => navigate(`/mypage/admin/containers/detail/${carbon.productId}`, {
@@ -206,7 +216,6 @@ export default function AdminContainerList() {
                                     >
                                         <EditIcon className={styles.edit_icon} />
                                     </button>
-
                                     <button
                                         className={styles.delete_btn}
                                         onClick={() => handleDelete(carbon.productId)}

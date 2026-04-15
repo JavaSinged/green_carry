@@ -171,11 +171,7 @@ export default function ManagerInfoEdit() {
           >
             {previewImg ? (
               <img
-                src={
-                  previewImg.startsWith("blob:")
-                    ? previewImg
-                    : `${backHost}${previewImg}`
-                }
+                src={previewImg.startsWith("blob:") ? previewImg : previewImg}
                 alt="profile"
                 className={styles.profile_image}
                 style={{

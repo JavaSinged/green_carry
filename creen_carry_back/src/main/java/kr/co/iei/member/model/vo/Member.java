@@ -32,7 +32,7 @@ public class Member {
 	private Integer memberPoint; // MEMBER_POINT (NUMBER) : 보유 포인트
 	private Integer memberStatus; // MEMBER_STATUS (NUMBER) : 1:활동중, 2:정지, 3:탈퇴
 	private String enrollDate; // ENROLL_DATE (DATE) : 가입일 (화면 출력을 위해 String으로 받음)
-
+	private Double totalCarbonReduce;
 	// 4. 사업자 전용 정보 (MEMBER_GRADE가 2인 경우 사용)
 	/*
 	private String storeOwnerNo; // STORE_OWNER_NO (NUMBER) : 사업자 등록 번호 (10자리 숫자이므로 Long 사용)

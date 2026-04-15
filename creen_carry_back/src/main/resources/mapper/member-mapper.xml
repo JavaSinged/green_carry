@@ -131,8 +131,10 @@
 	</update>
 
 	<select id="getTotalCarbonPoint" parameterType="string"
-		resultType="Double">
-		SELECT NVL(total_carbon_reduce, 0)
+		resultType="Member">
+		SELECT 
+		member_point,
+		total_carbon_reduce
 		FROM member_tbl
 		WHERE member_id = #{memberId}
 	</select>
@@ -260,6 +262,7 @@
 		JOIN store_tbl s ON
 		o.store_id = s.store_id
 		WHERE o.member_id = #{memberId}
+		AND o.order_status > 0
 		AND m.reg_date
 		>= ADD_MONTHS(SYSDATE, -3)
 		AND (o.get_point > 0 OR o.used_point > 0)

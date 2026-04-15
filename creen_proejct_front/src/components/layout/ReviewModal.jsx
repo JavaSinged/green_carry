@@ -75,9 +75,7 @@ export default function ReviewModal({ order, onClose }) {
         <div className={styles.order_card}>
           <img
             src={
-              order.storeThumb
-                ? `${backHost}/${order.storeThumb}`
-                : "/default-image.png"
+              order.storeThumb ? `${order.storeThumb}` : "/default-image.png"
             }
             alt="store"
             className={styles.order_img}

@@ -130,7 +130,7 @@ const ManagerMenuList = () => {
                 {/* 🌟 1. 이미지가 있으면 img 태그를, 없으면 기본 아이콘을 출력합니다. */}
                 {menu.menuImage ? (
                   <img
-                    src={`${backHost}${menu.menuImage}`}
+                    src={menu.menuImage}
                     alt={menu.menuName}
                     className={styles.menu_img} // CSS에서 크기 조절 필요
                     onError={(e) => {

@@ -143,8 +143,8 @@ const UserReviewList = () => {
                   src={
                     review.reviewThumb
                       ? review.reviewThumb.startsWith("/")
-                        ? `${backHost}${review.reviewThumb}`
-                        : `${backHost}/uploads/review/${review.reviewThumb}`
+                        ? `${review.reviewThumb}`
+                        : `${review.reviewThumb}`
                       : "/image/no-image.png"
                   }
                   alt="리뷰사진"
@@ -161,7 +161,7 @@ const UserReviewList = () => {
                         <img
                           src={
                             review.memberProfile
-                              ? `${backHost}${review.memberProfile}`
+                              ? `${review.memberProfile}`
                               : "/image/default-user.png"
                           }
                           alt="avatar"
