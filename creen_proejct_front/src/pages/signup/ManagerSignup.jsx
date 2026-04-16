@@ -7,7 +7,7 @@ import useEcoEffects from "../../hooks/useEcoEffects";
 import styles from "./UserSignup.module.css";
 
 const ManagerSignup = () => {
-  // ?뙚 leafData(?섎춪???④낵) 異붽?
+  // 코덱스가 수정함: leafData와 fireflyData를 함께 사용
   const {
     containerRef,
     bubblesRef,
@@ -53,7 +53,7 @@ const ManagerSignup = () => {
   const inputMember = (e) => {
     const { name, value } = e.target;
 
-    // 1. ?대???踰덊샇 ?먮룞 ?섏씠??
+    // 휴대폰 번호 자동 하이픈 처리
     if (name === "memberPhone") {
       const onlyNums = value.replace(/[^0-9]/g, "");
       let formattedPhone = "";
@@ -67,27 +67,27 @@ const ManagerSignup = () => {
       return;
     }
 
-    // 2. ?곗씠??遺꾨같 濡쒖쭅
+    // 입력값에 따라 member/store 상태를 분리해서 반영
     if (name === "memberId") {
-      // memberId???묒そ ???낅뜲?댄듃
+      // memberId는 member와 store에 함께 반영
       setMember((prev) => ({ ...prev, memberId: value }));
       setStore((prev) => ({ ...prev, memberId: value }));
       setCheckId(0);
     } else if (name === "memberName") {
-      // memberName???ㅼ뼱?ㅻ㈃ member?먮뒗 ?깅챸?쇰줈, store?먮뒗 ??쒖옄紐낆쑝濡????
+      // memberName은 회원 이름과 대표자명으로 함께 사용
       setMember((prev) => ({ ...prev, memberName: value }));
       setStore((prev) => ({ ...prev, storeOwner: value }));
     } else if (name === "storeName") {
-      // ?곹샇紐낆? store ?곹깭?먮쭔 ???
+      // 상호명은 store 상태에만 반영
       setStore((prev) => ({ ...prev, storeName: value }));
     } else {
-      // ?섎㉧吏(PW, Email ????member ?곹깭?먮쭔 ???
+      // 나머지 값은 member 상태에만 반영
       setMember((prev) => ({ ...prev, [name]: value }));
     }
 
     if (name === "memberEmail") setMailAuth(0);
 
-    // 2. ?ъ뾽??踰덊샇 ?먮룞 ?섏씠??
+    // 사업자번호 자동 하이픈 처리
     /*
     if (name === "storeOwnerNo") {
       const onlyNums = value.replace(/[^0-9]/g, "");
@@ -105,7 +105,7 @@ const ManagerSignup = () => {
   };
   const handleIdCheck = () => {
     if (!idRegex.test(member.memberId)) {
-      Swal.fire({ icon: "warning", text: "?꾩씠???뺤떇??癒쇱? 留욎떠二쇱꽭??" });
+      Swal.fire({ icon: "warning", text: "아이디 형식을 먼저 맞춰주세요." });
       return;
     }
     axios
@@ -114,17 +114,17 @@ const ManagerSignup = () => {
       )
       .then((res) => {
         if (res.data) {
-          Swal.fire({ icon: "success", text: "?ъ슜 媛?ν븳 ?꾩씠?붿엯?덈떎." });
+          Swal.fire({ icon: "success", text: "사용 가능한 아이디입니다." });
           setCheckId(2);
         } else {
-          Swal.fire({ icon: "error", text: "?대? ?ъ슜以묒씤 ?꾩씠?붿엯?덈떎!" });
+          Swal.fire({ icon: "error", text: "이미 사용 중인 아이디입니다." });
           setCheckId(1);
         }
       })
       .catch((err) => {
         Swal.fire({
           icon: "error",
-          text: "?쒕쾭? ?듭떊 以??ㅻ쪟媛 諛쒖깮?덉뒿?덈떎.",
+          text: "서버와 통신 중 오류가 발생했습니다.",
         });
       });
   };
@@ -133,7 +133,7 @@ const ManagerSignup = () => {
     if (!emailRegex.test(member.memberEmail)) {
       Swal.fire({
         icon: "warning",
-        text: "?щ컮瑜??대찓???뺤떇??癒쇱? ?낅젰?댁＜?몄슂.",
+        text: "올바른 이메일 형식을 먼저 입력해주세요.",
       });
       return;
     }
@@ -144,7 +144,7 @@ const ManagerSignup = () => {
         );
         if (res.data) setCheckEmail(2);
         else {
-          Swal.fire({ icon: "error", text: "?대? ?ъ슜以묒씤 ?대찓?쇱엯?덈떎." });
+          Swal.fire({ icon: "error", text: "이미 사용 중인 이메일입니다." });
           setCheckEmail(1);
           return;
         }
@@ -168,7 +168,7 @@ const ManagerSignup = () => {
         setTimeout(intervalId);
       })
       .catch((err) => {
-        Swal.fire({ icon: "error", text: "硫붿씪 諛쒖넚 以??ㅻ쪟媛 諛쒖깮?덉뒿?덈떎." });
+        Swal.fire({ icon: "error", text: "메일 발송 중 오류가 발생했습니다." });
       });
   };
 
@@ -176,19 +176,19 @@ const ManagerSignup = () => {
     if (mailAuth !== 2) {
       Swal.fire({
         icon: "warning",
-        text: "癒쇱? ?몄쬆 ?대찓???꾩넚 踰꾪듉???뚮윭二쇱꽭??",
+        text: "먼저 인증 메일 발송 버튼을 눌러주세요.",
       });
       return;
     }
     if (String(mailAuthCode) === mailAuthInput) {
-      Swal.fire({ icon: "success", text: "?대찓???몄쬆???꾨즺?섏뿀?듬땲??" });
+      Swal.fire({ icon: "success", text: "이메일 인증이 완료되었습니다." });
       setMailAuth(3);
       window.clearInterval(timeout);
       setTimeout(null);
     } else {
       Swal.fire({
         icon: "error",
-        text: "?몄쬆踰덊샇媛 ?쇱튂?섏? ?딆뒿?덈떎. ?ㅼ떆 ?뺤씤?댁＜?몄슂.",
+        text: "인증번호가 일치하지 않습니다. 다시 확인해주세요.",
       });
     }
   };
@@ -200,7 +200,7 @@ const ManagerSignup = () => {
       setTimeout(null);
       Swal.fire({
         icon: "error",
-        text: "?몄쬆 ?쒓컙??留뚮즺?섏뿀?듬땲?? ?ㅼ떆 ?쒕룄?댁＜?몄슂.",
+        text: "인증 시간이 만료되었습니다. 다시 시도해주세요.",
       });
       setMailAuth(0);
     }
@@ -216,7 +216,7 @@ const ManagerSignup = () => {
     if (member.storeOwnerNo.length < 12) {
       Swal.fire({
         icon: "warning",
-        text: "?ъ뾽?먮쾲??10?먮━瑜?紐⑤몢 ?낅젰?댁＜?몄슂.",
+        text: "사업자번호 10자리를 모두 입력해주세요.",
       });
       return;
     }
@@ -230,16 +230,16 @@ const ManagerSignup = () => {
       )
       .then((res) => {
         if (res.data === null || res.data === "") {
-          Swal.fire({ icon: "success", text: "媛??媛?ν븳 ?ъ뾽?먮쾲?몄엯?덈떎!" });
+          Swal.fire({ icon: "success", text: "사용 가능한 사업자번호입니다." });
           setCheckStoreOwnerNo(2);
         } else {
-          Swal.fire({ icon: "error", text: "以묐났???ъ뾽??踰덊샇 ?낅땲??" });
+          Swal.fire({ icon: "error", text: "중복된 사업자번호입니다." });
         }
       })
       .catch((err) => {
         Swal.fire({
           icon: "error",
-          text: "?ъ뾽??踰덊샇 以묐났 ?뺤씤 以??쒕쾭 ?ㅻ쪟媛 諛쒖깮?덉뒿?덈떎.",
+          text: "사업자번호 중복 확인 중 서버 오류가 발생했습니다.",
         });
       });
   };
@@ -248,85 +248,85 @@ const ManagerSignup = () => {
   const getIdMessage = () => {
     if (!member.memberId)
       return {
-        text: isSubmitted ? "?꾩씠?붾? ?낅젰?섏꽭??" : "\u00A0",
+        text: isSubmitted ? "아이디를 입력해주세요." : "\u00A0",
         isError: isSubmitted,
       };
     if (!idRegex.test(member.memberId))
-      return { text: "?곷Ц, ?レ옄 議고빀 8???댁긽 ?낅젰?댁＜?몄슂.", isError: true };
+      return { text: "영문, 숫자 조합 8자 이상 입력해주세요.", isError: true };
     if (checkId !== 2)
-      return { text: "以묐났 ?뺤씤 踰꾪듉???뚮윭二쇱꽭??", isError: true };
-    return { text: "?ъ슜 媛?ν븳 ?꾩씠?붿엯?덈떎.", isError: false };
+      return { text: "중복 확인 버튼을 눌러주세요.", isError: true };
+    return { text: "사용 가능한 아이디입니다.", isError: false };
   };
   const getPwMessage = () => {
     if (!member.memberPw)
       return {
-        text: isSubmitted ? "鍮꾨?踰덊샇瑜??낅젰?섏꽭??" : "\u00A0",
+        text: isSubmitted ? "비밀번호를 입력해주세요." : "\u00A0",
         isError: isSubmitted,
       };
     if (!pwRegex.test(member.memberPw))
       return {
-        text: "?곷Ц ?/?뚮Ц?? ?レ옄, ?뱀닔湲고샇 ?ы븿 10???댁긽 ?낅젰?댁＜?몄슂.",
+        text: "영문 대/소문자, 숫자, 특수기호 포함 10자 이상 입력해주세요.",
         isError: true,
       };
-    return { text: "?ъ슜 媛?ν븳 鍮꾨?踰덊샇?낅땲??", isError: false };
+    return { text: "사용 가능한 비밀번호입니다.", isError: false };
   };
   const getPwReMessage = () => {
     if (!memberPwRe)
       return {
-        text: isSubmitted ? "鍮꾨?踰덊샇 ?뺤씤???낅젰?섏꽭??" : "\u00A0",
+        text: isSubmitted ? "비밀번호 확인을 입력해주세요." : "\u00A0",
         isError: isSubmitted,
       };
     if (member.memberPw !== memberPwRe)
-      return { text: "鍮꾨?踰덊샇? ?쇱튂?섏? ?딆뒿?덈떎.", isError: true };
-    return { text: "鍮꾨?踰덊샇? ?쇱튂?⑸땲??", isError: false };
+      return { text: "비밀번호가 일치하지 않습니다.", isError: true };
+    return { text: "비밀번호가 일치합니다.", isError: false };
   };
   const getEmailMessage = () => {
     if (!member.memberEmail)
       return {
-        text: isSubmitted ? "?대찓?쇱쓣 ?낅젰?섏꽭??" : "\u00A0",
+        text: isSubmitted ? "이메일을 입력해주세요." : "\u00A0",
         isError: isSubmitted,
       };
     if (!emailRegex.test(member.memberEmail))
-      return { text: "?щ컮瑜??대찓???뺤떇???낅젰?댁＜?몄슂.", isError: true };
+      return { text: "올바른 이메일 형식을 입력해주세요.", isError: true };
     if (mailAuth === 0)
-      return { text: "?몄쬆 ?대찓?쇱쓣 ?꾩넚?댁＜?몄슂.", isError: true };
+      return { text: "인증 이메일을 발송해주세요.", isError: true };
     if (mailAuth === 2)
       return {
-        text: `?몄쬆踰덊샇瑜??낅젰?섏꽭?? (?⑥? ?쒓컙: ${showTime()})`,
+        text: `인증번호를 입력해주세요. (남은 시간: ${showTime()})`,
         isError: true,
       };
     if (mailAuth === 3)
-      return { text: "?대찓???몄쬆???꾨즺?섏뿀?듬땲??", isError: false };
+      return { text: "이메일 인증이 완료되었습니다.", isError: false };
     return { text: "\u00A0", isError: false };
   };
   /*
   const getStoreOwnerNoMessage = () => {
     if (!member.storeOwnerNo.trim())
       return {
-        text: isSubmitted ? "?ъ뾽?먮쾲?몃? ?낅젰?섏꽭??" : "\u00A0",
+        text: isSubmitted ? "사업자번호를 입력해주세요." : "\u00A0",
         isError: isSubmitted,
       };
     if (member.storeOwnerNo.length < 12)
-      return { text: "?ъ뾽?먮쾲??10?먮━瑜?紐⑤몢 ?낅젰?댁＜?몄슂.", isError: true };
+      return { text: "사업자번호 10자리를 모두 입력해주세요.", isError: true };
     if (checkStoreOwnerNo !== 2)
-      return { text: "?ъ뾽?먮쾲??以묐났 ?뺤씤???뚮윭二쇱꽭??", isError: true };
-    return { text: "媛??媛?ν븳 ?ъ뾽??踰덊샇?낅땲??", isError: false };
+      return { text: "사업자번호 중복 확인을 눌러주세요.", isError: true };
+    return { text: "사용 가능한 사업자번호입니다.", isError: false };
   };
   */
   const getPhoneMessage = () => {
     if (!member.memberPhone.trim())
       return {
-        text: isSubmitted ? "?대???踰덊샇瑜??낅젰?섏꽭??" : "\u00A0",
+        text: isSubmitted ? "휴대폰 번호를 입력해주세요." : "\u00A0",
         isError: isSubmitted,
       };
     if (member.memberPhone.length < 13)
-      return { text: "?곕씫泥?11?먮━瑜?紐⑤몢 ?낅젰?댁＜?몄슂.", isError: true };
+      return { text: "연락처 11자리를 모두 입력해주세요.", isError: true };
     return { text: "\u00A0", isError: false };
   };
   const getStoreNameMessage = () => {
     if (!store.storeName.trim())
       return {
-        text: isSubmitted ? "?곹샇紐낆쓣 ?낅젰?섏꽭??" : "\u00A0",
+        text: isSubmitted ? "상호명을 입력해주세요." : "\u00A0",
         isError: isSubmitted,
       };
     return { text: "\u00A0", isError: false };
@@ -334,7 +334,7 @@ const ManagerSignup = () => {
   const getMemberNameMessage = () => {
     if (!member.memberName.trim())
       return {
-        text: isSubmitted ? "??쒖옄?깅챸???낅젰?섏꽭??" : "\u00A0",
+        text: isSubmitted ? "대표자명을 입력해주세요." : "\u00A0",
         isError: isSubmitted,
       };
     return { text: "\u00A0", isError: false };
@@ -343,7 +343,7 @@ const ManagerSignup = () => {
   const getOpeningDateMessage = () => {
     if (!member.openingDate.trim())
       return {
-        text: isSubmitted ? "媛쒖뾽?쇱옄瑜??좏깮?섏꽭??" : "\u00A0",
+        text: isSubmitted ? "개업일자를 선택해주세요." : "\u00A0",
         isError: isSubmitted,
       };
     return { text: "\u00A0", isError: false };
@@ -387,7 +387,7 @@ const ManagerSignup = () => {
     ) {
       Swal.fire({
         icon: "warning",
-        text: "?낅젰?섏떊 ?뺣낫瑜??ㅼ떆 ?뺤씤?댁＜?몄슂.",
+        text: "입력하신 정보를 다시 확인해주세요.",
       });
       return;
     }
@@ -404,7 +404,7 @@ const ManagerSignup = () => {
       .then((res) => {
         Swal.fire({
           icon: "success",
-          text: "?ъ뾽???뚯썝媛?낆씠 ?꾨즺?섏뿀?듬땲??",
+          text: "사업자 회원가입이 완료되었습니다.",
         }).then(() => {
           navigate("/login");
         });
@@ -412,7 +412,7 @@ const ManagerSignup = () => {
       .catch((err) => {
         Swal.fire({
           icon: "error",
-          text: "?뚯썝媛??泥섎━ 以??ㅻ쪟媛 諛쒖깮?덉뒿?덈떎.",
+          text: "회원가입 처리 중 오류가 발생했습니다.",
         });
       });
   };
@@ -433,7 +433,7 @@ const ManagerSignup = () => {
       ref={containerRef}
       style={{ backgroundImage: `url(${selectedBg})` }}
     >
-      {/* ?뛽 留덉슦???섎춪???④낵 */}
+      {/* 마우스 이동 이펙트 */}
       {leafData &&
         leafData.map((leaf) => (
           <div
@@ -456,7 +456,7 @@ const ManagerSignup = () => {
           />
         ))}
 
-      {/* ?ェ ?먯퐫 踰꾨툝 */}
+      {/* 에코 버블 */}
       {bubbleData.map((style, i) => (
         <div
           key={i}
@@ -479,12 +479,12 @@ const ManagerSignup = () => {
           </h1>
         </header>
 
-        {/* ?뙚 ?곸꽭?쇱씠誘濡??ㅽ겕濡?吏??移대뱶 ?곸슜 */}
+        {/* 스크롤 가능한 카드 레이아웃 */}
         <div className={`${styles.signupCard} ${styles.signupCardScroll}`}>
           <h2 className={styles.signupTitle}>사업자 회원가입</h2>
 
           <form className={styles.signupForm} onSubmit={joinSubmit}>
-            {/* ?꾩씠??*/}
+            {/* 아이디 */}
             <div className={styles.signupFieldGroup}>
               <label className={styles.signupLabel}>아이디</label>
               <div className={styles.signupInputArea}>
@@ -495,7 +495,7 @@ const ManagerSignup = () => {
                     value={member.memberId}
                     onChange={inputMember}
                     className={styles.signupInputUnderline}
-                    placeholder="?곷Ц, ?レ옄 議고빀 8???댁긽"
+                    placeholder="영문, 숫자 조합 8자 이상"
                     readOnly={checkId === 2}
                   />
                   <button
@@ -504,7 +504,7 @@ const ManagerSignup = () => {
                     onClick={handleIdCheck}
                     disabled={checkId === 2}
                   >
-                    以묐났 ?뺤씤
+                    중복 확인
                   </button>
                 </div>
                 <p
@@ -515,9 +515,9 @@ const ManagerSignup = () => {
               </div>
             </div>
 
-            {/* 鍮꾨?踰덊샇 */}
+            {/* 비밀번호 */}
             <div className={styles.signupFieldGroup}>
-              <label className={styles.signupLabel}>鍮꾨?踰덊샇</label>
+              <label className={styles.signupLabel}>비밀번호</label>
               <div className={styles.signupInputArea}>
                 <input
                   type="password"
@@ -525,7 +525,7 @@ const ManagerSignup = () => {
                   value={member.memberPw}
                   onChange={inputMember}
                   className={styles.signupInputUnderline}
-                  placeholder="?곷Ц ?/?뚮Ц?? ?レ옄, ?뱀닔湲고샇 ?ы븿 10???댁긽"
+                  placeholder="영문 대/소문자, 숫자, 특수기호 포함 10자 이상"
                 />
                 <p
                   className={`${styles.signupStatusMsg} ${pwStatus.isError ? styles.signupErrorMsg : ""}`}
@@ -535,9 +535,9 @@ const ManagerSignup = () => {
               </div>
             </div>
 
-            {/* 鍮꾨?踰덊샇 ?뺤씤 */}
+            {/* 비밀번호 확인 */}
             <div className={styles.signupFieldGroup}>
-              <label className={styles.signupLabel}>鍮꾨?踰덊샇 ?뺤씤</label>
+              <label className={styles.signupLabel}>비밀번호 확인</label>
               <div className={styles.signupInputArea}>
                 <input
                   type="password"
@@ -555,7 +555,7 @@ const ManagerSignup = () => {
               </div>
             </div>
 
-            {/* ?대찓??*/}
+            {/* 이메일 */}
             <div className={styles.signupFieldGroup}>
               <label className={styles.signupLabel}>이메일</label>
               <div className={styles.signupInputArea}>
@@ -582,7 +582,7 @@ const ManagerSignup = () => {
                   <input
                     type="text"
                     className={styles.signupInputUnderline}
-                    placeholder="?몄쬆踰덊샇"
+                    placeholder="인증번호"
                     value={mailAuthInput}
                     onChange={(e) => setMailAuthInput(e.target.value)}
                     disabled={mailAuth !== 2}
@@ -593,7 +593,7 @@ const ManagerSignup = () => {
                     onClick={handleVerifyMail}
                     disabled={mailAuth !== 2}
                   >
-                    ?몄쬆踰덊샇 ?뺤씤
+                    인증번호 확인
                   </button>
                 </div>
                 <p
@@ -604,9 +604,9 @@ const ManagerSignup = () => {
               </div>
             </div>
 
-            {/* ?대???踰덊샇 */}
+            {/* 휴대폰 번호 */}
             <div className={styles.signupFieldGroup}>
-              <label className={styles.signupLabel}>?대???踰덊샇</label>
+              <label className={styles.signupLabel}>휴대폰 번호</label>
               <div className={styles.signupInputArea}>
                 <input
                   type="text"
@@ -625,9 +625,9 @@ const ManagerSignup = () => {
             </div>
 
             {/* 
-            ?ъ뾽??踰덊샇 
+            사업자번호
             <div className={styles.signupFieldGroup}>
-              <label className={styles.signupLabel}>?ъ뾽??踰덊샇</label>
+              <label className={styles.signupLabel}>사업자번호</label>
               <div className={styles.signupInputArea}>
                 <div className={styles.signupInputInner}>
                   <input
@@ -636,7 +636,7 @@ const ManagerSignup = () => {
                     value={member.storeOwnerNo}
                     onChange={inputMember}
                     className={styles.signupInputUnderline}
-                    placeholder="?レ옄留??낅젰?섏꽭??
+                    placeholder="숫자만 입력해주세요."
                     readOnly={checkStoreOwnerNo === 2}
                   />
                   <button
@@ -645,7 +645,7 @@ const ManagerSignup = () => {
                     onClick={handleStoreOwnerNoCheck}
                     disabled={checkStoreOwnerNo === 2}
                   >
-                    以묐났 ?뺤씤
+                    중복 확인
                   </button>
                 </div>
                 <p
@@ -657,7 +657,7 @@ const ManagerSignup = () => {
             </div>
             */}
 
-            {/* ?곹샇紐?*/}
+            {/* 상호명 */}
             <div className={styles.signupFieldGroup}>
               <label className={styles.signupLabel}>상호명</label>
               <div className={styles.signupInputArea}>
@@ -677,9 +677,9 @@ const ManagerSignup = () => {
               </div>
             </div>
 
-            {/* ??쒖옄?깅챸 */}
+            {/* 대표자명 */}
             <div className={styles.signupFieldGroup}>
-              <label className={styles.signupLabel}>??쒖옄?깅챸</label>
+              <label className={styles.signupLabel}>대표자명</label>
               <div className={styles.signupInputArea}>
                 <input
                   type="text"
@@ -698,9 +698,9 @@ const ManagerSignup = () => {
             </div>
 
             {/*
-             ?뙚 媛쒖뾽?쇱옄 (?щ젰???쇱쓣 源⑥? ?딅룄濡?position ?ㅼ젙) 
+             개업일자 선택 영역
             <div className={styles.signupFieldGroup}>
-              <label className={styles.signupLabel}>媛쒖뾽?쇱옄</label>
+              <label className={styles.signupLabel}>개업일자</label>
               <div className={styles.signupInputArea}>
                 <div
                   style={{
@@ -768,7 +768,7 @@ const ManagerSignup = () => {
             </div>
             */}
 
-            {/* 媛??踰꾪듉 */}
+            {/* 가입 버튼 */}
             <button type="submit" className={styles.signupBtn}>
               사업자 회원가입
             </button>

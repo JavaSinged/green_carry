@@ -68,7 +68,7 @@ const UserSignup = () => {
 
   const handleIdCheck = () => {
     if (!idRegex.test(member.memberId)) {
-      Swal.fire({ icon: "warning", text: "?꾩씠???뺤떇??癒쇱? 留욎떠二쇱꽭??" });
+      Swal.fire({ icon: "warning", text: "아이디 형식을 먼저 맞춰주세요." });
       return;
     }
     axios
@@ -77,17 +77,17 @@ const UserSignup = () => {
       )
       .then((res) => {
         if (res.data) {
-          Swal.fire({ icon: "success", text: "?ъ슜 媛?ν븳 ?꾩씠?붿엯?덈떎." });
+          Swal.fire({ icon: "success", text: "사용 가능한 아이디입니다." });
           setCheckId(2);
         } else {
-          Swal.fire({ icon: "error", text: "?대? ?ъ슜以묒씤 ?꾩씠?붿엯?덈떎!" });
+          Swal.fire({ icon: "error", text: "이미 사용 중인 아이디입니다." });
           setCheckId(1);
         }
       })
       .catch((err) => {
         Swal.fire({
           icon: "error",
-          text: "?쒕쾭? ?듭떊 以??ㅻ쪟媛 諛쒖깮?덉뒿?덈떎.",
+          text: "서버와 통신 중 오류가 발생했습니다.",
         });
       });
   };
@@ -96,7 +96,7 @@ const UserSignup = () => {
     if (!emailRegex.test(member.memberEmail)) {
       Swal.fire({
         icon: "warning",
-        text: "?щ컮瑜??대찓???뺤떇??癒쇱? ?낅젰?댁＜?몄슂.",
+        text: "올바른 이메일 형식을 먼저 입력해주세요.",
       });
       return;
     }
@@ -107,7 +107,7 @@ const UserSignup = () => {
         );
         if (res.data) setCheckEmail(2);
         else {
-          Swal.fire({ icon: "error", text: "?대? ?ъ슜以묒씤 ?대찓?쇱엯?덈떎." });
+          Swal.fire({ icon: "error", text: "이미 사용 중인 이메일입니다." });
           setCheckEmail(1);
           return;
         }
@@ -131,7 +131,7 @@ const UserSignup = () => {
         setTimeoutId(intervalId);
       })
       .catch((err) => {
-        Swal.fire({ icon: "error", text: "硫붿씪 諛쒖넚 以??ㅻ쪟媛 諛쒖깮?덉뒿?덈떎." });
+        Swal.fire({ icon: "error", text: "메일 발송 중 오류가 발생했습니다." });
       });
   };
 
@@ -139,19 +139,19 @@ const UserSignup = () => {
     if (mailAuth !== 2) {
       Swal.fire({
         icon: "warning",
-        text: "癒쇱? ?몄쬆 ?대찓???꾩넚 踰꾪듉???뚮윭二쇱꽭??",
+        text: "먼저 인증 메일 발송 버튼을 눌러주세요.",
       });
       return;
     }
     if (String(mailAuthCode) === mailAuthInput) {
-      Swal.fire({ icon: "success", text: "?대찓???몄쬆???꾨즺?섏뿀?듬땲??" });
+      Swal.fire({ icon: "success", text: "이메일 인증이 완료되었습니다." });
       setMailAuth(3);
       window.clearInterval(timeoutId);
       setTimeoutId(null);
     } else {
       Swal.fire({
         icon: "error",
-        text: "?몄쬆踰덊샇媛 ?쇱튂?섏? ?딆뒿?덈떎. ?ㅼ떆 ?뺤씤?댁＜?몄슂.",
+        text: "인증번호가 일치하지 않습니다. 다시 확인해주세요.",
       });
     }
   };
@@ -163,7 +163,7 @@ const UserSignup = () => {
       setTimeoutId(null);
       Swal.fire({
         icon: "error",
-        text: "?몄쬆 ?쒓컙??留뚮즺?섏뿀?듬땲?? ?ㅼ떆 ?쒕룄?댁＜?몄슂.",
+        text: "인증 시간이 만료되었습니다. 다시 시도해주세요.",
       });
       setMailAuth(0);
     }
@@ -190,7 +190,7 @@ const UserSignup = () => {
       fullAddress += extraAddress !== "" ? ` (${extraAddress})` : "";
     }
 
-    // ?ㅼ씠踰?Geocoding API濡??꾧꼍??蹂??
+    // 코덱스가 수정함: 네이버 Geocoding API로 좌표를 변환
     if (window.naver && naver.maps.Service) {
       naver.maps.Service.geocode({ query: fullAddress }, (status, response) => {
         if (status === naver.maps.Service.Status.OK) {
@@ -203,7 +203,7 @@ const UserSignup = () => {
             longitude: parseFloat(result.x),
           }));
         } else {
-          console.error("醫뚰몴 蹂???ㅽ뙣");
+          console.error("좌표 변환 실패");
           setMember((prev) => ({
             ...prev,
             memberAddrcode: data.zonecode,
@@ -227,65 +227,65 @@ const UserSignup = () => {
   const getIdMessage = () => {
     if (!member.memberId)
       return {
-        text: isSubmitted ? "?꾩씠?붾? ?낅젰?섏꽭??" : "\u00A0",
+        text: isSubmitted ? "아이디를 입력해주세요." : "\u00A0",
         isError: isSubmitted,
       };
     if (!idRegex.test(member.memberId))
-      return { text: "?곷Ц, ?レ옄 議고빀 8???댁긽 ?낅젰?댁＜?몄슂.", isError: true };
+      return { text: "영문, 숫자 조합 8자 이상 입력해주세요.", isError: true };
     if (checkId !== 2)
-      return { text: "以묐났 ?뺤씤 踰꾪듉???뚮윭二쇱꽭??", isError: true };
-    return { text: "?ъ슜 媛?ν븳 ?꾩씠?붿엯?덈떎.", isError: false };
+      return { text: "중복 확인 버튼을 눌러주세요.", isError: true };
+    return { text: "사용 가능한 아이디입니다.", isError: false };
   };
 
   const getPwMessage = () => {
     if (!member.memberPw)
       return {
-        text: isSubmitted ? "鍮꾨?踰덊샇瑜??낅젰?섏꽭??" : "\u00A0",
+        text: isSubmitted ? "비밀번호를 입력해주세요." : "\u00A0",
         isError: isSubmitted,
       };
     if (!pwRegex.test(member.memberPw))
       return {
-        text: "?곷Ц ?/?뚮Ц?? ?レ옄, ?뱀닔湲고샇 ?ы븿 10???댁긽 ?낅젰?댁＜?몄슂.",
+        text: "영문 대/소문자, 숫자, 특수기호 포함 10자 이상 입력해주세요.",
         isError: true,
       };
-    return { text: "?ъ슜 媛?ν븳 鍮꾨?踰덊샇?낅땲??", isError: false };
+    return { text: "사용 가능한 비밀번호입니다.", isError: false };
   };
 
   const getPwReMessage = () => {
     if (!memberPwRe)
       return {
-        text: isSubmitted ? "鍮꾨?踰덊샇 ?뺤씤???낅젰?섏꽭??" : "\u00A0",
+        text: isSubmitted ? "비밀번호 확인을 입력해주세요." : "\u00A0",
         isError: isSubmitted,
       };
     if (member.memberPw !== memberPwRe)
-      return { text: "鍮꾨?踰덊샇? ?쇱튂?섏? ?딆뒿?덈떎.", isError: true };
-    return { text: "鍮꾨?踰덊샇? ?쇱튂?⑸땲??", isError: false };
+      return { text: "비밀번호가 일치하지 않습니다.", isError: true };
+    return { text: "비밀번호가 일치합니다.", isError: false };
   };
 
   const getEmailMessage = () => {
     if (!member.memberEmail)
       return {
-        text: isSubmitted ? "?대찓?쇱쓣 ?낅젰?섏꽭??" : "\u00A0",
+        text: isSubmitted ? "이메일을 입력해주세요." : "\u00A0",
         isError: isSubmitted,
       };
     if (!emailRegex.test(member.memberEmail))
-      return { text: "?щ컮瑜??대찓???뺤떇???낅젰?댁＜?몄슂.", isError: true };
+      return { text: "올바른 이메일 형식을 입력해주세요.", isError: true };
     if (mailAuth === 0)
-      return { text: "?몄쬆 ?대찓?쇱쓣 ?꾩넚?댁＜?몄슂.", isError: true };
+      return { text: "인증 이메일을 발송해주세요.", isError: true };
     if (mailAuth === 2)
       return {
-        text: `?몄쬆踰덊샇瑜??낅젰?섏꽭?? (?⑥? ?쒓컙: ${showTime()})`,
+        text: `인증번호를 입력해주세요. (남은 시간: ${showTime()})`,
         isError: true,
       };
     if (mailAuth === 3)
-      return { text: "?대찓???몄쬆???꾨즺?섏뿀?듬땲??", isError: false };
+      return { text: "이메일 인증이 완료되었습니다.", isError: false };
     return { text: "\u00A0", isError: false };
   };
 
   const getNameMessage = () => {
     if (!member.memberName.trim())
       return {
-        text: isSubmitted ? "?대쫫???낅젰?섏꽭??" : "\u00A0",
+        text: isSubmitted ? "이름을 입력해주세요." : "\u00A0",
         isError: isSubmitted,
       };
     return { text: "\u00A0", isError: false };
@@ -294,18 +294,18 @@ const UserSignup = () => {
   const getPhoneMessage = () => {
     if (!member.memberPhone.trim())
       return {
-        text: isSubmitted ? "?대???踰덊샇瑜??낅젰?섏꽭??" : "\u00A0",
+        text: isSubmitted ? "휴대폰 번호를 입력해주세요." : "\u00A0",
         isError: isSubmitted,
       };
     if (member.memberPhone.length < 13)
-      return { text: "?곕씫泥?11?먮━瑜?紐⑤몢 ?낅젰?댁＜?몄슂.", isError: true };
+      return { text: "연락처 11자리를 모두 입력해주세요.", isError: true };
     return { text: "\u00A0", isError: false };
   };
 
   const getAddrMessage = () => {
     if (!member.memberAddrcode || !member.memberDetailAddr.trim())
       return {
-        text: isSubmitted ? "二쇱냼 諛??곸꽭 二쇱냼瑜?紐⑤몢 ?낅젰?댁＜?몄슂." : "\u00A0",
+        text: isSubmitted ? "주소 및 상세 주소를 모두 입력해주세요." : "\u00A0",
         isError: isSubmitted,
       };
     return { text: "\u00A0", isError: false };
@@ -344,7 +344,7 @@ const UserSignup = () => {
     ) {
       Swal.fire({
         icon: "warning",
-        text: "?낅젰?섏떊 ?뺣낫瑜??ㅼ떆 ?뺤씤?댁＜?몄슂.",
+        text: "입력하신 정보를 다시 확인해주세요.",
       });
       return;
     }
@@ -354,7 +354,7 @@ const UserSignup = () => {
       .then((res) => {
         Swal.fire({
           icon: "success",
-          text: "?뚯썝媛?낆씠 ?꾨즺?먯뒿?덈떎. 濡쒓렇?명럹?댁?濡??대룞?⑸땲??",
+          text: "회원가입이 완료되었습니다. 로그인 페이지로 이동합니다.",
         }).then(() => {
           navigate("/login");
         });
@@ -427,8 +427,8 @@ const UserSignup = () => {
                     name="memberId"
                     value={member.memberId}
                     onChange={inputMember}
-                    className={styles.signupInputUnderline}
-                    placeholder="?곷Ц, ?レ옄 議고빀 8???댁긽"
+                  className={styles.signupInputUnderline}
+                    placeholder="영문, 숫자 조합 8자 이상"
                     readOnly={checkId === 2}
                   />
                   <button
@@ -437,7 +437,7 @@ const UserSignup = () => {
                     onClick={handleIdCheck}
                     disabled={checkId === 2}
                   >
-                    以묐났 ?뺤씤
+                    중복 확인
                   </button>
                 </div>
                 <p
@@ -449,7 +449,7 @@ const UserSignup = () => {
             </div>
 
             <div className={styles.signupFieldGroup}>
-              <label className={styles.signupLabel}>鍮꾨?踰덊샇</label>
+              <label className={styles.signupLabel}>비밀번호</label>
               <div className={styles.signupInputArea}>
                 <input
                   type="password"
@@ -457,7 +457,7 @@ const UserSignup = () => {
                   value={member.memberPw}
                   onChange={inputMember}
                   className={styles.signupInputUnderline}
-                  placeholder="?곷Ц ?/?뚮Ц?? ?レ옄, ?뱀닔湲고샇 ?ы븿 10???댁긽"
+                  placeholder="영문 대/소문자, 숫자, 특수기호 포함 10자 이상"
                 />
                 <p
                   className={`${styles.signupStatusMsg} ${pwStatus.isError ? styles.signupErrorMsg : ""}`}
@@ -468,7 +468,7 @@ const UserSignup = () => {
             </div>
 
             <div className={styles.signupFieldGroup}>
-              <label className={styles.signupLabel}>鍮꾨?踰덊샇 ?뺤씤</label>
+              <label className={styles.signupLabel}>비밀번호 확인</label>
               <div className={styles.signupInputArea}>
                 <input
                   type="password"
@@ -487,7 +487,7 @@ const UserSignup = () => {
             </div>
 
             <div className={styles.signupFieldGroup}>
-              <label className={styles.signupLabel}>?대쫫</label>
+              <label className={styles.signupLabel}>이름</label>
               <div className={styles.signupInputArea}>
                 <input
                   type="text"
@@ -531,7 +531,7 @@ const UserSignup = () => {
                   <input
                     type="text"
                     className={styles.signupInputUnderline}
-                    placeholder="?몄쬆踰덊샇"
+                    placeholder="인증번호"
                     value={mailAuthInput}
                     onChange={(e) => setMailAuthInput(e.target.value)}
                     disabled={mailAuth !== 2}
@@ -542,7 +542,7 @@ const UserSignup = () => {
                     onClick={handleVerifyMail}
                     disabled={mailAuth !== 2}
                   >
-                    ?몄쬆踰덊샇 ?뺤씤
+                    인증번호 확인
                   </button>
                 </div>
                 <p
@@ -554,7 +554,7 @@ const UserSignup = () => {
             </div>
 
             <div className={styles.signupFieldGroup}>
-              <label className={styles.signupLabel}>?대???踰덊샇</label>
+              <label className={styles.signupLabel}>휴대폰 번호</label>
               <div className={styles.signupInputArea}>
                 <input
                   type="text"
@@ -573,12 +573,12 @@ const UserSignup = () => {
             </div>
 
             <div className={styles.signupFieldGroup}>
-              <label className={styles.signupLabel}>二쇱냼</label>
+              <label className={styles.signupLabel}>주소</label>
               <div className={styles.signupInputArea}>
                 <div className={styles.signupInputInner}>
                   <input
                     type="text"
-                    placeholder="?고렪踰덊샇"
+                    placeholder="우편번호"
                     name="memberAddrcode"
                     value={member.memberAddrcode}
                     className={styles.signupInputUnderline}
@@ -589,13 +589,13 @@ const UserSignup = () => {
                     className={styles.signupBtnFilled}
                     onClick={handleSearchAddress}
                   >
-                    ?고렪踰덊샇 寃??
+                    우편번호 검색
                   </button>
                 </div>
                 <div className={`${styles.signupInputInner} ${styles.signupMt10}`}>
                   <input
                     type="text"
-                    placeholder="二쇱냼"
+                    placeholder="주소"
                     name="memberAddr"
                     value={member.memberAddr}
                     className={styles.signupInputUnderline}
@@ -605,7 +605,7 @@ const UserSignup = () => {
                 <div className={`${styles.signupInputInner} ${styles.signupMt10}`}>
                   <input
                     type="text"
-                    placeholder="?곸꽭二쇱냼"
+                    placeholder="상세 주소"
                     name="memberDetailAddr"
                     value={member.memberDetailAddr}
                     onChange={inputMember}
@@ -616,7 +616,7 @@ const UserSignup = () => {
                   className={`${styles.signupStatusMsg} ${!member.memberAddrcode && isSubmitted ? styles.signupErrorMsg : ""}`}
                 >
                   {!member.memberAddrcode && isSubmitted
-                    ? "二쇱냼瑜??낅젰?댁＜?몄슂."
+                    ? "주소를 입력해주세요."
                     : "\u00A0"}
                 </p>
               </div>
