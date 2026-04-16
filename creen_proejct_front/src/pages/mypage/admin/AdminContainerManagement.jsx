@@ -5,66 +5,67 @@ import CloseIcon from "@mui/icons-material/Close";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import api from "../../../utils/accessToken";
 import Swal from "sweetalert2";
-import axios from "axios";
 
 const AdminContainerManagement = () => {
-  //용기
   const location = useLocation();
   const passedData = location.state?.carbonData;
   const backHost = import.meta.env.VITE_BACKSERVER;
+
+  // 코덱스가 수정함: Cloudinary 절대 URL과 기존 상대 경로를 모두 처리
+  const resolveImageUrl = (imagePath) => {
+    if (!imagePath) return "";
+    if (/^https?:\/\//i.test(imagePath) || imagePath.startsWith("blob:")) {
+      return imagePath;
+    }
+    return `${backHost}${imagePath.startsWith("/") ? "" : "/"}${imagePath}`;
+  };
 
   const [productName, setProductName] = useState(
     passedData?.productMaterial || "",
   );
   const [kgValue, setKgValue] = useState(passedData?.productEmissions || "");
   const [description, setDescription] = useState(passedData?.productDesc || "");
-
   const [fileName, setFileName] = useState("");
   const [fileSize, setFileSize] = useState(0);
   const [uploadFile, setUploadFile] = useState(null);
-
   const [previewImg, setPreviewImg] = useState(
-    passedData?.productImg
-      ? `${backHost}${passedData.productImg.startsWith("/") ? "" : "/"}${passedData.productImg}`
-      : "",
+    resolveImageUrl(passedData?.productImg),
   );
+  const [isDragging, setIsDragging] = useState(false);
 
   const navigate = useNavigate();
   const fileInput = useRef(null);
-  const [isDragging, setIsDragging] = useState(false);
-
-  const finalValue = kgValue.toString().replace("g", "");
   const { productId } = useParams();
+  const MAX_LENGTH = 240;
 
-  // 버튼 누를 때 작동
   const onUploadBtnClick = () => {
-    fileInput.current.click();
+    fileInput.current?.click();
   };
 
-  // 바이트 단위 변환기
   const formatBytes = (bytes) => {
     if (bytes === 0) return "0 Bytes";
     const k = 1024;
     const sizes = ["Bytes", "KB", "MB", "GB"];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
+    return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`;
   };
 
-  // 파일 첨부 취소
   const onRemoveFile = (e) => {
     e.stopPropagation();
-    if (previewImg) {
+    if (previewImg && previewImg.startsWith("blob:")) {
       URL.revokeObjectURL(previewImg);
     }
     setFileName("");
     setFileSize(0);
     setUploadFile(null);
     setPreviewImg("");
-    if (fileInput.current) fileInput.current.value = "";
+    if (fileInput.current) {
+      fileInput.current.value = "";
+    }
   };
 
   useEffect(() => {
-    if (!productId) {
+    if (!productId || productId === "new") {
       setProductName("");
       setKgValue("");
       setDescription("");
@@ -72,36 +73,32 @@ const AdminContainerManagement = () => {
       setFileSize(0);
       setUploadFile(null);
       setPreviewImg("");
-    } else if (passedData) {
+      return;
+    }
+
+    if (passedData) {
       setProductName(passedData.productMaterial || "");
       setKgValue(passedData.productEmissions || "");
       setDescription(passedData.productDesc || "");
-
-      if (passedData.productImg) {
-        setFileName(passedData.productImg);
-
-        const fullPath = passedData.productImg.startsWith("/")
-          ? `${passedData.productImg}`
-          : `${passedData.productImg}`;
-
-        setPreviewImg(fullPath);
-      }
+      setFileName(passedData.productImg || "");
+      setFileSize(0);
+      setUploadFile(null);
+      setPreviewImg(resolveImageUrl(passedData.productImg));
     }
-  }, [productId, passedData, backHost]);
+  }, [productId, passedData]);
 
-  // 공통 파일 저장 로직
   const handleSaveFile = (file) => {
-    if (file) {
-      setFileName(file.name);
-      setFileSize(file.size);
-      setUploadFile(file);
+    if (!file) return;
 
-      const imageUrl = URL.createObjectURL(file);
-      setPreviewImg(imageUrl);
+    if (previewImg && previewImg.startsWith("blob:")) {
+      URL.revokeObjectURL(previewImg);
     }
-  };
 
-  const MAX_LENGTH = 240;
+    setFileName(file.name);
+    setFileSize(file.size);
+    setUploadFile(file);
+    setPreviewImg(URL.createObjectURL(file));
+  };
 
   const handleDescriptionChange = (e) => {
     const inputText = e.target.value;
@@ -109,12 +106,15 @@ const AdminContainerManagement = () => {
       setDescription(inputText);
     }
   };
-  const handleFileChange = (e) => handleSaveFile(e.target.files[0]);
+
+  const handleFileChange = (e) => {
+    handleSaveFile(e.target.files?.[0]);
+  };
 
   const onDrop = (e) => {
     e.preventDefault();
     setIsDragging(false);
-    handleSaveFile(e.dataTransfer.files[0]);
+    handleSaveFile(e.dataTransfer.files?.[0]);
   };
 
   const onDragOver = (e) => {
@@ -122,61 +122,55 @@ const AdminContainerManagement = () => {
     setIsDragging(true);
   };
 
-  const onDragLeave = (e) => {
+  const onDragLeave = () => {
     setIsDragging(false);
   };
+
   const handleCo2Change = (e) => {
     const value = e.target.value.replace(/[^0-9.]/g, "");
     if (value.split(".").length > 2) return;
     setKgValue(value);
   };
+
   const handleSaveSubmit = async () => {
-    if (!productName)
+    if (!productName.trim()) {
       return Swal.fire("알림", "용기 이름을 입력해주세요.", "warning");
-    if (!kgValue)
+    }
+    if (!kgValue) {
       return Swal.fire("알림", "용기 탄소 배출량을 입력해주세요.", "warning");
+    }
 
     const formData = new FormData();
-    console.log("보낼 ID:", productId);
 
     if (productId && productId !== "new") {
       formData.append("productId", parseInt(productId, 10));
     }
 
-    formData.append("productMaterial", productName);
+    formData.append("productMaterial", productName.trim());
     formData.append("productEmissions", kgValue);
     formData.append("productDesc", description);
 
     if (uploadFile) {
       formData.append("uploadFile", uploadFile);
-    } else if (productId !== "new" && fileName) {
-      formData.append("productImg", fileName);
+    } else if (productId !== "new" && passedData?.productImg) {
+      formData.append("productImg", passedData.productImg);
     }
+
     try {
       const response = await api.post("/carbon-list/update", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
       if (response.data === "SUCCESS") {
-        Swal.fire("성공!", "용기 정보가 저장되었습니다.", "success").then(
-          () => {
-            navigate("/mypage/admin/containers");
-
-            setProductName("");
-            setKgValue("");
-            setDescription("");
-            setFileName("");
-            setFileSize(0);
-            setUploadFile(null);
-          },
-        );
+        Swal.fire("성공", "용기 정보가 저장되었습니다.", "success").then(() => {
+          navigate("/mypage/admin/containers");
+        });
       } else {
-        console.log("서버가 보낸 실제 값:", response.data);
-        Swal.fire("실패", `서버 대답: ${response.data}`, "error");
+        Swal.fire("실패", `서버 응답: ${response.data}`, "error");
       }
     } catch (err) {
       console.error(err);
-      Swal.fire("에러", "서버 통신 오류", "error");
+      Swal.fire("에러", "서버 통신 중 오류가 발생했습니다.", "error");
     }
   };
 
@@ -204,7 +198,7 @@ const AdminContainerManagement = () => {
             {previewImg && (
               <img
                 src={previewImg}
-                alt="미리보기"
+                alt="용기 미리보기"
                 className={styles.preview_img}
               />
             )}
@@ -213,7 +207,8 @@ const AdminContainerManagement = () => {
               <div className={styles.attached_text}>
                 <span className={styles.attached_name}>첨부 완료</span>
                 <span className={styles.attached_size}>
-                  {fileName} | {formatBytes(fileSize)}
+                  {fileName}
+                  {fileSize > 0 ? ` | ${formatBytes(fileSize)}` : ""}
                 </span>
               </div>
             </div>
@@ -233,7 +228,7 @@ const AdminContainerManagement = () => {
               className={styles.upload_icon}
             />
             <p className={styles.upload_title}>
-              용기 사진을 업로드하거나 드래그해서 넣으세요.
+              용기 사진을 업로드하거나 드래그해서 올려주세요.
             </p>
             <p className={styles.upload_sub}>PNG, JPG, GIF (최대 5MB)</p>
             <button
@@ -251,7 +246,7 @@ const AdminContainerManagement = () => {
           <p>용기 이름</p>
           <input
             type="text"
-            placeholder="ex) 사각 용기(소)"
+            placeholder="ex) 종이컵 용기(대)"
             className={styles.item_name}
             value={productName}
             onChange={(e) => setProductName(e.target.value)}
@@ -273,11 +268,11 @@ const AdminContainerManagement = () => {
       </section>
       <section className={styles.desc_section}>
         <div className={styles.item_content}>
-          <p>용기 설명 (필요 시)</p>
+          <p>용기 설명 (선택 사항)</p>
           <div className={styles.textarea_wrapper}>
             <textarea
               className={styles.item_content_input}
-              placeholder="용기의 설명을 작성해주세요."
+              placeholder="용기에 대한 설명을 작성해주세요."
               value={description}
               onChange={handleDescriptionChange}
             />

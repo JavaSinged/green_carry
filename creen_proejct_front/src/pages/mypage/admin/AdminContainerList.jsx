@@ -16,6 +16,15 @@ export default function AdminContainerList() {
   const navigate = useNavigate();
   const backHost = import.meta.env.VITE_BACKSERVER;
 
+  // 코덱스가 수정함: Cloudinary 절대 URL과 기존 상대 경로를 함께 처리
+  const resolveImageUrl = (imagePath) => {
+    if (!imagePath) return "/image/default_container.png";
+    if (/^https?:\/\//i.test(imagePath)) {
+      return imagePath;
+    }
+    return `${backHost}${imagePath.startsWith("/") ? "" : "/"}${imagePath}`;
+  };
+
   const [searchTerm, setSearchTerm] = useState("");
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
   const [carbonList, setCarbonList] = useState([]);
@@ -33,13 +42,13 @@ export default function AdminContainerList() {
       .then((res) => {
         setCarbonList(res.data);
       })
-      .catch((err) => console.log("데이터 불러오기 실패: ", err));
+      .catch((err) => console.log("데이터 불러오기 실패:", err));
   }, [backHost]);
 
   const handleDelete = (productId) => {
     Swal.fire({
       title: "정말 삭제하시겠습니까?",
-      text: "삭제하면 데이터를 복구할 수 없습니다!",
+      text: "삭제하면 데이터를 복구할 수 없습니다.",
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#d33",
@@ -52,9 +61,9 @@ export default function AdminContainerList() {
           .delete(`${backHost}/carbon-list/${productId}`)
           .then((res) => {
             if (res.data === "SUCCESS") {
-              Swal.fire("삭제 완료!", "용기가 삭제되었습니다.", "success");
-              setCarbonList(
-                carbonList.filter((carbon) => carbon.productId !== productId),
+              Swal.fire("삭제 완료", "용기가 삭제되었습니다.", "success");
+              setCarbonList((prev) =>
+                prev.filter((carbon) => carbon.productId !== productId),
               );
             }
           })
@@ -75,19 +84,21 @@ export default function AdminContainerList() {
   };
 
   const getSortedCarbonList = () => {
-    let items = carbonList.filter((carbon) => {
+    const items = carbonList.filter((carbon) => {
       if (!carbon.productMaterial) return false;
       return carbon.productMaterial
         .toLowerCase()
         .includes(searchTerm.toLowerCase());
     });
+
     items.sort((a, b) => {
       const getPoint = (name) => {
-        if (name.includes("(소)")) return 1;
+        if (name.includes("(대)")) return 1;
         if (name.includes("(중)")) return 2;
-        if (name.includes("(대)")) return 3;
+        if (name.includes("(소)")) return 3;
         return 9;
       };
+
       if (sortConfig.key === "productMaterial" || sortConfig.key === null) {
         const pointA = getPoint(a.productMaterial);
         const pointB = getPoint(b.productMaterial);
@@ -101,6 +112,7 @@ export default function AdminContainerList() {
           ? a.productMaterial.localeCompare(b.productMaterial)
           : b.productMaterial.localeCompare(a.productMaterial);
       }
+
       if (a[sortConfig.key] < b[sortConfig.key]) {
         return sortConfig.direction === "asc" ? -1 : 1;
       }
@@ -109,6 +121,7 @@ export default function AdminContainerList() {
       }
       return 0;
     });
+
     return items;
   };
 
@@ -139,7 +152,6 @@ export default function AdminContainerList() {
             className={styles.addPage}
           >
             <span className={styles.AddIconText}>
-              {" "}
               <AddIcon />
               추가
             </span>
@@ -167,7 +179,7 @@ export default function AdminContainerList() {
                 className={styles.col_emissions}
                 onClick={() => handleSort("productEmissions")}
               >
-                1개 당 탄소 배출량(g){" "}
+                1개당 탄소 배출량(g)
                 <UnfoldMoreIcon className={styles.sort_icon} />
               </th>
               <th className={styles.col_action}>수정</th>
@@ -180,13 +192,7 @@ export default function AdminContainerList() {
                   <div className={styles.store_info}>
                     <div className={styles.store_image_placeholder}>
                       <img
-                        src={
-                          carbon.productImg
-                            ? carbon.productImg.includes("/uploads/")
-                              ? `${carbon.productImg}`
-                              : `${carbon.productImg}`
-                            : "/image/default_container.png"
-                        }
+                        src={resolveImageUrl(carbon.productImg)}
                         alt="용기 이미지"
                       />
                     </div>
