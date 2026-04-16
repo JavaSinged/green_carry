@@ -14,10 +14,20 @@
     </select>
 
     <insert id="insertCarbonProduct">
-    insert into carbon_definition_tbl
+    insert into carbon_definition_tbl(
+    	product_id, 
+        product_material, 
+        product_emissions, 
+        product_img, 
+        product_desc
+    )
     values (
-        product_seq.nextval, 
-        #{product.productMaterial},   #{product.productEmissions},  #{product.productImg},        #{product.productDesc}         )
+        product_seq.nextval,
+        #{product.productMaterial},
+        #{product.productEmissions},
+        #{product.productImg},
+        #{product.productDesc}
+        )
 </insert>
 
 <update id="updateCarbonProduct">

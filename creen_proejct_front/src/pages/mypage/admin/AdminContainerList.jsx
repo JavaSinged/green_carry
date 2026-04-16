@@ -76,20 +76,35 @@ export default function AdminContainerList() {
             if (!carbon.productMaterial) return false;
             return carbon.productMaterial.toLowerCase().includes(searchTerm.toLowerCase());
         });
+        items.sort((a, b) => {
+            // 소, 중, 대 정
+            const getPoint = (name) => {
+                if (name.includes("(소)")) return 1;
+                if (name.includes("(중)")) return 2;
+                if (name.includes("(대)")) return 3;
+                return 9;
+            };
+            if (sortConfig.key === "productMaterial" || sortConfig.key === null) {
+                const pointA = getPoint(a.productMaterial);
+                const pointB = getPoint(b.productMaterial);
 
-        if (sortConfig.key !== null) {
-            items.sort((a, b) => {
-                if (a[sortConfig.key] < b[sortConfig.key]) {
-                    return sortConfig.direction === "asc" ? -1 : 1;
+                if (pointA !== pointB) {
+                    return sortConfig.direction === "asc" ? pointA - pointB : pointB - pointA;
                 }
-                if (a[sortConfig.key] > b[sortConfig.key]) {
-                    return sortConfig.direction === "asc" ? 1 : -1;
-                }
-                return 0;
-            });
-        }
+                return sortConfig.direction === "asc"
+                    ? a.productMaterial.localeCompare(b.productMaterial)
+                    : b.productMaterial.localeCompare(a.productMaterial);
+            }
+            if (a[sortConfig.key] < b[sortConfig.key]) {
+                return sortConfig.direction === "asc" ? -1 : 1;
+            }
+            if (a[sortConfig.key] > b[sortConfig.key]) {
+                return sortConfig.direction === "asc" ? 1 : -1;
+            }
+            return 0;
+        });
         return items;
-    };
+    }
 
     const sortedCarbonList = getSortedCarbonList();
 
@@ -108,6 +123,18 @@ export default function AdminContainerList() {
         setCurrentPage(pageNumber);
     };
 
+    //용기 소중대 구분
+    const sortedList = [...carbonList].sort((a, b) => {
+        const score = { "(소)": 1, "(중)": 2, "(대)": 3 };
+
+        const getPoint = (name) => {
+            if (name.includes("(소)")) return score["(소)"];
+            if (name.includes("(중)")) return score["(중)"];
+            if (name.includes("(대)")) return score["(대)"];
+            return 9;
+        };
+        return getPoint(a.productMaterial) - getPoint(b.productMaterial);
+    });
     return (
         <div className={styles.dashboard_container}>
             <div className={styles.header}>
@@ -131,22 +158,22 @@ export default function AdminContainerList() {
                 <table className={styles.table}>
                     <thead>
                         <tr>
-                            <th className={styles.col_left} onClick={() => handleSort("productMaterial")}>
+                            <th className={styles.col_name} onClick={() => handleSort("productMaterial")}>
                                 용기 이름 <UnfoldMoreIcon className={styles.sort_icon} />
                             </th>
-                            <th onClick={() => handleSort("productDesc")}>
+                            <th className={styles.col_desc} onClick={() => handleSort("productDesc")}>
                                 용기 설명 <UnfoldMoreIcon className={styles.sort_icon} />
                             </th>
-                            <th onClick={() => handleSort("productEmissions")}>
+                            <th className={styles.col_emissions} onClick={() => handleSort("productEmissions")}>
                                 1개 당 탄소 배출량(g) <UnfoldMoreIcon className={styles.sort_icon} />
                             </th>
-                            <th>수정</th>
+                            <th className={styles.col_action}>수정</th>
                         </tr>
                     </thead>
                     <tbody>
                         {currentItems.map((carbon) => (
                             <tr key={carbon.productId} className={styles.table_row}>
-                                <td className={styles.col_left}>
+                                <td className={styles.col_name}>
                                     <div className={styles.store_info}>
                                         <div className={styles.store_image_placeholder}>
                                             <img
@@ -162,12 +189,11 @@ export default function AdminContainerList() {
                                         </div>
                                         <div className={styles.store_text}>
                                             <p className={styles.store_name}>{carbon.productMaterial}</p>
-                                            <span className={styles.store_sub}>{carbon.productDesc}</span>
                                         </div>
                                     </div>
                                 </td>
                                 <td>
-                                    <span className={styles.badge}>{carbon.productDesc}</span>
+                                    {carbon.productDesc && carbon.productDesc.trim() !== "" && (<span className={styles.badge}>{carbon.productDesc}</span>)}
                                 </td>
                                 <td>{carbon.productEmissions} g</td>
                                 <td className={styles.iconContain}>

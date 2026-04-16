@@ -17,4 +17,5 @@ public interface ProductCarbonDao {
 	Integer insertCarbonProduct(@Param("product") ProductCarbon product, @Param("uploadFile") MultipartFile uploadFile);
 
 	Integer deleteCarbon(Integer productId);
+	
 }
