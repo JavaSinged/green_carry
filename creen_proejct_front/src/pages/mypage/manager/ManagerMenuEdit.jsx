@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
+import Swal from "sweetalert2";
 
 const ManagerMenuEdit = () => {
   const navigate = useNavigate();
@@ -155,7 +156,10 @@ const ManagerMenuEdit = () => {
 
   const addContainer = (target) => {
     if (selectedContainers.find((c) => c.productId === target.productId))
-      return alert("이미 추가된 용기입니다.");
+      return Swal.fire({
+        icon: "warning",
+        text: "이미 추가된 용기입니다.",
+      });
 
     setSelectedContainers([
       ...selectedContainers,
@@ -174,7 +178,10 @@ const ManagerMenuEdit = () => {
   const handleSave = () => {
     // 필수값 검사 (가격, 이름 등)
     if (!menu.menuName || !menu.menuPrice) {
-      alert("메뉴 이름과 가격은 필수 입력 항목입니다!");
+      Swal.fire({
+        icon: "warning",
+        text: "메뉴이름과 가격은 필수 항목 입니다.",
+      });
       return;
     }
 
@@ -224,12 +231,18 @@ const ManagerMenuEdit = () => {
       headers: { "Content-Type": "multipart/form-data" },
     })
       .then(() => {
-        alert("저장되었습니다.");
+        Swal.fire({
+          icon: "success",
+          text: "저장되었습니다.",
+        });
         navigate(-1);
       })
       .catch((err) => {
         console.error(err);
-        alert("저장 중 오류가 발생했습니다. 자바 콘솔 창을 확인해주세요!");
+        Swal.fire({
+          icon: "warning",
+          text: "저장 중 오류가 발생했습니다. 자바 콘솔 창을 확인해주세요!",
+        });
       });
   };
 
@@ -241,27 +254,50 @@ const ManagerMenuEdit = () => {
       })
       .then(() => {
         setMenu((prev) => ({ ...prev, menuStatus: nextStatus }));
-        alert(
-          nextStatus === 1
-            ? "판매중으로 변경되었습니다."
-            : "판매중지로 변경되었습니다.",
-        );
+        Swal.fire({
+          icon: "success",
+          text:
+            nextStatus === 1
+              ? "판매중으로 변경되었습니다."
+              : "판매중지로 변경되었습니다.",
+        });
       })
-      .catch(() => alert("상태 변경에 실패했습니다."));
+      .catch(() => {
+        Swal.fire({
+          icon: "warning",
+          text: "상태 변경에 실패했습니다.",
+        });
+      });
   };
 
-  const handleDelete = () => {
-    if (
-      !window.confirm("메뉴를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.")
-    )
-      return;
+  const handleDelete = async () => {
+    const result = await Swal.fire({
+      icon: "warning", // 느낌표 아이콘
+      title: "정말 삭제하시겠습니까?",
+      text: "이 작업은 되돌릴 수 없습니다.",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#aaa",
+      confirmButtonText: "삭제",
+      cancelButtonText: "취소",
+    });
+
+    if (!result.isConfirmed) return;
     axios
       .delete(`${import.meta.env.VITE_BACKSERVER}/menus/${menuId}`)
       .then(() => {
-        alert("메뉴가 삭제되었습니다.");
+        Swal.fire({
+          icon: "success",
+          text: "메뉴가 삭제되었습니다.",
+        });
         navigate(-1);
       })
-      .catch(() => alert("삭제에 실패했습니다."));
+      .catch(() => {
+        Swal.fire({
+          icon: "warning",
+          text: "삭제에 실패했습니다.",
+        });
+      });
   };
 
   const generalList = allOptions.filter((o) => o.optionType === 2);
@@ -540,7 +576,10 @@ const ManagerMenuEdit = () => {
                       onClick={() => {
                         const cur = sec.k === "size" ? tempSize : tempGeneral;
                         if (!cur.name || !cur.price || cur.carbon === "")
-                          return alert("이름, 가격, 탄소량을 모두 입력하세요.");
+                          return Swal.fire({
+                            icon: "warning",
+                            text: "이름, 가격, 탄소량을 모두 입력하세요.",
+                          });
 
                         setNewOptions([
                           ...newOptions,
