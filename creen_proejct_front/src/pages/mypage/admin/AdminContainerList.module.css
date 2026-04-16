@@ -63,7 +63,7 @@
 .table_wrap {
   width: 100%;
   overflow-x: auto;
-  min-height: 780px;
+  min-height: 520px;
 }
 
 .table {

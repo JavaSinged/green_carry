@@ -21,7 +21,7 @@ export default function AdminContainerList() {
     const [carbonList, setCarbonList] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
 
-    const itemsPerPage = 6;
+    const itemsPerPage = 4;
 
     useEffect(() => {
         setCurrentPage(1);
