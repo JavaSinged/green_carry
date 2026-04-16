@@ -154,7 +154,7 @@ const StoreStats = () => {
     <div className={styles.statsLayout}>
       {/* 1. 왼쪽: 주문 통계 + 배달 경로 */}
       <div className={`${styles.commonCard} ${styles.combinedStatsCard}`}>
-        <OrderStatsChart data={orderStatsData} />
+        <OrderStatsChart data={seriesAmount} />
         <div className={styles.deliveryPathSection}>
           <div className={styles.centeredSubTitleGroup}>
             <h3 className={styles.sectionSubTitle}>배달 경로</h3>
