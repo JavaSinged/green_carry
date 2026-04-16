@@ -10,6 +10,7 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import BusinessCenterIcon from "@mui/icons-material/BusinessCenter";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import Pagination from "../../../components/commons/Pagination";
 
 export default function AdminUserManagement() {
   const [memberList, setMemberList] = useState([]);
@@ -246,38 +247,11 @@ export default function AdminUserManagement() {
       </div>
 
       {/* 3. 페이지네이션 영역 */}
-      <div className={styles.pagination}>
-        <button
-          className={styles.page_btn_nav}
-          onClick={handlePrevPage}
-          disabled={currentPage === 1}
-        >
-          <ChevronLeftIcon /> 이전
-        </button>
-
-        <div className={styles.page_numbers}>
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map((num) => (
-            <div
-              key={num}
-              className={`${styles.page_num} ${
-                currentPage === num ? styles.active : ""
-              }`}
-              onClick={() => handlePageClick(num)}
-              style={{ cursor: "pointer" }}
-            >
-              {num < 10 ? `0${num}` : num}
-            </div>
-          ))}
-        </div>
-
-        <button
-          className={styles.page_btn_nav}
-          onClick={handleNextPage}
-          disabled={currentPage === totalPages || totalPages === 0}
-        >
-          다음 <ChevronRightIcon />
-        </button>
-      </div>
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={setCurrentPage}
+      />
     </div>
   );
 }

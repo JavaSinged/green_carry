@@ -1,101 +1,121 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import styles from "./AdminStoreManagement.module.css";
 import SearchIcon from "@mui/icons-material/Search";
 import StarIcon from "@mui/icons-material/Star";
 import StarHalfIcon from "@mui/icons-material/StarHalf";
 import StarOutlineIcon from "@mui/icons-material/StarOutline";
 import UnfoldMoreIcon from "@mui/icons-material/UnfoldMore";
-import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import Pagination from "../../../components/commons/Pagination";
 
+// 코덱스가 수정함: 정의되지 않은 searchKeyword 참조를 제거하고 검색, 정렬, 페이지네이션 흐름을 하나로 정리함.
 export default function AdminStoreManagement() {
   const navigate = useNavigate();
   const [stores, setStores] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const backHost = import.meta.env.VITE_BACKSERVER;
-  // 1. 정렬 상태 관리 (key: 기준컬럼, direction: 'asc' 또는 'desc')
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
-  const [orderType, setOrderType] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const backHost = import.meta.env.VITE_BACKSERVER;
+  const itemsPerPage = 6;
+
   useEffect(() => {
     axios
-      .get(`${import.meta.env.VITE_BACKSERVER}/stores`)
+      .get(`${backHost}/stores`)
       .then((res) => {
-        console.log(res.data);
-
         const now = new Date();
-
         const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
-
         const prevDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
         const prevMonth = `${prevDate.getFullYear()}-${String(prevDate.getMonth() + 1).padStart(2, "0")}`;
 
-        const dataWithSales = res.data.map((item) => {
-          const salesList = item.SaleMonth || [];
+        const dataWithSales = (Array.isArray(res.data) ? res.data : []).map(
+          (item) => {
+            const salesList = item?.SaleMonth || [];
+            const currentData = salesList.find(
+              (sale) => sale.saleMonth === currentMonth,
+            );
+            const prevData = salesList.find(
+              (sale) => sale.saleMonth === prevMonth,
+            );
 
-          const currentData = salesList.find(
-            (sale) => sale.saleMonth === currentMonth,
-          );
-          const prevData = salesList.find(
-            (sale) => sale.saleMonth === prevMonth,
-          );
-
-          return {
-            ...item,
-            currentSales: currentData?.totalSales || 0,
-            prevSales: prevData?.totalSales || 0,
-          };
-        });
-
-        setStores(dataWithSales);
+            return {
+              ...item,
+              currentSales: currentData?.totalSales || 0,
+              prevSales: prevData?.totalSales || 0,
+            };
+          },
+        );
 
         setStores(dataWithSales);
       })
       .catch((err) => console.log(err));
-  }, []);
-  // 2. 정렬 실행 함수
+  }, [backHost]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, sortConfig]);
+
   const handleSort = (key) => {
     let direction = "asc";
+
     if (sortConfig.key === key && sortConfig.direction === "asc") {
       direction = "desc";
     }
+
     setSortConfig({ key, direction });
   };
 
-  // 3. 필터링 + 정렬이 모두 적용된 데이터 계산
-  const getSortedStores = () => {
-    // 먼저 검색어로 필터링
-    let items = stores.filter((store) =>
-      store.storeName.toLowerCase().includes(searchTerm.toLowerCase()),
+  const filteredAndSortedStores = useMemo(() => {
+    const normalizedSearchTerm = searchTerm.trim().toLowerCase();
+
+    const filteredStores = stores.filter((store) =>
+      (store.storeName || "").toLowerCase().includes(normalizedSearchTerm),
     );
 
-    // 그 다음 정렬 적용
-    if (sortConfig.key !== null) {
-      items.sort((a, b) => {
-        if (a[sortConfig.key] < b[sortConfig.key]) {
-          return sortConfig.direction === "asc" ? -1 : 1;
-        }
-        if (a[sortConfig.key] > b[sortConfig.key]) {
-          return sortConfig.direction === "asc" ? 1 : -1;
-        }
-        return 0;
-      });
+    if (!sortConfig.key) {
+      return filteredStores;
     }
-    return items;
-  };
 
-  const sortedStores = getSortedStores();
+    return [...filteredStores].sort((a, b) => {
+      const aValue = a?.[sortConfig.key] ?? "";
+      const bValue = b?.[sortConfig.key] ?? "";
 
-  const renderStars = (rating) => {
+      if (typeof aValue === "number" && typeof bValue === "number") {
+        return sortConfig.direction === "asc"
+          ? aValue - bValue
+          : bValue - aValue;
+      }
+
+      return sortConfig.direction === "asc"
+        ? String(aValue).localeCompare(String(bValue))
+        : String(bValue).localeCompare(String(aValue));
+    });
+  }, [searchTerm, sortConfig, stores]);
+
+  const totalPages = Math.max(
+    1,
+    Math.ceil(filteredAndSortedStores.length / itemsPerPage),
+  );
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const paginatedStores = filteredAndSortedStores.slice(
+    indexOfFirstItem,
+    indexOfLastItem,
+  );
+
+  const renderStars = (rating = 0) => {
     const stars = [];
+
     for (let i = 1; i <= 5; i++) {
-      if (rating >= i)
+      if (rating >= i) {
         stars.push(<StarIcon key={i} style={{ color: "#ffb300" }} />);
-      else if (rating >= i - 0.5)
+      } else if (rating >= i - 0.5) {
         stars.push(<StarHalfIcon key={i} style={{ color: "#ffb300" }} />);
-      else stars.push(<StarOutlineIcon key={i} style={{ color: "#ccc" }} />);
+      } else {
+        stars.push(<StarOutlineIcon key={i} style={{ color: "#ccc" }} />);
+      }
     }
+
     return stars;
   };
 
@@ -119,7 +139,6 @@ export default function AdminStoreManagement() {
         <table className={styles.table}>
           <thead>
             <tr>
-              {/* 클릭 시 각 컬럼 키값을 넘겨줌 */}
               <th
                 className={styles.col_left}
                 onClick={() => handleSort("storeName")}
@@ -140,7 +159,7 @@ export default function AdminStoreManagement() {
             </tr>
           </thead>
           <tbody>
-            {sortedStores.map((store) => (
+            {paginatedStores.map((store) => (
               <tr
                 key={store.storeId}
                 className={styles.table_row}
@@ -152,11 +171,8 @@ export default function AdminStoreManagement() {
                   <div className={styles.store_info}>
                     <div className={styles.store_image_placeholder}>
                       <img
-                        src={
-                          store.storeThumb
-                            ? `${store.storeThumb}`
-                            : "/image/default_store.png"
-                        }
+                        src={store.storeThumb || "/image/default_store.png"}
+                        alt={store.storeName || "매장 이미지"}
                       />
                     </div>
                     <div className={styles.store_text}>
@@ -171,19 +187,15 @@ export default function AdminStoreManagement() {
                 <td>
                   <span className={styles.badge}>{store.storeCategory}</span>
                 </td>
-                {/* 당월 */}
-                <td>{store.currentSales?.toLocaleString()}원</td>
-                {/* 전월 */}
-                <td>
-                  {store.totalSale ? store.totalSale?.toLocaleString() : 0}원
-                </td>
+                <td>{(store.currentSales || 0).toLocaleString()}원</td>
+                <td>{(store.totalSale || 0).toLocaleString()}원</td>
                 <td>
                   <div className={styles.rating_wrap}>
                     <div className={styles.stars}>
                       {renderStars(store.storeRating)}
                     </div>
                     <span className={styles.rating_score}>
-                      {store.storeRating?.toFixed(1)}
+                      {(store.storeRating || 0).toFixed(1)}
                     </span>
                   </div>
                 </td>
@@ -192,17 +204,11 @@ export default function AdminStoreManagement() {
           </tbody>
         </table>
       </div>
-      <div className={styles.pagination}>
-        <button className={styles.page_btn_nav}>
-          <ChevronLeftIcon fontSize="small" /> 이전
-        </button>
-        <div className={styles.page_numbers}>
-          <button className={`${styles.page_num} ${styles.active}`}>01</button>
-        </div>
-        <button className={styles.page_btn_nav}>
-          다음 <ChevronRightIcon fontSize="small" />
-        </button>
-      </div>
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={setCurrentPage}
+      />
     </div>
   );
 }

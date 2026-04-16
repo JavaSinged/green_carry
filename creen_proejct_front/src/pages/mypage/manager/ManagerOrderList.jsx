@@ -14,6 +14,7 @@ import {
   Avatar, // ✨ 사진 표시용 아바타 추가
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import Pagination from "../../../components/commons/Pagination";
 
 const ManagerOrderList = () => {
   const [orderList, setOrderList] = useState([]);
@@ -370,33 +371,11 @@ const ManagerOrderList = () => {
         )}
       </div>
 
-      {totalPages > 1 && (
-        <div className={styles.pagination}>
-          <button
-            className={styles.pageBtn}
-            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-            disabled={currentPage === 1}
-          >
-            &lt;
-          </button>
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-            <button
-              key={page}
-              className={`${styles.pageBtn} ${currentPage === page ? styles.activePage : ""}`}
-              onClick={() => setCurrentPage(page)}
-            >
-              {page}
-            </button>
-          ))}
-          <button
-            className={styles.pageBtn}
-            onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-            disabled={currentPage === totalPages}
-          >
-            &gt;
-          </button>
-        </div>
-      )}
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={setCurrentPage}
+      />
 
       {/* 상세 주문 모달 UI 추가 */}
       <Modal open={openDetailModal} onClose={handleCloseModal}>

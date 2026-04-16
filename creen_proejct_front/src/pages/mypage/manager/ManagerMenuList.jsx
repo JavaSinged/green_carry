@@ -8,6 +8,7 @@ import ImageOutlinedIcon from "@mui/icons-material/ImageOutlined";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import { useNavigate } from "react-router-dom";
+import Pagination from "../../../components/commons/Pagination";
 
 const ManagerMenuList = () => {
   const navigate = useNavigate();
@@ -157,37 +158,11 @@ const ManagerMenuList = () => {
       </div>
 
       {/* 페이지네이션 영역 (관리자 페이지와 동일한 스타일 적용) */}
-      <div className={styles.pagination}>
-        <button
-          className={styles.page_btn_nav}
-          onClick={handlePrevPage}
-          disabled={currentPage === 1}
-        >
-          <ChevronLeftIcon /> 이전
-        </button>
-
-        <div className={styles.page_numbers}>
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map((num) => (
-            <div
-              key={num}
-              className={`${styles.page_num} ${
-                currentPage === num ? styles.active : ""
-              }`}
-              onClick={() => handlePageClick(num)}
-            >
-              {num < 10 ? `0${num}` : num}
-            </div>
-          ))}
-        </div>
-
-        <button
-          className={styles.page_btn_nav}
-          onClick={handleNextPage}
-          disabled={currentPage === totalPages || totalPages === 0}
-        >
-          다음 <ChevronRightIcon />
-        </button>
-      </div>
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={setCurrentPage}
+      />
     </div>
   );
 };
