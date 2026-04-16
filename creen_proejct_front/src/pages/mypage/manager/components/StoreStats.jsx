@@ -15,15 +15,15 @@ const StoreStats = () => {
   const [reviewStatsData, setReviewStatsData] = useState(null); // 리뷰 별점 데이터
   const [isLoading, setIsLoading] = useState(true);
 
-  //수치보정 함수 (100% 로 맞추기)
+  // 수치보정 함수 (100% 로 맞추기)
   const getAdjustedData = (rawData) => {
     if (!rawData || !Array.isArray(rawData) || rawData.length === 0) {
       // rawData가 배열인지 검증
       return [];
     }
-    //1.모든숫자 정수로 만들기
+    // 1.모든숫자 정수로 만들기
     let roundedData = rawData.map((item) => {
-      const multiplied = item.percent * 10;
+      const multiplied = (item.percent || 0) * 10;
       const rounded = Math.round(multiplied);
       return {
         ...item,
@@ -31,7 +31,7 @@ const StoreStats = () => {
         diff: multiplied - rounded, // 오차 저장
       };
     });
-    //2.현재 합계 계산(정수)
+    // 2.현재 합계 계산(정수)
     const currentSum = roundedData.reduce(
       (sum, item) => sum + item.tempValue,
       0,
@@ -39,14 +39,14 @@ const StoreStats = () => {
     const targetSum = 1000; // 100.0%는 정수로 1000
     let difference = targetSum - currentSum; // 모자라거나 남는 양 (예: 2)
 
-    //3.오차보정
+    // 3.오차보정
     if (difference !== 0) {
       const sortedByDiff = [...roundedData].sort((a, b) => b.diff - a.diff);
       const direction = difference > 0 ? 1 : -1;
       const absDiff = Math.abs(difference);
 
       for (let i = 0; i < absDiff; i++) {
-        //차이가 큰 항목부터 0.1%씩 조정
+        // 차이가 큰 항목부터 0.1%씩 조정
         const targetIndex = roundedData.findIndex(
           (item) => item === sortedByDiff[i % roundedData.length],
         );
@@ -83,7 +83,8 @@ const StoreStats = () => {
         })
         .then((res) => {
           const fetchedStoreId = res.data.storeId;
-          setStoreId(getAdjustedData(fetchedStoreId));
+          // [수정] storeId는 수치 보정 함수(getAdjustedData)를 타면 안 됩니다.
+          setStoreId(fetchedStoreId);
 
           if (fetchedStoreId) {
             // 2️⃣ storeId가 확인되면 주문 통계와 리뷰 통계를 동시에 요청합니다.
@@ -100,14 +101,34 @@ const StoreStats = () => {
             ]);
           }
         })
-
         .then((responses) => {
           if (responses) {
             const [orderRes, reviewRes] = responses;
 
-            // 📊 주문 및 배달 경로 데이터 설정
+            // 📊 주문 및 배달 경로 데이터 설정 (배달비 포함 금액 처리)
             console.log("주문 통계 로드 완료:", orderRes.data);
-            setOrderStatsData(orderRes.data);
+            const rawOrderData = orderRes.data || [];
+
+            // 전체 금액 합산 (seriesAmount 기준)
+            const totalSales = rawOrderData.reduce(
+              (sum, item) => sum + (item.seriesAmount || 0),
+              0,
+            );
+
+            let finalOrderData = [];
+            if (totalSales > 0) {
+              // 각 항목별 비중(%)을 먼저 계산한 배열 생성
+              const dataWithPercent = rawOrderData.map((item) => ({
+                ...item,
+                percent: ((item.seriesAmount || 0) / totalSales) * 100,
+              }));
+              // 퍼센트가 들어간 배열을 보정 함수에 넘김
+              finalOrderData = getAdjustedData(dataWithPercent);
+            } else {
+              finalOrderData = rawOrderData;
+            }
+
+            setOrderStatsData(finalOrderData);
 
             // ⭐ 리뷰 통계 데이터 가공 및 설정
             const rd = reviewRes.data;
@@ -154,7 +175,8 @@ const StoreStats = () => {
     <div className={styles.statsLayout}>
       {/* 1. 왼쪽: 주문 통계 + 배달 경로 */}
       <div className={`${styles.commonCard} ${styles.combinedStatsCard}`}>
-        <OrderStatsChart data={seriesAmount} />
+        {/* [수정] seriesAmount라는 변수는 없으므로 orderStatsData 자체를 넘깁니다 */}
+        <OrderStatsChart data={orderStatsData} />
         <div className={styles.deliveryPathSection}>
           <div className={styles.centeredSubTitleGroup}>
             <h3 className={styles.sectionSubTitle}>배달 경로</h3>
