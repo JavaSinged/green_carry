@@ -131,7 +131,7 @@ export default function AdminStoreManagement() {
               <th onClick={() => handleSort("currentSales")}>
                 당월 매출 <UnfoldMoreIcon className={styles.sort_icon} />
               </th>
-              <th onClick={() => handleSort("prevSales")}>
+              <th onClick={() => handleSort("totalSale")}>
                 총 매출 <UnfoldMoreIcon className={styles.sort_icon} />
               </th>
               <th onClick={() => handleSort("storeRating")}>
