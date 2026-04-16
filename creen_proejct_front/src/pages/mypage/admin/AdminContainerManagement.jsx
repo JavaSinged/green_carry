@@ -64,16 +64,31 @@ const AdminContainerManagement = () => {
 
   useEffect(() => {
 
-    if (productId == "new") {
+    if (!productId) {
 
-      setProductName(""),
-        setKgValue(""),
-        setDescription(""),
-        setPreviewImg(""),
-        setUploadFile(null);
-    } else {
+      setProductName("");
+      setKgValue("");
+      setDescription("");
+      setFileName("");
+      setFileSize(0);
+      setUploadFile(null);
+      setPreviewImg("");
+    } else if (passedData) {
+      setProductName(passedData.productMaterial || "");
+      setKgValue(passedData.productEmissions || "");
+      setDescription(passedData.productDesc || "");
+
+      if (passedData.productImg) {
+        setFileName(passedData.productImg);
+
+        const fullPath = passedData.productImg.startsWith('/')
+          ? `${backHost}${passedData.productImg}`
+          : `${backHost}/uploads/container/${passedData.productImg}`;
+
+        setPreviewImg(fullPath);
+      }
     }
-  }, [productId]);
+  }, [productId, passedData, backHost]);
 
   // 공통 파일 저장 로직
   const handleSaveFile = (file) => {
@@ -129,12 +144,13 @@ const AdminContainerManagement = () => {
     }
 
     formData.append("productMaterial", productName);
-    const cleanValue = kgValue.toString().replace(/[^0-9.]/g, "");
-    formData.append("productEmissions", kgValue || "0");
+    formData.append("productEmissions", kgValue);
     formData.append("productDesc", description);
 
     if (uploadFile) {
       formData.append("uploadFile", uploadFile);
+    } else if (productId !== "new" && fileName) {
+      formData.append("productImg", fileName);
     }
     try {
       const response = await api.post("/carbon-list/update", formData, {

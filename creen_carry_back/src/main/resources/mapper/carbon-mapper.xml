@@ -14,10 +14,18 @@
     </select>
 
     <insert id="insertCarbonProduct">
-    insert into carbon_definition_tbl
-    values (
-        product_seq.nextval, 
-        #{product.productMaterial},   #{product.productEmissions},  #{product.productImg},        #{product.productDesc}         )
+    INSERT INTO CARBON_DEFINITION_TBL (
+        PRODUCT_ID, PRODUCT_MATERIAL,
+        PRODUCT_EMISSIONS,
+        PRODUCT_IMG,
+        PRODUCT_DESC
+    )
+    VALUES (
+        PRODUCT_SEQ.NEXTVAL, 
+        #{product.productMaterial},
+        #{product.productEmissions},
+        #{product.productImg, jdbcType=VARCHAR},
+        #{product.productDesc, jdbcType=VARCHAR}  )
 </insert>
 
 <update id="updateCarbonProduct">
