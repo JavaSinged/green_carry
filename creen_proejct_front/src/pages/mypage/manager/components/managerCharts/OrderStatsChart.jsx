@@ -12,69 +12,96 @@ const OrderStatsChart = ({ data }) => {
     );
   }
 
-  const series = data.map((item) => item.percent); // 배달수단 비중
-  const labels = data.map((item) => item.label); // 배달수단 카테고리
+  // 1. 배달수단 비중 (%)
+  const series = data.map((item) => item.percent || 0);
+
+  // 2. [수정됨] label이 데이터에 없으므로 deliveryType을 한글로 직접 변환
+  const labels = data.map((item) => {
+    if (item.deliveryType === 1) return "직접 배달 (포장)";
+    if (item.deliveryType === 2) return "배달 대행 (기본)";
+    if (item.deliveryType === 3) return "배달 대행 (할증)";
+    return "기타";
+  });
+
   const chartColors = data.map((item) => {
     if (item.deliveryType === 1) return "var(--color-point)";
     if (item.deliveryType === 2) return "var(--color-brand)";
     return "var(--color-info)";
   });
-  const totalAmount = data.reduce((sum, item) => sum + item.seriesAmount, 0); // 총매출
+
+  // 3. [추가됨] 총 매출액과 총 주문 건수 계산
+  const totalAmount = data.reduce(
+    (sum, item) => sum + (item.seriesAmount || 0),
+    0,
+  );
+  const totalOrderCount = data.reduce(
+    (sum, item) => sum + (item.orderCount || 0),
+    0,
+  );
 
   const options = {
     chart: {
-      type: "donut", // 차트 종류를 donut으로 설정
+      type: "donut",
     },
     plotOptions: {
       pie: {
         donut: {
-          size: "70%", // 도넛의 두께 (중앙 빈 공간 크기, 이미지처럼 적절히 크게)
+          size: "70%",
           labels: {
-            show: true, // 중앙에 데이터를 표시 (이미지처럼)
+            show: true,
             name: {
               show: true,
               fontSize: "14px",
               color: "#666",
-              offsetY: -10, // 텍스트 위치 조정
+              offsetY: -10,
             },
             value: {
               show: true,
               fontSize: "20px",
               fontWeight: "bold",
               color: "#333",
-              offsetY: 10, // 숫자 위치 조정
-              formatter: (val) => val.toLocaleString() + "원", // 금액 형식으로 변환
+              offsetY: 10,
+              // 중앙 값은 퍼센트로 표시
+              formatter: (val) => val + "%",
             },
             total: {
               show: true,
-              showAlways: true, // 데이터를 하나만 선택해도 총합 표시 유지
-              label: "당월 주문 금액", // 중앙 상단 텍스트 (이미지 그대로)
+              showAlways: true,
+              label: "당월 주문 금액",
               fontSize: "14px",
               color: "#666",
               formatter: () => {
-                if (totalAmount !== undefined && totalAmount !== null) {
-                  return totalAmount.toLocaleString() + "원";
-                }
-                return "0원";
+                return totalAmount > 0
+                  ? totalAmount.toLocaleString() + "원"
+                  : "0원";
               },
             },
           },
         },
       },
     },
-
     colors: chartColors,
     labels: labels,
     dataLabels: {
-      enabled: false, // 차트 조각 위에 데이터를 직접 표시하지 않음 (이미지처럼)
+      enabled: false,
     },
     legend: {
-      show: false, // 범례 숨기기 (이미지처럼)
+      show: false,
     },
     stroke: {
-      show: true, // 조각 사이의 간격
+      show: true,
       width: 2,
       colors: ["#ffffff"],
+    },
+    // 4. [추가됨] 차트 조각에 마우스 올렸을 때 금액과 건수 표시 툴팁
+    tooltip: {
+      y: {
+        formatter: function (val, opts) {
+          const index = opts.seriesIndex;
+          const originalData = data[index];
+          return `${(originalData.seriesAmount || 0).toLocaleString()}원 (${originalData.orderCount || 0}건)`;
+        },
+      },
     },
   };
 
@@ -93,14 +120,22 @@ const OrderStatsChart = ({ data }) => {
         </button>
       </div>
 
-      <div className={styles.mainValue}>
-        {totalAmount !== undefined && totalAmount !== null
-          ? totalAmount.toLocaleString()
-          : 0}
-        원
+      {/* 5. [추가됨] 메인 금액 옆에 총 주문 건수 표시 */}
+      <div
+        className={styles.mainValue}
+        style={{ display: "flex", alignItems: "baseline", gap: "8px" }}
+      >
+        <span>
+          {totalAmount !== undefined && totalAmount !== null
+            ? totalAmount.toLocaleString()
+            : 0}
+          원
+        </span>
+        <span style={{ fontSize: "1rem", color: "#666", fontWeight: "normal" }}>
+          (총 {totalOrderCount}건)
+        </span>
       </div>
 
-      {/* 차트 타입을 donut으로 명시하고 height를 적절히 조절 */}
       <Chart options={options} series={series} type="donut" height={350} />
     </div>
   );

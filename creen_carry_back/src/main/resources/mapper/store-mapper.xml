@@ -510,7 +510,9 @@
 	<select id="selectStatsOrderInfo" resultType="statsOrderInfo">
 		SELECT
 		deliveryType,
-		SUM(orderTotal) AS seriesAmount
+		SUM(orderTotal) AS seriesAmount,
+		COUNT(order_id) AS
+		orderCount
 		FROM (
 		/* 주문(order_id)별로 각각 계산 */
 		SELECT
@@ -519,20 +521,25 @@
 		/* 해당 주문의 (메뉴 총합) + (배달비 1번) */
 		(SELECT SUM(od.PRICE * od.QUANTITY)
 		FROM order_detail od
-		WHERE od.order_id = o.order_id) +
+		WHERE
+		od.order_id = o.order_id) +
 		CASE
 		WHEN o.DELIVERY_TYPE = 1 THEN 0
-		WHEN o.DELIVERY_TYPE = 2 THEN 1000
+		WHEN
+		o.DELIVERY_TYPE = 2 THEN 1000
 		WHEN o.DELIVERY_TYPE = 3 THEN 3000
 		ELSE 0
 		END AS orderTotal
 		FROM order_list_map m
-		JOIN order_tbl o ON m.order_id = o.order_id
+		JOIN order_tbl o ON m.order_id =
+		o.order_id
 		WHERE
 		o.store_id = #{storeId}
 		AND o.order_status = 5
-		AND TO_CHAR(m.reg_date, 'YYYY-MM') = #{yearMonth}
-		GROUP BY o.order_id, o.DELIVERY_TYPE
+		AND
+		TO_CHAR(m.reg_date, 'YYYY-MM') = #{yearMonth}
+		GROUP BY o.order_id,
+		o.DELIVERY_TYPE
 		)
 		GROUP BY deliveryType
 		ORDER BY deliveryType ASC
