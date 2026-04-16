@@ -99,10 +99,6 @@ const OrderStatsChart = ({ data }) => {
         formatter: function (val, opts) {
           const index = opts.seriesIndex;
           const originalData = data[index];
-          console.log(
-            "🚀 ~ OrderStatsChart ~ originalData.orderCount:",
-            originalData.orderCount,
-          );
           return `${(originalData.seriesAmount || 0).toLocaleString()}원 (${originalData.orderCount || 0}건)`;
         },
       },
