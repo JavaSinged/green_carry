@@ -3,7 +3,6 @@ import axios from "axios";
 import styles from "./ManagerOrderList.module.css";
 import Swal from "sweetalert2";
 import RefreshIcon from "@mui/icons-material/Refresh";
-// 모달 관련 MUI 컴포넌트 추가
 import {
   Modal,
   Box,
@@ -11,7 +10,7 @@ import {
   Divider,
   IconButton,
   CircularProgress,
-  Avatar, // ✨ 사진 표시용 아바타 추가
+  Avatar,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import Pagination from "../../../components/commons/Pagination";
@@ -31,7 +30,7 @@ const ManagerOrderList = () => {
   const itemsPerPage = 10;
 
   const storeId = localStorage.getItem("storeId");
-  const backHost = import.meta.env.VITE_BACKSERVER; // ✨ backHost 변수화
+  const backHost = import.meta.env.VITE_BACKSERVER;
 
   const fetchStoreOrders = () => {
     if (!storeId) return;
@@ -83,7 +82,6 @@ const ManagerOrderList = () => {
 
     try {
       const res = await axios.get(`${backHost}/stores/order/${order.orderId}`);
-      // 기존 코드에 맞춰 res.data.items를 배열로 담습니다.
       setDetailMenus(res.data.items || []);
     } catch (err) {
       console.error("상세 메뉴 불러오기 실패:", err);
@@ -92,21 +90,19 @@ const ManagerOrderList = () => {
     }
   };
 
-  // 모달 닫기
   const handleCloseModal = () => {
     setOpenDetailModal(false);
     setSelectedOrder(null);
     setDetailMenus([]);
   };
 
-  // 모달 스타일
   const modalStyle = {
     position: "absolute",
     top: "50%",
     left: "50%",
     transform: "translate(-50%, -50%)",
-    width: 480, // ✨ 사진이 들어가므로 너비를 약간 넓힘
-    maxHeight: "85vh", // 높이 약간 늘림
+    width: 480,
+    maxHeight: "85vh",
     overflowY: "auto",
     bgcolor: "background.paper",
     borderRadius: 3,
@@ -115,7 +111,7 @@ const ManagerOrderList = () => {
     outline: "none",
   };
 
-  // 주문 상태 업데이트 로직 (시간 설정 포함)
+  // 주문 상태 업데이트 로직
   const updateOrderStatus = (orderId, currentStatus, deliveryType) => {
     const nextStatus = currentStatus + 1;
     const isPickup = deliveryType === 1;
@@ -130,11 +126,7 @@ const ManagerOrderList = () => {
           </div>
         `,
         input: "range",
-        inputAttributes: {
-          min: "5",
-          max: "120",
-          step: "1",
-        },
+        inputAttributes: { min: "5", max: "120", step: "1" },
         inputValue: 15,
         showCancelButton: true,
         confirmButtonText: "주문 수락",
@@ -222,7 +214,6 @@ const ManagerOrderList = () => {
     return `${parts[0]} ${parts[1]} ${parts[2]} ***`;
   };
 
-  // ✨ 취소선 스타일을 컴포넌트 내부로 가져옴
   const strikeThroughStyle = {
     color: "text.disabled",
     textDecoration: "line-through",
@@ -282,18 +273,14 @@ const ManagerOrderList = () => {
                       {order.menuName}{" "}
                       {order.extraCount > 0 && `외 ${order.extraCount}건`}
                     </h3>
-
-                    {/* 상세 메뉴 모달 띄우기 버튼으로 변경 */}
                     {order.extraCount > 0 && (
                       <button
                         className={styles.detailToggleBtn}
                         onClick={() => handleOpenDetailModal(order)}
-                        style={{ marginTop: "8px", cursor: "pointer" }}
                       >
                         상세메뉴 보기
                       </button>
                     )}
-
                     <p className={styles.price} style={{ marginTop: "12px" }}>
                       결제금액:{" "}
                       <strong
@@ -379,10 +366,9 @@ const ManagerOrderList = () => {
         onPageChange={setCurrentPage}
       />
 
-      {/* 상세 주문 모달 UI 추가 */}
+      {/* 상세 주문 모달 */}
       <Modal open={openDetailModal} onClose={handleCloseModal}>
         <Box sx={modalStyle}>
-          {/* 헤더 부분 */}
           <Box
             display="flex"
             justifyContent="space-between"
@@ -398,33 +384,30 @@ const ManagerOrderList = () => {
           </Box>
           <Divider sx={{ mb: 3 }} />
 
-          {/* 로딩 중일 때 스피너 표시 */}
           {isLoadingDetail ? (
             <Box display="flex" justifyContent="center" py={4}>
               <CircularProgress />
             </Box>
           ) : (
             <Box display="flex" flexDirection="column" gap={2}>
-              {/* ✨ 가져온 상세 메뉴 리스트 출력 (사진 추가 및 레이아웃 변경) */}
               {detailMenus.map((item, idx) => {
                 const isItemCanceled = selectedOrder?.orderStatus === 9;
-
                 return (
                   <Box
                     key={idx}
                     display="flex"
-                    alignItems="center" // 세로 가운데 정렬
-                    gap={2} // 사진과 텍스트 사이 간격
+                    alignItems="center"
+                    gap={2}
+                    p={1}
                     sx={{
                       backgroundColor: isItemCanceled ? "#f9f9f9" : "#fff",
                       borderRadius: "8px",
                       border: "1px solid #eee",
                     }}
                   >
-                    {/* 메뉴 사진 (Avatar 활용) */}
                     <Avatar
                       src={item.menuImage}
-                      variant="rounded" // 모서리 둥근 사각형
+                      variant="rounded"
                       sx={{
                         width: 60,
                         height: 60,
@@ -433,52 +416,35 @@ const ManagerOrderList = () => {
                           : "none",
                       }}
                     />
-
-                    {/* 메뉴 정보 (이름, 옵션) */}
                     <Box flex={1}>
                       <Typography
                         fontWeight="bold"
-                        sx={
-                          isItemCanceled
-                            ? strikeThroughStyle
-                            : { textDecoration: "none" }
-                        }
+                        sx={isItemCanceled ? strikeThroughStyle : {}}
                       >
                         {item.menuName}
                       </Typography>
-
                       {item.optionString && (
                         <Typography
                           variant="body2"
                           color="text.secondary"
-                          sx={
-                            isItemCanceled
-                              ? strikeThroughStyle
-                              : { textDecoration: "none" }
-                          }
+                          sx={isItemCanceled ? strikeThroughStyle : {}}
                         >
                           옵션: {item.optionString}
                         </Typography>
                       )}
                     </Box>
-
-                    {/* ✨ 우측 정보 (수량 + 가격 세로 배치) */}
                     <Box
                       display="flex"
                       flexDirection="column"
                       alignItems="flex-end"
                       minWidth="80px"
                     >
-                      <Typography component="span" variant="h6" fontSize="13px">
-                        {item.quantity}개
-                      </Typography>
+                      <Typography fontSize="13px">{item.quantity}개</Typography>
                       <Typography
                         variant="subtitle2"
-                        component="span"
                         fontSize="16px"
                         fontWeight="bold"
                       >
-                        {/* item.price 값이 있다고 가정하고 콤마(,) 포맷 적용 */}
                         {item.price ? Number(item.price).toLocaleString() : 0}원
                       </Typography>
                     </Box>
@@ -486,44 +452,58 @@ const ManagerOrderList = () => {
                 );
               })}
 
-              {detailMenus.length === 0 && (
-                <Typography color="text.secondary" textAlign="center" py={3}>
-                  상세 메뉴 정보가 없습니다.
-                </Typography>
-              )}
-
               <Divider sx={{ my: 2, borderColor: "#ccc" }} />
 
-              {/* 총 결제 금액 */}
-              <Box
-                display="flex"
-                justifyContent="space-between"
-                alignItems="center"
-                px={1}
-              >
-                <Typography variant="subtitle1" fontWeight="bold">
-                  총 결제 금액
-                </Typography>
-                <Typography
-                  variant="h5"
-                  color="var(--color-brand)"
-                  fontWeight="bold"
-                  sx={{
-                    color:
-                      selectedOrder?.orderStatus === 9
-                        ? "text.disabled"
-                        : "var(--color-brand)",
-                    textDecoration:
-                      selectedOrder?.orderStatus === 9
-                        ? "line-through"
-                        : "none",
-                  }}
+              {/* ✨ 배달비 및 총액 섹션 수정 (내용물 유지 및 배달비 해결) */}
+              <Box px={1}>
+                <Box display="flex" justifyContent="space-between" mb={1}>
+                  <Typography variant="body2" color="text.secondary">
+                    주문 금액
+                  </Typography>
+                  <Typography variant="body2">
+                    {selectedOrder?.totalPrice?.toLocaleString()}원
+                  </Typography>
+                </Box>
+                <Box display="flex" justifyContent="space-between" mb={1}>
+                  <Typography variant="body2" color="text.secondary">
+                    배달비
+                  </Typography>
+                  <Typography variant="body2" fontWeight="bold" color="primary">
+                    + {selectedOrder?.deliveryPrice?.toLocaleString() || 0}원
+                  </Typography>
+                </Box>
+                <Box
+                  display="flex"
+                  justifyContent="space-between"
+                  alignItems="center"
+                  mt={2}
                 >
-                  {selectedOrder?.orderStatus === 9
-                    ? "0"
-                    : selectedOrder?.totalPrice?.toLocaleString()}
-                  원
-                </Typography>
+                  <Typography variant="subtitle1" fontWeight="bold">
+                    총 결제 금액
+                  </Typography>
+                  <Typography
+                    variant="h5"
+                    fontWeight="bold"
+                    sx={{
+                      color:
+                        selectedOrder?.orderStatus === 9
+                          ? "text.disabled"
+                          : "var(--color-brand)",
+                      textDecoration:
+                        selectedOrder?.orderStatus === 9
+                          ? "line-through"
+                          : "none",
+                    }}
+                  >
+                    {selectedOrder?.orderStatus === 9
+                      ? "0"
+                      : (
+                          Number(selectedOrder?.totalPrice || 0) +
+                          Number(selectedOrder?.deliveryPrice || 0)
+                        ).toLocaleString()}
+                    원
+                  </Typography>
+                </Box>
               </Box>
             </Box>
           )}
