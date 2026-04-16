@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../../context/AuthContext"; // 🌟 AuthContext 경로 확인 필수!
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import Pagination from "../../../components/commons/Pagination";
 
 const UserOrderListPage = () => {
   const backHost = import.meta.env.VITE_BACKSERVER;
@@ -345,37 +346,11 @@ const UserOrderListPage = () => {
         )}
       </div>
 
-      {totalPages > 1 && (
-        <div className={styles.pagination}>
-          <button
-            className={styles.page_btn_nav}
-            onClick={handlePrevPage}
-            disabled={currentPage === 1}
-          >
-            <ChevronLeftIcon fontSize="small" /> 이전
-          </button>
-
-          <div className={styles.page_numbers}>
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-              <button
-                key={page}
-                className={`${styles.page_num} ${currentPage === page ? styles.active : ""}`}
-                onClick={() => handlePageClick(page)}
-              >
-                {String(page).padStart(2, "0")}
-              </button>
-            ))}
-          </div>
-
-          <button
-            className={styles.page_btn_nav}
-            onClick={handleNextPage}
-            disabled={currentPage === totalPages || totalPages === 0}
-          >
-            다음 <ChevronRightIcon fontSize="small" />
-          </button>
-        </div>
-      )}
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={setCurrentPage}
+      />
 
       {isModalOpen && selectedOrder && (
         <ReviewModal

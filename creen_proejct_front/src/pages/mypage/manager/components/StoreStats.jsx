@@ -83,7 +83,7 @@ const StoreStats = () => {
         })
         .then((res) => {
           const fetchedStoreId = res.data.storeId;
-          setStoreId(fetchedStoreId);
+          setStoreId(getAdjustedData(fetchedStoreId));
 
           if (fetchedStoreId) {
             // 2️⃣ storeId가 확인되면 주문 통계와 리뷰 통계를 동시에 요청합니다.

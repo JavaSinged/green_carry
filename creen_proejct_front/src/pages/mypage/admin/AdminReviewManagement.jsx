@@ -3,6 +3,7 @@ import styles from "../manager/ManagerReviewComment.module.css";
 import axios from "axios";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import Pagination from "../../../components/commons/Pagination";
 
 const ManagerReviewComment = () => {
   const [reviews, setReviews] = useState([]); // 전체 리뷰 데이터
@@ -173,37 +174,11 @@ const ManagerReviewComment = () => {
             ))}
 
             {/* 페이지네이션 */}
-            <div className={styles.pagination}>
-              <button
-                className={styles.page_btn_nav}
-                onClick={handlePrevPage}
-                disabled={currentPage === 1}
-              >
-                <ChevronLeftIcon fontSize="small" /> 이전
-              </button>
-
-              <div className={styles.page_numbers}>
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                  (page) => (
-                    <button
-                      key={page}
-                      className={`${styles.page_num} ${currentPage === page ? styles.active : ""}`}
-                      onClick={() => handlePageClick(page)}
-                    >
-                      {String(page).padStart(2, "0")}
-                    </button>
-                  ),
-                )}
-              </div>
-
-              <button
-                className={styles.page_btn_nav}
-                onClick={handleNextPage}
-                disabled={currentPage === totalPages || totalPages === 0}
-              >
-                다음 <ChevronRightIcon fontSize="small" />
-              </button>
-            </div>
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+            />
           </>
         )}
       </div>
