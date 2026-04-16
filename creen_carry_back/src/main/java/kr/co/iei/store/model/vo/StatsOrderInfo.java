@@ -18,4 +18,5 @@ public class StatsOrderInfo {
     // ✅ [추가] 백엔드 서비스에서 계산해서 채워줄 필드들 (프론트엔드 차트용)
     private String label;           // 배달 수단 이름 (예: '오토바이 배달')
     private Double percent;			// 당월 총 금액 대비 비율 (%)
+    private Integer orderCount;
 }
