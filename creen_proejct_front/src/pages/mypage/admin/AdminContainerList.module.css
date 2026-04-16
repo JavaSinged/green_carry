@@ -3,16 +3,16 @@
   border: 1px solid #e0e0e0;
   border-radius: 12px;
   padding: 30px;
-
+  width: 100%;
   box-sizing: border-box;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
 }
 
 .header {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 0px;
+  margin-bottom: 24px;
 }
 
 .title {
@@ -24,7 +24,6 @@
 
 .search_wrap {
   display: flex;
-  justify-content: right;
   align-items: center;
   border: 1px solid #ccc;
   border-radius: 30px;
@@ -49,7 +48,7 @@
 
 .search_icon {
   color: var(--text-main);
-  font-size: 20px;
+  font-size: 20px !important;
   cursor: pointer;
 }
 .table td {
@@ -98,11 +97,13 @@
 }
 
 .col_name {
-  width: 36%;
-  text-align: left;
+  text-align: left !important;
+}
+.col_name {
+  width: 250px;
 }
 .col_desc {
-  width: 30%;
+  width: 450px;
 }
 .col_emissions {
   width: 200px;
@@ -111,7 +112,7 @@
   width: 100px;
 }
 .sort_icon {
-  font-size: 16px;
+  font-size: 16px !important;
   vertical-align: middle;
   color: #bbb;
   cursor: pointer;
@@ -121,9 +122,6 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  width: 100%;
-  min-width: 0;
-  overflow: hidden;
 }
 
 .store_image_placeholder {
@@ -139,19 +137,10 @@
   border-radius: 8px;
 }
 .store_text {
-  flex: 1;
-  min-width: 0;
-  text-align: left;
+  display: flex;
+  flex-direction: column;
 }
-.store_name,
-.store_sub {
-  display: block;
-  width: 100%;
-  overflow: hidden;
-  word-break: keep-all;
-  font-weight: 600;
-  font-size: 15px;
-}
+
 .store_name {
   margin: 0;
   font-size: 15px;
@@ -169,7 +158,7 @@
   background-color: var(--color-surface);
   color: var(--color-brand);
   padding: 4px 10px;
-  border-radius: 3px;
+  border-radius: 12px;
   font-size: 12px;
   font-weight: 600;
   display: inline-block;
@@ -231,13 +220,7 @@
   align-items: center;
   margin-top: 24px;
 }
-.two_contain {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-  margin-bottom: 24px;
-}
+
 .page_btn_nav {
   display: flex;
   align-items: center;
@@ -298,7 +281,7 @@
 }
 .addPage {
   background-color: var(--color-brand);
-  padding: 8px 16px;
+  padding: 10px;
   border-radius: 8px;
   color: white;
   cursor: pointer;
