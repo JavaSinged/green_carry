@@ -14,7 +14,7 @@ const UserProfile = () => {
   const { user } = useContext(AuthContext);
   const backHost = import.meta.env.VITE_BACKSERVER;
 
-  // 1. 상태 관리
+  // 상태 관리
   const [point, setPoint] = useState(() => {
     const savedPoint = localStorage.getItem("memberPoint");
     return savedPoint ? Number(savedPoint) : 0;
@@ -26,38 +26,15 @@ const UserProfile = () => {
   const [openHistory, setOpenHistory] = useState(false);
   const [progress, setProgress] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5; // 한 페이지당 보여줄 내역 수
-  const pageGroupSize = 10; // 한번에 보여줄 페이지 번호 개수
+  const itemsPerPage = 5;
 
-  // 2. 페이지네이션 계산 로직 (순서 중요!)
+  // 등급 및 페이지네이션 로직
   const filteredHistory = pointHistory.filter((item) => item.orderStatus >= 1);
-  const totalPages = Math.ceil(filteredHistory.length / itemsPerPage) || 1;
-
-  // 현재 페이지가 속한 그룹 계산 (예: 1~10페이지는 1그룹)
-  const currentGroup = Math.ceil(currentPage / pageGroupSize);
-  const startPage = (currentGroup - 1) * pageGroupSize + 1;
-  const endPage = Math.min(startPage + pageGroupSize - 1, totalPages);
-
-  // 페이지 번호 배열 생성
-  const pageNumbers = [];
-  for (let i = startPage; i <= endPage; i++) {
-    pageNumbers.push(i);
-  }
-
-  // 현재 페이지에 보여줄 아이템 슬라이싱
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const totalPages = Math.ceil(filteredHistory.length / itemsPerPage);
   const currentHistoryItems = filteredHistory.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
-
-  // 3. 이벤트 핸들러
-  const toggleEco = () => setOpenEco(!openEco);
-  const toggleHistory = () => {
-    setOpenHistory(!openHistory);
-    if (!openHistory) setCurrentPage(1);
-  };
 
   const getEcoGrade = (currentCarbon) => {
     if (currentCarbon < 1000) return { name: "꼬마 씨앗 🌰", next: 1000 };
@@ -67,6 +44,8 @@ const UserProfile = () => {
     return { name: "울창한 숲 🌲", next: null };
   };
   const myGradeInfo = getEcoGrade(totalCarbon);
+
+  // 데이터 패칭 함수
   const fetchUserData = useCallback(async () => {
     if (!user?.memberId) return;
     try {
@@ -86,31 +65,37 @@ const UserProfile = () => {
       const carbonVal = typeof carbonRes.data === 'object' ? carbonRes.data.totalCarbonReduce : carbonRes.data;
       setTotalCarbon(Math.floor(carbonVal * 1000));
 
+      // 커뮤니티 데이터
       const commRes = await axios.get(`${backHost}/member/community-carbon`);
       setCommunityPoint(commRes.data);
 
-      console.log("데이터 새로고침 성공");
+      console.log("실시간 데이터 동기화 완료");
     } catch (err) {
       console.error("데이터 로딩 실패", err);
     }
   }, [user?.memberId, backHost]);
 
-  // 5. useEffect 훅
   useEffect(() => {
     const handleAutoUpdate = () => {
       const savedPoint = localStorage.getItem("memberPoint");
       if (savedPoint) setPoint(Number(savedPoint));
       fetchUserData();
     };
+
     window.addEventListener("pointUpdated", handleAutoUpdate);
-    fetchUserData();
+    fetchUserData(); // 초기 호출
+
     return () => window.removeEventListener("pointUpdated", handleAutoUpdate);
   }, [fetchUserData]);
 
+  // --- 3. 유저 정보 변경 시 포인트 동기화 ---
   useEffect(() => {
-    if (user?.memberPoint !== undefined) setPoint(user.memberPoint);
+    if (user?.memberPoint !== undefined) {
+      setPoint(user.memberPoint);
+    }
   }, [user]);
 
+  // --- 4. 탄소 게이지 애니메이션 ---
   useEffect(() => {
     const targetPoint = 10000;
     const calculatedPercent = Math.min((totalCarbon / targetPoint) * 100, 100);
@@ -118,8 +103,13 @@ const UserProfile = () => {
     return () => clearTimeout(timer);
   }, [totalCarbon]);
 
+  // --- 이벤트 핸들러 ---
+  const toggleEco = () => setOpenEco(!openEco);
+  const toggleHistory = () => {
+    setOpenHistory(!openHistory);
+    if (!openHistory) setCurrentPage(1);
+  };
 
-  // 6. JSX 렌더링
   return (
     <div className={styles.right}>
       <div className={styles.user_grade}>
@@ -202,99 +192,58 @@ const UserProfile = () => {
                     const isCancelled = item.orderStatus === 9;
                     const isPending = item.orderStatus >= 1 && item.orderStatus <= 4;
                     const actualGetPoint = isCancelled && item.pointReward === 0 ? 0 : item.getPoint;
-
                     return (
                       <div key={item.orderId} className={`${styles.history_item} ${isCancelled ? styles.item_cancelled : ""}`}>
                         <div className={styles.history_left}>
                           <StorefrontIcon className={`${styles.store_icon} ${isCancelled ? styles.icon_cancelled : ""}`} />
                           <div>
                             <div className={styles.store_name_row}>
-                              <strong
-                                className={
-                                  isCancelled ? styles.text_cancelled : ""
-                                }
-                              >
-                                {item.storeName}
-                              </strong>
-                              {isCancelled && (
-                                <span className={styles.cancel_badge}>
-                                  결제취소
-                                </span>
-                              )}
+                              <strong className={isCancelled ? styles.text_cancelled : ""}>{item.storeName}</strong>
+                              {isCancelled && <span className={styles.cancel_badge}>결제취소</span>}
                               {isPending && (
-                                <span className={styles.pending_badge}>
+                                <span className={styles.pending_badge} style={{ fontSize: "0.7rem", marginLeft: "5px", color: "#2e7d32", border: "1px solid #2e7d32", padding: "1px 4px", borderRadius: "4px" }}>
                                   적립 예정
                                 </span>
                               )}
+                              <div className={styles.orderIdRow}>&nbsp;&nbsp;(주문번호 :{item.orderId})</div>
                             </div>
-                            <div className={styles.history_date}>
-                              {item.orderDate} (주문번호:{item.orderId})
-                            </div >
                             <div className={styles.history_date}>{item.orderDate}</div>
-                          </div >
-                        </div >
+                          </div>
+                        </div>
                         <div className={styles.history_right}>
                           {isPending ? (
                             <span className={styles.point_pending}>적립 예정</span>
                           ) : isCancelled && actualGetPoint === 0 ? (
-                            <span className={styles.text_cancelled}>
-                              적립 취소
-                            </span>
+                            <span className={styles.text_cancelled} style={{ fontSize: "0.9rem" }}>적립 취소</span>
                           ) : (
-                            <span
-                              className={
-                                isCancelled
-                                  ? styles.point_refund_minus
-                                  : styles.plus_point
-                              }
-                            >
-                              {isCancelled ? "-" : "+"}
-                              {actualGetPoint.toLocaleString()}P
-                            </span>
+                            actualGetPoint > 0 && (
+                              <span className={isCancelled ? styles.point_refund_minus : styles.plus_point}>
+                                {isCancelled ? "-" : "+"}{" "}{actualGetPoint.toLocaleString()}P
+                              </span>
+                            )
                           )}
                         </div>
-                      </div >
+                      </div>
                     );
                   })}
-
-                  {/* 페이지네이션 버튼부 */}
                   {totalPages > 1 && (
                     <div className={styles.pagination}>
-                      <button
-                        onClick={() => setCurrentPage(startPage - 1)}
-                        disabled={startPage === 1}
-                      >
-                        이전
-                      </button>
-                      {pageNumbers.map((number) => (
-                        <button
-                          key={number}
-                          onClick={() => setCurrentPage(number)}
-                          className={
-                            currentPage === number ? styles.activePage : ""
-                          }
-                        >
-                          {number}
-                        </button>
+                      <button onClick={() => setCurrentPage((p) => Math.max(1, p - 1))} disabled={currentPage === 1}>&lt;</button>
+                      {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                        <button key={page} className={`${styles.pageBtn} ${currentPage === page ? styles.activePage : ""}`} onClick={() => setCurrentPage(page)}>{page}</button>
                       ))}
-                      <button
-                        onClick={() => setCurrentPage(endPage + 1)}
-                        disabled={endPage === totalPages}
-                      >
-                        다음
-                      </button>
+                      <button onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages}>&gt;</button>
                     </div>
                   )}
                 </>
               ) : (
                 <div className={styles.empty_msg}>최근 내역이 없습니다. 🌱</div>
-              )
-              }
-            </div >
-          </Collapse >
-        </div >
-      </section >
-    </div >
+              )}
+            </div>
+          </Collapse>
+        </div>
+      </section>
+    </div>
   );
 };
 

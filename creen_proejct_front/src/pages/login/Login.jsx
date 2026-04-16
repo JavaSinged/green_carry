@@ -16,13 +16,9 @@ import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import EcoEarth from "../../components/Easter Egg/EcoEarth";
 
-const API_BASE_URL = import.meta.env.VITE_BACKSERVER?.trim() || "";
-const isBrowser = typeof window !== "undefined";
-
 const Login = () => {
   // 🌟 1번 이스터에그 상태 (로고 클릭)
   const [clickCount, setClickCount] = useState(0);
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleLogoEasterEgg = () => {
     setClickCount((prev) => prev + 1);
@@ -114,54 +110,31 @@ const Login = () => {
   };
 
   useEffect(() => {
-    if (!API_BASE_URL) {
-      console.error("VITE_BACKSERVER is not configured for the login page.");
-      return;
-    }
-
-    let isMounted = true;
-
     // 1. 유저 수 로드
-    Promise.allSettled([
-      axios.get(`${API_BASE_URL}/member`),
-      axios.get(`${API_BASE_URL}/member/community-carbon`),
-    ]).then(([memberResult, communityCarbonResult]) => {
-      if (!isMounted) {
-        return;
-      }
+    axios
+      .get(`${import.meta.env.VITE_BACKSERVER}/member`)
+      .then((res) => {
+        setUserCount(res.data.length);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
 
-      if (memberResult.status === "fulfilled") {
-        const memberList = Array.isArray(memberResult.value.data)
-          ? memberResult.value.data
-          : [];
-        setUserCount(memberList.length);
-      } else {
-        console.error("유저 수 로드 실패:", memberResult.reason);
-      }
-
-      if (communityCarbonResult.status === "fulfilled") {
-        setCommunityCarbon(Number(communityCarbonResult.value.data) || 0);
-      } else {
-        console.error(
-          "커뮤니티 탄소량 로드 실패:",
-          communityCarbonResult.reason,
-        );
-      }
-    });
-
-    return () => {
-      isMounted = false;
-    };
+    // 🌟 2. 전체 커뮤니티 탄소 절감량 로드 (Header와 동일한 로직)
+    axios
+      .get(`${import.meta.env.VITE_BACKSERVER}/member/community-carbon`)
+      .then((res) => {
+        setCommunityCarbon(Number(res.data) || 0);
+      })
+      .catch((err) => {
+        console.error("커뮤니티 탄소량 로드 실패:", err);
+      });
   }, []);
 
   const { containerRef, bubblesRef, selectedBg, bubbleData, fireflyData } =
     useEcoEffects();
 
   useEffect(() => {
-    if (!isBrowser) {
-      return;
-    }
-
     const savedId = localStorage.getItem("savedUserId");
     if (savedId) {
       setMember((prev) => ({ ...prev, memberId: savedId }));
@@ -173,7 +146,7 @@ const Login = () => {
   const inputMember = (e) => {
     const { name, value } = e.target;
     const noSpaceValue = value.replace(/\s/g, ""); // 모든 공백 제거
-    setMember((prev) => ({ ...prev, [name]: noSpaceValue }));
+    setMember({ ...member, [name]: noSpaceValue });
   };
 
   // 스페이스바 타이핑 자체를 막는 함수
@@ -184,7 +157,11 @@ const Login = () => {
   };
 
   const handleKeyUp = (e) => {
-    setIsCapsLockOn(e.getModifierState("CapsLock"));
+    if (e.getModifierState("CapsLock")) {
+      setIsCapsLockOn(true);
+    } else {
+      setIsCapsLockOn(false);
+    }
   };
 
   const handleTabChange = (tab) => {
@@ -192,46 +169,7 @@ const Login = () => {
     setMember((prev) => ({ ...prev, memberGrade: tab === "personal" ? 1 : 2 }));
   };
 
-  const persistLoginSession = (loginUser, accessToken, refreshToken, memberId) => {
-    // 브라우저 저장소 접근은 한 곳으로 모아두면 배포 환경 이슈를 추적하기 쉽습니다.
-    if (!isBrowser) {
-      return;
-    }
-
-    if (refreshToken) {
-      localStorage.setItem("refreshToken", refreshToken);
-    }
-
-    localStorage.setItem("accessToken", accessToken);
-    localStorage.setItem("memberId", loginUser.memberId ?? "");
-    localStorage.setItem("memberName", loginUser.memberName ?? "");
-    localStorage.setItem("memberGrade", String(loginUser.memberGrade ?? ""));
-    localStorage.setItem("memberThumb", loginUser.memberThumb ?? "");
-    localStorage.setItem("memberAddr", loginUser.memberAddr ?? "");
-    localStorage.setItem("LATITUDE", String(loginUser.latitude ?? ""));
-    localStorage.setItem("LONGITUDE", String(loginUser.longitude ?? ""));
-    localStorage.setItem("memberPoint", String(loginUser.memberPoint ?? 0));
-
-    if (loginUser.storeId) {
-      localStorage.setItem("storeId", String(loginUser.storeId));
-    } else {
-      localStorage.removeItem("storeId");
-    }
-
-    if (rememberId) {
-      localStorage.setItem("savedUserId", memberId);
-    } else {
-      localStorage.removeItem("savedUserId");
-    }
-
-    if (autoLogin) {
-      localStorage.setItem("isAutoLogin", "true");
-    } else {
-      localStorage.removeItem("isAutoLogin");
-    }
-  };
-
-  const login = async () => {
+  const login = () => {
     const { memberId, memberPw } = member;
 
     if (!memberId || !memberPw) {
@@ -267,89 +205,96 @@ const Login = () => {
       return;
     }
 
-    if (!API_BASE_URL) {
-      Swal.fire({
-        icon: "error",
-        title: "서버 설정 오류",
-        text: "로그인 서버 주소가 설정되지 않았습니다.",
-        customClass: swalCustomClass,
-      });
-      return;
-    }
-
-    if (isSubmitting) {
-      return;
-    }
-
     const loginPayload = {
       ...member,
-      autoLogin,
+      autoLogin: autoLogin,
     };
 
-    setIsSubmitting(true);
+    axios
+      .post(`${import.meta.env.VITE_BACKSERVER}/member/login`, loginPayload)
+      .then((res) => {
+        const { member: loginUser, accessToken, refreshToken } = res.data;
 
-    try {
-      const res = await axios.post(`${API_BASE_URL}/member/login`, loginPayload);
-      const { member: loginUser, accessToken, refreshToken } = res.data ?? {};
+        if (loginUser && Number(loginUser.memberStatus) === 2) {
+          Swal.fire({
+            icon: "error",
+            title: "로그인 불가",
+            text: "탈퇴한 회원입니다. 다시 이용하시려면 고객센터에 문의해주세요.",
+            customClass: swalCustomClass,
+          });
+          return;
+        }
 
-      if (loginUser && Number(loginUser.memberStatus) === 2) {
+        if (loginUser && accessToken) {
+          if (refreshToken) {
+            localStorage.setItem("refreshToken", refreshToken);
+          }
+          localStorage.setItem("accessToken", accessToken);
+          localStorage.setItem("memberId", loginUser.memberId);
+          localStorage.setItem("memberName", loginUser.memberName);
+          localStorage.setItem("memberGrade", loginUser.memberGrade);
+          localStorage.setItem("memberThumb", loginUser.memberThumb);
+          localStorage.setItem("memberAddr", loginUser.memberAddr);
+          localStorage.setItem("LATITUDE", loginUser.latitude);
+          localStorage.setItem("LONGITUDE", loginUser.longitude);
+
+          localStorage.setItem("memberPoint", loginUser.memberPoint || 0);
+          if (loginUser.storeId) {
+            localStorage.setItem("storeId", loginUser.storeId);
+          }
+
+          if (rememberId) {
+            localStorage.setItem("savedUserId", memberId);
+          } else {
+            localStorage.removeItem("savedUserId");
+          }
+
+          if (autoLogin) {
+            localStorage.setItem("isAutoLogin", "true");
+          } else {
+            localStorage.removeItem("isAutoLogin");
+          }
+
+          let welcomeTitle = "";
+          let welcomeHtml = "";
+          let targetPath = "/";
+          const grade = Number(loginUser.memberGrade);
+
+          if (grade === 0) {
+            welcomeTitle = "관리자 시스템 접속";
+            welcomeHtml = `<b style="color: #2e7d32;">관리자님</b> 환영합니다! <br/>그린캐리 관리자 모드로 로그인되었습니다.`;
+            targetPath = "/mypage/admin";
+          } else if (grade === 2) {
+            welcomeTitle = "파트너 센터 접속";
+            welcomeHtml = `<b>${loginUser.memberName}</b> 사장님! <br/>매장 관리 화면으로 이동합니다.`;
+            targetPath = "/mypage/manager";
+          } else {
+            welcomeTitle = "로그인 성공!";
+            welcomeHtml = `<b>${loginUser.memberName}</b> 에코 히어로님! 환영합니다!<br/>메인 페이지로 이동합니다.`;
+            targetPath = "/";
+          }
+
+          Swal.fire({
+            icon: "success",
+            title: welcomeTitle,
+            html: welcomeHtml,
+            showConfirmButton: false,
+            timer: 1500,
+            customClass: swalCustomClass,
+          }).then(() => {
+            window.location.replace(targetPath);
+          });
+        }
+      })
+      .catch((err) => {
+        console.error(err);
         Swal.fire({
           icon: "error",
-          title: "로그인 불가",
-          text: "탈퇴한 회원입니다. 다시 이용하시려면 고객센터에 문의해주세요.",
+          title: "로그인 실패",
+          text: "정보가 일치하지 않습니다.",
           customClass: swalCustomClass,
         });
-        return;
-      }
-
-      if (!loginUser || !accessToken) {
-        throw new Error("Login response is missing required session data.");
-      }
-
-      persistLoginSession(loginUser, accessToken, refreshToken, memberId);
-
-      let welcomeTitle = "";
-      let welcomeHtml = "";
-      let targetPath = "/";
-      const grade = Number(loginUser.memberGrade);
-
-      if (grade === 0) {
-        welcomeTitle = "관리자 시스템 접속";
-        welcomeHtml = `<b style="color: #2e7d32;">관리자님</b> 환영합니다! <br/>그린캐리 관리자 모드로 로그인되었습니다.`;
-        targetPath = "/mypage/admin";
-      } else if (grade === 2) {
-        welcomeTitle = "파트너 센터 접속";
-        welcomeHtml = `<b>${loginUser.memberName}</b> 사장님! <br/>매장 관리 화면으로 이동합니다.`;
-        targetPath = "/mypage/manager";
-      } else {
-        welcomeTitle = "로그인 성공!";
-        welcomeHtml = `<b>${loginUser.memberName}</b> 에코 히어로님! 환영합니다!<br/>메인 페이지로 이동합니다.`;
-        targetPath = "/";
-      }
-
-      await Swal.fire({
-        icon: "success",
-        title: welcomeTitle,
-        html: welcomeHtml,
-        showConfirmButton: false,
-        timer: 1500,
-        customClass: swalCustomClass,
       });
-
-      if (isBrowser) {
-        window.location.replace(targetPath);
-      }
-    } catch (err) {
-      console.error("Login failed:", err);
-      Swal.fire({
-        icon: "error",
-        title: "로그인 실패",
-        text: "정보가 일치하지 않거나 서버 연결에 문제가 있습니다.",
-        customClass: swalCustomClass,
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
   };
 
   return (
@@ -545,7 +490,6 @@ const Login = () => {
                   type="checkbox"
                   id="auto_login_check"
                   checked={autoLogin}
-                  disabled={isSubmitting}
                   onChange={(e) => setAutoLogin(e.target.checked)}
                 />
                 <label htmlFor="auto_login_check" style={{ margin: 0 }}>
@@ -554,12 +498,8 @@ const Login = () => {
               </div>
             </div>
 
-            <button
-              type="submit"
-              className="login-button shimmer-btn"
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? "로그인 중..." : "로그인"}
+            <button type="submit" className="login-button shimmer-btn">
+              로그인
             </button>
           </form>
 

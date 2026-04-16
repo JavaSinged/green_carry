@@ -319,12 +319,6 @@ button {
 .verify-send-btn:hover {
   background-color: var(--color-surface);
 }
-.verify-send-btn:disabled,
-.login-button:disabled,
-.submit-verify-btn:disabled {
-  cursor: not-allowed;
-  filter: grayscale(0.15);
-}
 
 .login-button,
 .submit-verify-btn {

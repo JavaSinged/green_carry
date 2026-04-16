@@ -6,15 +6,10 @@ import api from "../../utils/accessToken";
 import useAccountStore from "../../store/accountStore";
 import useEcoEffects from "../../hooks/useEcoEffects";
 
-const isBrowser = typeof window !== "undefined";
-
 const Account = () => {
   const { containerRef, bubblesRef, selectedBg, bubbleData, fireflyData } =
     useEcoEffects();
   const navigate = useNavigate();
-  const [isSendingCode, setIsSendingCode] = React.useState(false);
-  const [isVerifying, setIsVerifying] = React.useState(false);
-  const [isResettingPassword, setIsResettingPassword] = React.useState(false);
 
   const {
     activeTab,
@@ -64,12 +59,6 @@ const Account = () => {
       return;
     }
 
-    if (isSendingCode) {
-      return;
-    }
-
-    setIsSendingCode(true);
-
     api
       .post("/member/sendAuthCode", { memberEmail: formData.memberEmail })
       .then(() => {
@@ -89,20 +78,11 @@ const Account = () => {
           title: "발송 실패",
           text: "잠시 후 다시 시도해주세요.",
         });
-      })
-      .finally(() => {
-        setIsSendingCode(false);
       });
   };
 
   const handleVerifySubmit = (e) => {
     e.preventDefault();
-
-    // 인증 요청은 순차적으로만 처리해서 타이머와 검증 상태가 꼬이지 않게 합니다.
-    if (isVerifying) {
-      return;
-    }
-
     if (!inputCode) {
       Swal.fire({ icon: "warning", title: "인증번호를 입력해주세요." });
       return;
@@ -115,8 +95,6 @@ const Account = () => {
       });
       return;
     }
-
-    setIsVerifying(true);
 
     api
       .post("/member/verifyCode", {
@@ -138,11 +116,7 @@ const Account = () => {
                   icon: "success",
                   title: "아이디 찾기 성공",
                   html: `고객님의 아이디는 <b>${resId.data}</b> 입니다.`,
-                }).then(() => {
-                  if (isBrowser) {
-                    navigate("/login");
-                  }
-                });
+                }).then(() => navigate("/login"));
               })
               .catch(() =>
                 Swal.fire({
@@ -189,25 +163,12 @@ const Account = () => {
           title: "오류",
           text: "문제가 발생했습니다.",
         }),
-      )
-      .finally(() => {
-        setIsVerifying(false);
-      });
+      );
   };
 
   const handlePasswordChangeSubmit = (e) => {
     e.preventDefault();
-    if (
-      isResettingPassword ||
-      pwError ||
-      matchError ||
-      !newPassword ||
-      !confirmPassword
-    ) {
-      return;
-    }
-
-    setIsResettingPassword(true);
+    if (pwError || matchError || !newPassword || !confirmPassword) return;
 
     api
       .post("/member/resetPw", {
@@ -227,11 +188,7 @@ const Account = () => {
           icon: "success",
           title: "변경 완료",
           text: "비밀번호가 성공적으로 변경되었습니다.",
-        }).then(() => {
-          if (isBrowser) {
-            navigate("/login");
-          }
-        });
+        }).then(() => navigate("/login"));
       })
       .catch(() =>
         Swal.fire({
@@ -239,10 +196,7 @@ const Account = () => {
           title: "변경 실패",
           text: "비밀번호 변경 중 서버 오류가 발생했습니다.",
         }),
-      )
-      .finally(() => {
-        setIsResettingPassword(false);
-      });
+      );
   };
 
   return (
@@ -383,14 +337,9 @@ const Account = () => {
                 <button
                   type="button"
                   className="verify-send-btn"
-                  disabled={isSendingCode}
                   onClick={sendCode}
                 >
-                  {isSendingCode
-                    ? "전송 중..."
-                    : isCodeSent
-                      ? "재전송"
-                      : "인증번호 전송"}
+                  {isCodeSent ? "재전송" : "인증번호 전송"}
                 </button>
               </div>
 
@@ -416,14 +365,9 @@ const Account = () => {
                   <button
                     type="submit"
                     className="submit-verify-btn shimmer-btn"
-                    disabled={isVerifying}
                     style={{ marginTop: "15px" }}
                   >
-                    {isVerifying
-                      ? "확인 중..."
-                      : activeTab === "findId"
-                        ? "아이디 찾기"
-                        : "인증 확인"}
+                    {activeTab === "findId" ? "아이디 찾기" : "인증 확인"}
                   </button>
                 </>
               )}
@@ -502,24 +446,16 @@ const Account = () => {
                 type="submit"
                 className="submit-verify-btn shimmer-btn"
                 disabled={
-                  isResettingPassword ||
-                  pwError ||
-                  matchError ||
-                  !confirmPassword ||
-                  !newPassword
+                  pwError || matchError || !confirmPassword || !newPassword
                 }
                 style={{
                   opacity:
-                    isResettingPassword ||
-                    pwError ||
-                    matchError ||
-                    !confirmPassword ||
-                    !newPassword
+                    pwError || matchError || !confirmPassword || !newPassword
                       ? 0.5
                       : 1,
                 }}
               >
-                {isResettingPassword ? "변경 중..." : "비밀번호 변경 완료"}
+                비밀번호 변경 완료
               </button>
             </form>
           )}
