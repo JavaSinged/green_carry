@@ -194,7 +194,8 @@
 		optionString,
 		CASE
 		WHEN o.delivery_type = 1 THEN 0
-		WHEN o.delivery_type = 2 THEN 1000
+		WHEN o.delivery_type =
+		2 THEN 1000
 		WHEN o.delivery_type = 3 THEN 3000
 		ELSE 0
 		END AS deliveryFee
@@ -203,12 +204,14 @@
 		JOIN order_tbl o
 		ON od.order_id
 		= o.order_id
-		JOIN menu_tbl m
+		JOIN
+		menu_tbl m
 		ON od.menu_id =
 		m.menu_id
 		WHERE od.order_id =
 		#{orderId}
-		ORDER BY od.order_detail_id
+		ORDER
+		BY od.order_detail_id
 	</select>
 
 	<select id="searchOrderInfo" parameterType="int"
@@ -506,16 +509,19 @@
 
 	<select id="selectStatsOrderInfo" resultType="statsOrderInfo">
 		SELECT
+		deliveryType,
+		SUM(menuAmount + deliveryFee) AS seriesAmount
+		FROM (
+		SELECT
+		o.order_id,
 		o.DELIVERY_TYPE AS deliveryType,
-		SUM(
-		(od.PRICE * od.QUANTITY) +
+		SUM(od.PRICE * od.QUANTITY) AS menuAmount,
 		CASE
 		WHEN o.DELIVERY_TYPE = 1 THEN 0
 		WHEN o.DELIVERY_TYPE = 2 THEN 1000
 		WHEN o.DELIVERY_TYPE = 3 THEN 3000
 		ELSE 0
-		END
-		) AS seriesAmount
+		END AS deliveryFee
 		FROM order_list_map m
 		JOIN order_tbl o ON m.order_id = o.order_id
 		JOIN order_detail od ON o.order_id = od.order_id
@@ -523,8 +529,10 @@
 		o.store_id = #{storeId}
 		AND o.order_status = 5
 		AND TO_CHAR(m.reg_date, 'YYYY-MM') = #{yearMonth}
-		GROUP BY o.delivery_type
-		ORDER BY o.delivery_type ASC
+		GROUP BY o.order_id, o.DELIVERY_TYPE
+		)
+		GROUP BY deliveryType
+		ORDER BY deliveryType ASC
 	</select>
 
 	<select id="selectStoreReviewStats" resultType="map">
