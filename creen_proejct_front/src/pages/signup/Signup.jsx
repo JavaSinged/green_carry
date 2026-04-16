@@ -1,4 +1,4 @@
-import styles from "./Signup.module.css";
+﻿import styles from "./Signup.module.css";
 import { useNavigate } from "react-router-dom";
 import useEcoEffects from "../../hooks/useEcoEffects";
 
@@ -23,7 +23,7 @@ const Signup = () => {
         leafData.map((leaf) => (
           <div
             key={leaf.id}
-            className="particle-leaf"
+            className={styles.particleLeaf}
             style={{
               left: leaf.x,
               top: leaf.y,
@@ -34,7 +34,7 @@ const Signup = () => {
         fireflyData.map((style, i) => (
           <div
             key={`firefly-${i}`}
-            className="firefly"
+            className={styles.firefly}
             style={{
               left: style.left,
               top: style.top,
@@ -47,7 +47,7 @@ const Signup = () => {
       {bubbleData.map((style, i) => (
         <div
           key={i}
-          className="eco-bubble"
+          className={styles.ecoBubble}
           ref={(el) => (bubblesRef.current[i] = el)}
           style={{
             left: style.left,
@@ -85,7 +85,7 @@ const Signup = () => {
         </div>
 
         <p className={styles.footer_text}>
-          회원 정보를 잊어버리셨나요?
+          회원 정보를 잊으셨나요?
           <span
             className={styles.find_link}
             onClick={() => navigate("/account")}
@@ -99,3 +99,4 @@ const Signup = () => {
 };
 
 export default Signup;
+

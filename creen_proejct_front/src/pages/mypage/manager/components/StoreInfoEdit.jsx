@@ -292,7 +292,7 @@ export default function StoreInfoEdit() {
   const handleAddRestDay = () => {
     setRestDays([
       ...restDays,
-      { id: Date.now(), weekMonth: "week", day: "mon" },
+      { id: Date.now(), weekMonth: "week1", day: "mon" },
     ]);
   };
 
