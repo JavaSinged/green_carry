@@ -17,7 +17,7 @@ const AdminContainerManagement = () => {
     if (/^https?:\/\//i.test(imagePath) || imagePath.startsWith("blob:")) {
       return imagePath;
     }
-    return `${backHost}${imagePath.startsWith("/") ? "" : "/"}${imagePath}`;
+    return `${imagePath.startsWith("/") ? "" : "/"}${imagePath}`;
   };
 
   const [productName, setProductName] = useState(
