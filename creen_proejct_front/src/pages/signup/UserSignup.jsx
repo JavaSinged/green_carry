@@ -100,20 +100,24 @@ const UserSignup = () => {
       });
       return;
     }
-    if (checkEmail === 0) {
-      try {
-        const res = await axios.get(
-          `${import.meta.env.VITE_BACKSERVER}/member/emailDupCheck?memberEmail=${member.memberEmail}`,
-        );
-        if (res.data) setCheckEmail(2);
-        else {
-          Swal.fire({ icon: "error", text: "이미 사용 중인 이메일입니다." });
-          setCheckEmail(1);
-          return;
-        }
-      } catch (err) {
+    try {
+      // 코덱스가 수정함: 인증 메일 발송 시도마다 이메일 중복 검사를 다시 수행
+      const res = await axios.get(
+        `${import.meta.env.VITE_BACKSERVER}/member/emailDupCheck?memberEmail=${member.memberEmail}`,
+      );
+      if (!res.data) {
+        Swal.fire({ icon: "error", text: "이미 사용 중인 이메일입니다." });
+        setCheckEmail(1);
+        setMailAuth(0);
         return;
       }
+      setCheckEmail(2);
+    } catch (err) {
+      Swal.fire({
+        icon: "error",
+        text: "이메일 중복 확인 중 오류가 발생했습니다.",
+      });
+      return;
     }
     setTime(180);
     if (timeoutId) window.clearInterval(timeoutId);
