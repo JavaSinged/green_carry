@@ -330,7 +330,7 @@ export default function MenuModal({
               <span>🍃 다회용 용기 사용</span>
               <span className={styles.badge}>+에코 포인트</span>
             </div>
-            <p>용기 탄소 배출량 50% 감소</p>
+            <p>용기 탄소 배출량 30% 감소</p>
           </div>
           <label className={styles.toggle_switch}>
             <input
