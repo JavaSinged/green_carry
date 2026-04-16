@@ -1,10 +1,11 @@
-import { useEffect, useRef, useState } from "react";
-import styles from "./AdminContainerManagement.module.css";
-import CheckIcon from "@mui/icons-material/Check";
-import CloseIcon from "@mui/icons-material/Close";
-import { useNavigate, useParams, useLocation } from "react-router-dom";
-import api from "../../../utils/accessToken";
-import Swal from "sweetalert2";
+import { useEffect, useRef, useState } from 'react';
+import styles from './AdminContainerManagement.module.css';
+import CheckIcon from '@mui/icons-material/Check';
+import CloseIcon from '@mui/icons-material/Close';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
+import api from '../../../utils/accessToken';
+import Swal from 'sweetalert2';
+import axios from 'axios';
 
 const AdminContainerManagement = () => {
   //용기
@@ -12,9 +13,7 @@ const AdminContainerManagement = () => {
   const passedData = location.state?.carbonData;
   const backHost = import.meta.env.VITE_BACKSERVER;
 
-  const [productName, setProductName] = useState(
-    passedData?.productMaterial || "",
-  );
+  const [productName, setProductName] = useState(passedData?.productMaterial || "");
   const [kgValue, setKgValue] = useState(passedData?.productEmissions || "");
   const [description, setDescription] = useState(passedData?.productDesc || "");
 
@@ -24,16 +23,17 @@ const AdminContainerManagement = () => {
 
   const [previewImg, setPreviewImg] = useState(
     passedData?.productImg
-      ? `${passedData.productImg.startsWith("/") ? "" : "/"}${passedData.productImg}`
-      : "",
+      ? `${backHost}${passedData.productImg.startsWith('/') ? '' : '/'}${passedData.productImg}`
+      : ""
   );
 
   const navigate = useNavigate();
   const fileInput = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
 
-  const finalValue = kgValue.toString().replace("g", "");
+  const finalValue = kgValue.toString().replace('g', '');
   const { productId } = useParams();
+
 
   // 버튼 누를 때 작동
   const onUploadBtnClick = () => {
@@ -42,27 +42,38 @@ const AdminContainerManagement = () => {
 
   // 바이트 단위 변환기
   const formatBytes = (bytes) => {
-    if (bytes === 0) return "0 Bytes";
+    if (bytes === 0) return '0 Bytes';
     const k = 1024;
-    const sizes = ["Bytes", "KB", "MB", "GB"];
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
   // 파일 첨부 취소
   const onRemoveFile = (e) => {
     e.stopPropagation();
-
     if (previewImg) {
       URL.revokeObjectURL(previewImg);
     }
-
     setFileName("");
     setFileSize(0);
     setUploadFile(null);
     setPreviewImg("");
     if (fileInput.current) fileInput.current.value = "";
   };
+
+  useEffect(() => {
+
+    if (productId == "new") {
+
+      setProductName(""),
+        setKgValue(""),
+        setDescription(""),
+        setPreviewImg(""),
+        setUploadFile(null);
+    } else {
+    }
+  }, [productId]);
 
   // 공통 파일 저장 로직
   const handleSaveFile = (file) => {
@@ -75,6 +86,7 @@ const AdminContainerManagement = () => {
       setPreviewImg(imageUrl);
     }
   };
+
 
   const MAX_LENGTH = 240;
 
@@ -102,43 +114,47 @@ const AdminContainerManagement = () => {
   };
   const handleCo2Change = (e) => {
     const value = e.target.value.replace(/[^0-9.]/g, "");
-    if (value.split(".").length > 2) return;
+    if (value.split('.').length > 2) return;
     setKgValue(value);
   };
   const handleSaveSubmit = async () => {
-    if (!productName)
-      return Swal.fire("알림", "용기 이름을 입력해주세요.", "warning");
-    if (!kgValue)
-      return Swal.fire("알림", "용기 탄소 배출량을 입력해주세요.", "warning");
+    if (!productName) return Swal.fire("알림", "용기 이름을 입력해주세요.", "warning");
+    if (!kgValue) return Swal.fire("알림", "용기 탄소 배출량을 입력해주세요.", "warning");
+
     const formData = new FormData();
-    if (productId) {
-      formData.append("productId", productId);
+    console.log("보낼 ID:", productId)
+
+    if (productId && productId !== "new") {
+      formData.append("productId", parseInt(productId, 10));
     }
-    formData.append("productName", productName);
-    formData.append("productEmissions", kgValue);
+
+    formData.append("productMaterial", productName);
+    const cleanValue = kgValue.toString().replace(/[^0-9.]/g, "");
+    formData.append("productEmissions", kgValue || "0");
     formData.append("productDesc", description);
 
-    if (uploadFile) formData.append("uploadFile", uploadFile);
-
+    if (uploadFile) {
+      formData.append("uploadFile", uploadFile);
+    }
     try {
-      const response = await api.post("/admin/container/register", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
+      const response = await api.post("/carbon-list/update", formData, {
+        headers: { "Content-Type": "multipart/form-data" }
       });
 
-      if (response.status === 200 && response.data === "SUCCESS") {
-        Swal.fire("성공!", "용기 정보가 저장되었습니다.", "success").then(
-          () => {
-            navigate("/mypage/admin/containers");
-            setProductName("");
-            setKgValue("");
-            setDescription("");
-            setFileName("");
-            setFileSize(0);
-            setUploadFile(null);
-          },
-        );
+      if (response.data === "SUCCESS") {
+        Swal.fire("성공!", "용기 정보가 저장되었습니다.", "success").then(() => {
+          navigate("/mypage/admin/containers");
+
+          setProductName("");
+          setKgValue("");
+          setDescription("");
+          setFileName("");
+          setFileSize(0);
+          setUploadFile(null);
+        });
       } else {
-        Swal.fire("실패", "등록에 실패했습니다.", "error");
+        console.log("서버가 보낸 실제 값:", response.data);
+        Swal.fire("실패", `서버 대답: ${response.data}`, "error");
       }
     } catch (err) {
       console.error(err);
@@ -146,13 +162,15 @@ const AdminContainerManagement = () => {
     }
   };
 
+
+
   return (
     <div>
       <div className={styles.main}>
         <span>용기 등록/수정</span>
       </div>
       <div
-        className={`${styles.upload_box} ${isDragging ? styles.dragging : ""}`}
+        className={`${styles.upload_box} ${isDragging ? styles.dragging : ''}`}
         onDragOver={onDragOver}
         onDragLeave={onDragLeave}
         onDrop={onDrop}
@@ -162,7 +180,7 @@ const AdminContainerManagement = () => {
           ref={fileInput}
           onChange={handleFileChange}
           accept="image/png, image/jpeg, image/gif"
-          style={{ display: "none" }}
+          style={{ display: 'none' }}
         />
 
         {fileName ? (
@@ -183,30 +201,16 @@ const AdminContainerManagement = () => {
                 </span>
               </div>
             </div>
-            <button
-              type="button"
-              className={styles.close_btn}
-              onClick={onRemoveFile}
-            >
+            <button type="button" className={styles.close_btn} onClick={onRemoveFile}>
               <CloseIcon />
             </button>
           </div>
         ) : (
           <div className={styles.upload_content}>
-            <img
-              src="/image/recycling.png"
-              alt="업로드 아이콘"
-              className={styles.upload_icon}
-            />
-            <p className={styles.upload_title}>
-              용기 사진을 업로드하거나 드래그해서 넣으세요.
-            </p>
+            <img src="/image/recycling.png" alt="업로드 아이콘" className={styles.upload_icon} />
+            <p className={styles.upload_title}>용기 사진을 업로드하거나 드래그해서 넣으세요.</p>
             <p className={styles.upload_sub}>PNG, JPG, GIF (최대 5MB)</p>
-            <button
-              type="button"
-              className={styles.upload_btn}
-              onClick={onUploadBtnClick}
-            >
+            <button type="button" className={styles.upload_btn} onClick={onUploadBtnClick}>
               지금 찾아보기
             </button>
           </div>
@@ -216,7 +220,7 @@ const AdminContainerManagement = () => {
         <div className={styles.item_name_input}>
           <p>용기 이름</p>
           <input
-            type="text"
+            type='text'
             placeholder="ex) 사각 용기(소)"
             className={styles.item_name}
             value={productName}
@@ -227,12 +231,11 @@ const AdminContainerManagement = () => {
           <p>용기 탄소 배출량 (kg)</p>
           <div className={styles.input_wrapper}>
             <input
-              type="text"
+              type='text'
               placeholder="0"
               className={styles.co2_value}
               value={kgValue}
-              onChange={handleCo2Change}
-            />
+              onChange={handleCo2Change} />
             {kgValue && <span className={styles.unit}>kg</span>}
           </div>
         </div>
@@ -254,18 +257,10 @@ const AdminContainerManagement = () => {
         </div>
       </section>
       <div className={styles.btn}>
-        <button
-          type="button"
-          className={styles.cancel_btn}
-          onClick={() => navigate(-1)}
-        >
+        <button type='button' className={styles.cancel_btn} onClick={() => navigate(-1)}>
           취소
         </button>
-        <button
-          type="button"
-          className={styles.save_btn}
-          onClick={handleSaveSubmit}
-        >
+        <button type='button' className={styles.save_btn} onClick={handleSaveSubmit}>
           저장
         </button>
       </div>

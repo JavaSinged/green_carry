@@ -107,8 +107,8 @@
 }
 
 .store_image_placeholder {
-  width: 40px;
-  height: 40px;
+  width: 90px;
+  height: 90px;
   background: var(--color-bg);
   border-radius: 8px;
   flex-shrink: 0;
@@ -144,6 +144,11 @@
   font-size: 12px;
   font-weight: 600;
   display: inline-block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 120px;
+  vertical-align: middle;
 }
 
 .rating_wrap {
@@ -255,4 +260,22 @@
 
 .page_dots {
   color: var(--text-sub);
+}
+.addPage {
+  background-color: var(--color-brand);
+  padding: 10px;
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+}
+.AddIconText {
+  display: flex;
+  align-items: center;
+  margin: 0;
+  font-size: 14px;
+  gap: 2px;
+}
+.AddIconText svg {
+  width: 20px;
+  height: 20px;
 }
