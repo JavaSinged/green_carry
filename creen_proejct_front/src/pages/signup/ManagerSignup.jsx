@@ -7,7 +7,7 @@ import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import axios from "axios";
 import Swal from "sweetalert2";
 import useEcoEffects from "../../hooks/useEcoEffects";
-import "./ManagerSignup.module.css";
+import "./UserSignup.module.css";
 
 const ManagerSignup = () => {
   // 🌟 leafData(나뭇잎 효과) 추가
