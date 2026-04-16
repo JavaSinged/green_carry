@@ -4,7 +4,7 @@ import "react-calendar/dist/Calendar.css";
 import axios from "axios";
 import Swal from "sweetalert2";
 import useEcoEffects from "../../hooks/useEcoEffects";
-import "./UserSignup.css";
+import "./UserSignup.module.css";
 
 const ManagerSignup = () => {
   // 🌟 leafData(나뭇잎 효과) 추가
