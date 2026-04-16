@@ -16,4 +16,5 @@ public class ProductCarbon {
 	private double productEmissions;
 	private String productImg;
 	private String productDesc;
+	private String productCategory;
 }

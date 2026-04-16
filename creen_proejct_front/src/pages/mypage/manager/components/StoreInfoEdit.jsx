@@ -308,7 +308,7 @@ export default function StoreInfoEdit() {
 
           // 🌟 서버에서 받은 이미지 경로 설정
           if (data.storeThumb) {
-            setPreviewImg(`${backHost}/${data.storeThumb}`);
+            setPreviewImg(data.storeThumb);
           }
         }
       } catch (error) {

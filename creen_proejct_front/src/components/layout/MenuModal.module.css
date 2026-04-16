@@ -235,6 +235,11 @@ input:checked + .slider:before {
   font-weight: bold;
   font-size: 1.1rem;
 }
+.carbon_total_red {
+  color: var(--color-carbon);
+  font-weight: bold;
+  font-size: 1.1rem;
+}
 
 .submit_btn {
   background-color: var(--color-brand);

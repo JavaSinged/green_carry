@@ -3,16 +3,16 @@
   border: 1px solid #e0e0e0;
   border-radius: 12px;
   padding: 30px;
-
+  width: 100%;
   box-sizing: border-box;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
 }
 
 .header {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 0px;
+  margin-bottom: 24px;
 }
 
 .title {
@@ -24,7 +24,6 @@
 
 .search_wrap {
   display: flex;
-  justify-content: right;
   align-items: center;
   border: 1px solid #ccc;
   border-radius: 30px;
@@ -49,28 +48,21 @@
 
 .search_icon {
   color: var(--text-main);
-  font-size: 20px;
+  font-size: 20px !important;
   cursor: pointer;
 }
-.table td {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
+
+/* 2. 테이블 영역 */
 .table_wrap {
   width: 100%;
-  overflow: auto;
-  border-collapse: collapse;
+  overflow-x: auto;
 }
 
 .table {
   width: 100%;
-  min-width: 800px;
   border-collapse: collapse;
   text-align: center;
   font-family: var(--font-body);
-  table-layout: fixed;
-  border-collapse: collapse;
 }
 
 .table th,
@@ -97,21 +89,12 @@
   width: 40px;
 }
 
-.col_name {
-  width: 36%;
-  text-align: left;
+.col_left {
+  text-align: left !important;
 }
-.col_desc {
-  width: 30%;
-}
-.col_emissions {
-  width: 200px;
-}
-.col_action {
-  width: 100px;
-}
+
 .sort_icon {
-  font-size: 16px;
+  font-size: 16px !important;
   vertical-align: middle;
   color: #bbb;
   cursor: pointer;
@@ -121,14 +104,11 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  width: 100%;
-  min-width: 0;
-  overflow: hidden;
 }
 
 .store_image_placeholder {
-  width: 90px;
-  height: 90px;
+  width: 40px;
+  height: 40px;
   background: var(--color-bg);
   border-radius: 8px;
   flex-shrink: 0;
@@ -139,19 +119,10 @@
   border-radius: 8px;
 }
 .store_text {
-  flex: 1;
-  min-width: 0;
-  text-align: left;
+  display: flex;
+  flex-direction: column;
 }
-.store_name,
-.store_sub {
-  display: block;
-  width: 100%;
-  overflow: hidden;
-  word-break: keep-all;
-  font-weight: 600;
-  font-size: 15px;
-}
+
 .store_name {
   margin: 0;
   font-size: 15px;
@@ -169,15 +140,10 @@
   background-color: var(--color-surface);
   color: var(--color-brand);
   padding: 4px 10px;
-  border-radius: 3px;
+  border-radius: 12px;
   font-size: 12px;
   font-weight: 600;
   display: inline-block;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 120px;
-  vertical-align: middle;
 }
 
 .rating_wrap {
@@ -231,13 +197,7 @@
   align-items: center;
   margin-top: 24px;
 }
-.two_contain {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-  margin-bottom: 24px;
-}
+
 .page_btn_nav {
   display: flex;
   align-items: center;
@@ -295,22 +255,4 @@
 
 .page_dots {
   color: var(--text-sub);
-}
-.addPage {
-  background-color: var(--color-brand);
-  padding: 8px 16px;
-  border-radius: 8px;
-  color: white;
-  cursor: pointer;
-}
-.AddIconText {
-  display: flex;
-  align-items: center;
-  margin: 0;
-  font-size: 14px;
-  gap: 2px;
-}
-.AddIconText svg {
-  width: 20px;
-  height: 20px;
 }
