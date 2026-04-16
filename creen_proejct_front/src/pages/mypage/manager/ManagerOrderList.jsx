@@ -273,14 +273,14 @@ const ManagerOrderList = () => {
                       {order.menuName}{" "}
                       {order.extraCount > 0 && `외 ${order.extraCount}건`}
                     </h3>
-                    {order.extraCount > 0 && (
-                      <button
-                        className={styles.detailToggleBtn}
-                        onClick={() => handleOpenDetailModal(order)}
-                      >
-                        상세메뉴 보기
-                      </button>
-                    )}
+
+                    <button
+                      className={styles.detailToggleBtn}
+                      onClick={() => handleOpenDetailModal(order)}
+                    >
+                      상세메뉴 보기
+                    </button>
+
                     <p className={styles.price} style={{ marginTop: "12px" }}>
                       결제금액:{" "}
                       <strong
