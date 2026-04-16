@@ -18,7 +18,9 @@ import kr.co.iei.CreenCarryBackApplication;
 import kr.co.iei.admin.model.service.AdminService;
 import kr.co.iei.admin.model.vo.OrderListByStoreId;
 import kr.co.iei.admin.model.vo.StoreResponse;
+import kr.co.iei.admin.model.vo.orderDetail;
 import kr.co.iei.member.model.vo.Review;
+import kr.co.iei.store.model.vo.OrderResponse;
 import kr.co.iei.store.model.vo.StoreReviewResponse;
 
 @RestController
@@ -28,7 +30,6 @@ public class AdminController {
 
 	@Autowired
 	private AdminService adminService;
-
 
 	@GetMapping("/api/sales/stats")
 	public ResponseEntity<?> getSalesStats() {
@@ -45,8 +46,8 @@ public class AdminController {
 
 		for (int i = 5; i >= 0; i--) {
 			YearMonth ym = now.minusMonths(i);
-			targetCurrent.add(ym.toString());             // 예: "2026-04"
-			targetPast.add(ym.minusYears(1).toString());  // 예: "2025-04"
+			targetCurrent.add(ym.toString()); // 예: "2026-04"
+			targetPast.add(ym.minusYears(1).toString()); // 예: "2025-04"
 			categories.add(String.format("%02d월", ym.getMonthValue())); // 예: "04월"
 
 			// 데이터가 없는 달을 대비해 기본값 0 셋팅
@@ -133,9 +134,17 @@ public class AdminController {
 		return ResponseEntity.ok(list);
 	}
 
-	
+	@GetMapping("/order-detail/{orderId}")
+	public ResponseEntity<?> selectOrderDetailByOrderId(@PathVariable("orderId") int orderId) {
+		// 1. 서비스로 주문번호(orderId)를 넘겨서 상세 메뉴 리스트를 받아옴
+		List<orderDetail> detailList = adminService.selectOrderDetailByOrderId(orderId);
+
+		// 2. 프론트엔드로 JSON 형태로 반환
+		return ResponseEntity.ok(detailList);
+	}
+
 	@GetMapping("/reviews")
-	public ResponseEntity<?> selectAllReviews(){
+	public ResponseEntity<?> selectAllReviews() {
 		List<StoreReviewResponse> list = adminService.selectAllReview();
 		return ResponseEntity.ok(list);
 	}

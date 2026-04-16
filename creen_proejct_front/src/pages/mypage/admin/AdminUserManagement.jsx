@@ -176,7 +176,7 @@ export default function AdminUserManagement() {
                         <img
                           src={
                             member.memberThumb
-                              ? `${backHost}${member.memberThumb}`
+                              ? `${member.memberThumb}`
                               : "/image/default-user.png"
                           }
                           alt="profile"

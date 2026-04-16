@@ -160,7 +160,7 @@ export default function Header() {
                 <div className={styles.profile_circle}>
                   {user?.memberThumb && user.memberThumb !== "null" ? (
                     <img
-                      src={`${user.memberThumb}`}
+                      src={user.memberThumb}
                       alt="profile"
                       className={styles.profile_img}
                       onError={(e) => {

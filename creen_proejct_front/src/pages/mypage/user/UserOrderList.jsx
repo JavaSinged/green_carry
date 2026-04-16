@@ -231,7 +231,7 @@ const UserOrderListPage = () => {
                     <img
                       src={
                         order.storeThumb
-                          ? `${backHost}/${order.storeThumb}`
+                          ? `${order.storeThumb}`
                           : "/image/no-image.png"
                       }
                       alt={order.menuName || "메뉴"}

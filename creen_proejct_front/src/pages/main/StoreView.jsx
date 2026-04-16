@@ -94,21 +94,6 @@ export default function StoreView() {
           storeRating: Number(storeResult.value.data?.storeRating ?? 0),
         };
 
-        // 🚀 [상점 정보 로드]
-        axios
-          .get(`${API_BASE_URL}/stores/${storeId}`)
-          .then((res) => {
-            if (res.data.storeName) setGlobalStoreName(res.data.storeName);
-            setStoreInfo({
-              storeId: res.data.storeId,
-              storeIntro: res.data.storeIntro,
-              storeName: res.data.storeName,
-              storeThumb: res.data.storeThumb,
-              storeRating: res.data.storeRating || 0,
-            });
-          })
-          .catch((err) => console.error("가게 로딩 실패:", err));
-
         setStoreInfo(nextStoreInfo);
         setGlobalStoreName(nextStoreInfo.storeName);
       } else {
@@ -148,12 +133,6 @@ export default function StoreView() {
     if (isLogin) {
       setSelectedMenu(menu);
       setIsModalOpen(true);
-    } else {
-      Swal.fire({
-        title: "로그인 후 이용 가능합니다",
-        icon: "warning",
-      });
-
       return;
     }
 
@@ -187,8 +166,7 @@ export default function StoreView() {
         <div className={styles.store_text_wrap}>
           <div className={styles.title_row}>
             <h2 className={styles.store_name}>
-              {storeInfo.storeName ||
-                (isLoading ? "로딩 중..." : "매장 정보 없음")}
+              {storeInfo.storeName || (isLoading ? "로딩 중..." : "매장 정보 없음")}
             </h2>
 
             <div className={styles.store_rating_box}>
