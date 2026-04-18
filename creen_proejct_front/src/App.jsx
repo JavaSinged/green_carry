@@ -51,6 +51,7 @@ import ManagerCS from "./pages/mypage/manager/ManagerCS";
 import AdminStoreManagementDetail from "./pages/mypage/admin/AdminStoreManagementDetail";
 import StoreReviewPage from "./pages/main/StoreReviewPage";
 import AdminContainerList from "./pages/mypage/admin/AdminContainerList";
+import ScrollToTop from "./components/commons/ScrollToTop";
 
 const BasicLayout = () => {
   return (
@@ -68,6 +69,7 @@ function App() {
   return (
     <AuthProvider>
       <div>
+        <ScrollToTop/>
         <Routes>
           {/* ==================================================== */}
           {/* 1. 퍼블릭 구역 (로그인한 사용자는 접근 불가) */}
