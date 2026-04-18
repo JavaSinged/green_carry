@@ -59,12 +59,11 @@
   justify-content: flex-start;
   padding: 30px 0;
   align-items: center;
-  border-bottom: 2px solid #bfbfbf;
   gap: 250px;
 }
 
 .menuItem:last-child {
-  border-bottom: 2px solid #bfbfbf;
+  border-bottom: none;
 }
 
 .menuInfo {
@@ -182,6 +181,10 @@
 }
 .menuList {
   border-bottom: 1px solid #bfbfbf;
+}
+
+.menuList:last-child {
+  border-bottom: none;
 }
 .totalPriceText u {
   text-decoration-thickness: 2px;
