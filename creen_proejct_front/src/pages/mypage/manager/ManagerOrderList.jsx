@@ -325,7 +325,8 @@ const ManagerOrderList = () => {
                       {maskPhoneNumber(order.memberPhone)}
                     </p>
                     <p className={styles.address}>
-                      <strong>주소:</strong> {order.deliveryAddress}
+                      <strong>주소:</strong>{" "}
+                      {maskAddress(order.deliveryAddress)}
                     </p>
                   </div>
                 </div>
