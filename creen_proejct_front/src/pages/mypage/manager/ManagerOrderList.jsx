@@ -57,6 +57,18 @@ const ManagerOrderList = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [currentPage]);
 
+  // 전화번호 마스킹 (010-****-1234)
+  const maskPhoneNumber = (phone) => {
+    if (!phone) return "연락처 없음";
+    const cleaned = phone.replace(/[^0-9]/g, "");
+    if (cleaned.length === 11) {
+      return cleaned.replace(/(\d{3})(\d{4})(\d{4})/, "$1-****-$3");
+    } else if (cleaned.length === 10) {
+      return cleaned.replace(/(\d{3})(\d{3})(\d{4})/, "$1-***-$3");
+    }
+    return phone;
+  };
+
   // 공통 API 호출 함수
   const requestStatusUpdate = (orderId, nextStatus, expectedTime = null) => {
     axios
@@ -94,21 +106,6 @@ const ManagerOrderList = () => {
     setOpenDetailModal(false);
     setSelectedOrder(null);
     setDetailMenus([]);
-  };
-
-  const modalStyle = {
-    position: "absolute",
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%, -50%)",
-    width: 480,
-    maxHeight: "85vh",
-    overflowY: "auto",
-    bgcolor: "background.paper",
-    borderRadius: 3,
-    boxShadow: 24,
-    p: 4,
-    outline: "none",
   };
 
   // 주문 상태 업데이트 로직
@@ -214,6 +211,21 @@ const ManagerOrderList = () => {
     return `${parts[0]} ${parts[1]} ${parts[2]} ***`;
   };
 
+  const modalStyle = {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    width: 480,
+    maxHeight: "85vh",
+    overflowY: "auto",
+    bgcolor: "background.paper",
+    borderRadius: 3,
+    boxShadow: 24,
+    p: 4,
+    outline: "none",
+  };
+
   const strikeThroughStyle = {
     color: "text.disabled",
     textDecoration: "line-through",
@@ -241,6 +253,7 @@ const ManagerOrderList = () => {
           currentOrders.map((order) => {
             const isCanceled = order.orderStatus === 9;
             const isNewOrder = order.orderStatus === 1;
+            const isCompleted = order.orderStatus === 5;
 
             return (
               <div
@@ -273,14 +286,12 @@ const ManagerOrderList = () => {
                       {order.menuName}{" "}
                       {order.extraCount > 0 && `외 ${order.extraCount}건`}
                     </h3>
-
                     <button
                       className={styles.detailToggleBtn}
                       onClick={() => handleOpenDetailModal(order)}
                     >
                       상세메뉴 보기
                     </button>
-
                     <p className={styles.price} style={{ marginTop: "12px" }}>
                       결제금액:{" "}
                       <strong
@@ -288,8 +299,8 @@ const ManagerOrderList = () => {
                       >
                         {isCanceled
                           ? "0"
-                          : Number(
-                              order.totalPrice + order.deliveryPrice,
+                          : (
+                              order.totalPrice + (order.deliveryPrice || 0)
                             ).toLocaleString()}
                         원
                       </strong>
@@ -299,11 +310,11 @@ const ManagerOrderList = () => {
                   <div className={styles.deliveryInfo}>
                     <p className={isCanceled ? styles.strikeThrough : ""}>
                       <strong>배달 방식:</strong>{" "}
-                      {order.deliveryType === 1
-                        ? "픽업"
-                        : order.deliveryType === 2
-                          ? "도보/자전거"
-                          : "오토바이"}
+                      {order.deliveryType === 1 ? "픽업" : "배달"}
+                    </p>
+                    <p className={isCanceled ? styles.strikeThrough : ""}>
+                      <strong>연락처:</strong>{" "}
+                      {maskPhoneNumber(order.customerPhone || order.userPhone)}
                     </p>
                     <p
                       className={`${styles.address} ${isCanceled ? styles.strikeThrough : ""}`}
@@ -325,6 +336,17 @@ const ManagerOrderList = () => {
                         order.deliveryType,
                       )}
                     </span>
+                    {isCompleted && (
+                      <span
+                        className={
+                          order.isReviewed
+                            ? styles.reviewDone
+                            : styles.reviewPending
+                        }
+                      >
+                        {order.isReviewed ? "● 리뷰 작성완료" : "○ 리뷰 미작성"}
+                      </span>
+                    )}
                   </div>
 
                   <div className={styles.actionButtons}>
@@ -366,7 +388,6 @@ const ManagerOrderList = () => {
         onPageChange={setCurrentPage}
       />
 
-      {/* 상세 주문 모달 */}
       <Modal open={openDetailModal} onClose={handleCloseModal}>
         <Box sx={modalStyle}>
           <Box
@@ -383,78 +404,81 @@ const ManagerOrderList = () => {
             </IconButton>
           </Box>
           <Divider sx={{ mb: 3 }} />
-
           {isLoadingDetail ? (
             <Box display="flex" justifyContent="center" py={4}>
               <CircularProgress />
             </Box>
           ) : (
             <Box display="flex" flexDirection="column" gap={2}>
-              {detailMenus.map((item, idx) => {
-                const isItemCanceled = selectedOrder?.orderStatus === 9;
-                return (
-                  <Box
-                    key={idx}
-                    display="flex"
-                    alignItems="center"
-                    gap={2}
-                    p={1}
+              {detailMenus.map((item, idx) => (
+                <Box
+                  key={idx}
+                  display="flex"
+                  alignItems="center"
+                  gap={2}
+                  p={1}
+                  sx={{
+                    backgroundColor:
+                      selectedOrder?.orderStatus === 9 ? "#f9f9f9" : "#fff",
+                    borderRadius: "8px",
+                    border: "1px solid #eee",
+                  }}
+                >
+                  <Avatar
+                    src={item.menuImage}
+                    variant="rounded"
                     sx={{
-                      backgroundColor: isItemCanceled ? "#f9f9f9" : "#fff",
-                      borderRadius: "8px",
-                      border: "1px solid #eee",
-                    }}
-                  >
-                    <Avatar
-                      src={item.menuImage}
-                      variant="rounded"
-                      sx={{
-                        width: 60,
-                        height: 60,
-                        filter: isItemCanceled
+                      width: 60,
+                      height: 60,
+                      filter:
+                        selectedOrder?.orderStatus === 9
                           ? "grayscale(100%) opacity(60%)"
                           : "none",
-                      }}
-                    />
-                    <Box flex={1}>
-                      <Typography
-                        fontWeight="bold"
-                        sx={isItemCanceled ? strikeThroughStyle : {}}
-                      >
-                        {item.menuName}
-                      </Typography>
-                      {item.optionString && (
-                        <Typography
-                          variant="body2"
-                          color="text.secondary"
-                          sx={isItemCanceled ? strikeThroughStyle : {}}
-                        >
-                          옵션: {item.optionString}
-                        </Typography>
-                      )}
-                    </Box>
-                    <Box
-                      display="flex"
-                      flexDirection="column"
-                      alignItems="flex-end"
-                      minWidth="80px"
+                    }}
+                  />
+                  <Box flex={1}>
+                    <Typography
+                      fontWeight="bold"
+                      sx={
+                        selectedOrder?.orderStatus === 9
+                          ? strikeThroughStyle
+                          : {}
+                      }
                     >
-                      <Typography fontSize="13px">{item.quantity}개</Typography>
+                      {item.menuName}
+                    </Typography>
+                    {item.optionString && (
                       <Typography
-                        variant="subtitle2"
-                        fontSize="16px"
-                        fontWeight="bold"
+                        variant="body2"
+                        color="text.secondary"
+                        sx={
+                          selectedOrder?.orderStatus === 9
+                            ? strikeThroughStyle
+                            : {}
+                        }
                       >
-                        {item.price ? Number(item.price).toLocaleString() : 0}원
+                        옵션: {item.optionString}
                       </Typography>
-                    </Box>
+                    )}
                   </Box>
-                );
-              })}
-
-              <Divider sx={{ my: 2, borderColor: "#ccc" }} />
-
-              {/* ✨ 배달비 및 총액 섹션 수정 (내용물 유지 및 배달비 해결) */}
+                  <Box
+                    display="flex"
+                    flexDirection="column"
+                    alignItems="flex-end"
+                    minWidth="80px"
+                  >
+                    <Typography fontSize="13px">{item.quantity}개</Typography>
+                    <Typography
+                      variant="subtitle2"
+                      fontSize="16px"
+                      fontWeight="bold"
+                    >
+                      {(item.price || 0).toLocaleString()}원
+                    </Typography>
+                  </Box>
+                </Box>
+              ))}
+              <Divider sx={{ my: 2 }} />
               <Box px={1}>
                 <Box display="flex" justifyContent="space-between" mb={1}>
                   <Typography variant="body2" color="text.secondary">
@@ -469,15 +493,10 @@ const ManagerOrderList = () => {
                     배달비
                   </Typography>
                   <Typography variant="body2" fontWeight="bold" color="primary">
-                    + {selectedOrder?.deliveryPrice?.toLocaleString() || 0}원
+                    + {(selectedOrder?.deliveryPrice || 0).toLocaleString()}원
                   </Typography>
                 </Box>
-                <Box
-                  display="flex"
-                  justifyContent="space-between"
-                  alignItems="center"
-                  mt={2}
-                >
+                <Box display="flex" justifyContent="space-between" mt={2}>
                   <Typography variant="subtitle1" fontWeight="bold">
                     총 결제 금액
                   </Typography>
