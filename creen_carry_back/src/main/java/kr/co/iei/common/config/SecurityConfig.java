@@ -20,7 +20,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         // 기본 로그인창이 뜨지 않도록 모든 접근을 허용하고 CSRF를 해제함
         http
-        	.cors(cors -> cors.disable())
+        	.cors(cors -> {})
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
                 .anyRequest().permitAll()

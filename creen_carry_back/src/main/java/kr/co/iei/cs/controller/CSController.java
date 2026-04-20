@@ -15,7 +15,7 @@ import tools.jackson.databind.ext.QNameSerializer;
 
 @RestController
 @RequestMapping("/cs/inquiries")
-@CrossOrigin(value = "*")
+@CrossOrigin(origins = "https://greencarry.vercel.app")
 public class CSController {
 
 	@Autowired

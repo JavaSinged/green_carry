@@ -25,7 +25,7 @@ import kr.co.iei.store.model.vo.StoreReviewResponse;
 
 @RestController
 @RequestMapping("/admin")
-@CrossOrigin("*")
+@CrossOrigin(origins = "https://greencarry.vercel.app")
 public class AdminController {
 
 	@Autowired

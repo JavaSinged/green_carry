@@ -9,7 +9,7 @@ import kr.co.iei.notification.model.service.NotificationService;
 
 @RestController
 @RequestMapping("/api/notification")
-@CrossOrigin("*")
+@CrossOrigin(origins = "https://greencarry.vercel.app")
 public class NotificationController {
 
 	@Autowired

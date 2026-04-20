@@ -36,7 +36,7 @@ import kr.co.iei.member.model.service.MemberService;
 
 @RestController
 @RequestMapping("/member")
-@CrossOrigin(value = "*")
+@CrossOrigin(origins = "https://greencarry.vercel.app")
 public class MemberController {
 
 	@Autowired
