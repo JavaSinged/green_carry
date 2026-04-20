@@ -51,6 +51,7 @@ public class CSController {
 	@PostMapping(value = "/submit")
 	public ResponseEntity<?> insertQna(@RequestBody Qna qna) {
 		int result = csService.insertQna(qna);
+		notificationService.sendNotification("admin123", "orderUpdate", "1대1 문의가 등록되었습니다.", "/mypage/admin");
 		return ResponseEntity.ok(result);
 	}
 
