@@ -57,7 +57,7 @@ const PaymentPage = () => {
   const [storeRequest, setStoreRequest] = useState("");
   const [deliveryRequest, setDeliveryRequest] = useState("");
   const [ecoPoint, setEcoPoint] = useState(0); // 사용자가 입력한 사용 포인트
-  const [availableEcoPoint, setAvailableEcoPoint] = useState(0); // 🌟 로컬 스토리지에서 가져온 보유 포인트
+  const [availableEcoPoint, setAvailableEcoPoint] = useState(0); // 로컬 스토리지에서 가져온 보유 포인트
 
   const [itemPrice] = useState(superTotalPrice);
   const cartList = useCartStore((state) => state.cart);

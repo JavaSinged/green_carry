@@ -11,7 +11,7 @@ const MemberCountChart = () => {
     axios
       .get(`${import.meta.env.VITE_BACKSERVER}/member`)
       .then((res) => {
-        const users = res.data;
+        const users = res.data.filter((user) => user.memberGrade !== 0);
         setTotalCount(users.length);
 
         const generalData = Array(12).fill(0);
