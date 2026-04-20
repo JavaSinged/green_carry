@@ -560,22 +560,33 @@ const ManagerMenuEdit = () => {
                     <input
                       type="number"
                       step="0.01"
-                      min="0" //
+                      min="0"
                       placeholder="탄소량"
                       style={{ width: "80px" }}
                       value={
                         sec.k === "size" ? tempSize.carbon : tempGeneral.carbon
                       }
+                      // 1. 키보드 입력 차단 (-, e, +)
                       onKeyDown={(e) => {
-                        if (e.key === "-" || e.key === "e") {
+                        if (["-", "e", "+", "E"].includes(e.key)) {
                           e.preventDefault();
                         }
                       }}
+                      // 2. 복붙 및 모든 입력값 검사 (핵심!)
                       onChange={(e) => {
-                        const val = e.target.value;
+                        let val = e.target.value;
 
-                        if (val < 0) return;
+                        // 음수 기호(-)가 들어오면 즉시 제거 (복붙 대응)
+                        if (val.includes("-")) {
+                          val = val.replace(/-/g, "");
+                        }
 
+                        // 혹시라도 0보다 작은 값이 들어오면 절대값으로 강제 변환
+                        if (Number(val) < 0) {
+                          val = Math.abs(Number(val)).toString();
+                        }
+
+                        // 상태 업데이트
                         sec.k === "size"
                           ? setTempSize({ ...tempSize, carbon: val })
                           : setTempGeneral({ ...tempGeneral, carbon: val });
