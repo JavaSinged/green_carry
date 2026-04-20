@@ -1,4 +1,4 @@
-package kr.co.iei.notification.controller; // 이 경로가 실제 폴더 구조와 맞아야 합니다!
+package kr.co.iei.notification.controller; 
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
