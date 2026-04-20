@@ -41,7 +41,7 @@ export default function Footer() {
               </a>
               <span className={styles.one_divider}>|</span>
               <a
-                href="https://www.erdcloud.com/d/itPtb4kbn5yTwFpjg"
+                href="https://www.erdcloud.com/d/vfPwB6RWxmZKjAJ9i"
                 target="_blank"
                 rel="noopener noreferrer"
                 className={styles.footerLink}
