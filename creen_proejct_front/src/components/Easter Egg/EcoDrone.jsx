@@ -35,7 +35,7 @@ const EcoDrone = () => {
 
     const handleMouseMove = (e) => {
       targetPos.current.x = e.clientX;
-      targetPos.current.y = Math.min(e.clientY, 200); // 드론은 상단(200px)까지만 내려옴
+      targetPos.current.y = Math.min(e.clientY, 900); //
     };
     window.addEventListener("mousemove", handleMouseMove);
 
@@ -48,7 +48,7 @@ const EcoDrone = () => {
 
       if (droneRef.current) {
         // 이동 방향에 따라 드론 본체 살짝 기울이기
-        const tilt = (targetPos.current.x - currentPos.current.x) * 0.05;
+        const tilt = (targetPos.current.x - currentPos.current.x) * 0.1;
         droneRef.current.style.transform = `translate(${currentPos.current.x}px, ${currentPos.current.y}px) rotate(${tilt}deg)`;
       }
       requestRef.current = requestAnimationFrame(update);
@@ -68,10 +68,10 @@ const EcoDrone = () => {
 
     setTimeout(() => {
       Swal.fire({
-        title: "🎁 시크릿 보급품 도착!",
-        html: "그린캐리 VVIP 10% 할인 코드<br/><b style='color:#2e7d32; font-size: 20px; letter-spacing: 2px;'>GREEN-HERO-2026</b>",
+        title: "시크릿 보급품 도착!",
+        html: "숨겨진 포인트 1000P 지급!<br/><b style='color:#2e7d32; font-size: 20px; letter-spacing: 2px;'></b>",
         icon: "success",
-        confirmButtonText: "배달원 팁 주기",
+        confirmButtonText: "받기(최초1회)",
         confirmButtonColor: "#2e7d32",
       }).then(() => {
         setIsActive(false); // 창 닫으면 드론 퇴근
