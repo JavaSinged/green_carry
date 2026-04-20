@@ -153,6 +153,7 @@ const UserSignup = () => {
           setTime((prev) => prev - 1);
         }, 1000);
         setTimeoutId(intervalId);
+        console.log(res.data);
       })
       .catch((err) => {
         resetMailAuthState();
@@ -452,7 +453,7 @@ const UserSignup = () => {
                     name="memberId"
                     value={member.memberId}
                     onChange={inputMember}
-                  className={styles.signupInputUnderline}
+                    className={styles.signupInputUnderline}
                     placeholder="영문, 숫자 조합 8자 이상"
                     readOnly={checkId === 2}
                   />
@@ -552,7 +553,9 @@ const UserSignup = () => {
                     {mailAuth === 0 ? "인증 메일 발송" : "재전송"}
                   </button>
                 </div>
-                <div className={`${styles.signupInputInner} ${styles.signupMt10}`}>
+                <div
+                  className={`${styles.signupInputInner} ${styles.signupMt10}`}
+                >
                   <input
                     type="text"
                     className={styles.signupInputUnderline}
@@ -617,7 +620,9 @@ const UserSignup = () => {
                     우편번호 검색
                   </button>
                 </div>
-                <div className={`${styles.signupInputInner} ${styles.signupMt10}`}>
+                <div
+                  className={`${styles.signupInputInner} ${styles.signupMt10}`}
+                >
                   <input
                     type="text"
                     placeholder="주소"
@@ -627,7 +632,9 @@ const UserSignup = () => {
                     readOnly
                   />
                 </div>
-                <div className={`${styles.signupInputInner} ${styles.signupMt10}`}>
+                <div
+                  className={`${styles.signupInputInner} ${styles.signupMt10}`}
+                >
                   <input
                     type="text"
                     placeholder="상세 주소"
@@ -658,4 +665,3 @@ const UserSignup = () => {
 };
 
 export default UserSignup;
-
