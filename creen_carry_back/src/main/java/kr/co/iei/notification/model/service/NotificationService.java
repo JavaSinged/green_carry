@@ -13,8 +13,9 @@ public class NotificationService {
 
 	private final Map<String, SseEmitter> emitters = new ConcurrentHashMap<>();
 
+	//sse emitter연결
 	public SseEmitter subscribe(String memberId) {
-		// 1. 이미 연결된 정보가 있다면 종료시키고 새로 생성
+		
 		if (emitters.containsKey(memberId)) {
 			emitters.get(memberId).complete();
 			emitters.remove(memberId);
@@ -36,6 +37,7 @@ public class NotificationService {
 		return emitter;
 	}
 
+	//noti sender
 	public void sendNotification(String memberId, String eventName, String message, String navUrl) {
 		SseEmitter emitter = emitters.get(memberId);
 		Map<String, Object> data = new HashMap<>();
@@ -50,6 +52,7 @@ public class NotificationService {
 		}
 	}
 
+	//ping sender (신호없는 연결 프록시가 끊는걸 방지)
 	@Scheduled(fixedRate = 30000)
 	public void sendPing() {
 		emitters.forEach((memberId, emitter) -> {
