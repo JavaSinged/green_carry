@@ -17,7 +17,7 @@ WHERE EXISTS (
     FROM menu_tbl m
     WHERE m.store_id = s.store_id
 )
-ORDER BY storeRating DESC
+ORDER BY storeRating DESC, store_id
 	</select>
 
 	<select id="findStoreById" parameterType="int"
