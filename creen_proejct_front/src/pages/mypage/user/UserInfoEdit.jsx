@@ -138,10 +138,14 @@ export default function UserInfoEdit() {
           serverPath === "SUCCESS_NO_IMAGE" ? previewImg : serverPath;
 
         localStorage.setItem("memberThumb", finalPath);
+        localStorage.setItem("memberName", profileData.memberName);
+        localStorage.setItem("memberPhone", profileData.memberPhone);
 
         setUser({
           ...user,
           memberThumb: finalPath,
+          memberName: profileData.memberName,
+          memberPhone: profileData.memberPhone,
         });
 
         setPreviewImg(finalPath);
@@ -291,6 +295,9 @@ export default function UserInfoEdit() {
           memberAddrcode: newAddress.memberAddrCode,
           memberAddr: newAddress.memberAddr,
           memberDetailAddr: newAddress.memberDetailAddr,
+          memberName: profileData.memberName,
+          memberPhone: profileData.memberPhone,
+          memberThumb: finalPath,
         }));
 
         // 🌟 2. [완벽 해결] 로컬스토리지에 위도/경도를 직접 덮어쓰기!
