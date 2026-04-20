@@ -407,6 +407,7 @@
 		s.store_thumb AS storeThumb,
 		o.order_status
 		AS orderStatus,
+		m.member_phone AS memberPhone,
 		o.delivery_address AS deliveryAddress,
 		o.get_point AS
 		getPoint,

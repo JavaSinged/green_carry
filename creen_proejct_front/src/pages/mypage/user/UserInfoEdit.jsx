@@ -239,6 +239,7 @@ export default function UserInfoEdit() {
 
   // 주소 저장 핸들러
   const updateAddress = async () => {
+    console.log("1. 함수 시작");
     if (!newAddress.memberAddrCode || !newAddress.memberDetailAddr.trim()) {
       Swal.fire({
         icon: "warning",
@@ -248,6 +249,7 @@ export default function UserInfoEdit() {
     }
 
     try {
+      console.log("2. 네이버 지오코딩 시작");
       // 1. 네이버 지도 Geocoding으로 위경도 가져오기
       const coords = await new Promise((resolve, reject) => {
         naver.maps.Service.geocode(
@@ -267,6 +269,7 @@ export default function UserInfoEdit() {
       });
 
       // 2. 위경도 포함해서 백엔드로 전송
+      console.log("4. 백엔드 전송 시작");
       const response = await axios.patch(
         `${import.meta.env.VITE_BACKSERVER}/member/updateAddress`,
         {

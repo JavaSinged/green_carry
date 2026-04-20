@@ -8,8 +8,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -36,7 +38,9 @@ import kr.co.iei.member.model.service.MemberService;
 
 @RestController
 @RequestMapping("/member")
-@CrossOrigin(value = "*")
+
+@CrossOrigin(origins = "https://greencarry.vercel.app")
+
 public class MemberController {
 
 	@Autowired
@@ -54,6 +58,9 @@ public class MemberController {
 
 	@Autowired
 	private JwtUtil jwtUtil;
+	
+	@Autowired
+	private StringRedisTemplate redisTemplate;
 
 	@Autowired
 	private StoreDao storeDao;
@@ -80,18 +87,26 @@ public class MemberController {
 		System.out.println("로그인 결과 데이터: " + loginMember);
 
 		if (loginMember != null) {
+			// 1. Access Token 생성
 			String accessToken = jwtUtil.createToken(loginMember.getMemberId(), loginMember.getMemberGrade());
+
+			// 🌟 2. [중복 로그인 방지 핵심] Redis에 최신 토큰 저장
+			// Key: "AUTH:아이디", Value: "액세스 토큰", 만료시간: 2시간(토큰 수명과 맞춤)
+			redisTemplate.opsForValue().set("AUTH:" + loginMember.getMemberId(), accessToken, 2, TimeUnit.HOURS);
 
 			Map<String, Object> response = new HashMap<>();
 			response.put("member", loginMember);
 			response.put("accessToken", accessToken);
 
+			// 3. 자동 로그인 처리
 			if (member.getAutoLogin()) {
-
 				String refreshToken = jwtUtil.createRefreshToken(loginMember.getMemberId());
 
-				response.put("refreshToken", refreshToken);
+				// (선택사항) 리프레시 토큰도 보안을 위해 Redis에 저장하면 더 좋습니다.
+				// redisTemplate.opsForValue().set("REFRESH:" + loginMember.getMemberId(),
+				// refreshToken, 7, TimeUnit.DAYS);
 
+				response.put("refreshToken", refreshToken);
 				System.out.println("✅ 자동 로그인 활성화: Refresh Token 발급 완료");
 			}
 
@@ -99,6 +114,19 @@ public class MemberController {
 		} else {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 		}
+	}
+	
+	@PostMapping("/logout")
+	public ResponseEntity<?> logout(@RequestBody Map<String, String> request) {
+	    String memberId = request.get("memberId");
+	    
+	    if (memberId != null) {
+	        // 🌟 Redis에서 해당 유저의 최신 토큰 정보를 삭제하여 중복 로그인 로직 초기화
+	        redisTemplate.delete("AUTH:" + memberId);
+	        System.out.println("✅ Redis 삭제 완료: " + memberId);
+	    }
+	    
+	    return ResponseEntity.ok("LOGOUT_SUCCESS");
 	}
 
 	// 아이디 찾기 (이름 + 이메일)
@@ -427,12 +455,12 @@ public class MemberController {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("회원 정보를 찾을 수 없습니다.");
 		}
 	}
-	
+
 	@GetMapping("/point/{memberId}")
-    public ResponseEntity<?> getMemberPoint(@PathVariable String memberId) {
-        // DB에서 해당 유저의 현재 포인트를 가져옵니다.
-        int currentPoint = memberService.getPointByMemberId(memberId);
-        return ResponseEntity.ok(currentPoint); 
-    }
+	public ResponseEntity<?> getMemberPoint(@PathVariable String memberId) {
+		// DB에서 해당 유저의 현재 포인트를 가져옵니다.
+		int currentPoint = memberService.getPointByMemberId(memberId);
+		return ResponseEntity.ok(currentPoint);
+	}
 
 }

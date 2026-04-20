@@ -11,7 +11,7 @@ import org.springframework.http.MediaType;
 import java.util.List;
 import java.util.Map;
 
-@CrossOrigin("*")
+@CrossOrigin(origins = "https://greencarry.vercel.app")
 @RestController
 @RequestMapping("/menus")
 public class ManagerController {

@@ -11,7 +11,7 @@ const MemberCountChart = () => {
     axios
       .get(`${import.meta.env.VITE_BACKSERVER}/member`)
       .then((res) => {
-        const users = res.data;
+        const users = res.data.filter((user) => user.memberGrade !== 0);
         setTotalCount(users.length);
 
         const generalData = Array(12).fill(0);
@@ -20,6 +20,7 @@ const MemberCountChart = () => {
         users.forEach((user) => {
           if (user.enrollDate) {
             const monthIndex = parseInt(user.enrollDate.split("-")[1], 10) - 1;
+
             if (user.memberGrade === 1) {
               generalData[monthIndex]++;
             } else if (user.memberGrade === 2) {

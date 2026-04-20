@@ -18,6 +18,7 @@ public class OrderResponse {
 	private Integer orderStatus;
 	private Integer storeId;
 	private String storeName;
+	private String memberPhone;
 
 	// 2. 🌟 금액 및 수량 정보 (이게 있어야 0원이 안 나옵니다)
 	private Integer totalPrice; // 총 결제 금액

@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/admin/container")
-@CrossOrigin("*")
+@CrossOrigin(origins = "https://greencarry.vercel.app")
 public class ContainerController {
 
     @Autowired

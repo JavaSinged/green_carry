@@ -62,7 +62,12 @@ const ReviewStatsChart = ({ data }) => {
     labels: ["5점", "4점", "3점", "2점", "1점"],
     legend: { show: false },
     dataLabels: { enabled: false },
-    tooltip: { enabled: true },
+    tooltip: {
+      enabled: true,
+      y: {
+        formatter: (val) => `${val}%`,
+      },
+    },
   };
 
   return (

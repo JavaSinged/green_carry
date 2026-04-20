@@ -19,7 +19,7 @@ import kr.co.iei.admin.model.vo.ProductCarbon;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@CrossOrigin
+@CrossOrigin(origins = "https://greencarry.vercel.app")
 @RequestMapping("/carbon-list")
 @RequiredArgsConstructor
 public class ProductCarbonController {

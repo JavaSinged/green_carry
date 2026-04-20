@@ -91,26 +91,43 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
-  // 로그아웃 처리
-  const logout = (isExpired = false) => {
+  // 로그아웃 처리 (async 추가)
+  const logout = async (isExpired = false) => {
+    // 1. 타이머 및 상태 초기화
     if (logoutTimerRef.current) {
       clearTimeout(logoutTimerRef.current);
       logoutTimerRef.current = null;
     }
 
-    if (isExpired === true) {
-      fireStyledSwal(
-        "warning",
-        "세션 만료",
-        "로그인 유지 시간이 만료되어 자동 로그아웃 되었습니다."
-      ).then(() => {
+    // 🌟 2. 백엔드 Redis 데이터 삭제 시도
+    // memberId는 AuthContext 상태나 localStorage에서 가져옵니다.
+    const memberId = user?.memberId || localStorage.getItem("memberId");
+
+    try {
+      if (memberId) {
+        // /member/logout은 SecurityConfig에서 permitAll 되어 있어야 함
+        await api.post("/member/logout", { memberId });
+        console.log("✅ 서버 세션(Redis) 삭제 성공");
+      }
+    } catch (err) {
+      // 서버 통신 실패 시에도 로그아웃은 진행되어야 하므로 에러 로그만 기록
+      console.error("서버 로그아웃 요청 실패 (Redis 삭제 안됨):", err);
+    } finally {
+      // 🌟 3. 로컬 인증 데이터 삭제 및 리다이렉트 (공통 로직)
+      if (isExpired === true) {
+        fireStyledSwal(
+          "warning",
+          "세션 만료",
+          "로그인 유지 시간이 만료되어 자동 로그아웃 되었습니다.",
+        ).then(() => {
+          clearAuthData();
+          window.location.replace("/");
+        });
+      } else {
+        isLoggingOut.current = true;
         clearAuthData();
         window.location.replace("/");
-      });
-    } else {
-      isLoggingOut.current = true;
-      clearAuthData();
-      window.location.replace("/");
+      }
     }
   };
 

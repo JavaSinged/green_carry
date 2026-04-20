@@ -26,7 +26,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/stores")
-@CrossOrigin("*")
+@CrossOrigin(origins = "https://greencarry.vercel.app")
 public class StoreController {
 	private static final String STORE_IMAGE_FOLDER = "projet/upload/web/store";
 
