@@ -20,6 +20,7 @@ const MemberCountChart = () => {
         users.forEach((user) => {
           if (user.enrollDate) {
             const monthIndex = parseInt(user.enrollDate.split("-")[1], 10) - 1;
+
             if (user.memberGrade === 1) {
               generalData[monthIndex]++;
             } else if (user.memberGrade === 2) {
