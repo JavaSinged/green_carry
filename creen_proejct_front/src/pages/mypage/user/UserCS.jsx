@@ -1,18 +1,18 @@
-import styles from './UserCS.module.css';
-import { useContext, useEffect, useState } from 'react';
-import { AuthContext } from '../../../context/AuthContext';
-import Swal from 'sweetalert2';
+import styles from "./UserCS.module.css";
+import { useContext, useEffect, useState } from "react";
+import { AuthContext } from "../../../context/AuthContext";
+import Swal from "sweetalert2";
 //icon
-import SearchIcon from '@mui/icons-material/Search';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import axios from 'axios';
-import StarsIcon from '@mui/icons-material/Stars';
+import SearchIcon from "@mui/icons-material/Search";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import axios from "axios";
+import StarsIcon from "@mui/icons-material/Stars";
 
 const UserCS = () => {
   const { user } = useContext(AuthContext);
-  const [activeTab, setActiveTab] = useState('faq'); // 기본: faq활성화
+  const [activeTab, setActiveTab] = useState("faq"); // 기본: faq활성화
 
-  const [searchKeyword, setSearchKeyword] = useState('');
+  const [searchKeyword, setSearchKeyword] = useState("");
   return (
     <section className={styles.cs_container}>
       <div className={styles.top_section}>
@@ -43,10 +43,10 @@ const UserCS = () => {
           <div className={styles.tabs_nav_faq}>
             <button
               className={`${styles.tab_item} ${
-                activeTab === 'faq' ? styles.active : ''
+                activeTab === "faq" ? styles.active : ""
               }`}
               onClick={() => {
-                setActiveTab('faq');
+                setActiveTab("faq");
               }}
             >
               자주 묻는 질문
@@ -55,10 +55,10 @@ const UserCS = () => {
           <div className={styles.tabs_nav_qna}>
             <button
               className={`${styles.tab_item} ${
-                activeTab === 'qna' ? styles.active : ''
+                activeTab === "qna" ? styles.active : ""
               }`}
               onClick={() => {
-                setActiveTab('qna');
+                setActiveTab("qna");
               }}
             >
               1 : 1 문의하기
@@ -67,10 +67,10 @@ const UserCS = () => {
           <div className={styles.tabs_nav_answer}>
             <button
               className={`${styles.tab_item} ${
-                activeTab === 'answer' ? styles.active : ''
+                activeTab === "answer" ? styles.active : ""
               }`}
               onClick={() => {
-                setActiveTab('answer');
+                setActiveTab("answer");
               }}
             >
               1 : 1 문의내역
@@ -80,12 +80,12 @@ const UserCS = () => {
       </div>
       {/*컨텐츠 랜더링영역 */}
       <div className={styles.content_area}>
-        {activeTab === 'faq' ? (
+        {activeTab === "faq" ? (
           <FAQSection
             searchKeyword={searchKeyword}
             setSearchKeyword={setSearchKeyword}
           />
-        ) : activeTab === 'qna' ? (
+        ) : activeTab === "qna" ? (
           <QnASection
             setSearchKeyword={setSearchKeyword}
             user={user}
@@ -102,11 +102,11 @@ const UserCS = () => {
 const FAQSection = ({ searchKeyword, setSearchKeyword }) => {
   //0:전체조회, 1:결제, 2:배달, 3:에코포인트, 4:서비스이용
   const categories = [
-    { id: 0, label: '전체' },
-    { id: 1, label: '결제' },
-    { id: 2, label: '배달' },
-    { id: 3, label: '에코 포인트' },
-    { id: 4, label: '서비스 이용' },
+    { id: 0, label: "전체" },
+    { id: 1, label: "결제" },
+    { id: 2, label: "배달" },
+    { id: 3, label: "에코 포인트" },
+    { id: 4, label: "서비스 이용" },
   ];
   const [status, setStatus] = useState(0); // 0:전체조회, 1:결제, 2:배달, 3:에코포인트, 4:서비스이용
   const [faqList, setFaqList] = useState([]); // 받아올 리스트
@@ -127,8 +127,9 @@ const FAQSection = ({ searchKeyword, setSearchKeyword }) => {
         },
       })
       .then((res) => {
-        console.log(res);
+        console.log("🚀 ~ FAQSection ~ res:", res);
         setFaqList(res.data);
+        console.log("🚀 ~ FAQSection ~ res:", res);
       })
       .catch((err) => {
         console.log(err);
@@ -142,7 +143,7 @@ const FAQSection = ({ searchKeyword, setSearchKeyword }) => {
             <button
               key={`key:${cat.id}`}
               className={`${styles.cat_btn} ${
-                status === cat.id ? styles.cat_active : ''
+                status === cat.id ? styles.cat_active : ""
               }`}
               onClick={() => {
                 setStatus(cat.id);
@@ -195,14 +196,14 @@ const FAQSection = ({ searchKeyword, setSearchKeyword }) => {
 //1:1문의하기
 const QnASection = ({ setSearchKeyword, user, setActiveTab }) => {
   useEffect(() => {
-    setSearchKeyword('');
+    setSearchKeyword("");
   }, [setSearchKeyword]);
 
   //입력: 제목, 내용 ( 답변상태: 0 ))
   const [inquiry, setInquiry] = useState({
     memberId: user.memberId,
-    qnaTitle: '',
-    qnaContent: '',
+    qnaTitle: "",
+    qnaContent: "",
   });
 
   const handleChange = (e) => {
@@ -214,11 +215,11 @@ const QnASection = ({ setSearchKeyword, user, setActiveTab }) => {
     const { name, value } = e.target;
     if (value.length > maxLength[name]) {
       Swal.fire({
-        icon: 'warning',
-        title: '글자 수 초과',
-        text: `${name === 'qnaTitle' ? '제목' : '내용'}은 최대 ${maxLength[name]}자까지 입력 가능합니다.`,
-        confirmButtonColor: 'var(--color-brand)',
-        confirmButtonText: '확인',
+        icon: "warning",
+        title: "글자 수 초과",
+        text: `${name === "qnaTitle" ? "제목" : "내용"}은 최대 ${maxLength[name]}자까지 입력 가능합니다.`,
+        confirmButtonColor: "var(--color-brand)",
+        confirmButtonText: "확인",
       });
 
       setInquiry({ ...inquiry, [name]: value.slice(0, maxLength[name]) });
@@ -234,28 +235,28 @@ const QnASection = ({ setSearchKeyword, user, setActiveTab }) => {
     axios
       .post(`${import.meta.env.VITE_BACKSERVER}/cs/inquiries/submit`, inquiry)
       .then((res) => {
-        console.log(res);
+        console.log("🚀 ~ insertQna ~ res:", res);
         console.log(inquiry);
         Swal.fire({
-          icon: 'success',
-          title: '등록 완료',
-          text: '문의가 정상적으로 등록되었습니다.',
-          confirmButtonColor: 'var(--color-brand)',
-          confirmButtonText: '확인',
+          icon: "success",
+          title: "등록 완료",
+          text: "문의가 정상적으로 등록되었습니다.",
+          confirmButtonColor: "var(--color-brand)",
+          confirmButtonText: "확인",
           timer: 1500, // 2000ms = 2초 후 자동으로 닫힘
           timerProgressBar: true,
         });
 
-        setActiveTab('answer');
+        setActiveTab("answer");
       })
       .catch((err) => {
         console.log(err);
         Swal.fire({
-          icon: 'error',
-          title: '등록 실패',
-          text: '서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.',
-          confirmButtonColor: 'var(--color-brand)',
-          confirmButtonText: '확인',
+          icon: "error",
+          title: "등록 실패",
+          text: "서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.",
+          confirmButtonColor: "var(--color-brand)",
+          confirmButtonText: "확인",
         });
       });
   };
@@ -295,7 +296,7 @@ const QnASection = ({ setSearchKeyword, user, setActiveTab }) => {
 
           <div className={styles.char_count_wrapper}>
             <span
-              className={`${styles.char_count} ${inquiry.qnaContent.length >= 300 ? styles.limit_reached : ''}`}
+              className={`${styles.char_count} ${inquiry.qnaContent.length >= 300 ? styles.limit_reached : ""}`}
             >
               {inquiry.qnaContent.length} / 300자
             </span>
@@ -311,7 +312,7 @@ const QnASection = ({ setSearchKeyword, user, setActiveTab }) => {
 //1:1문의내역
 const AnswerSection = ({ user, setSearchKeyword }) => {
   useEffect(() => {
-    setSearchKeyword('');
+    setSearchKeyword("");
   }, [setSearchKeyword]);
 
   const [inquiryList, setInquiryList] = useState([]);
@@ -319,10 +320,10 @@ const AnswerSection = ({ user, setSearchKeyword }) => {
   const indexToggle = (index) => {
     if (editingNo !== null) {
       Swal.fire({
-        icon: 'warning',
-        text: '수정 중인 내용을 먼저 저장하거나 취소해주세요.',
-        confirmButtonColor: 'var(--color-brand)',
-        confirmButtonText: '확인',
+        icon: "warning",
+        text: "수정 중인 내용을 먼저 저장하거나 취소해주세요.",
+        confirmButtonColor: "var(--color-brand)",
+        confirmButtonText: "확인",
       });
       return;
     }
@@ -339,11 +340,11 @@ const AnswerSection = ({ user, setSearchKeyword }) => {
     if (value.length >= maxLength[name]) {
       if (value.length === maxLength[name]) {
         Swal.fire({
-          icon: 'warning',
-          title: '글자 수 초과',
-          text: `${name === 'qnaTitle' ? '제목' : '내용'}은 최대 ${maxLength[name]}자까지 입력 가능합니다.`,
-          confirmButtonColor: 'var(--color-brand)',
-          confirmButtonText: '확인',
+          icon: "warning",
+          title: "글자 수 초과",
+          text: `${name === "qnaTitle" ? "제목" : "내용"}은 최대 ${maxLength[name]}자까지 입력 가능합니다.`,
+          confirmButtonColor: "var(--color-brand)",
+          confirmButtonText: "확인",
         });
       }
       setUpdateData({ ...updateData, [name]: value.slice(0, maxLength[name]) });
@@ -358,30 +359,30 @@ const AnswerSection = ({ user, setSearchKeyword }) => {
 
   //수정내용 임시저장용
   const [updateData, setUpdateData] = useState({
-    qnaTitle: '',
-    qnaContent: '',
+    qnaTitle: "",
+    qnaContent: "",
   });
 
   //수정취소
   const cancelEdit = () => {
     setEditingNo(null);
     setUpdateData({
-      qnaTitle: '',
-      qnaContent: '',
+      qnaTitle: "",
+      qnaContent: "",
     });
   };
 
   //1:1문의내역 > 삭제
   const deleteInquiry = (qnaNo) => {
     Swal.fire({
-      title: '정말 삭제하시겠습니까?',
-      text: '삭제된 문의는 복구할 수 없습니다.',
-      icon: 'warning',
+      title: "정말 삭제하시겠습니까?",
+      text: "삭제된 문의는 복구할 수 없습니다.",
+      icon: "warning",
       showCancelButton: true,
-      confirmButtonColor: '#d32f2f',
-      cancelButtonColor: '#aaa',
-      confirmButtonText: '삭제',
-      cancelButtonText: '취소',
+      confirmButtonColor: "#d32f2f",
+      cancelButtonColor: "#aaa",
+      confirmButtonText: "삭제",
+      cancelButtonText: "취소",
     }).then((result) => {
       if (result.isConfirmed) {
         if (answerStatus === 0) {
@@ -390,13 +391,15 @@ const AnswerSection = ({ user, setSearchKeyword }) => {
               params: { qnaNo: qnaNo },
             })
             .then((res) => {
+              console.log("🚀 ~ deleteInquiry ~ res:", res);
               console.log(res);
+              console.log("🚀 ~ deleteInquiry ~ res:", res);
               Swal.fire({
-                icon: 'success',
-                title: '삭제 완료',
-                text: '문의가 정상적으로 삭제되었습니다.',
-                confirmButtonColor: 'var(--color-brand)',
-                confirmButtonText: '확인',
+                icon: "success",
+                title: "삭제 완료",
+                text: "문의가 정상적으로 삭제되었습니다.",
+                confirmButtonColor: "var(--color-brand)",
+                confirmButtonText: "확인",
               });
               setOpenIndex(null);
               fetchInquiryList();
@@ -404,11 +407,11 @@ const AnswerSection = ({ user, setSearchKeyword }) => {
             .catch((err) => {
               console.log(err);
               Swal.fire({
-                icon: 'error',
-                title: '등록 실패',
-                text: '삭제 중 오류가 발생했습니다. 고객센터에 문의 하세요.',
-                confirmButtonColor: 'var(--color-brand)',
-                confirmButtonText: '확인',
+                icon: "error",
+                title: "등록 실패",
+                text: "삭제 중 오류가 발생했습니다. 고객센터에 문의 하세요.",
+                confirmButtonColor: "var(--color-brand)",
+                confirmButtonText: "확인",
               });
             });
         }
@@ -427,10 +430,10 @@ const AnswerSection = ({ user, setSearchKeyword }) => {
         updateData.qnaContent === item.qnaContent
       ) {
         Swal.fire({
-          icon: 'info',
-          text: '수정된 내용이 없습니다.',
-          confirmButtonColor: 'var(--color-brand)',
-          confirmButtonText: '확인',
+          icon: "info",
+          text: "수정된 내용이 없습니다.",
+          confirmButtonColor: "var(--color-brand)",
+          confirmButtonText: "확인",
         });
         return;
       } else {
@@ -445,13 +448,15 @@ const AnswerSection = ({ user, setSearchKeyword }) => {
             dataSend,
           )
           .then((res) => {
+            console.log("🚀 ~ updateInquiry ~ res:", res);
             console.log(res);
+            console.log("🚀 ~ updateInquiry ~ res:", res);
             Swal.fire({
-              icon: 'success',
-              title: '수정 완료',
-              text: '문의가 정상적으로 수정되었습니다.',
-              confirmButtonColor: 'var(--color-brand)',
-              confirmButtonText: '확인',
+              icon: "success",
+              title: "수정 완료",
+              text: "문의가 정상적으로 수정되었습니다.",
+              confirmButtonColor: "var(--color-brand)",
+              confirmButtonText: "확인",
               timer: 1500, // 2000ms = 2초 후 자동으로 닫힘
               timerProgressBar: true,
             });
@@ -462,11 +467,11 @@ const AnswerSection = ({ user, setSearchKeyword }) => {
           .catch((err) => {
             console.log(err);
             Swal.fire({
-              icon: 'error',
-              title: '수정 실패',
-              text: '수정 중 오류가 발생했습니다. 고객센터에 문의 하세요.',
-              confirmButtonColor: 'var(--color-brand)',
-              confirmButtonText: '확인',
+              icon: "error",
+              title: "수정 실패",
+              text: "수정 중 오류가 발생했습니다. 고객센터에 문의 하세요.",
+              confirmButtonColor: "var(--color-brand)",
+              confirmButtonText: "확인",
             });
           });
       }
@@ -481,8 +486,11 @@ const AnswerSection = ({ user, setSearchKeyword }) => {
         params: { memberId: user.memberId },
       })
       .then((res) => {
+        console.log("🚀 ~ fetchInquiryList ~ res:", res);
         console.log(res);
+        console.log("🚀 ~ fetchInquiryList ~ res:", res);
         setInquiryList(res.data);
+        console.log("🚀 ~ fetchInquiryList ~ res:", res);
       })
       .catch((err) => {
         console.log(err);
@@ -511,7 +519,7 @@ const AnswerSection = ({ user, setSearchKeyword }) => {
                 className={`${styles.faq_header} ${
                   editingNo !== null && editingNo !== item.qnaNo
                     ? styles.disabled
-                    : ''
+                    : ""
                 }`}
                 onClick={(e) => {
                   e.preventDefault(); // 브라우저 기본 토글 동작 중지
@@ -525,10 +533,10 @@ const AnswerSection = ({ user, setSearchKeyword }) => {
                   // 2. 내가 아닌 '다른 항목'이 수정 중인데, 이 항목을 클릭했다면?
                   if (editingNo !== null) {
                     Swal.fire({
-                      icon: 'warning',
-                      text: '수정 중인 내용을 먼저 저장하거나 취소해주세요.',
-                      confirmButtonColor: 'var(--color-brand)',
-                      confirmButtonText: '확인',
+                      icon: "warning",
+                      text: "수정 중인 내용을 먼저 저장하거나 취소해주세요.",
+                      confirmButtonColor: "var(--color-brand)",
+                      confirmButtonText: "확인",
                     });
 
                     return; // indexToggle(i)가 실행되지 않도록 여기서 끊어줌
@@ -645,7 +653,7 @@ const AnswerSection = ({ user, setSearchKeyword }) => {
                       />
                       <div className={styles.char_count_wrapper}>
                         <span
-                          className={`${styles.char_count} ${updateData.qnaContent.length >= 300 ? styles.limit_reached : ''}`}
+                          className={`${styles.char_count} ${updateData.qnaContent.length >= 300 ? styles.limit_reached : ""}`}
                         >
                           {updateData.qnaContent.length} / 300자
                         </span>
@@ -687,31 +695,31 @@ const AnswerSection = ({ user, setSearchKeyword }) => {
 const ValidateInquiry = (title, content) => {
   if (!title?.trim() || !content?.trim()) {
     Swal.fire({
-      icon: 'error',
-      title: '입력 오류',
-      text: '제목과 내용을 모두 입력해주세요.',
-      confirmButtonColor: 'var(--color-brand)',
-      confirmButtonText: '확인',
+      icon: "error",
+      title: "입력 오류",
+      text: "제목과 내용을 모두 입력해주세요.",
+      confirmButtonColor: "var(--color-brand)",
+      confirmButtonText: "확인",
     });
     return false;
   }
   if (title.length > 20) {
     Swal.fire({
-      icon: 'error',
-      title: '입력 오류',
-      text: '제목이 20자를 초과했습니다. 내용을 줄여주세요.',
-      confirmButtonColor: 'var(--color-brand)',
-      confirmButtonText: '확인',
+      icon: "error",
+      title: "입력 오류",
+      text: "제목이 20자를 초과했습니다. 내용을 줄여주세요.",
+      confirmButtonColor: "var(--color-brand)",
+      confirmButtonText: "확인",
     });
     return false;
   }
   if (content.length > 300) {
     Swal.fire({
-      icon: 'error',
-      title: '입력 오류',
-      text: '내용이 300자를 초과했습니다. 내용을 줄여주세요.',
-      confirmButtonColor: 'var(--color-brand)',
-      confirmButtonText: '확인',
+      icon: "error",
+      title: "입력 오류",
+      text: "내용이 300자를 초과했습니다. 내용을 줄여주세요.",
+      confirmButtonColor: "var(--color-brand)",
+      confirmButtonText: "확인",
     });
     return false;
   }

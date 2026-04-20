@@ -45,7 +45,6 @@ const UserOrderListPage = () => {
       .get(`${backHost}/stores/orders/${memberId}`)
       .then((res) => {
         setOrderList(Array.isArray(res.data) ? res.data : []);
-        console.log("🚀 ~ fetchOrders ~ res.data:", res.data)
       })
       .catch((err) => {
         console.error("주문 내역 불러오기 실패:", err);
@@ -298,7 +297,10 @@ const UserOrderListPage = () => {
                     <p className={styles.infoTitle}>주문 정보</p>
                     <p className={isCanceled ? styles.strikeThrough : ""}>
                       {order.totalCount}개 |{" "}
-                      {Number(order.totalPrice + order.deliveryPrice ?? 0).toLocaleString()}원
+                      {Number(
+                        order.totalPrice + order.deliveryPrice ?? 0,
+                      ).toLocaleString()}
+                      원
                     </p>
                   </div>
                   <div className={styles.infoBlock}>
