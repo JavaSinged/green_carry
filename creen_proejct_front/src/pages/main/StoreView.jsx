@@ -158,7 +158,7 @@ export default function StoreView() {
             />
           ) : (
             <div className={styles.image_placeholder}>
-              <span style={{ color: "#999" }}>사진 준비 중 🥘</span>
+              <span style={{ color: "#999" }}> 사진 준비 중 </span>
             </div>
           )}
         </div>
@@ -166,7 +166,8 @@ export default function StoreView() {
         <div className={styles.store_text_wrap}>
           <div className={styles.title_row}>
             <h2 className={styles.store_name}>
-              {storeInfo.storeName || (isLoading ? "로딩 중..." : "매장 정보 없음")}
+              {storeInfo.storeName ||
+                (isLoading ? "로딩 중..." : "매장 정보 없음")}
             </h2>
 
             <div className={styles.store_rating_box}>

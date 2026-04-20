@@ -98,7 +98,6 @@ const Account = () => {
   const handleVerifySubmit = (e) => {
     e.preventDefault();
 
-    // 인증 요청은 순차적으로만 처리해서 타이머와 검증 상태가 꼬이지 않게 합니다.
     if (isVerifying) {
       return;
     }
@@ -251,7 +250,6 @@ const Account = () => {
       ref={containerRef}
       style={{ backgroundImage: `url(${selectedBg})` }}
     >
-      {/* 🌟 1. 반딧불이 애니메이션 적용 */}
       {fireflyData &&
         fireflyData.map((style, i) => (
           <div
@@ -281,27 +279,29 @@ const Account = () => {
         />
       ))}
 
-      <h1
-        className="logo"
-        style={{
-          textAlign: "center",
-          padding: "30px 0",
-          margin: 0,
-          fontSize: "2.2rem",
-          fontWeight: 700,
-        }}
-      >
-        <Link
-          to="/"
+      <header className="header">
+        <h1
+          className="logo"
           style={{
-            textDecoration: "none",
-            color: "inherit",
-            fontFamily: "var(--font-logo)",
+            textAlign: "center",
+            padding: "30px 0",
+            margin: 0,
+            fontSize: "2.2rem",
+            fontWeight: 700,
           }}
         >
-          GreenCarry
-        </Link>
-      </h1>
+          <Link
+            to="/"
+            style={{
+              textDecoration: "none",
+              color: "inherit",
+              fontFamily: "var(--font-logo)",
+            }}
+          >
+            GreenCarry
+          </Link>
+        </h1>
+      </header>
 
       <div className="main-content find-content">
         <section className="info-section" style={{ width: "320px" }}>
@@ -323,12 +323,12 @@ const Account = () => {
           </div>
         </section>
 
-        {/* 🌟 2. 프리미엄 글래스모피즘 클래스(premium-glass) 추가 */}
         <section className="find-card premium-glass" style={{ width: "450px" }}>
-          {/* 🌟 3. 애플 스타일 슬라이딩 탭 적용 */}
           <div className="premium-tabs">
             <div
-              className={`slide-indicator ${activeTab === "resetPw" ? "right" : "left"}`}
+              className={`slide-indicator ${
+                activeTab === "resetPw" ? "right" : "left"
+              }`}
             ></div>
             <button
               type="button"
@@ -339,7 +339,9 @@ const Account = () => {
             </button>
             <button
               type="button"
-              className={`tab-button ${activeTab === "resetPw" ? "active" : ""}`}
+              className={`tab-button ${
+                activeTab === "resetPw" ? "active" : ""
+              }`}
               onClick={() => handleTabChange("resetPw")}
             >
               비밀번호 재설정
@@ -412,7 +414,6 @@ const Account = () => {
                       {formatTime(timeLeft)}
                     </span>
                   </div>
-                  {/* 🌟 4. 빛나는 버튼 애니메이션(shimmer-btn) 추가 */}
                   <button
                     type="submit"
                     className="submit-verify-btn shimmer-btn"
@@ -497,7 +498,6 @@ const Account = () => {
                 )}
               </div>
 
-              {/* 🌟 4. 빛나는 버튼 애니메이션(shimmer-btn) 추가 */}
               <button
                 type="submit"
                 className="submit-verify-btn shimmer-btn"
@@ -531,7 +531,6 @@ const Account = () => {
           </div>
         </section>
 
-        {/* 우측 공백 맞춤 섹션 */}
         <section
           className="illustration-section"
           style={{ width: "320px", visibility: "hidden" }}

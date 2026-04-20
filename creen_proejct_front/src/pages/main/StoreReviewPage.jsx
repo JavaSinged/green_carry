@@ -148,7 +148,7 @@ export default function StoreReviewPage() {
 
               <div className={styles.card_body}>
                 <p className={styles.menu_name}>
-                  🍶 주문메뉴: {review.menuName || "메뉴 정보 없음"}
+                  주문메뉴: {review.menuName || "메뉴 정보 없음"}
                 </p>
                 <div className={styles.content_wrap}>
                   <img
@@ -168,7 +168,7 @@ export default function StoreReviewPage() {
 
               {review.reviewCommentContent && (
                 <div className={styles.reply_box}>
-                  <p className={styles.reply_owner}>💬 사장님 답글</p>
+                  <p className={styles.reply_owner}> 사장님 답글</p>
                   <p className={styles.reply_text}>
                     {review.reviewCommentContent}
                   </p>

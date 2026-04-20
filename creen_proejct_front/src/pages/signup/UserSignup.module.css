@@ -1,18 +1,36 @@
+/* --- [원본 보존] 컨테이너 설정 --- */
 .signupScreenContainer {
+  position: relative; /* fixed에서 relative로 변경 (모바일 스크롤 대응) */
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  z-index: 1;
+}
+
+/* 🌟 [추가 기능] 모바일 배경 꿀렁임 방지용 고정 레이어 */
+.signupScreenContainer::before {
+  content: "";
   position: fixed;
-  top: 0;
+  top: -5%;
   left: 0;
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 110%;
+  /* JSX에서 --bg-image 변수로 이미지를 넘겨줘야 완벽하게 작동합니다 */
+  background-image: var(--bg-image);
   background-size: cover;
   background-position: center;
-  z-index: 1;
+  z-index: -1;
   animation: signupBgBreathe 12s ease-in-out infinite alternate;
+  will-change: transform;
 }
 
 .signupScreenContainer::after {
   content: "";
-  position: absolute;
+  position: fixed; /* absolute에서 fixed로 변경하여 배경과 같이 고정 */
   top: 0;
   left: 0;
   width: 100%;
@@ -23,6 +41,7 @@
   animation: signupMoodShift 30s infinite alternate ease-in-out;
 }
 
+/* --- [원본 보존] 입자 및 이스터에그 --- */
 .ecoBubble {
   position: absolute;
   background: rgba(255, 255, 255, 0.2);
@@ -60,27 +79,28 @@
   animation-iteration-count: infinite;
 }
 
+/* --- [원본 보존] 메인 레이아웃 --- */
 .signupMainContent {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  /* transform: translate(-50%, -50%)를 제거하고 Flex로 중앙 정렬 (모바일 스크롤 보장) */
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 20px;
+  justify-content: flex-start;
+  padding: 80px 20px;
   z-index: 10;
   width: 100%;
+  box-sizing: border-box;
 }
 
 .signupLogo {
   font-family: "Gaegu", cursive;
   color: #ffffff;
   font-size: 3.5rem;
-  margin: 0;
+  margin: 0 0 20px 0;
   cursor: pointer;
   transition: transform 0.2s;
   text-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+  text-decoration: none;
 }
 
 .signupLogo:hover {
@@ -106,6 +126,8 @@
   overflow-y: auto;
   padding: 40px 50px;
   border-radius: 24px;
+  width: 100%;
+  box-sizing: border-box;
   -webkit-mask-image: -webkit-radial-gradient(white, black);
   transform: translateZ(0);
   backface-visibility: hidden;
@@ -132,6 +154,7 @@
   text-align: center;
 }
 
+/* --- [원본 보존] 폼 및 입력 필드 --- */
 .signupForm {
   display: flex;
   flex-direction: column;
@@ -161,6 +184,7 @@
   display: flex;
   flex-direction: column;
   width: 100%;
+  min-width: 0;
 }
 
 .signupInputInner {
@@ -186,6 +210,7 @@
   font-family: "Pretendard Variable", "Pretendard", sans-serif;
   transition: border-color 0.3s ease;
   border-radius: 0;
+  min-width: 0;
 }
 
 .signupInputUnderline:focus {
@@ -196,6 +221,7 @@
   color: #6b6666;
 }
 
+/* --- [원본 보존] 버튼 스타일 --- */
 .signupBtnFilled {
   background-color: #2e8147;
   color: #ffffff;
@@ -282,6 +308,7 @@
   animation: signupShimmerSweep 3s infinite;
 }
 
+/* --- [원본 보존] 크롬 자동완성 배경 제거 --- */
 .signupInputUnderline:-webkit-autofill,
 .signupInputUnderline:-webkit-autofill:hover,
 .signupInputUnderline:-webkit-autofill:focus,
@@ -291,6 +318,7 @@
   -webkit-text-fill-color: #222222 !important;
 }
 
+/* --- [원본 보존] 키프레임 애니메이션 --- */
 @keyframes signupBgBreathe {
   0% {
     background-size: 120%;
@@ -299,7 +327,6 @@
     background-size: 125%;
   }
 }
-
 @keyframes signupMoodShift {
   0% {
     background-color: rgba(0, 150, 255, 0.3);
@@ -308,7 +335,6 @@
     background-color: rgba(20, 0, 80, 0.4);
   }
 }
-
 @keyframes signupShimmerSweep {
   0% {
     left: -100%;
@@ -317,7 +343,6 @@
     left: 200%;
   }
 }
-
 @keyframes signupFloatAround {
   0%,
   100% {
@@ -329,7 +354,6 @@
     opacity: 0.4;
   }
 }
-
 @keyframes leafFadeOut {
   0% {
     transform: translate(0, 0) rotate(0deg) scale(1);
@@ -340,7 +364,6 @@
     opacity: 0;
   }
 }
-
 @keyframes fireflyTwinkle {
   0%,
   100% {
@@ -353,18 +376,47 @@
   }
 }
 
-@media (max-width: 600px) {
+/* --- 🌟 [추가 기능] 모바일 대응 미디어 쿼리 통합 --- */
+@media (max-width: 768px) {
+  .signupMainContent {
+    padding: 40px 15px; /* 상단 여백 줄임 */
+  }
+
+  .signupLogo {
+    font-size: 2.5rem;
+  }
+
   .signupCardScroll {
-    padding: 30px 20px;
+    padding: 30px 20px !important; /* 패딩 대폭 축소 */
+    max-height: none; /* 모바일은 페이지 전체 스크롤이 편함 */
   }
 
   .signupFieldGroup {
-    flex-direction: column;
+    flex-direction: column !important; /* 라벨과 인풋 세로 배치 */
+    gap: 5px;
   }
 
   .signupLabel {
-    margin-bottom: 5px;
-    width: 100%;
+    width: 100% !important;
     padding-top: 0;
+    margin-bottom: 5px;
+    font-size: 0.9rem;
+    font-weight: bold;
+  }
+
+  .signupInputInner {
+    gap: 8px; /* 버튼과 인풋 사이 간격 축소 */
+  }
+
+  .signupBtnFilled,
+  .signupBtnOutlined {
+    padding: 8px 12px;
+    font-size: 0.8rem;
+    min-width: 80px; /* 버튼 찌그러짐 방지 */
+  }
+
+  .signupBtn {
+    padding: 15px;
+    font-size: 1rem;
   }
 }

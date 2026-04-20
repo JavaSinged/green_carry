@@ -1,3 +1,4 @@
+/* --- 1. 폰트 및 공통 변수 설정 --- */
 .screen-container {
   font-family: var(--font-body);
 }
@@ -17,24 +18,25 @@ button {
   font-family: var(--font-body);
 }
 
+/* --- 2. 메인 컨테이너 & 배경 효과 --- */
 .screen-container {
   position: absolute;
   top: 0;
   left: 0;
-  width: 100vw;
-  min-height: 100vh;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+  width: 100%;
+  height: 100%;
+  background-size: cover !important;
+  background-position: center center !important;
+  background-repeat: no-repeat !important;
+  background-attachment: fixed !important;
   background-color: var(--color-brand);
   display: flex;
   flex-direction: column;
   color: var(--color-bg);
   overflow-x: hidden;
-  overflow-y: hidden;
+  overflow-y: auto; /* 🌟 모바일 대응: 컨텐츠 길어지면 스크롤 허용 */
   transition: background-position 0.2s ease-out;
   z-index: 1;
-
   animation: bg-breathe 12s ease-in-out infinite alternate;
 }
 
@@ -51,6 +53,7 @@ button {
   animation: mood-shift 30s infinite alternate ease-in-out;
 }
 
+/* --- 3. 헤더 및 로고 --- */
 .header {
   width: 100%;
   text-align: center;
@@ -65,6 +68,7 @@ button {
   color: var(--color-bg);
 }
 
+/* --- 4. 메인 레이아웃 (데스크톱 기준) --- */
 .main-content,
 .find-content {
   flex: 1;
@@ -89,7 +93,6 @@ button {
   align-items: center;
   gap: 10px;
 }
-
 .main-title {
   font-size: 2.4rem;
   font-weight: 700;
@@ -105,13 +108,11 @@ button {
   font-size: 0.95rem;
   opacity: 0.9;
 }
-
 .stat-item {
   display: flex;
   align-items: center;
   gap: 8px;
 }
-
 .notice-icon {
   display: inline-flex;
   justify-content: center;
@@ -120,6 +121,7 @@ button {
   height: 20px;
 }
 
+/* --- 5. 카드 및 유리 효과 --- */
 .login-card,
 .find-card {
   width: 450px;
@@ -142,7 +144,6 @@ button {
   font-weight: 700;
   margin: 0 0 10px 0;
 }
-
 .card-info {
   font-size: 14px;
   color: var(--text-main);
@@ -154,13 +155,11 @@ button {
   color: var(--color-brand);
   transition: color 0.3s;
 }
-
 .leaf-point {
   position: relative;
   display: inline-block;
   font-weight: bold;
 }
-
 .leaf-point::before {
   content: "🌱";
   position: absolute;
@@ -170,6 +169,7 @@ button {
   font-size: 1rem;
 }
 
+/* --- 6. 탭 및 입력 폼 --- */
 .premium-tabs {
   position: relative;
   display: flex;
@@ -191,7 +191,6 @@ button {
   box-shadow: 0 4px 12px rgba(46, 125, 50, 0.3);
   z-index: 1;
 }
-
 .slide-indicator.left {
   transform: translateX(0);
 }
@@ -212,7 +211,6 @@ button {
   z-index: 2;
   transition: color 0.4s ease;
 }
-
 .premium-tabs .tab-button.active {
   color: #fff;
 }
@@ -230,11 +228,9 @@ button {
   border: 1px solid var(--color-surface);
   font-size: 0.95rem;
   outline: none;
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.02);
   background: rgba(255, 255, 255, 0.6);
   transition: border-color 0.3s;
 }
-
 .find-content input:hover {
   border-color: var(--text-sub);
 }
@@ -246,7 +242,6 @@ button {
   width: 100%;
   box-sizing: border-box;
 }
-
 .input-with-btn {
   display: flex;
   gap: 10px;
@@ -255,34 +250,7 @@ button {
   flex: 1;
 }
 
-.caps-warning {
-  max-height: 0;
-  overflow: hidden;
-  opacity: 0;
-  color: #d32f2f;
-  font-size: 0.85rem;
-  font-weight: bold;
-  padding-left: 5px;
-  transition: all 0.3s ease-out;
-}
-.caps-warning.show {
-  max-height: 30px;
-  opacity: 1;
-  margin-top: -5px;
-  margin-bottom: 5px;
-}
-
-.remember-me {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 0.85rem;
-  color: var(--text-main);
-}
-.remember-me input[type="checkbox"] {
-  accent-color: var(--color-brand);
-}
-
+/* --- 7. 타이머 및 인증 버튼 (누락 복구) --- */
 .timer-wrapper {
   position: relative;
   width: 100%;
@@ -319,11 +287,34 @@ button {
 .verify-send-btn:hover {
   background-color: var(--color-surface);
 }
-.verify-send-btn:disabled,
-.login-button:disabled,
-.submit-verify-btn:disabled {
-  cursor: not-allowed;
-  filter: grayscale(0.15);
+
+/* --- 8. 하단 옵션 및 버튼 --- */
+.caps-warning {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  color: #d32f2f;
+  font-size: 0.85rem;
+  font-weight: bold;
+  padding-left: 5px;
+  transition: all 0.3s ease-out;
+}
+.caps-warning.show {
+  max-height: 30px;
+  opacity: 1;
+  margin-top: -5px;
+  margin-bottom: 5px;
+}
+
+.remember-me {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: var(--text-main);
+}
+.remember-me input[type="checkbox"] {
+  accent-color: var(--color-brand);
 }
 
 .login-button,
@@ -345,14 +336,6 @@ button {
   position: relative;
   overflow: hidden;
   box-shadow: 0 4px 15px rgba(46, 125, 50, 0.2);
-  transition:
-    transform 0.2s,
-    box-shadow 0.2s,
-    background-color 0.3s;
-}
-.shimmer-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(46, 125, 50, 0.4);
 }
 .shimmer-btn::after {
   content: "";
@@ -375,14 +358,9 @@ button {
 .find-footer {
   display: flex;
   justify-content: center;
-  flex-direction: row;
   gap: 25px;
   margin-top: 25px;
   font-size: 0.85rem;
-}
-.find-footer {
-  flex-direction: column;
-  gap: 10px;
 }
 .card-footer a,
 .back-to-login {
@@ -395,6 +373,7 @@ button {
   color: var(--color-brand);
 }
 
+/* --- 9. 캐릭터 및 말풍선 --- */
 .illustration-section {
   width: 300px;
   display: flex;
@@ -402,7 +381,6 @@ button {
   align-items: flex-end;
   gap: 15px;
 }
-
 .speech-bubble {
   background-color: var(--color-bg);
   color: var(--text-main);
@@ -427,12 +405,11 @@ button {
   border-right: 10px solid transparent;
   border-top: 10px solid var(--color-bg);
 }
-
 .character-illustration img {
   width: 220px;
-  box-shadow: var(--text-main);
 }
 
+/* --- 10. MUI 및 Swal 오버라이드 --- */
 .MuiOutlinedInput-root {
   border-radius: 15px !important;
   background: rgba(255, 255, 255, 0.6);
@@ -440,7 +417,6 @@ button {
 .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
   border-color: var(--color-brand) !important;
 }
-
 .greencarry-swal-popup {
   border-radius: 20px !important;
   font-family: "Pretendard", sans-serif;
@@ -453,6 +429,87 @@ button {
   border-radius: 10px !important;
 }
 
+/* --- 11. 🌟 📱 모바일 대응 미디어 쿼리 (통합) 🌟 --- */
+@media (max-width: 1024px) {
+  .screen-container {
+    /* 🌟 1. scroll을 fixed로 변경 (배경은 가만히 있고 내용만 움직이게) */
+    background-attachment: fixed !important;
+    background-size: cover !important;
+    background-position: center !important;
+
+    /* 🌟 2. 높이 설정 최적화 */
+    height: auto; /* 고정 높이 해제 */
+    min-height: 100vh; /* 최소 화면 높이는 확보 */
+    overflow-y: visible; /* 스크롤은 브라우저 기본 스크롤 사용 */
+    position: relative; /* absolute에서 생기는 높이 꼬임 방지 */
+  }
+
+  .main-content,
+  .find-content {
+    flex-direction: column;
+    gap: 30px;
+    padding: 80px 15px 40px 15px !important; /* 상단 여백 줘서 헤더랑 안 겹치게 */
+    margin-top: 0;
+    width: 100%;
+    min-height: 100vh; /* 컨텐츠 영역도 최소 높이 확보 */
+    box-sizing: border-box !important;
+  }
+  .info-section {
+    width: 100%;
+    height: auto;
+    align-items: center;
+    text-align: center;
+  }
+  .main-title {
+    font-size: 2rem;
+  }
+  .login-card,
+  .find-card {
+    width: calc(100% - 30px) !important; /* 화면 양옆 여백 15px씩 확보 */
+    max-width: 420px !important;
+    padding: 30px 15px !important; /* 패딩을 확 줄여서 내부 공간 확보 */
+    margin: 0 auto !important;
+    box-sizing: border-box !important;
+  }
+  .illustration-section {
+    width: 100%;
+    align-items: center;
+    order: 3;
+  }
+  .speech-bubble {
+    text-align: center;
+  }
+  .speech-bubble::after {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
+
+@media (max-width: 480px) {
+  .logo {
+    font-size: 1.8rem;
+  }
+  .main-title {
+    font-size: 1.6rem;
+  }
+  .card-title {
+    font-size: 1.3rem;
+  }
+  .login-button {
+    padding: 15px;
+    font-size: 1rem;
+  }
+  /*주석*/
+  .card-footer {
+    gap: 15px;
+    font-size: 0.75rem;
+  }
+  .character-illustration img {
+    width: 160px;
+  }
+}
+
+/* --- 12. 애니메이션 Keyframes (전체 복구) --- */
 @keyframes text-sway {
   0%,
   100% {
@@ -465,7 +522,6 @@ button {
     transform: rotate(-2deg);
   }
 }
-
 @keyframes shimmer-sweep {
   0% {
     left: -100%;
@@ -477,7 +533,6 @@ button {
     left: 200%;
   }
 }
-
 @keyframes gentle-chat {
   0% {
     transform: translateY(0) rotate(0deg);
@@ -495,7 +550,6 @@ button {
     transform: translateY(0) rotate(0deg);
   }
 }
-
 @keyframes bg-breathe {
   0% {
     background-size: 120%;
@@ -504,7 +558,6 @@ button {
     background-size: 125%;
   }
 }
-
 @keyframes mood-shift {
   0% {
     background-color: rgba(0, 150, 255, 0.3);
@@ -519,7 +572,6 @@ button {
     background-color: rgba(20, 0, 80, 0.4);
   }
 }
-
 @keyframes leaf-fade-out {
   0% {
     transform: translate(0, 0) rotate(0deg) scale(1);
@@ -530,7 +582,14 @@ button {
     opacity: 0;
   }
 }
-
+@keyframes fall {
+  0% {
+    transform: translateY(0) rotate(0deg) translateX(0);
+  }
+  100% {
+    transform: translateY(110vh) rotate(360deg) translateX(0);
+  }
+}
 @keyframes float-around {
   0%,
   100% {
@@ -540,7 +599,6 @@ button {
     transform: translateY(-20px);
   }
 }
-
 @keyframes firefly-glow {
   0% {
     opacity: 0;
@@ -556,6 +614,7 @@ button {
   }
 }
 
+/* --- 13. 입자 효과 및 이스터에그 스타일 --- */
 .particle-leaf {
   position: fixed;
   background-color: var(--color-brand);
@@ -565,7 +624,6 @@ button {
   z-index: 100;
   animation: leaf-fade-out 1.5s ease-out forwards;
 }
-
 .eco-bubble {
   position: absolute;
   background: rgba(255, 255, 255, 0.25);
@@ -575,7 +633,6 @@ button {
   pointer-events: none;
   animation: float-around 6s infinite ease-in-out;
 }
-
 .firefly {
   position: absolute;
   width: 4px;
@@ -594,24 +651,6 @@ button {
   position: fixed;
   top: -50px;
   z-index: 9999;
-  pointer-events: none; /* 클릭 방해 금지 */
+  pointer-events: none;
   animation: fall linear forwards;
-}
-
-@keyframes fall {
-  0% {
-    transform: translateY(0) rotate(0deg) translateX(0);
-  }
-  25% {
-    transform: translateY(25vh) rotate(90deg) translateX(50px);
-  }
-  50% {
-    transform: translateY(50vh) rotate(180deg) translateX(-50px);
-  }
-  75% {
-    transform: translateY(75vh) rotate(270deg) translateX(50px);
-  }
-  100% {
-    transform: translateY(110vh) rotate(360deg) translateX(0);
-  }
 }
