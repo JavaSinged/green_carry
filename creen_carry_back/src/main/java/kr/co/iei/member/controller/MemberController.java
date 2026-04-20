@@ -239,8 +239,9 @@ public class MemberController {
 	@PostMapping(value = "/email-verification")
 	public ResponseEntity<?> sendMail(@RequestBody Member member) {
 
+		
 		String authCode = memberService.sendAuthCode(member.getMemberEmail());
-
+		System.out.println("인증번호 : " + authCode);
 		return ResponseEntity.ok(authCode);
 	}
 

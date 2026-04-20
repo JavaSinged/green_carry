@@ -1,5 +1,25 @@
 /* 1. 로컬 폰트 페이스 정의 */
 /* 티머니 둥근바람 - CDN 방식 */
+input::-ms-reveal,
+input::-ms-clear {
+  display: none !important;
+}
+
+/* 2. 크롬 & 사파리 자동완성/비밀번호 아이콘 제거 */
+/* (사파리에서 열쇠 모양이나 눈 모양이 뜰 때 잡는 법) */
+input::-webkit-contacts-auto-fill-button,
+input::-webkit-credentials-auto-fill-button {
+  visibility: hidden;
+  display: none !important;
+  pointer-events: none;
+}
+
+/* 3. 파이어폭스(Firefox) - 혹시 모를 기본 스타일 초기화 */
+/* 파이어폭스는 현재 기본 눈깔이 없지만, 입력 필드 내부의 잡다한 아이콘 방지 */
+input {
+  box-shadow: none;
+}
+
 @font-face {
   font-family: "TMoneyDungunbaram";
   src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_20-07@1.0/TmoneyRoundWindExtraBold.woff")
