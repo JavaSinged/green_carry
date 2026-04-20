@@ -20,51 +20,73 @@ const HeaderNotification = () => {
   useEffect(() => {
     if (!memberId) return;
 
+    console.log(
+      `%c🚀 SSE 연결 시도 (memberId: ${memberId})`,
+      "color: #1e88e5; font-weight: bold;",
+    );
+
     const eventSource = new EventSource(
       `${backHost}/api/notification/subscribe?memberId=${memberId}`,
     );
 
-    eventSource.addEventListener("orderUpdate", async (event) => {
-      const data = JSON.parse(event.data);
+    // 1. 연결 성공 확인
+    eventSource.onopen = () => {
+      console.log(
+        "%c✅ SSE 연결이 성공적으로 수립되었습니다.",
+        "color: #2e7d32; font-weight: bold;",
+      );
+    };
 
-      if (data.message.includes("취소") || data.message.includes("완료")) {
-        try {
+    // 2. 메시지 수신 (기존 eventSource.addEventListener("orderUpdate", ...))
+    eventSource.addEventListener("orderUpdate", async (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        console.log("%c📩 알림 도착:", "color: #fb8c00;", data);
+
+        if (data.message.includes("취소") || data.message.includes("완료")) {
+          // 포인트 동기화 로직 (기존과 동일)
           const token = localStorage.getItem("accessToken");
           const res = await axios.get(`${backHost}/member/point/${memberId}`, {
             headers: { Authorization: `Bearer ${token}` },
           });
-          console.log("서버 응답 데이터:", res.data);
-
-          // 1. 최신 포인트 스토리지 저장
-          // 백엔드 응답 필드가 point인지 memberPoint인지 확인 필요
           const latestPoint = res.data.point || res.data;
           localStorage.setItem("memberPoint", latestPoint);
-
-          // 2. 전역 신호 발송 (마이페이지에서 이 신호를 받음)
           window.dispatchEvent(new Event("pointUpdated"));
-
-          console.log("실시간 포인트 동기화 완료:", latestPoint);
-        } catch (err) {
-          console.error("포인트 갱신 중 에러 발생:", err);
+          console.log("💰 포인트 동기화 완료:", latestPoint);
         }
-      }
 
-      setUnreadCount((prev) => prev + 1);
-      setNotifications((prev) => [
-        {
-          message: data.message,
-          navUrl: data.navUrl,
-          time: new Date().toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-          }),
-        },
-        ...prev,
-      ]);
+        setUnreadCount((prev) => prev + 1);
+        setNotifications((prev) => [
+          {
+            message: data.message,
+            navUrl: data.navUrl,
+            time: new Date().toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+            }),
+          },
+          ...prev,
+        ]);
+      } catch (err) {
+        console.error("데이터 파싱 또는 포인트 업데이트 중 에러:", err);
+      }
     });
 
-    eventSource.onerror = () => eventSource.close();
-    return () => eventSource.close();
+    // 🚨 3. 에러 핸들링 (재연결을 위해 close() 호출 금지!)
+    eventSource.onerror = (e) => {
+      if (eventSource.readyState === EventSource.CONNECTING) {
+        console.warn("⚠️ SSE 연결이 끊겼습니다. 재연결을 시도합니다...");
+      } else if (eventSource.readyState === EventSource.CLOSED) {
+        console.error("❌ SSE 연결이 완전히 닫혔습니다.");
+      } else {
+        console.error("🚨 SSE 알 수 없는 에러 발생:", e);
+      }
+    };
+
+    return () => {
+      console.log("%c🧹 컴포넌트 언마운트: SSE 연결 종료", "color: #757575;");
+      eventSource.close();
+    };
   }, [memberId, backHost]);
 
   const handleNotiClick = (navUrl) => {
