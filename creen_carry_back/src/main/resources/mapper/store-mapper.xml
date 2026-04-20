@@ -5,21 +5,19 @@
 
 	<select id="selectAllStore">
 		SELECT s.*,
-		(SELECT NVL(AVG(review_rating), 0)
-		FROM
-		review_tbl r
-		WHERE r.store_id = s.store_id) AS storeRating,
-		(SELECT
-		COUNT(*)
-		FROM review_tbl r
-		WHERE r.store_id = s.store_id) AS reviewCount
-		FROM store_tbl s
-		WHERE EXISTS (
-		SELECT 1
-		FROM menu_tbl m
-		WHERE m.store_id
-		= s.store_id
-		)
+       (SELECT NVL(AVG(review_rating), 0)
+        FROM review_tbl r
+        WHERE r.store_id = s.store_id) AS storeRating,
+       (SELECT COUNT(*)
+        FROM review_tbl r
+        WHERE r.store_id = s.store_id) AS reviewCount
+FROM store_tbl s
+WHERE EXISTS (
+    SELECT 1
+    FROM menu_tbl m
+    WHERE m.store_id = s.store_id
+)
+ORDER BY storeRating DESC
 	</select>
 
 	<select id="findStoreById" parameterType="int"
