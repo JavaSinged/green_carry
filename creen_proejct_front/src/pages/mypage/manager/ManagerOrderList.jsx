@@ -205,8 +205,16 @@ const ManagerOrderList = () => {
 
   const maskAddress = (address) => {
     if (!address) return "주소 정보 없음";
+
     const parts = address.split(" ");
-    if (parts.length <= 3) return address;
+
+    // 주소가 3단어 이하일 때 (예: "서울 강남구 역삼동") -> 뒤에 *** 추가
+    if (parts.length <= 3) {
+      return `${address} ***`;
+    }
+
+    // 주소가 4단어 이상일 때 (예: "서울 종로구 종로 6 상세주소...")
+    // 앞의 3덩어리(시/구/도로명)만 보여주고 나머지는 마스킹
     return `${parts[0]} ${parts[1]} ${parts[2]} ***`;
   };
 
