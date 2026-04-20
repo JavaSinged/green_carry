@@ -209,7 +209,15 @@ const UserReviewList = () => {
                         </span>
                       </div>
                       <div className={styles.avatar_owner}>
-                        <span style={{ fontSize: "30px" }}>👨‍🍳</span>
+                        <img
+                          src="/image/chef.png"
+                          alt="요리사 아이콘"
+                          style={{
+                            width: "30px",
+                            height: "30px",
+                            verticalAlign: "middle",
+                          }}
+                        />
                       </div>
                     </div>
                   )}

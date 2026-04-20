@@ -14,8 +14,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 public class SecurityConfig {
 
-	@Autowired
-	private JwtAuthenticationFilter jwtAuthenticationFilter;
+
 
 	@Bean
 	public BCryptPasswordEncoder passwordEncoder() {
@@ -24,24 +23,17 @@ public class SecurityConfig {
 
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-		http.cors(cors -> {
-		}) // WebConfig의 CORS 설정을 따름
-				.csrf(csrf -> csrf.disable())
-				// 🌟 1. JWT를 사용하므로 서버에서 세션을 생성하거나 유지하지 않음
-				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-				.authorizeHttpRequests(auth -> auth
-						.requestMatchers("/member/login", "/member/userSignup", "/member/findId", "/member/checkMember",
-								"/member/resetPw", "/member/sendAuthCode", "/member/verifyCode", "/member/exists","/member/email-verification",
-								"/member/storeDupCheck","/member/emailDupCheck","/member/signupManager",
-								"/project/**")
-						.permitAll() // 누구나
-						// 접근
-						// 가능
-						.anyRequest().authenticated() // 그 외 모든 요청은 인증 필요
-				).formLogin(form -> form.disable()).httpBasic(basic -> basic.disable())
-				// 🌟 2. 우리가 만든 중복 로그인 체크 필터를 시큐리티 필터 체인에 추가
-				.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+	    http.cors(cors -> {})
+	        .csrf(csrf -> csrf.disable())
+	        .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+	        .authorizeHttpRequests(auth -> auth
+	            // 🌟 일단 모든 경로를 다 열어서(permitAll) 에러부터 없애보세요!
+	            .requestMatchers("/**").permitAll() 
+	        )
+	        .formLogin(form -> form.disable())
+	        .httpBasic(basic -> basic.disable());
+	        
 
-		return http.build();
+	    return http.build();
 	}
 }

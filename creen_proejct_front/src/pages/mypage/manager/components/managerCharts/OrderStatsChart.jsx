@@ -17,9 +17,9 @@ const OrderStatsChart = ({ data }) => {
 
   // 2. [수정됨] label이 데이터에 없으므로 deliveryType을 한글로 직접 변환
   const labels = data.map((item) => {
-    if (item.deliveryType === 1) return "직접 배달 (포장)";
-    if (item.deliveryType === 2) return "배달 대행 (기본)";
-    if (item.deliveryType === 3) return "배달 대행 (할증)";
+    if (item.deliveryType === 1) return "픽업";
+    if (item.deliveryType === 2) return "자전거";
+    if (item.deliveryType === 3) return "오토바이";
     return "기타";
   });
 

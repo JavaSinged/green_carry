@@ -1,4 +1,4 @@
-package kr.co.iei.common.config;
+/*package kr.co.iei.common.config;
 
 import java.io.IOException;
 
@@ -63,6 +63,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	    return path.equals("/member/login") || 
 	           path.equals("/member/userSignup") ||
 	           path.equals("/member/findId") ||
+	           path.equals("/member/community-carbon") ||
+	           path.equals("/member") ||
+	           
 	           path.startsWith("/project/"); // 프로젝트 관련 공개 API 등
 	}
-}
+}*/

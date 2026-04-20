@@ -168,7 +168,7 @@ const StoreStats = () => {
 
   if (isLoading)
     return (
-      <div className={styles.loadingBox}>데이터를 불러오는 중입니다... 📊</div>
+      <div className={styles.loadingBox}>데이터를 불러오는 중입니다...</div>
     );
 
   return (

@@ -560,13 +560,29 @@ const ManagerMenuEdit = () => {
                     <input
                       type="number"
                       step="0.01"
+                      min="0"
                       placeholder="탄소량"
                       style={{ width: "80px" }}
                       value={
                         sec.k === "size" ? tempSize.carbon : tempGeneral.carbon
                       }
+                      // 1. 키보드에서 마이너스, e, 플러스 키 입력 자체를 차단
+                      onKeyDown={(e) => {
+                        if (["-", "e", "+", "E"].includes(e.key)) {
+                          e.preventDefault();
+                        }
+                      }}
+                      // 2. 마우스 우클릭 -> 붙여넣기(Paste) 물리적 차단 (핵심!)
+                      onPaste={(e) => {
+                        e.preventDefault();
+                      }}
+                      // 3. 텍스트를 마우스로 끌어다 놓는(Drop) 행위 차단
+                      onDrop={(e) => {
+                        e.preventDefault();
+                      }}
                       onChange={(e) => {
                         const val = e.target.value;
+
                         sec.k === "size"
                           ? setTempSize({ ...tempSize, carbon: val })
                           : setTempGeneral({ ...tempGeneral, carbon: val });
