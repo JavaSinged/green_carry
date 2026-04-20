@@ -20,6 +20,7 @@
 		WHERE m.store_id
 		= s.store_id
 		)
+		order by review_rating desc
 	</select>
 
 	<select id="findStoreById" parameterType="int"
