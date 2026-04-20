@@ -127,8 +127,9 @@ const UserReviewList = () => {
                     {review.menuName}
                     {review.extraCount > 0 &&
                       ` 외 ${review.extraCount}개`} |{" "}
-                    {review.totalPrice +
-                      review.deliveryPrice?.toLocaleString() || 0}
+                    {(
+                      review.totalPrice + (review.deliveryPrice || 0)
+                    ).toLocaleString()}
                     원
                   </span>
                   <span className={styles.order_date}>{review.reviewDate}</span>
@@ -202,7 +203,7 @@ const UserReviewList = () => {
                             display: "inline-block",
                           }}
                         >
-                          ↳ 사장님 답글
+                          ↳ 사장님 답글..
                         </span>
                         <br />
                         {review.reviewCommentContent}

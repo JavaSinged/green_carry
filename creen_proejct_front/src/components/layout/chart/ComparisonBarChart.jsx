@@ -58,8 +58,8 @@ const CarbonComparisonChart = () => {
   }
 
   const series = [
-    { name: "2025 ~ 2026", data: chartData.currentSeries },
     { name: "2024 ~ 2025", data: chartData.pastSeries },
+    { name: "2025 ~ 2026", data: chartData.currentSeries },
   ];
 
   const chartOptions = {
@@ -82,7 +82,7 @@ const CarbonComparisonChart = () => {
       colors: ["transparent"],
     },
     // 전역 변수 컬러에 맞춤: 포인트 오렌지, 브랜드 그린
-    colors: ["#2e8147", "#ffb300"],
+    colors: ["#ffb300", "#2e8147"],
     xaxis: {
       categories: chartData.categories,
       labels: {
@@ -117,11 +117,6 @@ const CarbonComparisonChart = () => {
     },
   };
 
-  const chartSeries = [
-    { name: "2026년", data: [12.5, 15.2, 14.8, 16.0, 13.5, 12.9] },
-    { name: "2025년", data: [11.2, 13.8, 12.1, 14.5, 11.9, 11.0] },
-  ];
-
   return (
     <div className={`${styles.container} ${styles.carbonContainer}`}>
       <div className={styles.headerFlex}>
@@ -139,8 +134,14 @@ const CarbonComparisonChart = () => {
           </span>
         </div>
       </div>
-      <Chart options={chartOptions} series={series} type="bar" height="100%" />
-      {/*<Chart options={chartOptions} series={chartSeries} type="bar" height="100%" />*/}
+      {chartData.categories?.length > 0 && (
+        <Chart
+          options={chartOptions}
+          series={series}
+          type="bar"
+          height="100%"
+        />
+      )}
     </div>
   );
 };
