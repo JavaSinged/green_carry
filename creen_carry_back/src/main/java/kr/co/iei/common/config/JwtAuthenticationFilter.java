@@ -1,4 +1,4 @@
-package kr.co.iei.common.config;
+/*package kr.co.iei.common.config;
 
 import java.io.IOException;
 
@@ -68,4 +68,4 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	           
 	           path.startsWith("/project/"); // 프로젝트 관련 공개 API 등
 	}
-}
+}*/
