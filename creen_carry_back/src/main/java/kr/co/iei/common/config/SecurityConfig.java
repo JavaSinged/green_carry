@@ -32,7 +32,7 @@ public class SecurityConfig {
 				.authorizeHttpRequests(auth -> auth
 						.requestMatchers("/member/login", "/member/userSignup", "/member/findId", "/member/checkMember",
 								"/member/resetPw", "/member/sendAuthCode", "/member/verifyCode", "/member/exists","/member/email-verification",
-								"/member/storeDupCheck","/member/emailDupCheck","/member/signupManager",
+								"/member/storeDupCheck","/member/emailDupCheck","/member/signupManager", "/member/community-carbon", 
 								"/project/**")
 						.permitAll() // 누구나
 						// 접근
