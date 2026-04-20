@@ -54,4 +54,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 		filterChain.doFilter(request, response);
 	}
+	
+	@Override
+	protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+	    String path = request.getServletPath();
+	    
+	    // 아래 경로들은 필터 로직(Redis 조회 등)을 아예 타지 않고 바로 통과합니다.
+	    return path.equals("/member/login") || 
+	           path.equals("/member/userSignup") ||
+	           path.equals("/member/findId") ||
+	           path.startsWith("/project/"); // 프로젝트 관련 공개 API 등
+	}
 }
