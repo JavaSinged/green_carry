@@ -11,6 +11,7 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 import api from "../../../utils/accessToken";
+import Pagination from "../../../components/commons/Pagination";
 
 export default function AdminContainerList() {
   const navigate = useNavigate();
@@ -237,36 +238,11 @@ export default function AdminContainerList() {
           </tbody>
         </table>
       </div>
-
-      <div className={styles.pagination}>
-        <button
-          className={styles.page_btn_nav}
-          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-          disabled={currentPage === 1}
-        >
-          <ChevronLeftIcon fontSize="small" /> 이전
-        </button>
-        <div className={styles.page_numbers}>
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-            <button
-              key={page}
-              className={`${styles.page_num} ${currentPage === page ? styles.active : ""}`}
-              onClick={() => setCurrentPage(page)}
-            >
-              {page}
-            </button>
-          ))}
-        </div>
-        <button
-          className={styles.page_btn_nav}
-          onClick={() =>
-            setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-          }
-          disabled={currentPage === totalPages || totalPages === 0}
-        >
-          다음 <ChevronRightIcon fontSize="small" />
-        </button>
-      </div>
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={setCurrentPage}
+      />
     </div>
   );
 }
