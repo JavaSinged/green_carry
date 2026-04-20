@@ -38,9 +38,9 @@ public class SecurityConfig {
 						// 접근
 						// 가능
 						.anyRequest().authenticated() // 그 외 모든 요청은 인증 필요
-				).formLogin(form -> form.disable()).httpBasic(basic -> basic.disable())
+				).formLogin(form -> form.disable()).httpBasic(basic -> basic.disable());
 				// 🌟 2. 우리가 만든 중복 로그인 체크 필터를 시큐리티 필터 체인에 추가
-				.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+				//.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
 		return http.build();
 	}
