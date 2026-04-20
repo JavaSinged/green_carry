@@ -218,9 +218,13 @@ public class MemberController {
 
 	// 유저 정보 업데이트
 	@PostMapping("/updateProfile")
-	public ResponseEntity<?> updateProfile(@RequestParam String memberId, @RequestParam String memberName,
-			@RequestParam String memberPhone, @RequestParam(required = false) Integer memberGrade, // 400 에러 방지용
-																									// required=false
+	public ResponseEntity<?> updateProfile(
+			@RequestParam String memberId,
+			@RequestParam String memberName,
+			@RequestParam String memberPhone,
+			@RequestParam(required = false)
+			Integer memberGrade, // 400 에러 방지용
+								// required=false
 			@RequestParam(value = "uploadFile", required = false) MultipartFile uploadFile) {
 
 		Member member = new Member();
@@ -269,6 +273,7 @@ public class MemberController {
 
 		String authCode = memberService.sendAuthCode(member.getMemberEmail());
 
+		System.out.println("인증번호 : " + authCode);
 		return ResponseEntity.ok(authCode);
 	}
 

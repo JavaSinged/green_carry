@@ -241,7 +241,7 @@ export default function UserInfoEdit() {
     openPostcode({ onComplete: handleCompletePostcode });
   };
 
-  // 주소 저장 핸들러
+  // 주소 저장
   const updateAddress = async () => {
     console.log("1. 함수 시작");
     if (!newAddress.memberAddrCode || !newAddress.memberDetailAddr.trim()) {
@@ -254,7 +254,7 @@ export default function UserInfoEdit() {
 
     try {
       console.log("2. 네이버 지오코딩 시작");
-      // 1. 네이버 지도 Geocoding으로 위경도 가져오기
+      //네이버 지도 Geocoding으로 위경도 가져오기
       const coords = await new Promise((resolve, reject) => {
         naver.maps.Service.geocode(
           { query: newAddress.memberAddr },
@@ -272,7 +272,7 @@ export default function UserInfoEdit() {
         );
       });
 
-      // 2. 위경도 포함해서 백엔드로 전송
+      // 위경도 포함해서 백엔드로 전송
       console.log("4. 백엔드 전송 시작");
       const response = await axios.patch(
         `${import.meta.env.VITE_BACKSERVER}/member/updateAddress`,
@@ -297,10 +297,9 @@ export default function UserInfoEdit() {
           memberDetailAddr: newAddress.memberDetailAddr,
           memberName: profileData.memberName,
           memberPhone: profileData.memberPhone,
-          memberThumb: finalPath,
         }));
 
-        // 🌟 2. [완벽 해결] 로컬스토리지에 위도/경도를 직접 덮어쓰기!
+        // 로컬스토리지에 위도/경도를 직접 덮어쓰기
         localStorage.setItem("LATITUDE", coords.latitude);
         localStorage.setItem("LONGITUDE", coords.longitude);
 
@@ -377,23 +376,20 @@ export default function UserInfoEdit() {
   return (
     <div className={styles.right}>
       <section
-        className={`${styles.right_main} ${
-          isEditingProfile
-            ? styles.right_main_editing
-            : styles.right_main_default
-        }`}
+        className={`${styles.right_main} ${isEditingProfile
+          ? styles.right_main_editing
+          : styles.right_main_default
+          }`}
       >
         <div
-          className={`${styles.icon_content} ${
-            isEditingProfile
-              ? styles.icon_content_editing
-              : styles.icon_content_default
-          }`}
+          className={`${styles.icon_content} ${isEditingProfile
+            ? styles.icon_content_editing
+            : styles.icon_content_default
+            }`}
         >
           <div
-            className={`${styles.icon_wrapper} ${
-              isEditingProfile ? styles.icon_wrapper_editable : ""
-            }`}
+            className={`${styles.icon_wrapper} ${isEditingProfile ? styles.icon_wrapper_editable : ""
+              }`}
             onClick={() => isEditingProfile && fileInputRef.current.click()}
           >
             {previewImg ? (
@@ -565,9 +561,8 @@ export default function UserInfoEdit() {
                     </div>
                     <p className={styles.address_detail}>
                       {memberInfo?.memberAddr
-                        ? `[${memberInfo.memberAddrcode || ""}] ${
-                            memberInfo.memberAddr
-                          } ${memberInfo.memberDetailAddr || ""}`
+                        ? `[${memberInfo.memberAddrcode || ""}] ${memberInfo.memberAddr
+                        } ${memberInfo.memberDetailAddr || ""}`
                         : "주소 정보 없음"}
                     </p>
                   </div>

@@ -5,7 +5,6 @@
 	<select id="loginMember" resultType="member">
 		SELECT
 		m.*,
-		-- 🌟 사장님일 경우 가게 번호를 가져오는 서브쿼리 추가
 		(SELECT MIN(store_id) FROM
 		store_tbl WHERE member_id = m.member_id) AS
 		storeId

@@ -36,7 +36,7 @@ const UserDelAccount = () => {
         try {
           const token = localStorage.getItem("accessToken");
           const response = await axios.get(
-            `${import.meta.env.VITE_BACKSERVER}/member/total-carbon`, // 🌟 하이픈(-) 사용 확인
+            `${import.meta.env.VITE_BACKSERVER}/member/total-carbon`, // 하이픈(-) 사용 확인
             {
               params: { memberId: user.memberId },
               headers: { Authorization: `Bearer ${token}` },

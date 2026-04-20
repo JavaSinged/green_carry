@@ -12,10 +12,11 @@ import axios from "axios";
 import Pagination from "../../../components/commons/Pagination";
 
 const UserProfile = () => {
+  // Context 및 외부 설정
   const { user } = useContext(AuthContext);
   const backHost = import.meta.env.VITE_BACKSERVER;
 
-  // 1. 상태 관리
+  // 상태 관리 (State)
   const [point, setPoint] = useState(() => {
     const savedPoint = localStorage.getItem("memberPoint");
     return savedPoint ? Number(savedPoint) : 0;
@@ -27,42 +28,31 @@ const UserProfile = () => {
   const [openHistory, setOpenHistory] = useState(false);
   const [progress, setProgress] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5; // 한 페이지당 보여줄 내역 수
+
+  // 상수 및 페이지네이션 관련 계산 (Derived State)
+  const itemsPerPage = 5;
   const pageGroupSize = 10;
+
   const filteredHistory = pointHistory.filter((item) => item.orderStatus >= 1);
   const totalPages = Math.ceil(filteredHistory.length / itemsPerPage) || 1;
 
-  // 1. 현재 페이지가 몇 번째 그룹인지 계산 (예: 11페이지면 2그룹)
   const currentGroup = Math.ceil(currentPage / pageGroupSize);
-
-  // 2. 현재 그룹의 시작 번호 (1, 11, 21...)
   const startPage = (currentGroup - 1) * pageGroupSize + 1;
-
-  // 3. 현재 그룹의 끝 번호 (10, 20, 30... 단, 전체 페이지보다 클 순 없음)
-  // 이 부분이 16개가 아니라 10개에서 끊어주는 핵심 로직입니다!
   const endPage = Math.min(startPage + pageGroupSize - 1, totalPages);
 
-  // 4. 배열에 넣을 때 'endPage'까지만 넣기
   const pageNumbers = [];
   for (let i = startPage; i <= endPage; i++) {
     pageNumbers.push(i);
   }
 
-  // 현재 페이지에 보여줄 아이템 슬라이싱
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentHistoryItems = filteredHistory.slice(
     indexOfFirstItem,
-    indexOfLastItem,
+    indexOfLastItem
   );
 
-  // 3. 이벤트 핸들러
-  const toggleEco = () => setOpenEco(!openEco);
-  const toggleHistory = () => {
-    setOpenHistory(!openHistory);
-    if (!openHistory) setCurrentPage(1);
-  };
-
+  // 헬퍼 함수 및 등급/포맷팅 계산
   const getEcoGrade = (currentCarbon) => {
     if (currentCarbon < 1000) return { name: "꼬마 씨앗 🌰", next: 1000 };
     if (currentCarbon < 3000) return { name: "파릇파릇 새싹 🌱", next: 3000 };
@@ -70,9 +60,15 @@ const UserProfile = () => {
     if (currentCarbon < 10000) return { name: "든든한 나무 🌳", next: 10000 };
     return { name: "울창한 숲 🌲", next: null };
   };
+
   const myGradeInfo = getEcoGrade(totalCarbon);
 
-  // 4. 데이터 패칭 함수
+  const formattedCarbon =
+    totalCarbon >= 100000
+      ? (totalCarbon / 1000).toFixed(1) + "kg"
+      : totalCarbon.toLocaleString() + "g";
+
+  // 데이터 패칭 및 이벤트 핸들러 (useCallback / Functions)
   const fetchUserData = useCallback(async () => {
     if (!user?.memberId) return;
     try {
@@ -81,7 +77,7 @@ const UserProfile = () => {
 
       const historyRes = await axios.get(
         `${backHost}/member/point-history/${user.memberId}`,
-        config,
+        config
       );
       setPointHistory(historyRes.data);
 
@@ -100,7 +96,13 @@ const UserProfile = () => {
     }
   }, [user?.memberId, backHost]);
 
-  // 5. useEffect 훅
+  const toggleEco = () => setOpenEco(!openEco);
+  const toggleHistory = () => {
+    setOpenHistory(!openHistory);
+    if (!openHistory) setCurrentPage(1);
+  };
+
+  // 생명주기 관리 (useEffect)
   useEffect(() => {
     const handleAutoUpdate = () => {
       const savedPoint = localStorage.getItem("memberPoint");
@@ -123,7 +125,7 @@ const UserProfile = () => {
     return () => clearTimeout(timer);
   }, [totalCarbon]);
 
-  // 6. JSX 렌더링
+  // JSX 렌더링
   return (
     <div className={styles.right}>
       <div className={styles.user_grade}>
@@ -136,7 +138,9 @@ const UserProfile = () => {
             <h2 className={styles.grade_name}>{myGradeInfo.name}</h2>
             <p className={styles.grade_subtitle}>
               {myGradeInfo.next
-                ? `다음 레벨까지 ${(myGradeInfo.next - totalCarbon).toLocaleString()}g`
+                ? `다음 레벨까지 ${(
+                  myGradeInfo.next - totalCarbon
+                ).toLocaleString()}g`
                 : "🎉 최고 등급 달성!"}
             </p>
           </div>
@@ -149,9 +153,7 @@ const UserProfile = () => {
             </div>
             <div className={styles.dashboard}>
               <p className={styles.dashboard_title}>나의 누적 탄소 절감량</p>
-              <p className={styles.dashboard_value}>
-                {totalCarbon.toLocaleString()}g
-              </p>
+              <p className={styles.dashboard_value}>{formattedCarbon}</p>
               <p className={styles.dashbboard_subtitle}>나의 총 실천 기록</p>
             </div>
           </div>
@@ -229,16 +231,20 @@ const UserProfile = () => {
                     const isPending =
                       item.orderStatus >= 1 && item.orderStatus <= 4;
                     const actualGetPoint =
-                      isCancelled && item.pointReward === 0 ? 0 : item.getPoint;
+                      isCancelled && item.pointReward === 0
+                        ? 0
+                        : item.getPoint;
 
                     return (
                       <div
                         key={item.orderId}
-                        className={`${styles.history_item} ${isCancelled ? styles.item_cancelled : ""}`}
+                        className={`${styles.history_item} ${isCancelled ? styles.item_cancelled : ""
+                          }`}
                       >
                         <div className={styles.history_left}>
                           <StorefrontIcon
-                            className={`${styles.store_icon} ${isCancelled ? styles.icon_cancelled : ""}`}
+                            className={`${styles.store_icon} ${isCancelled ? styles.icon_cancelled : ""
+                              }`}
                           />
                           <div>
                             <div className={styles.store_name_row}>
@@ -298,7 +304,9 @@ const UserProfile = () => {
                   />
                 </>
               ) : (
-                <div className={styles.empty_msg}>최근 내역이 없습니다. 🌱</div>
+                <div className={styles.empty_msg}>
+                  최근 내역이 없습니다. 🌱
+                </div>
               )}
             </div>
           </Collapse>
