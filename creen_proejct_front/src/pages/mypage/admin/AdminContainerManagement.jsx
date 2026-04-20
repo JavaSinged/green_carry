@@ -143,7 +143,7 @@ const AdminContainerManagement = () => {
     const formData = new FormData();
 
     if (productId && productId !== "new") {
-      formData.append("productId", parseInt(productId, 10));
+      formData.append("productId", +productId);
     }
 
     formData.append("productMaterial", productName.trim());
