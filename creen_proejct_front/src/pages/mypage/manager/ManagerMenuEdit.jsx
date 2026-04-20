@@ -566,27 +566,23 @@ const ManagerMenuEdit = () => {
                       value={
                         sec.k === "size" ? tempSize.carbon : tempGeneral.carbon
                       }
-                      // 1. 키보드 입력 차단 (-, e, +)
+                      // 1. 키보드에서 마이너스, e, 플러스 키 입력 자체를 차단
                       onKeyDown={(e) => {
                         if (["-", "e", "+", "E"].includes(e.key)) {
                           e.preventDefault();
                         }
                       }}
-                      // 2. 복붙 및 모든 입력값 검사 (핵심!)
+                      // 2. 마우스 우클릭 -> 붙여넣기(Paste) 물리적 차단 (핵심!)
+                      onPaste={(e) => {
+                        e.preventDefault();
+                      }}
+                      // 3. 텍스트를 마우스로 끌어다 놓는(Drop) 행위 차단
+                      onDrop={(e) => {
+                        e.preventDefault();
+                      }}
                       onChange={(e) => {
-                        let val = e.target.value;
+                        const val = e.target.value;
 
-                        // 음수 기호(-)가 들어오면 즉시 제거 (복붙 대응)
-                        if (val.includes("-")) {
-                          val = val.replace(/-/g, "");
-                        }
-
-                        // 혹시라도 0보다 작은 값이 들어오면 절대값으로 강제 변환
-                        if (Number(val) < 0) {
-                          val = Math.abs(Number(val)).toString();
-                        }
-
-                        // 상태 업데이트
                         sec.k === "size"
                           ? setTempSize({ ...tempSize, carbon: val })
                           : setTempGeneral({ ...tempGeneral, carbon: val });
