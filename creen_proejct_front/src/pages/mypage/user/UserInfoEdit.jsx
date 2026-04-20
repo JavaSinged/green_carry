@@ -297,7 +297,6 @@ export default function UserInfoEdit() {
           memberDetailAddr: newAddress.memberDetailAddr,
           memberName: profileData.memberName,
           memberPhone: profileData.memberPhone,
-          memberThumb: finalPath,
         }));
 
         // 🌟 2. [완벽 해결] 로컬스토리지에 위도/경도를 직접 덮어쓰기!
