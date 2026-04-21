@@ -102,22 +102,6 @@ const HeaderNotification = () => {
     }
   };
 
-  // 💡 [추가] 전부 지우기 클릭 시
-  const handleClearAll = async () => {
-    try {
-      // 1. DB에 모두 읽음(Y) 처리 요청
-      await axios.patch(`${backHost}/api/notification/read/all`, null, {
-        params: { memberId },
-      });
-      // 2. 로컬 화면 상태 싹 비우기
-      setNotifications([]);
-      setUnreadCount(0);
-      setIsOpen(false); // 창 닫기 (선택 사항)
-    } catch (err) {
-      console.error("전부 지우기 실패:", err);
-    }
-  };
-
   // 💡 [수정] 종 아이콘 클릭 시 빨간 배지 초기화
   const handleIconClick = () => {
     setIsOpen(!isOpen);
@@ -136,13 +120,30 @@ const HeaderNotification = () => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+  // '지우기' 버튼 클릭 시 호출되는 함수
+  const handleClearAll = async () => {
+    try {
+      // 1. DB의 모든 알림을 'Y'로 업데이트 (이게 핵심!)
+      await axios.patch(`${backHost}/api/notification/read/all`, null, {
+        params: { memberId },
+      });
+
+      // 2. DB 업데이트 성공 후, 프론트엔드 상태 싹 비우기
+      setNotifications([]);
+      setUnreadCount(0);
+
+      console.log("✅ 모든 알림이 읽음 처리되고 삭제되었습니다.");
+    } catch (err) {
+      console.error("지우기 실패:", err);
+    }
+  };
+
   return (
     <div className={styles.noti_icon_wrap} ref={dropdownRef}>
       <NotificationsNoneIcon
         className={styles.bell_icon}
         onClick={handleIconClick}
       />
-
       {unreadCount > 0 && (
         <span className={styles.noti_badge}>{unreadCount}</span>
       )}
@@ -161,7 +162,6 @@ const HeaderNotification = () => {
                     key={noti.notiId || Math.random()}
                     className={styles.noti_item}
                     onClick={() => handleNotiClick(noti.notiId, noti.navUrl)}
-                    style={{ cursor: "pointer" }}
                   >
                     <p className={styles.noti_msg}>{noti.message}</p>
                     <span className={styles.noti_time}>
@@ -170,24 +170,25 @@ const HeaderNotification = () => {
                   </div>
                 ))}
 
-                {/* 💡 [수정] 알림이 있을 때만 오른쪽 아래에 '지우기' 버튼 표시 */}
+                {/* 💡 오른쪽 아래 작게 배치된 '지우기' 버튼 */}
                 <div
                   style={{
                     display: "flex",
                     justifyContent: "flex-end",
-                    padding: "8px 15px",
-                    borderTop: "1px solid #f9f9f9",
+                    padding: "5px 15px 10px 0", // 위 5, 오른쪽 15, 아래 10 여백
                   }}
                 >
                   <button
-                    onClick={handleClearAll}
+                    onClick={(e) => {
+                      e.stopPropagation(); // 드롭다운이 닫히지 않게 이벤트 전파 방지
+                      handleClearAll();
+                    }}
                     style={{
                       background: "none",
                       border: "none",
-                      color: "#bbb", // 조금 더 연한 회색으로 처리
+                      color: "#999",
                       fontSize: "11px",
                       cursor: "pointer",
-                      textDecoration: "underline",
                     }}
                   >
                     지우기

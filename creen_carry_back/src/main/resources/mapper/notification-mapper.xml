@@ -37,11 +37,21 @@
 		AND IS_READ = 'N'
 		ORDER BY CREATED_AT DESC
 	</select>
-	
+
 	<update id="updateReadStatus" parameterType="int">
-		UPDATE NOTIFICATION_tbl
+		UPDATE
+		NOTIFICATION_tbl
 		SET IS_READ = 'Y'
 		WHERE NOTI_ID = #{notiId}
+	</update>
+
+	<update id="updateAllReadStatus" parameterType="String">
+		UPDATE
+		NOTIFICATION_tbl
+		SET IS_READ = 'Y'
+		WHERE RECEIVER_ID = #{receiverId}
+		AND
+		IS_READ = 'N'
 	</update>
 
 	<update id="updateAllReadStatus" parameterType="String">
