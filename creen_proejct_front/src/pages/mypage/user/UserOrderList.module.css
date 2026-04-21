@@ -191,16 +191,18 @@
 
 .dateInput {
   padding: 8px 12px;
-  border: 1px solid #ddd;
   border-radius: 8px;
   font-size: 14px;
   color: #333;
-  outline: none;
-  transition: border-color 0.2s;
+  background: linear-gradient(180deg, #ffffff 0%, #f9fcfa 100%);
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s,
+    transform 0.2s;
 }
 
 .dateInput:focus {
-  border-color: #2f8f46;
+  transform: translateY(-1px);
 }
 
 .dateSeparator {
@@ -222,6 +224,10 @@
 
 .resetBtn:hover {
   background: #e2e6e3;
+}
+
+.dateInput::-webkit-calendar-picker-indicator {
+  opacity: 0.8;
 }
 .cancelBtn {
   background-color: white;

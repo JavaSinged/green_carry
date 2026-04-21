@@ -393,3 +393,66 @@
   color: #111;
   margin-right: 4px;
 }
+
+@media (max-width: 768px) {
+  .page {
+    padding: 20px 16px;
+    border-radius: 16px;
+  }
+
+  .headerArea {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .refreshBtn {
+    width: 100%;
+  }
+
+  .orderCard {
+    padding: 18px 14px;
+  }
+
+  .orderHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .headerLeft {
+    flex-wrap: wrap;
+  }
+
+  .actionButtons {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .nextStepBtn,
+  .cancelBtn {
+    width: 100%;
+  }
+
+  .canceledWatermark {
+    font-size: 22px;
+    padding: 10px 16px;
+    border-width: 5px;
+    letter-spacing: 2px;
+  }
+}
+
+@media (max-width: 480px) {
+  .orderNo {
+    font-size: 16px;
+  }
+
+  .menuInfo h3 {
+    font-size: 16px;
+  }
+
+  .deliveryInfo p,
+  .statusDisplay {
+    font-size: 13px;
+  }
+}

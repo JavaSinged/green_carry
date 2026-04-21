@@ -321,14 +321,24 @@
 }
 
 .filter_row input[type="date"] {
-  border: 1.5px solid #246337;
-  border-radius: 20px;
-  padding: 6px 15px;
+  min-height: 42px;
+  border-radius: 12px;
+  padding: 0 14px;
   color: #246337;
-  outline: none;
   font-family: inherit;
   font-size: 0.9rem;
-  background-color: white;
+  background: linear-gradient(180deg, #ffffff 0%, #f9fcfa 100%);
+  transition:
+    box-shadow 0.2s,
+    transform 0.2s;
+}
+
+.filter_row input[type="date"]:focus {
+  transform: translateY(-1px);
+}
+
+.filter_row input[type="date"]::-webkit-calendar-picker-indicator {
+  opacity: 0.8;
 }
 
 /* 필터 내 조회 버튼 (기존 delete_btn 스타일 계승) */

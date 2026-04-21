@@ -17,11 +17,22 @@
 }
 
 .filter_row input {
-  border: 1.5px solid #246337;
-  border-radius: 20px;
-  padding: 5px 15px;
+  min-height: 42px;
+  border-radius: 12px;
+  padding: 0 14px;
   color: #246337;
-  outline: none;
+  background: linear-gradient(180deg, #ffffff 0%, #f9fcfa 100%);
+  transition:
+    box-shadow 0.2s,
+    transform 0.2s;
+}
+
+.filter_row input:focus {
+  transform: translateY(-1px);
+}
+
+.filter_row input::-webkit-calendar-picker-indicator {
+  opacity: 0.8;
 }
 
 .review_card {

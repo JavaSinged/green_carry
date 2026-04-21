@@ -255,3 +255,56 @@
   height: auto;
   margin-bottom: 7px;
 }
+
+@media (max-width: 768px) {
+  .main_container {
+    align-items: stretch;
+  }
+
+  .big_text,
+  .two_btn {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .gray_box,
+  .reasonSection,
+  .reason_input,
+  .reason_pwInput,
+  .last_check_box {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .gray_box {
+    height: auto;
+    padding-bottom: 32px;
+  }
+
+  .reason_check {
+    grid-template-columns: 1fr;
+    width: 100%;
+    padding-left: 0;
+  }
+
+  .last_check_box {
+    justify-content: flex-start;
+  }
+
+  .cancel_btn p,
+  .goodbye_btn p {
+    margin: 0;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .gray_box_text {
+    padding-left: 20px;
+    padding-right: 16px;
+  }
+
+  .warning_icon {
+    padding: 16px;
+  }
+}

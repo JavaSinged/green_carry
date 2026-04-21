@@ -245,3 +245,29 @@
   color: #ff5252;
   margin-left: 8px;
 }
+
+@media (max-width: 768px) {
+  .dashboard_container {
+    padding: 20px 16px;
+    border-radius: 16px;
+  }
+
+  .header,
+  .header_right {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .search_wrap {
+    width: 100%;
+  }
+
+  .table {
+    min-width: 850px;
+  }
+
+  .table_wrap {
+    min-height: 0;
+  }
+}

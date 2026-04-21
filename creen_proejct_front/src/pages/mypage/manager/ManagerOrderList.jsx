@@ -223,13 +223,13 @@ const ManagerOrderList = () => {
     top: "50%",
     left: "50%",
     transform: "translate(-50%, -50%)",
-    width: 480,
+    width: "min(480px, calc(100vw - 24px))",
     maxHeight: "85vh",
     overflowY: "auto",
     bgcolor: "background.paper",
     borderRadius: 3,
     boxShadow: 24,
-    p: 4,
+    p: { xs: 2, sm: 4 },
     outline: "none",
   };
 

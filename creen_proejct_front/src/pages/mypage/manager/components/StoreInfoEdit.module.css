@@ -266,3 +266,139 @@
   gap: 8px;
   font-size: 14px;
 }
+
+.dateFieldWrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.dateInput {
+  cursor: pointer;
+  padding-right: 44px;
+}
+
+.calendarIcon {
+  position: absolute;
+  right: 14px;
+  color: var(--color-brand);
+  cursor: pointer;
+  font-size: 22px !important;
+}
+
+.calendarPopup {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 100;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 16px 30px rgba(15, 23, 42, 0.14);
+  background-color: #fff;
+  border: 1px solid #e5efe7;
+}
+
+.calendarPopup :global(.react-calendar) {
+  width: min(320px, calc(100vw - 32px));
+  border: none;
+  font-family: var(--font-body);
+  padding: 10px;
+}
+
+.calendarPopup :global(.react-calendar__navigation button) {
+  min-width: 40px;
+  border-radius: 10px;
+}
+
+.calendarPopup :global(.react-calendar__tile) {
+  border-radius: 10px;
+}
+
+.calendarPopup :global(.react-calendar__tile--active) {
+  background: var(--color-brand) !important;
+  color: #fff;
+}
+
+.calendarPopup :global(.react-calendar__tile--now) {
+  background: #eef7f0;
+  color: var(--color-brand);
+}
+
+@media (max-width: 768px) {
+  .container {
+    margin: 20px auto;
+    padding: 20px 16px;
+    border-radius: 16px;
+  }
+
+  .formRow {
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .label {
+    width: 100%;
+    padding-top: 0;
+  }
+
+  .addressTopRow,
+  .hoursToggleGroup,
+  .timeInputRow,
+  .restDayItem,
+  .restDaySelects,
+  .dayRow {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .addressSearchBtn {
+    width: 100%;
+    min-height: 44px;
+  }
+
+  .imageUploadBox {
+    height: 240px;
+    padding: 16px;
+  }
+
+  .browseBtn {
+    margin-right: 0;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .hoursContentBox,
+  .restDayBox {
+    padding: 16px;
+  }
+
+  .categoryGroup {
+    gap: 10px;
+  }
+
+  .categoryBtn {
+    flex: 1 1 calc(50% - 10px);
+    text-align: center;
+  }
+
+  .calendarPopup {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 16px 12px;
+  }
+
+  .imageUploadBox {
+    height: 200px;
+  }
+
+  .categoryBtn {
+    flex-basis: 100%;
+  }
+}

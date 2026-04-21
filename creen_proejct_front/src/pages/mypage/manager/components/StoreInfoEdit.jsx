@@ -699,49 +699,24 @@ export default function StoreInfoEdit() {
         <div className={styles.formRow}>
           <label className={styles.label}>개업일자</label>
           <div className={styles.inputWrap}>
-            <div
-              style={{
-                position: "relative",
-                display: "flex",
-                alignItems: "center",
-                width: "100%",
-              }}
-            >
+            <div className={styles.dateFieldWrap}>
               <input
                 type="text"
                 name="openDate"
                 value={formData.openDate || ""}
-                className={styles.inputBase}
+                className={`${styles.inputBase} ${styles.dateInput}`}
                 placeholder="YYYY-MM-DD"
                 readOnly
                 onClick={() => setShowCalendar(!showCalendar)}
-                style={{ cursor: "pointer", paddingRight: "35px" }}
               />
               <CalendarMonthIcon
                 onClick={() => setShowCalendar(!showCalendar)}
-                style={{
-                  position: "absolute",
-                  right: "10px",
-                  cursor: "pointer",
-                  color: "var(--color-brand)",
-                }}
+                className={styles.calendarIcon}
               />
 
               {/* ?щ젰 ?앹뾽 */}
               {showCalendar && (
-                <div
-                  style={{
-                    position: "absolute",
-                    top: "100%",
-                    left: "0",
-                    zIndex: 100,
-                    marginTop: "5px",
-                    borderRadius: "12px",
-                    overflow: "hidden",
-                    boxShadow: "0 10px 25px rgba(0,0,0,0.15)",
-                    backgroundColor: "#fff",
-                  }}
-                >
+                <div className={styles.calendarPopup}>
                   <Calendar
                     onChange={handleDateChange}
                     calendarType="gregory"
