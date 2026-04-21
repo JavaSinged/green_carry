@@ -401,3 +401,70 @@
   font-size: 0.9rem;
   font-weight: 500;
 }
+
+@media (max-width: 768px) {
+  .right_main {
+    padding: 20px 16px;
+    border-radius: 18px;
+  }
+
+  .user_grade {
+    flex-direction: column;
+  }
+
+  .icon_content {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .ecoGrade {
+    width: 100%;
+    padding: 20px 16px;
+  }
+
+  .my_point,
+  .collapse_header,
+  .eco_content_box,
+  .history_list {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .history_item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    min-height: auto;
+  }
+
+  .history_left {
+    width: 100%;
+    align-items: flex-start;
+  }
+
+  .pagination {
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .grade_name {
+    font-size: 20px;
+  }
+
+  .history_left {
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .store_name_row,
+  .address_tag_row {
+    flex-wrap: wrap;
+  }
+
+  .page_numbers {
+    gap: 4px;
+  }
+}

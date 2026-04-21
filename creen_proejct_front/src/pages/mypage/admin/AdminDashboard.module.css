@@ -310,3 +310,47 @@
   color: var(--color-point);
   border: 1px solid #ffe082;
 }
+
+@media (max-width: 768px) {
+  .dashboardContainer {
+    padding: 20px 16px;
+    border-radius: 16px;
+  }
+
+  .tabContainer {
+    width: 100%;
+    margin: 12px 0 24px;
+  }
+
+  .inquiryHeader {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    padding: 0;
+  }
+
+  .filterGroup {
+    flex-wrap: wrap;
+  }
+
+  .itemHeader,
+  .itemBody {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .itemTitleGroup,
+  .itemMeta {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .itemMeta {
+    justify-content: flex-start;
+    gap: 8px 12px;
+  }
+
+  .emptyMsg {
+    padding: 40px 20px;
+  }
+}
