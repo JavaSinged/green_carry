@@ -12,7 +12,7 @@ const EcoNight = () => {
     left: "50%",
   });
 
-  // 🌟 손전등 크기 상태 (평소 135px -> 찾았을 때 350px로 확장)
+  // 🌟 손전등 크기 상태 (평소 135px)
   const [flashlightSize, setFlashlightSize] = useState("135px");
   const overlayRef = useRef(null);
 
@@ -39,13 +39,13 @@ const EcoNight = () => {
   const triggerBlackout = () => {
     if (isActive) return;
     generateRandomPosition();
-    setFlashlightSize("150px"); // 초기 크기
+    setFlashlightSize("135px"); // 초기 크기 고정
     setIsActive(true);
     setIsFullyDark(false);
 
     setTimeout(() => {
       setIsFullyDark(true);
-      setFlashlightSize("350px"); // 🌟 쿠폰이 나오면 손전등 범위를 넓혀서 시야 확보!
+      // 🌟 기존에 여기서 350px로 키우던 로직을 제거했습니다! 끝까지 135px로 찾아야 합니다.
     }, 1000);
 
     const handleMouseMove = (e) => {
@@ -59,20 +59,14 @@ const EcoNight = () => {
     return () => window.removeEventListener("mousemove", handleMouseMove);
   };
 
-  // 🌟 로컬 스토리지 포인트 업데이트 함수
+  // 로컬 스토리지 포인트 업데이트 함수
   const updateLocalStoragePoints = (newPoint) => {
-    // 1. 만약 'member' 객체 전체를 저장하고 있다면
     const storedMember = JSON.parse(localStorage.getItem("member"));
     if (storedMember) {
-      storedMember.memberPoint = newPoint; // 포인트 필드 업데이트
+      storedMember.memberPoint = newPoint;
       localStorage.setItem("member", JSON.stringify(storedMember));
     }
-
-    // 2. 만약 별도의 'memberPoint' 키를 쓰고 있다면
     localStorage.setItem("memberPoint", newPoint);
-
-    // 🌟 [중요] Navbar나 다른 컴포넌트가 바뀐 로컬 스토리지를 감지하게 하려면
-    // 커스텀 이벤트를 쏴주는 게 베스트입니다.
     window.dispatchEvent(new Event("storage"));
   };
 
@@ -100,8 +94,11 @@ const EcoNight = () => {
         { event_code: "NIGHT_COUPON" },
       );
 
-      // 🌟 서버에서 준 최신 포인트(res.data)를 로컬 스토리지에 동기화!
+      // 서버에서 준 최신 포인트 동기화
       updateLocalStoragePoints(res.data);
+
+      // 🌟 쿠폰을 찾아서 포인트 지급까지 성공하면, 그때 시야를 350px로 확 밝혀줍니다!
+      setFlashlightSize("350px");
 
       Swal.fire({
         title: "올빼미족 인증!",
@@ -134,7 +131,7 @@ const EcoNight = () => {
   const resetState = () => {
     setIsActive(false);
     setIsFullyDark(false);
-    setFlashlightSize("150px");
+    setFlashlightSize("135px"); // 🌟 리셋할 때도 확실하게 135px로 돌려놓습니다.
   };
 
   if (!isActive) return null;
@@ -147,7 +144,7 @@ const EcoNight = () => {
         style={{
           "--mouse-x": "50%",
           "--mouse-y": "50%",
-          "--flashlight-size": flashlightSize, // 🌟 CSS 변수로 크기 조절
+          "--flashlight-size": flashlightSize, // 🌟 상태에 따라 크기 변경
         }}
       />
 

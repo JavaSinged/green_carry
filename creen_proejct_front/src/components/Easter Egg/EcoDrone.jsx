@@ -115,7 +115,7 @@ const EcoDrone = () => {
       console.error("드론 보급 실패:", error);
       const errorMsg =
         error.response?.status === 409
-          ? "오늘의 보급품을 이미 받으셨습니다."
+          ? "보급품을 이미 받으셨습니다."
           : "보급 도중 문제가 발생했습니다.";
 
       setTimeout(() => {
