@@ -102,7 +102,7 @@ const EcoNight = () => {
 
       Swal.fire({
         title: "올빼미족 인증!",
-        html: `어둠 속에서 쿠폰을 발견하셨군요!<br/><b>현재 포인트: ${res.data}P</b>`,
+        html: `어둠 속에서 쿠폰을 발견하셨군요!<br/><b> 2000P 지급!</b>`,
         icon: "success",
         background: "#000",
         color: "#fff",
