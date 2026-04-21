@@ -133,7 +133,7 @@ const PaymentPage = () => {
         orderId: `ORDER_${savedOrderId}_${Date.now()}`,
         orderName: orderNameStr,
         successUrl: `${window.location.origin}/checkoutPage?orderId=ORDER_${savedOrderId}`,
-        failUrl: `${window.location.origin}/payment/fail`,
+        failUrl: `${window.location.origin}/OrderPage`,
         customerName: memberId,
       });
       ///이구간이 결제 완료된 구간
