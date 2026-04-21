@@ -23,7 +23,6 @@
 
 /* 헤더 영역 레이아웃 */
 .headerFlex {
-  display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
@@ -51,7 +50,8 @@
 
 /* 수치 및 데이터 표시 영역 */
 .valueGroup {
-  text-align: right;
+  display: flex;
+  gap: 10px;
 }
 
 /* 공통 큰 수치 (매출, 가입자 등) */
@@ -76,6 +76,16 @@
   color: var(--color-brand);
   background-color: var(--color-surface);
   padding: 2px 8px;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.badge2 {
+  font-size: 14px;
+  font-weight: bold;
+  color: var(--color-brand);
+  background-color: var(--color-surface);
   border-radius: 10px;
   display: inline-flex;
   align-items: center;
