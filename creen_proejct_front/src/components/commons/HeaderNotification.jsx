@@ -136,7 +136,6 @@ const HeaderNotification = () => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
-
   return (
     <div className={styles.noti_icon_wrap} ref={dropdownRef}>
       <NotificationsNoneIcon
@@ -150,54 +149,51 @@ const HeaderNotification = () => {
 
       {isOpen && (
         <div className={styles.noti_dropdown}>
-          {/* 💡 [추가] 타이틀과 전부 지우기 버튼을 나란히 배치 */}
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              padding: "10px 15px",
-              borderBottom: "1px solid #eee",
-            }}
-          >
-            <span
-              className={styles.noti_header}
-              style={{ borderBottom: "none", padding: 0 }}
-            >
-              최근 알림
-            </span>
-            {notifications.length > 0 && (
-              <button
-                onClick={handleClearAll}
-                style={{
-                  background: "none",
-                  border: "none",
-                  color: "#888",
-                  fontSize: "12px",
-                  cursor: "pointer",
-                  textDecoration: "underline",
-                }}
-              >
-                전부 지우기
-              </button>
-            )}
+          <div className={styles.noti_header}>
+            <span>최근 알림</span>
           </div>
 
           <div className={styles.noti_list}>
             {notifications.length > 0 ? (
-              notifications.map((noti) => (
+              <>
+                {notifications.map((noti) => (
+                  <div
+                    key={noti.notiId || Math.random()}
+                    className={styles.noti_item}
+                    onClick={() => handleNotiClick(noti.notiId, noti.navUrl)}
+                    style={{ cursor: "pointer" }}
+                  >
+                    <p className={styles.noti_msg}>{noti.message}</p>
+                    <span className={styles.noti_time}>
+                      {noti.time || noti.createdAt}
+                    </span>
+                  </div>
+                ))}
+
+                {/* 💡 [수정] 알림이 있을 때만 오른쪽 아래에 '지우기' 버튼 표시 */}
                 <div
-                  key={noti.notiId || Math.random()}
-                  className={styles.noti_item}
-                  onClick={() => handleNotiClick(noti.notiId, noti.navUrl)}
-                  style={{ cursor: "pointer" }}
+                  style={{
+                    display: "flex",
+                    justifyContent: "flex-end",
+                    padding: "8px 15px",
+                    borderTop: "1px solid #f9f9f9",
+                  }}
                 >
-                  <p className={styles.noti_msg}>{noti.message}</p>
-                  <span className={styles.noti_time}>
-                    {noti.time || noti.createdAt}
-                  </span>
+                  <button
+                    onClick={handleClearAll}
+                    style={{
+                      background: "none",
+                      border: "none",
+                      color: "#bbb", // 조금 더 연한 회색으로 처리
+                      fontSize: "11px",
+                      cursor: "pointer",
+                      textDecoration: "underline",
+                    }}
+                  >
+                    지우기
+                  </button>
                 </div>
-              ))
+              </>
             ) : (
               <p className={styles.empty_msg}>새로운 알림이 없습니다. 🌿</p>
             )}
@@ -207,5 +203,4 @@ const HeaderNotification = () => {
     </div>
   );
 };
-
 export default HeaderNotification;

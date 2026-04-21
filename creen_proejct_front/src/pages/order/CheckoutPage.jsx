@@ -544,15 +544,6 @@ const CheckoutPage = () => {
                     alignItems: "flex-end",
                   }}
                 >
-                  <strong
-                    style={{
-                      display: "block",
-                      fontSize: "1.5rem",
-                      color: "#2f8f46",
-                    }}
-                  >
-                    {targetArrivalTime}
-                  </strong>
                   <span
                     style={{
                       fontSize: "13px",
