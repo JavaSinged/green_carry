@@ -102,22 +102,6 @@ const HeaderNotification = () => {
     }
   };
 
-  // 💡 [추가] 전부 지우기 클릭 시
-  const handleClearAll = async () => {
-    try {
-      // 1. DB에 모두 읽음(Y) 처리 요청
-      await axios.patch(`${backHost}/api/notification/read/all`, null, {
-        params: { memberId },
-      });
-      // 2. 로컬 화면 상태 싹 비우기
-      setNotifications([]);
-      setUnreadCount(0);
-      setIsOpen(false); // 창 닫기 (선택 사항)
-    } catch (err) {
-      console.error("전부 지우기 실패:", err);
-    }
-  };
-
   // 💡 [수정] 종 아이콘 클릭 시 빨간 배지 초기화
   const handleIconClick = () => {
     setIsOpen(!isOpen);
