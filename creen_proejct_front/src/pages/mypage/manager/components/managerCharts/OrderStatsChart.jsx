@@ -12,7 +12,10 @@ const OrderStatsChart = ({ data }) => {
     );
   }
 
+  // 1. 배달수단 비중 (%)
   const series = data.map((item) => item.percent || 0);
+
+  // 2. [수정됨] label이 데이터에 없으므로 deliveryType을 한글로 직접 변환
   const labels = data.map((item) => {
     if (item.deliveryType === 1) return "포장";
     if (item.deliveryType === 2) return "도보 & 자전거";
@@ -21,11 +24,12 @@ const OrderStatsChart = ({ data }) => {
   });
 
   const chartColors = data.map((item) => {
-    if (item.deliveryType === 1) return "#2ecc71"; // var(--color-brand) 대용
-    if (item.deliveryType === 2) return "#3498db";
-    return "#95a5a6";
+    if (item.deliveryType === 1) return "var(--color-point)";
+    if (item.deliveryType === 2) return "var(--color-brand)";
+    return "var(--color-info)";
   });
 
+  // 3. [추가됨] 총 매출액과 총 주문 건수 계산
   const totalAmount = data.reduce(
     (sum, item) => sum + (item.seriesAmount || 0),
     0,
@@ -36,17 +40,41 @@ const OrderStatsChart = ({ data }) => {
   );
 
   const options = {
-    chart: { type: "donut" },
+    chart: {
+      type: "donut",
+    },
     plotOptions: {
       pie: {
         donut: {
           size: "70%",
           labels: {
             show: true,
+            name: {
+              show: true,
+              fontSize: "14px",
+              color: "#666",
+              offsetY: -10,
+            },
+            value: {
+              show: true,
+              fontSize: "20px",
+              fontWeight: "bold",
+              color: "#333",
+              offsetY: 10,
+              // 중앙 값은 퍼센트로 표시
+              formatter: (val) => val + "%",
+            },
             total: {
               show: true,
-              label: "총 매출",
-              formatter: () => totalAmount.toLocaleString() + "원",
+              showAlways: true,
+              label: "당월 주문 금액",
+              fontSize: "14px",
+              color: "#666",
+              formatter: () => {
+                return totalAmount > 0
+                  ? totalAmount.toLocaleString() + "원"
+                  : "0원";
+              },
             },
           },
         },
@@ -54,12 +82,24 @@ const OrderStatsChart = ({ data }) => {
     },
     colors: chartColors,
     labels: labels,
-    legend: { show: false },
+    dataLabels: {
+      enabled: false,
+    },
+    legend: {
+      show: false,
+    },
+    stroke: {
+      show: true,
+      width: 2,
+      colors: ["#ffffff"],
+    },
+    // 4. [추가됨] 차트 조각에 마우스 올렸을 때 금액과 건수 표시 툴팁
     tooltip: {
       y: {
-        formatter: (val, opts) => {
-          const original = data[opts.seriesIndex];
-          return `${(original.seriesAmount || 0).toLocaleString()}원 (${original.orderCount || 0}건)`;
+        formatter: function (val, opts) {
+          const index = opts.seriesIndex;
+          const originalData = data[index];
+          return `${(originalData.seriesAmount || 0).toLocaleString()}원 (${originalData.orderCount || 0}건)`;
         },
       },
     },
@@ -68,23 +108,31 @@ const OrderStatsChart = ({ data }) => {
   return (
     <div className={styles.chartContainer}>
       <div className={styles.cardHeader}>
-        <h3 className={styles.cardTitle}>주문 통계</h3>
+        <span className={styles.cardTitle}>주문 통계</span>
         <button
           className={styles.viewMoreBtn}
-          onClick={() => navigate("/mypage/manager/orders")}
+          onClick={() => {
+            navigate("/mypage/manager/orders");
+          }}
         >
-          View more{" "}
+          View more
           <OpenInNewIcon style={{ fontSize: "1rem", marginLeft: "4px" }} />
         </button>
       </div>
 
-      <div className={styles.mainValue}>
-        <span>{totalAmount.toLocaleString()}원</span>
-        <span
-          className={styles.changePercent}
-          style={{ backgroundColor: "#f0f0f0", color: "#666" }}
-        >
-          총 {totalOrderCount}건
+      {/* 5. [추가됨] 메인 금액 옆에 총 주문 건수 표시 */}
+      <div
+        className={styles.mainValue}
+        style={{ display: "flex", alignItems: "baseline", gap: "8px" }}
+      >
+        <span>
+          {totalAmount !== undefined && totalAmount !== null
+            ? totalAmount.toLocaleString()
+            : 0}
+          원
+        </span>
+        <span style={{ fontSize: "1rem", color: "#666", fontWeight: "normal" }}>
+          (총 {totalOrderCount}건)
         </span>
       </div>
 

@@ -1,9 +1,7 @@
-/* --- 📦 전체 컨테이너 및 카드 구조 --- */
+/* --- 기존 코드 유지 --- */
 .chartContainer {
   padding: 24px;
   box-sizing: border-box;
-  background-color: #fff;
-  border-radius: 12px;
 }
 
 .chartCard {
@@ -26,7 +24,6 @@
   margin: 0;
 }
 
-/* --- 🔗 상단 버튼 (더보기 등) --- */
 .viewMoreBtn {
   border: none;
   background: none;
@@ -44,11 +41,10 @@
   color: #246a3a;
 }
 
-/* --- 💰 메인 수치 표시 (총 주문금액/총 리뷰수 등) --- */
 .mainValue {
   font-size: 28px;
   font-weight: bold;
-  color: #222;
+  color: #333;
   margin-bottom: 24px;
   display: flex;
   align-items: baseline;
@@ -64,26 +60,62 @@
   font-weight: normal;
 }
 
-/* --- 📊 리스트 및 프로그레스 바 영역 --- */
-.pathWrap {
+.legendContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: center;
+  margin-top: 24px;
   width: 100%;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  width: calc(50% - 16px);
+}
+
+.legendColor {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.legendLabel {
+  color: #757575;
+  flex: 1;
+}
+
+.legendValue {
+  font-weight: 600;
+  color: #212121;
+}
+
+.pathWrap {
+  padding: 10px;
+  width: 100%;
+}
+
+.title {
+  font-size: 28px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 20px;
 }
 
 .list {
   display: flex;
   flex-direction: column;
-  gap: 20px; /* 항목 간격 가독성 있게 조정 */
-}
-
-.item {
-  position: relative;
+  gap: 18px;
 }
 
 .info {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 .label {
@@ -98,25 +130,17 @@
   color: #222;
 }
 
-/* --- 🟩 바 차트 디자인 --- */
-.barContainer {
-  position: relative;
-  width: 100%;
-  cursor: pointer;
-}
-
 .barBg {
   width: 100%;
-  height: 10px; /* 두께 살짝 키움 */
+  height: 8px;
   background-color: #f0f0f0;
-  border-radius: 5px;
+  border-radius: 4px;
   overflow: hidden;
 }
 
 .barFill {
   height: 100%;
-  border-radius: 5px;
-  background-color: var(--color-brand); /* 기본 브랜드 컬러 */
+  border-radius: 4px;
   animation: fillUp 1.2s ease-out forwards;
   transition: width 0.4s ease-out;
 }
@@ -127,11 +151,30 @@
   }
 }
 
-/* --- 💬 통합 툴팁 (금액/수량/리뷰수 공용) --- */
-.valueTooltip {
+.noData {
+  text-align: center;
+  padding: 30px;
+  color: #bbb;
+}
+
+/* --- 🌟 툴팁(금액 호버) 기능을 위해 추가된 코드 --- */
+
+.item {
+  position: relative; /* 툴팁 배치의 기준점 */
+}
+
+/* 바와 툴팁을 감싸는 영역 */
+.barContainer {
+  position: relative;
+  width: 100%;
+  cursor: pointer;
+}
+
+/* 금액 툴팁 스타일 (평소엔 숨김) */
+.amountTooltip {
   position: absolute;
-  top: -32px;
-  right: 0;
+  top: -32px; /* 바 위쪽으로 배치 */
+  right: 0; /* 오른쪽에 고정 */
   background-color: #333;
   color: #fff;
   padding: 4px 10px;
@@ -139,14 +182,33 @@
   font-size: 12px;
   font-weight: 500;
   white-space: nowrap;
-  opacity: 0;
+  opacity: 0; /* 투명도 0 */
   visibility: hidden;
   transition: all 0.2s ease-in-out;
   z-index: 10;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
-.valueTooltip::after {
+.orderCountTooltip {
+  position: absolute;
+  top: -32px; /* 바 위쪽으로 배치 */
+  right: 0; /* 오른쪽에 고정 */
+  background-color: #333;
+  color: #fff;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  opacity: 0; /* 투명도 0 */
+  visibility: hidden;
+  transition: all 0.2s ease-in-out;
+  z-index: 10;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* 말풍선 꼬리표 */
+.amountTooltip::after {
   content: "";
   position: absolute;
   bottom: -4px;
@@ -156,54 +218,14 @@
   border-top: 5px solid #333;
 }
 
-/* 🌟 호버 효과 통합 */
-.barContainer:hover .valueTooltip {
+/* 🌟 마우스 호버 시 툴팁 출력 */
+.barContainer:hover .amountTooltip {
   opacity: 1;
   visibility: visible;
-  top: -38px;
+  top: -38px; /* 위로 슥 올라오는 효과 */
 }
 
+/* 호버 시 바 배경색 살짝 강조 */
 .barContainer:hover .barBg {
   background-color: #e5e5e5;
-}
-
-/* --- 📍 범례(Legend) 디자인 --- */
-.legendContainer {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
-  justify-content: center;
-  margin-top: 24px;
-}
-
-.legendItem {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 13px;
-  width: calc(50% - 16px);
-}
-
-.legendColor {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-}
-
-.legendLabel {
-  color: #757575;
-  flex: 1;
-}
-
-.legendValue {
-  font-weight: 600;
-  color: #212121;
-}
-
-/* 데이터 없을 때 */
-.noData {
-  text-align: center;
-  padding: 40px;
-  color: #bbb;
-  font-size: 14px;
 }
