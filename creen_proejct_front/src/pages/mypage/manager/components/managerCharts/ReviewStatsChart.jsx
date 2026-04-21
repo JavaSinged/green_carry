@@ -6,9 +6,8 @@ import { useNavigate } from "react-router-dom";
 const ReviewStatsChart = ({ data }) => {
   const navigate = useNavigate();
 
-  // 데이터가 아직 로드되지 않았을 때를 위한 방어 코드
   if (!data || !data.series) {
-    return <div className={styles.loading}>차트 데이터를 불러오는 중...</div>;
+    return <div className={styles.noData}>차트 데이터를 불러오는 중...</div>;
   }
 
   const options = {
@@ -41,7 +40,7 @@ const ReviewStatsChart = ({ data }) => {
             total: {
               show: true,
               showAlways: true,
-              label: "평균 별점", // 🌟 리뷰 개수 대신 평균 점수를 보여주면 더 직관적입니다.
+              label: "평균 별점",
               fontSize: "14px",
               color: "#666",
               formatter: () =>
@@ -51,21 +50,29 @@ const ReviewStatsChart = ({ data }) => {
         },
       },
     },
-    // 🌟 색상을 5개로 맞췄습니다 (5점 -> 1점 순서)
-    colors: [
-      "var(--color-brand)", // 5점 (진한 초록)
-      "#81c784", // 4점 (연한 초록)
-      "#ffb300", // 3점 (노란색)
-      "#ff8a65", // 2점 (주황색)
-      "#e57373", // 1점 (빨간색 계열) - 이제 1점이 잘 보일 거예요!
-    ],
+    colors: ["var(--color-brand)", "#81c784", "#ffb300", "#ff8a65", "#e57373"],
     labels: ["5점", "4점", "3점", "2점", "1점"],
     legend: { show: false },
     dataLabels: { enabled: false },
+
+    // 🌟 [수정됨] 형님 요청사항: 툴팁에 "5점 : (4건)" 형식으로 출력되도록 변경
     tooltip: {
       enabled: true,
       y: {
-        formatter: (val) => `${val}%`,
+        title: {
+          formatter: (seriesName) => `${seriesName} :`, // 라벨 뒤에 콜론 추가
+        },
+        formatter: (val, opts) => {
+          // 백엔드에서 배열로 건수를 넘겨준다면 data.counts[opts.seriesIndex] 활용 가능
+          if (data.counts && data.counts[opts.seriesIndex] !== undefined) {
+            return `(${data.counts[opts.seriesIndex]}건)`;
+          }
+          // 퍼센트로 넘어올 경우 전체 건수에서 역산하여 건수 계산
+          const calculatedCount = Math.round(
+            (val / 100) * (data.totalCount || 0),
+          );
+          return `(${calculatedCount}건)`;
+        },
       },
     },
   };
@@ -86,12 +93,13 @@ const ReviewStatsChart = ({ data }) => {
       </div>
 
       <div className={styles.mainValue}>
-        {data.avgRating?.toFixed(1)}점
-        <span className={styles.review_count_sub}>
+        <span>{data.avgRating?.toFixed(1)}점</span>
+        {/* CSS 파일에 없는 review_count_sub 클래스 대신 인라인 스타일로 통일 */}
+        <span style={{ fontSize: "1rem", color: "#666", fontWeight: "normal" }}>
           (총 {data.totalCount}건)
         </span>
         {data.changePercent > 0 && (
-          <span className={styles.changePercent}>
+          <span className={styles.changePercent} style={{ marginLeft: "auto" }}>
             ↑ {data.changePercent}% 지난 주보다
           </span>
         )}
@@ -107,7 +115,6 @@ const ReviewStatsChart = ({ data }) => {
               style={{ backgroundColor: options.colors[index] }}
             ></span>
             <span className={styles.legendLabel}>{label}</span>
-            {/* 🌟 데이터가 없을 경우를 대비해 0 표시 */}
             <span className={styles.legendValue}>
               {data.series[index] || 0}%
             </span>
