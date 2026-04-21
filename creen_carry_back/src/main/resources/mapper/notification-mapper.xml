@@ -12,9 +12,11 @@
 		</selectKey>
 
 		INSERT INTO NOTIFICATION_tbl (
-		NOTI_ID, RECEIVER_ID, NOTI_TYPE, MESSAGE, NAV_URL
+		NOTI_ID, RECEIVER_ID, NOTI_TYPE,
+		MESSAGE, NAV_URL
 		) VALUES (
-		#{notiId}, #{receiverId}, #{notiType}, #{message}, #{navUrl}
+		#{notiId}, #{receiverId}, #{notiType},
+		#{message}, #{navUrl}
 		)
 	</insert>
 
@@ -26,12 +28,26 @@
 		NOTI_TYPE as notiType,
 		MESSAGE as message,
 		NAV_URL as navUrl,
-		IS_READ as isRead,
+		IS_READ as
+		isRead,
 		CREATED_AT as createdAt
 		FROM NOTIFICATION_tbl
-		WHERE RECEIVER_ID = #{receiverId}
+		WHERE RECEIVER_ID =
+		#{receiverId}
 		AND IS_READ = 'N'
 		ORDER BY CREATED_AT DESC
 	</select>
+	
+	<update id="updateReadStatus" parameterType="int">
+		UPDATE NOTIFICATION_tbl
+		SET IS_READ = 'Y'
+		WHERE NOTI_ID = #{notiId}
+	</update>
 
+	<update id="updateAllReadStatus" parameterType="String">
+		UPDATE NOTIFICATION_tbl
+		SET IS_READ = 'Y'
+		WHERE RECEIVER_ID = #{receiverId}
+		AND IS_READ = 'N'
+	</update>
 </mapper>
