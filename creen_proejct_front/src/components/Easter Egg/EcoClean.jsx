@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import Swal from "sweetalert2";
+import axios from "axios"; // 🌟 axios 추가
 import "./EcoClean.css";
 
 const EcoClean = () => {
@@ -8,11 +9,10 @@ const EcoClean = () => {
   const trashDataRef = useRef([]);
   const requestRef = useRef();
 
-  // 🌟 1. 'clean' 타이핑 감지하여 게임 시작
+  // 🌟 1. 'clean' 타이핑 감지
   useEffect(() => {
     let keys = [];
     const secretWord = "clean";
-
     const handleKeyDown = (e) => {
       keys.push(e.key.toLowerCase());
       keys = keys.slice(-5);
@@ -25,25 +25,34 @@ const EcoClean = () => {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
+  // 🌟 포인트 로컬 스토리지 동기화 함수
+  const syncPoints = (newPoint) => {
+    const member = JSON.parse(localStorage.getItem("member"));
+    if (member) {
+      member.memberPoint = newPoint;
+      localStorage.setItem("member", JSON.stringify(member));
+    }
+    localStorage.setItem("memberPoint", newPoint);
+    window.dispatchEvent(new Event("storage")); // 전역 UI 갱신 신호
+  };
+
   const startGame = () => {
     if (isActive) return;
     setIsActive(true);
-
     const emojis = ["🥤", "🧃", "🥡", "🗑️", "🗞️", "🥫", "🚬", "🛍️"];
     const screenW = window.innerWidth;
 
-    // 🌟 쓰레기 초기 데이터 셋업
     trashDataRef.current = Array.from({ length: 20 }).map((_, i) => ({
       id: i,
       emoji: emojis[Math.floor(Math.random() * emojis.length)],
       x: Math.random() * (screenW - 100) + 50,
-      y: -100 - Math.random() * 500, // 하늘에서 떨어지도록
+      y: -100 - Math.random() * 500,
       vx: (Math.random() - 0.5) * 10,
       vy: Math.random() * 5 + 5,
       rot: Math.random() * 360,
       vRot: (Math.random() - 0.5) * 15,
       isDragging: false,
-      active: true, // true면 화면에 존재함
+      active: true,
       lastX: 0,
       lastY: 0,
       lastTime: 0,
@@ -52,12 +61,11 @@ const EcoClean = () => {
     startPhysicsLoop();
   };
 
-  // 🌟 2. 물리 엔진 루프 (60fps)
   const startPhysicsLoop = () => {
     let lastFrameTime = performance.now();
 
-    const update = (time) => {
-      const dt = (time - lastFrameTime) / 16; // 60fps 기준 정규화
+    const update = async (time) => {
+      const dt = (time - lastFrameTime) / 16;
       lastFrameTime = time;
 
       let activeCount = 0;
@@ -69,32 +77,28 @@ const EcoClean = () => {
         activeCount++;
 
         if (!t.isDragging) {
-          // 중력 및 이동 적용
-          t.vy += 0.6 * dt; // 중력 (떨어지는 속도 증가)
+          t.vy += 0.6 * dt;
           t.x += t.vx * dt;
           t.y += t.vy * dt;
           t.rot += t.vRot * dt;
 
-          // 바닥 충돌 (화면 안에 있을 때만 바닥에서 튕김)
           if (t.y > floor && t.x > -50 && t.x < screenW + 50) {
             t.y = floor;
-            t.vy *= -0.5; // 튕기는 탄성
-            t.vx *= 0.8; // 바닥 마찰력
+            t.vy *= -0.5;
+            t.vx *= 0.8;
             t.vRot *= 0.8;
           }
 
-          // 화면 밖으로 던져지면(청소 완료) 비활성화
           if (
-            t.y > window.innerHeight + 200 || // 화면 아래로 떨어짐 (화면 밖)
-            t.y < -300 || // 위로 휙 던짐
-            t.x < -150 || // 왼쪽으로 던짐
-            t.x > screenW + 150 // 오른쪽으로 던짐
+            t.y > window.innerHeight + 200 ||
+            t.y < -300 ||
+            t.x < -150 ||
+            t.x > screenW + 150
           ) {
             t.active = false;
           }
         }
 
-        // 실제 DOM 요소 움직이기 (React state 대신 직접 조작하여 버벅임 방지)
         const node = trashNodesRef.current[i];
         if (node) {
           if (t.active) {
@@ -105,16 +109,11 @@ const EcoClean = () => {
         }
       });
 
-      // 🌟 승리 조건: 모든 쓰레기가 화면 밖으로 던져짐
+      // 🌟 승리 조건 달성 시 (모든 쓰레기 청소 완료)
       if (activeCount === 0 && trashDataRef.current.length > 0) {
         cancelAnimationFrame(requestRef.current);
-        setIsActive(false);
-        Swal.fire({
-          title: "지구가 숨을 쉽니다! 🌸",
-          text: "플라스틱을 모두 치워주셔서 감사합니다.",
-          iconHtml: "🌿",
-          confirmButtonColor: "#2e7d32",
-        });
+        trashDataRef.current = []; // 중복 호출 방지
+        handleGameWin(); // 🌟 포인트 지급 처리 함수 호출
         return;
       }
 
@@ -124,7 +123,54 @@ const EcoClean = () => {
     requestRef.current = requestAnimationFrame(update);
   };
 
-  // 🌟 3. 던지기 마우스/터치 이벤트
+  // 🌟 게임 승리 시 서버 통신 처리
+  const handleGameWin = async () => {
+    const memberId = localStorage.getItem("memberId");
+
+    if (!memberId) {
+      setIsActive(false);
+      Swal.fire({
+        title: "로그인 필요",
+        text: "포인트를 받으려면 로그인이 필요합니다.",
+        icon: "info",
+      });
+      return;
+    }
+
+    try {
+      // 서버 전송 (이벤트 코드: CLEAN_EARTH)
+      const res = await axios.post(
+        `${import.meta.env.VITE_BACKSERVER}/member/Addpoint/${memberId}`,
+        { event_code: "CLEAN_EARTH" },
+      );
+
+      // 로컬 스토리지 동기화
+      syncPoints(res.data);
+
+      Swal.fire({
+        title: "지구가 숨을 쉽니다! 🌸",
+        html: `청소 완료 보너스 <b>2500P</b>가 지급되었습니다!`,
+        iconHtml: "🌿",
+        confirmButtonColor: "#2e7d32",
+      }).then(() => setIsActive(false));
+    } catch (error) {
+      console.error("포인트 지급 실패:", error);
+      const errorMsg =
+        error.response?.status === 409
+          ? "이미 오늘 정화 보상을 받으셨습니다."
+          : "보상 지급 중 오류가 발생했습니다.";
+
+      Swal.fire({
+        title: "청소 완료!",
+        text: errorMsg,
+        icon: "info",
+        confirmButtonColor: "#2e7d32",
+      }).then(() => setIsActive(false));
+    }
+  };
+
+  // ... (handlePointerDown, handlePointerMove, handlePointerUp 생략 - 기존 코드 유지)
+
   const handlePointerDown = (e, i) => {
     const t = trashDataRef.current[i];
     t.isDragging = true;
@@ -133,23 +179,18 @@ const EcoClean = () => {
     t.lastTime = performance.now();
     t.vx = 0;
     t.vy = 0;
-    e.target.setPointerCapture(e.pointerId); // 마우스가 빠르게 움직여도 놓치지 않음
+    e.target.setPointerCapture(e.pointerId);
   };
 
   const handlePointerMove = (e, i) => {
     const t = trashDataRef.current[i];
     if (!t.isDragging) return;
-
     const now = performance.now();
-    const dt = Math.max(1, now - t.lastTime); // 0 나누기 방지
-
-    // 마우스가 이동한 거리와 시간을 계산하여 '순간 가속도(던지는 힘)' 부여
+    const dt = Math.max(1, now - t.lastTime);
     t.vx = ((e.clientX - t.lastX) / dt) * 6;
     t.vy = ((e.clientY - t.lastY) / dt) * 6;
-
     t.x += e.clientX - t.lastX;
     t.y += e.clientY - t.lastY;
-
     t.lastX = e.clientX;
     t.lastY = e.clientY;
     t.lastTime = now;
@@ -157,8 +198,9 @@ const EcoClean = () => {
 
   const handlePointerUp = (e, i) => {
     const t = trashDataRef.current[i];
+    if (!t) return;
     t.isDragging = false;
-    t.vRot = t.vx * 0.5; // 던지는 방향으로 회전력 부여
+    t.vRot = t.vx * 0.5;
     e.target.releasePointerCapture(e.pointerId);
   };
 
@@ -166,14 +208,11 @@ const EcoClean = () => {
 
   return (
     <div className="eco-clean-overlay">
-      {/* 화면 중앙 안내 문구 */}
       <div className="eco-clean-instruction">
         마우스로 플라스틱을 집어서
         <br />
         화면 밖으로 휙! 던져보세요
       </div>
-
-      {/* 쓰레기 요소들 렌더링 */}
       {trashDataRef.current.map((t, i) => (
         <div
           key={t.id}
