@@ -52,4 +52,5 @@ public class NotificationController {
         // notificationService.markAllAsRead(memberId);
         return ResponseEntity.ok("all read success");
     }
+    
 }

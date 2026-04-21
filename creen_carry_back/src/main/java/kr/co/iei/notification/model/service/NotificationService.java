@@ -94,4 +94,8 @@ public class NotificationService {
             }
         });
     }
+ // 5. [추가] 모든 알림 읽음 처리
+    public int markAllAsRead(String memberId) {
+        return notificationDao.updateAllReadStatus(memberId);
+    }
 }
