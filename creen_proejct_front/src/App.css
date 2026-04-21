@@ -1,5 +1,26 @@
 /* 1. 로컬 폰트 정의 */
 /* 어둠의굴림바람 - CDN 방식 */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+/* 🚫 Safari (WebKit) - 암호 자동완성(열쇠 모양) 버튼 제거 */
+input[type="password"]::-webkit-credentials-auto-fill-button {
+  visibility: hidden;
+  display: none !important;
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+}
+
+/* (보너스) 사파리에서 인풋 선택 시 테두리 못생기게 변하는 거 방지 */
+input[type="password"]:focus {
+  outline: none;
+}
+
 @font-face {
   font-family: "TMoneyDungunbaram";
   src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_20-07@1.0/TmoneyRoundWindExtraBold.woff")
