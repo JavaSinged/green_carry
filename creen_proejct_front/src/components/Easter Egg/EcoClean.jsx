@@ -157,7 +157,7 @@ const EcoClean = () => {
       console.error("포인트 지급 실패:", error);
       const errorMsg =
         error.response?.status === 409
-          ? "이미 오늘 정화 보상을 받으셨습니다."
+          ? "이미 정화 보상을 받으셨습니다."
           : "보상 지급 중 오류가 발생했습니다.";
 
       Swal.fire({

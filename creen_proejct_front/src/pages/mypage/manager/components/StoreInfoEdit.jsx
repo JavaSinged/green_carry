@@ -807,18 +807,15 @@ export default function StoreInfoEdit() {
           </div>
           <div className={styles.inputWrap}>
             <div className={styles.imageUploadBox}>
-              {/* ?뙚 諛곌꼍 ???<img> ?쒓렇 ?ъ슜 */}
-              <img
-                src={
-                  previewImg
-                    ? previewImg.startsWith("blob:")
-                      ? previewImg
-                      : `${previewImg}`
-                    : ""
-                }
-                alt="가게 미리보기"
-                className={styles.previewImageTag}
-              />
+              {previewImg ? (
+                <img
+                  src={previewImg} // 로직을 단순화했습니다.
+                  alt="가게 미리보기"
+                  className={styles.previewImageTag}
+                />
+              ) : (
+                <div className={styles.noImage}>이미지 없음</div> // 대신 보여줄 텍스트나 빈 박스
+              )}
 
               <input
                 type="file"
