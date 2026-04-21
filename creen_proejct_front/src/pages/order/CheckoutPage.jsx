@@ -48,6 +48,7 @@ const CheckoutPage = () => {
   const [targetArrivalTime, setTargetArrivalTime] = useState("--:--");
   const isFirst = useRef(true);
 
+  // 1. 하버사인 공식 기반 거리 계산 함수
   const getNumericDistance = (storeLat, storeLng) => {
     const myLat = parseFloat(
       user?.LATITUDE || localStorage.getItem("LATITUDE"),
@@ -60,7 +61,7 @@ const CheckoutPage = () => {
 
     if (isNaN(myLat) || isNaN(myLng) || isNaN(sLat) || isNaN(sLng)) return null;
 
-    const R = 6371;
+    const R = 6371; // 지구 반지름 (km)
     const dLat = ((sLat - myLat) * Math.PI) / 180;
     const dLng = ((sLng - myLng) * Math.PI) / 180;
 
@@ -75,6 +76,7 @@ const CheckoutPage = () => {
     return R * c;
   };
 
+  // 2. 뒤로가기 방지 및 히스토리 관리
   useEffect(() => {
     window.history.pushState(null, null, window.location.href);
 
@@ -90,12 +92,12 @@ const CheckoutPage = () => {
     };
 
     window.addEventListener("popstate", handlePopState);
-
     return () => {
       window.removeEventListener("popstate", handlePopState);
     };
   }, [navigate]);
 
+  // 3. 주문 ID 기반 초기 새로고침 (세션 체크)
   useEffect(() => {
     const hasRefreshed = sessionStorage.getItem(`refreshed_${orderId}`);
     if (!hasRefreshed && orderId) {
@@ -104,6 +106,7 @@ const CheckoutPage = () => {
     }
   }, [orderId]);
 
+  // 4. 최신 포인트 정보 서버 동기화
   const fetchLatestPoint = async () => {
     const memberId = localStorage.getItem("memberId");
     if (!memberId) return;
@@ -112,7 +115,6 @@ const CheckoutPage = () => {
       const res = await axios.get(
         `${import.meta.env.VITE_BACKSERVER}/member/${memberId}`,
       );
-
       const latestPoint = res.data.memberPoint || 0;
       localStorage.setItem("memberPoint", latestPoint);
 
@@ -125,6 +127,7 @@ const CheckoutPage = () => {
     }
   };
 
+  // 5. 주문 상세 데이터 조회
   const fetchOrderDetails = () => {
     if (!orderId) return;
 
@@ -158,51 +161,12 @@ const CheckoutPage = () => {
       });
   };
 
-  useEffect(() => {
-    if (!storeId) return;
-
-    axios
-      .get(`${import.meta.env.VITE_BACKSERVER}/stores/location/${storeId}`)
-      .then((res) => {
-        const lat = Number(res.data.latitude ?? 0);
-        const lng = Number(res.data.longitude ?? 0);
-
-        setStoreLat(lat);
-        setStoreLong(lng);
-      })
-      .catch((err) => {
-        console.log("가게 좌표 조회 실패:", err);
-      });
-  }, [storeId]);
-
-  useEffect(() => {
-    clearCart();
-    fetchOrderDetails();
-
-    const intervalId = setInterval(() => {
-      fetchOrderDetails();
-    }, 5000);
-
-    return () => clearInterval(intervalId);
-  }, [orderId]);
-
-  useEffect(() => {
-    if (!orderId) return;
-    if (!isFirst.current) return;
-
-    isFirst.current = false;
-  }, []);
-
-  useEffect(() => {
-    fetchLatestPoint();
-  }, []);
-
+  // 6. 🌟 도착 예정 시간 계산 및 실시간 타이머 (형님 요청 사항 적용)
   useEffect(() => {
     if (rawOrderStatus === 5 && completeDate) {
       const timeText = completeDate.includes(" ")
         ? completeDate.split(" ")[1]
         : completeDate;
-
       setTargetArrivalTime(timeText || "--:--");
       setRemainingTimeText("이용해 주셔서 감사합니다!");
       return;
@@ -223,6 +187,7 @@ const CheckoutPage = () => {
       return;
     }
 
+    // 🌟 거리 계산 + 조리 시간 합산 로직
     const distance = getNumericDistance(storeLat, storeLong);
     const travelTime = deliveryType === 1 ? 0 : Math.ceil((distance || 0) * 6);
     const totalMinutes = Number(expectedTime) + travelTime;
@@ -266,6 +231,7 @@ const CheckoutPage = () => {
     user,
   ]);
 
+  // 7. 주문 취소 처리
   const cancelOrder = () => {
     Swal.fire({
       title: "주문 취소",
@@ -300,6 +266,38 @@ const CheckoutPage = () => {
     });
   };
 
+  // 나머지 데이터 연동 및 폴링 설정
+  useEffect(() => {
+    if (!storeId) return;
+    axios
+      .get(`${import.meta.env.VITE_BACKSERVER}/stores/location/${storeId}`)
+      .then((res) => {
+        setStoreLat(Number(res.data.latitude ?? 0));
+        setStoreLong(Number(res.data.longitude ?? 0));
+      })
+      .catch((err) => console.log("가게 좌표 조회 실패:", err));
+  }, [storeId]);
+
+  useEffect(() => {
+    clearCart();
+    fetchOrderDetails();
+    const intervalId = setInterval(() => {
+      fetchOrderDetails();
+    }, 5000);
+    return () => clearInterval(intervalId);
+  }, [orderId]);
+
+  useEffect(() => {
+    if (!orderId) return;
+    if (!isFirst.current) return;
+    isFirst.current = false;
+  }, []);
+
+  useEffect(() => {
+    fetchLatestPoint();
+  }, []);
+
+  // 가격 합산 및 최종 결제 금액 계산
   useEffect(() => {
     const total = orderList.reduce(
       (sum, item) => sum + Number(item.price ?? 0) * Number(item.quantity ?? 0),
@@ -318,6 +316,7 @@ const CheckoutPage = () => {
     setFinalPrice(paymentAmount);
   }, [orderAmount, deliveryPrice, usedPoint]);
 
+  // 네이버 지도 렌더링
   useEffect(() => {
     const checkNaver = setInterval(() => {
       if (window.naver && window.naver.maps && mapElement.current) {
@@ -325,15 +324,19 @@ const CheckoutPage = () => {
         clearInterval(checkNaver);
       }
     }, 100);
-
     return () => clearInterval(checkNaver);
   }, []);
 
   useEffect(() => {
-    if (!mapLoaded) return;
-    if (!mapElement.current) return;
-    if (!storeLat || !storeLong) return;
-    if (!window.naver || !window.naver.maps) return;
+    if (
+      !mapLoaded ||
+      !mapElement.current ||
+      !storeLat ||
+      !storeLong ||
+      !window.naver ||
+      !window.naver.maps
+    )
+      return;
 
     const { naver } = window;
     const position = new naver.maps.LatLng(storeLat, storeLong);
@@ -349,10 +352,7 @@ const CheckoutPage = () => {
         mapRef.current.setCenter(position);
       }
 
-      if (markerRef.current) {
-        markerRef.current.setMap(null);
-      }
-
+      if (markerRef.current) markerRef.current.setMap(null);
       markerRef.current = new naver.maps.Marker({
         position,
         map: mapRef.current,
@@ -366,8 +366,6 @@ const CheckoutPage = () => {
       console.error("지도 생성 중 에러:", e);
     }
   }, [mapLoaded, storeLat, storeLong]);
-
-  const isPickup = deliveryType === 1;
 
   const getStatusMessage = (status, isPickup) => {
     if (status === 9) return "주문이 아쉽게도 취소되었습니다.";
@@ -385,9 +383,10 @@ const CheckoutPage = () => {
       return isPickup
         ? "픽업이 완료되었습니다. 맛있게 드세요! 😋"
         : "배달이 완료되었습니다. 맛있게 드세요! 😋";
-
     return "주문 상태를 확인하고 있습니다.";
   };
+
+  const isPickupInUI = deliveryType === 1;
 
   return (
     <div className={styles.page}>
@@ -409,7 +408,7 @@ const CheckoutPage = () => {
           <p className={styles.completeDesc}>
             {rawOrderStatus === 9
               ? "결제하신 금액은 카드사에 따라 영업일 기준 2~3일 내로 환불될 예정입니다."
-              : isPickup
+              : isPickupInUI
                 ? "매장 방문 픽업을 선택해 주셔서 감사합니다."
                 : "친환경 배달을 선택해 주셔서 감사합니다."}
           </p>
@@ -421,7 +420,10 @@ const CheckoutPage = () => {
             주문내역 확인
           </button>
 
-          <p className={styles.orderNumber}>
+          <p
+            className={styles.orderNumber}
+            onClick={() => navigate("/mypage/user/orderList")}
+          >
             ECO-{orderDate ? orderDate.substring(0, 10).replace(/-/g, "") : ""}-
             {orderId}
           </p>
@@ -446,8 +448,8 @@ const CheckoutPage = () => {
               {[
                 "주문 접수",
                 "조리중",
-                isPickup ? "픽업 대기" : "배달중",
-                isPickup ? "픽업 완료" : "배달 완료",
+                isPickupInUI ? "픽업 대기" : "배달중",
+                isPickupInUI ? "픽업 완료" : "배달 완료",
               ].map((label, index) => (
                 <div key={index} className={styles.step}>
                   <div
@@ -466,7 +468,7 @@ const CheckoutPage = () => {
           </div>
 
           <p className={styles.statusMessage}>
-            {getStatusMessage(rawOrderStatus, isPickup)}
+            {getStatusMessage(rawOrderStatus, isPickupInUI)}
           </p>
         </section>
 
@@ -477,7 +479,7 @@ const CheckoutPage = () => {
                 <div className={styles.cardHeaderLeft}>
                   <span className={styles.smallIcon}></span>
                   <h3 className={styles.cardTitle}>
-                    <span>가게 위치</span> &gt;{" "}
+                    가게 위치 &gt;{" "}
                     <span className={styles.subtitle}>{storeName}</span>
                   </h3>
                 </div>
@@ -512,7 +514,6 @@ const CheckoutPage = () => {
                           : "none",
                     }}
                   ></span>
-
                   <span
                     style={{
                       color: rawOrderStatus === 5 ? "#2f8f46" : "#333",
@@ -520,16 +521,15 @@ const CheckoutPage = () => {
                     }}
                   >
                     {rawOrderStatus === 5
-                      ? isPickup
+                      ? isPickupInUI
                         ? "픽업 완료 시간"
                         : "배달 완료 시간"
                       : rawOrderStatus !== 9
-                        ? isPickup
+                        ? isPickupInUI
                           ? "픽업 예정 시간"
                           : "도착 예정 시간"
                         : "주문이 취소되었습니다."}
                   </span>
-
                   {rawOrderStatus === 5 && completeDate && (
                     <span style={{ color: "#2f8f46", fontWeight: "bold" }}>
                       {" "}
@@ -537,7 +537,6 @@ const CheckoutPage = () => {
                     </span>
                   )}
                 </div>
-
                 <div
                   style={{
                     display: "flex",
@@ -563,13 +562,11 @@ const CheckoutPage = () => {
           <aside className={styles.rightColumn}>
             <div className={styles.orderInfoCard}>
               <h3 className={styles.rightTitle}>주문 내역</h3>
-
               {orderDate && (
                 <p style={{ fontSize: "14px", color: "#666", margin: "5px 0" }}>
                   주문 일시 : {orderDate}
                 </p>
               )}
-
               {confirmDate && (
                 <p
                   style={{
@@ -585,25 +582,20 @@ const CheckoutPage = () => {
 
               <div className={styles.orderList}>
                 <OrderListMap orderList={orderList} />
-
                 <div className={styles.orderRow}>
                   <span>상품 금액</span>
                   <span>{orderAmount.toLocaleString()} 원</span>
                 </div>
-
                 <div className={styles.orderRow}>
-                  <span>{isPickup ? "포장 / 픽업" : "배달팁"}</span>
+                  <span>{isPickupInUI ? "포장 / 픽업" : "배달팁"}</span>
                   <span>{deliveryPrice.toLocaleString()} 원</span>
                 </div>
-
                 <div className={styles.orderRow}>
                   <span>에코포인트 사용</span>
                   <span>- {usedPoint.toLocaleString()} 원</span>
                 </div>
               </div>
-
               <div className={styles.divider}></div>
-
               <div className={styles.totalRow}>
                 <span>총 결제 금액</span>
                 <strong
@@ -623,7 +615,6 @@ const CheckoutPage = () => {
                 <span className={styles.smallIcon}></span>
                 <h3 className={styles.rightTitle}>환경 기여도</h3>
               </div>
-
               <div className={styles.ecoInnerBox}>
                 <p className={styles.ecoInnerTitle}>
                   이번 주문으로 절감한 탄소
@@ -633,12 +624,10 @@ const CheckoutPage = () => {
                   이번 주문으로 나무 가지 하나를 피웠습니다!
                 </p>
               </div>
-
               <div className={styles.ecoInfoRow}>
                 <span>에코 포인트 적립</span>
                 <strong>+{getPoint.toLocaleString()}p</strong>
               </div>
-
               <div className={styles.ecoInfoRow}>
                 <span>누적 탄소 절감량</span>
                 <strong>
@@ -653,7 +642,6 @@ const CheckoutPage = () => {
             >
               주문 목록 보기
             </button>
-
             {(rawOrderStatus === 0 || rawOrderStatus === 1) && (
               <button className={styles.secondaryBtn} onClick={cancelOrder}>
                 주문 취소
@@ -672,7 +660,6 @@ const OrderListMap = ({ orderList }) =>
   orderList.map((cart, index) => (
     <OrderItemList key={`orderList-${index}`} cart={cart} />
   ));
-
 const OrderItemList = ({ cart }) => (
   <div>
     <div className={`${styles.orderRow} ${styles.order_price}`}>

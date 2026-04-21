@@ -467,5 +467,27 @@ public class MemberController {
 		int currentPoint = memberService.getPointByMemberId(memberId);
 		return ResponseEntity.ok(currentPoint);
 	}
+	
+	@PostMapping("/Addpoint/{memberId}")
+	public ResponseEntity<?> EasterEgg(
+	        @PathVariable String memberId, 
+	        @RequestBody Map<String, String> request) {
+	    
+	    String eggName = request.get("event_code"); // 프론트: { "event_code": "NIGHT_COUPON" }
+
+	    try {
+
+	        int result = memberService.EasterEgg(memberId, eggName);
+	        
+
+	        return ResponseEntity.ok(result); 
+	        
+	    } catch (IllegalStateException e) {
+	        return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+	    } catch (Exception e) {
+	        e.printStackTrace(); 
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 에러가 발생했습니다.");
+	    }
+	}
 
 }

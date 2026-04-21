@@ -5,7 +5,7 @@
   width: 100vw;
   height: 100vh;
   pointer-events: none; /* 클릭 방해 금지 */
-  z-index: 40000;
+  z-index: 1010;
 }
 
 .eco-drone {

@@ -12,6 +12,7 @@ const HeaderNotification = () => {
   const backHost = import.meta.env.VITE_BACKSERVER;
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
+
   useEffect(() => {
     const saved = localStorage.getItem("memberId");
     if (saved) setMemberId(saved);
@@ -20,37 +21,37 @@ const HeaderNotification = () => {
   useEffect(() => {
     if (!memberId) return;
 
-    console.log(
-      `%c🚀 SSE 연결 시도 (memberId: ${memberId})`,
-      "color: #1e88e5; font-weight: bold;",
-    );
+    const fetchUnread = async () => {
+      try {
+        const res = await axios.get(`${backHost}/api/notification/list`, {
+          params: { memberId },
+        });
+        setNotifications(res.data);
+        setUnreadCount(res.data.length);
+      } catch (err) {
+        console.error("알림 목록 로딩 실패:", err);
+      }
+    };
+
+    fetchUnread();
 
     const eventSource = new EventSource(
       `${backHost}/api/notification/subscribe?memberId=${memberId}`,
     );
 
-    // 1. 연결 성공 확인
     eventSource.onopen = () => {
-      console.log(
-        "%c✅ SSE 연결이 성공적으로 수립되었습니다.",
-        "color: #2e7d32; font-weight: bold;",
-      );
+      /* 연결 로그 */
     };
-    eventSource.addEventListener("ping", (event) => {
-      console.log(
-        "%c📡 Heartbeat 수신: 연결 유지 중...",
-        "color: #9e9e9e; font-style: italic;",
-      );
+    eventSource.addEventListener("ping", () => {
+      /* 핑 로그 */
     });
 
-    // 2. 메시지 수신 (기존 eventSource.addEventListener("orderUpdate", ...))
     eventSource.addEventListener("orderUpdate", async (event) => {
       try {
         const data = JSON.parse(event.data);
-        console.log("%c📩 알림 도착:", "color: #fb8c00;", data);
 
+        // 포인트 동기화 (기존 로직 동일)
         if (data.message.includes("취소") || data.message.includes("완료")) {
-          // 포인트 동기화 로직 (기존과 동일)
           const token = localStorage.getItem("accessToken");
           const res = await axios.get(`${backHost}/member/point/${memberId}`, {
             headers: { Authorization: `Bearer ${token}` },
@@ -58,14 +59,12 @@ const HeaderNotification = () => {
           const latestPoint = res.data.point || res.data;
           localStorage.setItem("memberPoint", latestPoint);
           window.dispatchEvent(new Event("pointUpdated"));
-          console.log("💰 포인트 동기화 완료:", latestPoint);
         }
 
         setUnreadCount((prev) => prev + 1);
         setNotifications((prev) => [
           {
-            message: data.message,
-            navUrl: data.navUrl,
+            ...data,
             time: new Date().toLocaleTimeString([], {
               hour: "2-digit",
               minute: "2-digit",
@@ -74,37 +73,42 @@ const HeaderNotification = () => {
           ...prev,
         ]);
       } catch (err) {
-        console.error("데이터 파싱 또는 포인트 업데이트 중 에러:", err);
+        console.error("데이터 파싱 에러:", err);
       }
     });
 
-    // 🚨 3. 에러 핸들링 (재연결을 위해 close() 호출 금지!)
     eventSource.onerror = (e) => {
-      if (eventSource.readyState === EventSource.CONNECTING) {
-        console.warn("⚠️ SSE 연결이 끊겼습니다. 재연결을 시도합니다...");
-      } else if (eventSource.readyState === EventSource.CLOSED) {
-        console.error("❌ SSE 연결이 완전히 닫혔습니다.");
-      } else {
-        console.error("🚨 SSE 알 수 없는 에러 발생:", e);
-      }
+      /* 에러 처리 */
     };
 
     return () => {
-      console.log("%c🧹 컴포넌트 언마운트: SSE 연결 종료", "color: #757575;");
       eventSource.close();
     };
   }, [memberId, backHost]);
 
-  const handleNotiClick = (navUrl) => {
-    if (navUrl) {
-      navigate(navUrl); // 해당 페이지로 이동
-      setIsOpen(false); // 드롭다운 닫기
+  // 개별 클릭 시
+  const handleNotiClick = async (notiId, navUrl) => {
+    try {
+      if (notiId) {
+        await axios.patch(`${backHost}/api/notification/read/${notiId}`);
+      }
+      setNotifications((prev) => prev.filter((n) => n.notiId !== notiId));
+      setUnreadCount((prev) => (prev > 0 ? prev - 1 : 0));
+
+      if (navUrl) navigate(navUrl);
+      setIsOpen(false);
+    } catch (err) {
+      console.error("읽음 처리 실패:", err);
     }
   };
 
+  // 💡 [수정] 종 아이콘 클릭 시 빨간 배지 초기화
   const handleIconClick = () => {
-    setUnreadCount(0);
     setIsOpen(!isOpen);
+    if (!isOpen) {
+      // 드롭다운을 열 때만 숫자 0으로 초기화
+      setUnreadCount(0);
+    }
   };
 
   useEffect(() => {
@@ -116,6 +120,23 @@ const HeaderNotification = () => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+  // '지우기' 버튼 클릭 시 호출되는 함수
+  const handleClearAll = async () => {
+    try {
+      // 1. DB의 모든 알림을 'Y'로 업데이트 (이게 핵심!)
+      await axios.patch(`${backHost}/api/notification/read/all`, null, {
+        params: { memberId },
+      });
+
+      // 2. DB 업데이트 성공 후, 프론트엔드 상태 싹 비우기
+      setNotifications([]);
+      setUnreadCount(0);
+
+      console.log("✅ 모든 알림이 읽음 처리되고 삭제되었습니다.");
+    } catch (err) {
+      console.error("지우기 실패:", err);
+    }
+  };
 
   return (
     <div className={styles.noti_icon_wrap} ref={dropdownRef}>
@@ -123,29 +144,57 @@ const HeaderNotification = () => {
         className={styles.bell_icon}
         onClick={handleIconClick}
       />
-
-      {/* 빨간 배지 */}
       {unreadCount > 0 && (
         <span className={styles.noti_badge}>{unreadCount}</span>
       )}
 
-      {/* 알림 드롭다운 창 */}
       {isOpen && (
         <div className={styles.noti_dropdown}>
-          <span className={styles.noti_header}>최근 알림</span>
+          <div className={styles.noti_header}>
+            <span>최근 알림</span>
+          </div>
+
           <div className={styles.noti_list}>
             {notifications.length > 0 ? (
-              notifications.map((noti, idx) => (
+              <>
+                {notifications.map((noti) => (
+                  <div
+                    key={noti.notiId || Math.random()}
+                    className={styles.noti_item}
+                    onClick={() => handleNotiClick(noti.notiId, noti.navUrl)}
+                  >
+                    <p className={styles.noti_msg}>{noti.message}</p>
+                    <span className={styles.noti_time}>
+                      {noti.time || noti.createdAt}
+                    </span>
+                  </div>
+                ))}
+
+                {/* 💡 오른쪽 아래 작게 배치된 '지우기' 버튼 */}
                 <div
-                  key={idx}
-                  className={styles.noti_item}
-                  onClick={() => handleNotiClick(noti.navUrl)}
-                  style={{ cursor: "pointer" }}
+                  style={{
+                    display: "flex",
+                    justifyContent: "flex-end",
+                    padding: "5px 15px 10px 0", // 위 5, 오른쪽 15, 아래 10 여백
+                  }}
                 >
-                  <p className={styles.noti_msg}>{noti.message}</p>
-                  <span className={styles.noti_time}>{noti.time}</span>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation(); // 드롭다운이 닫히지 않게 이벤트 전파 방지
+                      handleClearAll();
+                    }}
+                    style={{
+                      background: "none",
+                      border: "none",
+                      color: "#999",
+                      fontSize: "11px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    지우기
+                  </button>
                 </div>
-              ))
+              </>
             ) : (
               <p className={styles.empty_msg}>새로운 알림이 없습니다. 🌿</p>
             )}
@@ -155,5 +204,4 @@ const HeaderNotification = () => {
     </div>
   );
 };
-
 export default HeaderNotification;

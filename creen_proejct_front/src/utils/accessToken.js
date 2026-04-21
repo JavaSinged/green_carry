@@ -1,8 +1,11 @@
 import axios from "axios";
+import { installMutationGuard } from "./mutationGuard";
 
 const api = axios.create({
   baseURL: `${import.meta.env.VITE_BACKSERVER}`,
 });
+
+installMutationGuard(api);
 
 api.interceptors.request.use(
   (config) => {

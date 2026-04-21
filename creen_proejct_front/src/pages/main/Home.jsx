@@ -23,6 +23,7 @@ import EcoRecycle from "../../components/Easter Egg/EcoRecycle";
 import EcoEarth from "../../components/Easter Egg/EcoEarth";
 import EcoFlood from "../../components/Easter Egg/EcoFlood";
 import { AuthContext } from "../../context/AuthContext";
+import EcoNight from "../../components/Easter Egg/EcoNight";
 
 const API_BASE_URL = import.meta.env.VITE_BACKSERVER?.trim() || "";
 const isBrowser = typeof window !== "undefined";
@@ -215,6 +216,7 @@ export default function Home() {
       <EcoRecycle />
       <EcoEarth />
       <EcoFlood />
+      <EcoNight />
 
       <div className={styles.banner_wrap}>
         <Swiper

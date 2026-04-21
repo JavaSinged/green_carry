@@ -59,6 +59,7 @@ const PaymentPage = () => {
   const [ecoPoint, setEcoPoint] = useState(0); // 사용자가 입력한 사용 포인트
   const [availableEcoPoint, setAvailableEcoPoint] = useState(0); // 로컬 스토리지에서 가져온 보유 포인트
 
+  const [isPaying, setIsPaying] = useState(false);
   const [itemPrice] = useState(superTotalPrice);
   const cartList = useCartStore((state) => state.cart);
   const memberId = localStorage.getItem("memberId");
@@ -82,6 +83,9 @@ const PaymentPage = () => {
 
   // 결제 요청 함수
   const handlePayment = async () => {
+    if (isPaying) {
+      return;
+    }
     console.log("주문하려는 매장 ID:", storeId);
     console.log(cartList);
     // 🌟 결제 시점의 최신 데이터를 담은 orderData
@@ -105,6 +109,7 @@ const PaymentPage = () => {
     };
 
     try {
+      setIsPaying(true);
       // 1. 우리 서버에 주문 데이터 임시 저장
       const response = await axios.post(
         `${import.meta.env.VITE_BACKSERVER}/stores/order`,
@@ -133,7 +138,7 @@ const PaymentPage = () => {
         orderId: `ORDER_${savedOrderId}_${Date.now()}`,
         orderName: orderNameStr,
         successUrl: `${window.location.origin}/checkoutPage?orderId=ORDER_${savedOrderId}`,
-        failUrl: `${window.location.origin}/payment/fail`,
+        failUrl: `${window.location.origin}/orderPage`,
         customerName: memberId,
       });
       ///이구간이 결제 완료된 구간
@@ -153,6 +158,8 @@ const PaymentPage = () => {
           text: "결제 처리 중 오류가 발생했습니다.",
         });
       }
+    } finally {
+      setIsPaying(false);
     }
   };
   // 포인트 입력 핸들러
@@ -320,7 +327,11 @@ const PaymentPage = () => {
                   {totalCarbon.toLocaleString()}g
                 </strong>
               </div>
-              <button className={styles["pay-btn"]} onClick={handlePayment}>
+              <button
+                className={styles["pay-btn"]}
+                onClick={handlePayment}
+                disabled={isPaying}
+              >
                 {totalPrice.toLocaleString()}원 결제하기
               </button>
               <p className={styles["pay-notice"]}>

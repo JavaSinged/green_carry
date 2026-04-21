@@ -29,4 +29,5 @@ public class Review {
     private int totalPrice;      // 주문 총 금액
     private String reviewCommentContent;
     private String reviewCommentDate;
+    private int deliveryPrice;
 }

@@ -330,6 +330,30 @@ button {
   cursor: pointer;
   margin-top: 10px;
   transition: background-color 0.3s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  position: relative;
+}
+
+.login-button:disabled,
+.submit-verify-btn:disabled,
+.verify-send-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.85;
+}
+
+.login-button:disabled::before,
+.submit-verify-btn:disabled::before,
+.verify-send-btn:disabled::before {
+  content: "";
+  width: 1em;
+  height: 1em;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: auth-button-spin 0.7s linear infinite;
 }
 
 .shimmer-btn {
@@ -547,6 +571,14 @@ button {
   }
   100% {
     left: 200%;
+  }
+}
+@keyframes auth-button-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
   }
 }
 @keyframes gentle-chat {

@@ -233,6 +233,10 @@
   cursor: pointer;
   white-space: nowrap;
   transition: opacity 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
 .signupBtnOutlined {
@@ -246,6 +250,10 @@
   cursor: pointer;
   white-space: nowrap;
   transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
 .signupBtnFilled:hover,
@@ -289,6 +297,10 @@
   overflow: hidden;
   box-shadow: 0 4px 15px rgba(46, 125, 50, 0.2);
   margin-top: 15px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
 }
 
 .signupBtn::after {
@@ -306,6 +318,11 @@
   );
   transform: skewX(-25deg);
   animation: signupShimmerSweep 3s infinite;
+}
+
+.signupBtn:disabled {
+  opacity: 0.8;
+  cursor: not-allowed;
 }
 
 /* --- [원본 보존] 크롬 자동완성 배경 제거 --- */

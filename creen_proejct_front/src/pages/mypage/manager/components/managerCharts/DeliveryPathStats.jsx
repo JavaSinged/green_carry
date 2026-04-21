@@ -12,16 +12,18 @@ const DeliveryPathStats = ({ data }) => {
         {data.map((item) => (
           <div className={styles.item} key={item.deliveryType}>
             <div className={styles.info}>
-              {/* 왼쪽: 라벨 + 주문 건수 (항상 노출) */}
+              {/* 왼쪽: 라벨 + 주문 건수 */}
               <span className={styles.label}>
                 {item.label}
-                <span className={styles.orderCount}>
+                <span
+                  style={{ fontSize: "12px", color: "#888", marginLeft: "4px" }}
+                >
                   ({item.orderCount || 0}건)
                 </span>
               </span>
 
-              {/* 오른쪽: 퍼센트 (항상 노출) */}
-              <div className={styles.percentArea}>
+              {/* 오른쪽: 퍼센트 */}
+              <div>
                 <span className={styles.percent}>{item.percent}%</span>
               </div>
             </div>
@@ -43,7 +45,7 @@ const DeliveryPathStats = ({ data }) => {
                 />
               </div>
 
-              {/* 🌟 마우스 호버 시 나타날 금액 툴팁 */}
+              {/* 🌟 amountTooltip 클래스 적용 (제공된 CSS 사용) */}
               <div className={styles.amountTooltip}>
                 {(item.seriesAmount || 0).toLocaleString()}원 (
                 {item.orderCount || 0}건)

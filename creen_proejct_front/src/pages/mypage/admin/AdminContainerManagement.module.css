@@ -265,3 +265,27 @@
   font-weight: bold;
   pointer-events: none;
 }
+
+@media (max-width: 768px) {
+  .upload_content {
+    padding: 28px 16px;
+  }
+
+  .attached_container,
+  .input_two,
+  .btn {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .preview_img {
+    width: 100%;
+    height: auto;
+    max-height: 240px;
+  }
+
+  .cancel_btn,
+  .save_btn {
+    width: 100%;
+  }
+}

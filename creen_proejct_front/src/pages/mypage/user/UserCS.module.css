@@ -439,3 +439,80 @@
   color: #888;
   border: 1px solid #cccccc;
 }
+
+@media (max-width: 768px) {
+  .cs_container {
+    padding: 20px 16px;
+    border-radius: 16px;
+  }
+
+  .title {
+    font-size: 22px;
+  }
+
+  .title_sub {
+    font-size: 16px;
+  }
+
+  .search_bar {
+    width: 100%;
+    margin-bottom: 24px;
+  }
+
+  .tabs_nav,
+  .category_group,
+  .inquiry_meta {
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .tabs_nav {
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+
+  .tab_item,
+  .cat_btn {
+    white-space: nowrap;
+  }
+
+  .faq_header {
+    align-items: flex-start;
+    gap: 10px;
+    padding: 16px 8px;
+  }
+
+  .q_text {
+    font-size: 15px;
+    margin-left: 6px;
+  }
+
+  .faq_answer {
+    padding: 16px;
+  }
+
+  .action_buttons {
+    position: static;
+    margin-bottom: 12px;
+    justify-content: flex-end;
+  }
+
+  .submit_btn {
+    width: 100%;
+    margin-top: 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .faq_header {
+    padding: 14px 4px;
+  }
+
+  .inquiry_preview_one_line {
+    max-width: 100%;
+  }
+
+  .edit_update_title {
+    width: 100%;
+  }
+}

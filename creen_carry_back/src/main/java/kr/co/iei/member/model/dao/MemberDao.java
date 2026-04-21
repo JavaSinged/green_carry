@@ -69,4 +69,10 @@ public interface MemberDao {
     int updateStoreOwner(Member member);
 
 	int getPointByMemberId(String memberId);
+
+	int checkEasterEgg(String memberId, String eggName);
+
+	void addMemberPoint(String memberId, int reward);
+
+	void insertEasterEgg(String memberId, String eggName, int reward);
 }

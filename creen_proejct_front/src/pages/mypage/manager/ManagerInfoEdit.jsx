@@ -114,23 +114,40 @@ export default function ManagerInfoEdit() {
         const finalPath =
           serverPath === "SUCCESS_NO_IMAGE" ? previewImg : serverPath;
 
+        // 🌟 1. 개별 로컬 스토리지 아이템 덮어쓰기
         localStorage.setItem("memberThumb", finalPath);
+        localStorage.setItem("memberName", profileData.memberName);
+        localStorage.setItem("memberPhone", profileData.memberPhone);
 
+        // 🌟 2. member 객체가 통째로 저장되어 있을 경우를 대비한 업데이트
+        const storedMember = JSON.parse(localStorage.getItem("member"));
+        if (storedMember) {
+          storedMember.memberThumb = finalPath;
+          storedMember.memberName = profileData.memberName;
+          storedMember.memberPhone = profileData.memberPhone;
+          localStorage.setItem("member", JSON.stringify(storedMember));
+        }
+
+        // 🌟 3. 전역 상태(Context) user 업데이트
         setUser({
           ...user,
           memberThumb: finalPath,
+          memberName: profileData.memberName,
+          memberPhone: profileData.memberPhone,
         });
 
+        // 🌟 4. 현재 페이지의 컴포넌트 상태 업데이트
         setPreviewImg(finalPath);
         setManagerInfo((prev) => ({
           ...prev,
           memberName: profileData.memberName,
           memberPhone: profileData.memberPhone,
         }));
+
         setIsEditingProfile(false);
       }
     } catch (err) {
-      Swal.fire("에러", "수정 중 오류 발생", err);
+      Swal.fire("에러", "수정 중 오류 발생", "error");
     }
   };
 

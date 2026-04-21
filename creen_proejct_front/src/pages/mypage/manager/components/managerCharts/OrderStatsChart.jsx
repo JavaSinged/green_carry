@@ -12,13 +12,11 @@ const OrderStatsChart = ({ data }) => {
     );
   }
 
-  // 1. 배달수단 비중 (%)
   const series = data.map((item) => item.percent || 0);
 
-  // 2. [수정됨] label이 데이터에 없으므로 deliveryType을 한글로 직접 변환
   const labels = data.map((item) => {
-    if (item.deliveryType === 1) return "픽업";
-    if (item.deliveryType === 2) return "자전거";
+    if (item.deliveryType === 1) return "포장";
+    if (item.deliveryType === 2) return "도보 & 자전거";
     if (item.deliveryType === 3) return "오토바이";
     return "기타";
   });
@@ -29,7 +27,6 @@ const OrderStatsChart = ({ data }) => {
     return "var(--color-info)";
   });
 
-  // 3. [추가됨] 총 매출액과 총 주문 건수 계산
   const totalAmount = data.reduce(
     (sum, item) => sum + (item.seriesAmount || 0),
     0,
@@ -61,7 +58,6 @@ const OrderStatsChart = ({ data }) => {
               fontWeight: "bold",
               color: "#333",
               offsetY: 10,
-              // 중앙 값은 퍼센트로 표시
               formatter: (val) => val + "%",
             },
             total: {
@@ -93,7 +89,6 @@ const OrderStatsChart = ({ data }) => {
       width: 2,
       colors: ["#ffffff"],
     },
-    // 4. [추가됨] 차트 조각에 마우스 올렸을 때 금액과 건수 표시 툴팁
     tooltip: {
       y: {
         formatter: function (val, opts) {
@@ -120,11 +115,7 @@ const OrderStatsChart = ({ data }) => {
         </button>
       </div>
 
-      {/* 5. [추가됨] 메인 금액 옆에 총 주문 건수 표시 */}
-      <div
-        className={styles.mainValue}
-        style={{ display: "flex", alignItems: "baseline", gap: "8px" }}
-      >
+      <div className={styles.mainValue}>
         <span>
           {totalAmount !== undefined && totalAmount !== null
             ? totalAmount.toLocaleString()

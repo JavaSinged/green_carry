@@ -464,3 +464,53 @@
   color: #9ca3af;
   margin-top: 10px;
 }
+
+@media (max-width: 768px) {
+  .page_container {
+    padding: 20px 16px;
+    border-radius: 16px;
+  }
+
+  .main_title {
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
+
+  .top_content,
+  .input_row_group,
+  .checkbox_grid,
+  .btn_area,
+  .add_form {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .top_content,
+  .btn_area {
+    gap: 20px;
+  }
+
+  .preview_box {
+    width: 100%;
+    max-width: 240px;
+    margin: 0 auto 15px;
+  }
+
+  .status_area,
+  .container_item,
+  .group_header {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .green_btn,
+  .cancel_btn,
+  .delete_btn,
+  .add_form button {
+    width: 100%;
+  }
+
+  .delete_btn {
+    margin-left: 0;
+  }
+}

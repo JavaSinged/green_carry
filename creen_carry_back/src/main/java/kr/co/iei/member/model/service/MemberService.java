@@ -335,5 +335,38 @@ public class MemberService {
 		int currentPoint = memberDao.getPointByMemberId(memberId);
 		return currentPoint;
 	}
+	
+	@Transactional
+	public int EasterEgg(String memberId, String eggName) {
+	    // 1. 중복 체크 (DAO 호출)
+	    int alreadyFound = memberDao.checkEasterEgg(memberId, eggName);
+	    if (alreadyFound > 0) {
+	        throw new IllegalStateException("이미 획득한 보상입니다.");
+	    }
+
+	    // 2. 이스터에그 보상 설정 (🌟 확장성 있게 switch 문으로 변경)
+	    int reward = 0;
+	    switch (eggName) {
+	        case "NIGHT_COUPON":
+	            reward = 2000; 
+	            break;
+	        case "DRONE_SUPPLY":
+	            reward = 1000; 
+	            break;
+	        case "CLEAN_EARTH": 
+	            reward = 2500;
+	            break;
+	        default:
+	            throw new IllegalArgumentException("존재하지 않는 이벤트 코드입니다: " + eggName);
+	    }
+
+	    // 3. 포인트 증액 & 이력 저장 (DAO 호출)
+	    memberDao.addMemberPoint(memberId, reward);
+	    memberDao.insertEasterEgg(memberId, eggName, reward);
+
+	    // 4. 최종 포인트 반환 (기존 getPointByMemberId 활용)
+	    // 🌟 이 리턴값이 컨트롤러를 타고 프론트의 로컬스토리지까지 갱신할 겁니다.
+	    return memberDao.getPointByMemberId(memberId);
+	}
 
 }

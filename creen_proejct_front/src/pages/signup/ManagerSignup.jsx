@@ -5,6 +5,7 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import useEcoEffects from "../../hooks/useEcoEffects";
 import styles from "./UserSignup.module.css";
+import ButtonSpinner from "../../components/commons/ButtonSpinner";
 
 const ManagerSignup = () => {
   // 코덱스가 수정함: leafData와 fireflyData를 함께 사용
@@ -44,6 +45,9 @@ const ManagerSignup = () => {
   const [time, setTime] = useState(180);
   const [timeout, setTimeout] = useState(null);
   const [checkEmail, setCheckEmail] = useState(0);
+  const [isCheckingId, setIsCheckingId] = useState(false);
+  const [isSendingMail, setIsSendingMail] = useState(false);
+  const [isJoining, setIsJoining] = useState(false);
 
   const resetMailAuthState = () => {
     if (timeout) window.clearInterval(timeout);
@@ -115,33 +119,36 @@ const ManagerSignup = () => {
     }
     */
   };
-  const handleIdCheck = () => {
+  const handleIdCheck = async () => {
+    if (isCheckingId) return;
     if (!idRegex.test(member.memberId)) {
       Swal.fire({ icon: "warning", text: "아이디 형식을 먼저 맞춰주세요." });
       return;
     }
-    axios
-      .get(
+    setIsCheckingId(true);
+    try {
+      const res = await axios.get(
         `${import.meta.env.VITE_BACKSERVER}/member/exists?memberId=${member.memberId}`,
-      )
-      .then((res) => {
-        if (res.data) {
-          Swal.fire({ icon: "success", text: "사용 가능한 아이디입니다." });
-          setCheckId(2);
-        } else {
-          Swal.fire({ icon: "error", text: "이미 사용 중인 아이디입니다." });
-          setCheckId(1);
-        }
-      })
-      .catch((err) => {
-        Swal.fire({
-          icon: "error",
-          text: "서버와 통신 중 오류가 발생했습니다.",
-        });
+      );
+      if (res.data) {
+        Swal.fire({ icon: "success", text: "사용 가능한 아이디입니다." });
+        setCheckId(2);
+      } else {
+        Swal.fire({ icon: "error", text: "이미 사용 중인 아이디입니다." });
+        setCheckId(1);
+      }
+    } catch (err) {
+      Swal.fire({
+        icon: "error",
+        text: "서버와 통신 중 오류가 발생했습니다.",
       });
+    } finally {
+      setIsCheckingId(false);
+    }
   };
 
   const handleSendMail = async () => {
+    if (isSendingMail) return;
     if (!emailRegex.test(member.memberEmail)) {
       Swal.fire({
         icon: "warning",
@@ -182,22 +189,26 @@ const ManagerSignup = () => {
     }
     resetMailAuthState();
     setMailAuth(1);
-    axios
-      .post(`${import.meta.env.VITE_BACKSERVER}/member/email-verification`, {
+    setIsSendingMail(true);
+    try {
+      const res = await axios.post(
+        `${import.meta.env.VITE_BACKSERVER}/member/email-verification`,
+        {
         memberEmail: member.memberEmail,
-      })
-      .then((res) => {
-        setMailAuthCode(res.data);
-        setMailAuth(2);
-        const intervalId = window.setInterval(() => {
-          setTime((prev) => prev - 1);
-        }, 1000);
-        setTimeout(intervalId);
-      })
-      .catch((err) => {
-        resetMailAuthState();
-        Swal.fire({ icon: "error", text: "메일 발송 중 오류가 발생했습니다." });
-      });
+        },
+      );
+      setMailAuthCode(res.data);
+      setMailAuth(2);
+      const intervalId = window.setInterval(() => {
+        setTime((prev) => prev - 1);
+      }, 1000);
+      setTimeout(intervalId);
+    } catch (err) {
+      resetMailAuthState();
+      Swal.fire({ icon: "error", text: "메일 발송 중 오류가 발생했습니다." });
+    } finally {
+      setIsSendingMail(false);
+    }
   };
 
   const handleVerifyMail = () => {
@@ -388,8 +399,9 @@ const ManagerSignup = () => {
   const openingDateStatus = getOpeningDateMessage();
   const storeOwnerNoStatus = getStoreOwnerNoMessage();
   */
-  const joinSubmit = (e) => {
+  const joinSubmit = async (e) => {
     e.preventDefault();
+    if (isJoining) return;
     setIsSubmitted(true);
     const hasEmpty =
       !member.memberId ||
@@ -424,25 +436,25 @@ const ManagerSignup = () => {
       ...store,
       memberGrade: 2,
     };
-    axios
-      .post(
+    setIsJoining(true);
+    try {
+      await axios.post(
         `${import.meta.env.VITE_BACKSERVER}/member/signupManager`,
         submitData,
-      )
-      .then((res) => {
-        Swal.fire({
-          icon: "success",
-          text: "사업자 회원가입이 완료되었습니다.",
-        }).then(() => {
-          navigate("/login");
-        });
-      })
-      .catch((err) => {
-        Swal.fire({
-          icon: "error",
-          text: "회원가입 처리 중 오류가 발생했습니다.",
-        });
+      );
+      await Swal.fire({
+        icon: "success",
+        text: "사업자 회원가입이 완료되었습니다.",
       });
+      navigate("/login");
+    } catch (err) {
+      Swal.fire({
+        icon: "error",
+        text: "회원가입 처리 중 오류가 발생했습니다.",
+      });
+    } finally {
+      setIsJoining(false);
+    }
   };
 
   /*
@@ -530,9 +542,16 @@ const ManagerSignup = () => {
                     type="button"
                     className={styles.signupBtnOutlined}
                     onClick={handleIdCheck}
-                    disabled={checkId === 2}
+                    disabled={checkId === 2 || isCheckingId}
                   >
-                    중복 확인
+                    {isCheckingId ? (
+                      <>
+                        <ButtonSpinner />
+                        <span>확인 중</span>
+                      </>
+                    ) : (
+                      "중복 확인"
+                    )}
                   </button>
                 </div>
                 <p
@@ -601,9 +620,18 @@ const ManagerSignup = () => {
                     type="button"
                     className={styles.signupBtnOutlined}
                     onClick={handleSendMail}
-                    disabled={mailAuth === 1 || mailAuth === 3}
+                    disabled={mailAuth === 1 || mailAuth === 3 || isSendingMail}
                   >
-                    {mailAuth === 0 ? "인증 메일 발송" : "재전송"}
+                    {isSendingMail ? (
+                      <>
+                        <ButtonSpinner />
+                        <span>발송 중</span>
+                      </>
+                    ) : mailAuth === 0 ? (
+                      "인증 메일 발송"
+                    ) : (
+                      "재전송"
+                    )}
                   </button>
                 </div>
                 <div className={`${styles.signupInputInner} ${styles.signupMt10}`}>
@@ -797,8 +825,15 @@ const ManagerSignup = () => {
             */}
 
             {/* 가입 버튼 */}
-            <button type="submit" className={styles.signupBtn}>
-              사업자 회원가입
+            <button type="submit" className={styles.signupBtn} disabled={isJoining}>
+              {isJoining ? (
+                <>
+                  <ButtonSpinner />
+                  <span>가입 처리 중...</span>
+                </>
+              ) : (
+                "사업자 회원가입"
+              )}
             </button>
           </form>
         </div>

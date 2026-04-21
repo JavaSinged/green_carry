@@ -191,16 +191,18 @@
 
 .dateInput {
   padding: 8px 12px;
-  border: 1px solid #ddd;
   border-radius: 8px;
   font-size: 14px;
   color: #333;
-  outline: none;
-  transition: border-color 0.2s;
+  background: linear-gradient(180deg, #ffffff 0%, #f9fcfa 100%);
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s,
+    transform 0.2s;
 }
 
 .dateInput:focus {
-  border-color: #2f8f46;
+  transform: translateY(-1px);
 }
 
 .dateSeparator {
@@ -222,6 +224,10 @@
 
 .resetBtn:hover {
   background: #e2e6e3;
+}
+
+.dateInput::-webkit-calendar-picker-indicator {
+  opacity: 0.8;
 }
 .cancelBtn {
   background-color: white;
@@ -375,5 +381,71 @@
   }
   100% {
     opacity: 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .page {
+    padding: 20px 16px;
+    border-radius: 16px;
+  }
+
+  .filterContainer,
+  .orderTop,
+  .leftInfo,
+  .carbonBox {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .dateInputs {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .dateInput,
+  .resetBtn {
+    width: 100%;
+  }
+
+  .menuThumb {
+    width: 100%;
+    height: 180px;
+    margin-top: 0;
+  }
+
+  .rightInfo {
+    width: 100%;
+    align-items: flex-start;
+  }
+
+  .orderMiddle {
+    grid-template-columns: 1fr;
+  }
+
+  .carbonValueWrap {
+    text-align: left;
+  }
+
+  .pagination {
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .summaryValue {
+    font-size: 26px;
+  }
+
+  .orderCard {
+    padding: 16px 14px;
+  }
+
+  .canceledWatermark {
+    font-size: 22px;
+    padding: 8px 16px;
   }
 }

@@ -199,3 +199,40 @@
 .page_dots {
   color: var(--text-sub);
 }
+
+@media (max-width: 1024px) {
+  .grid_container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .header_right {
+    flex-wrap: wrap;
+  }
+
+  .search_wrap {
+    width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .container {
+    padding: 20px 16px;
+    border-radius: 16px;
+  }
+
+  .grid_container {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+
+  .addButton {
+    width: 100%;
+  }
+}

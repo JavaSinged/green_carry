@@ -116,3 +116,19 @@
     width: 100%;
   }
 }
+
+@media (max-width: 768px) {
+  .dashboardContainer {
+    padding: 20px 16px;
+    border-radius: 16px;
+  }
+
+  .tabContainer {
+    width: 100%;
+    margin: 12px 0 24px;
+  }
+
+  .deliveryPathSection {
+    padding: 18px 14px;
+  }
+}

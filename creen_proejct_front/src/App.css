@@ -1,5 +1,26 @@
-/* 1. 로컬 폰트 페이스 정의 */
-/* 티머니 둥근바람 - CDN 방식 */
+/* 1. 로컬 폰트 정의 */
+/* 어둠의굴림바람 - CDN 방식 */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+/* 🚫 Safari (WebKit) - 암호 자동완성(열쇠 모양) 버튼 제거 */
+input[type="password"]::-webkit-credentials-auto-fill-button {
+  visibility: hidden;
+  display: none !important;
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+}
+
+/* (보너스) 사파리에서 인풋 선택 시 테두리 못생기게 변하는 거 방지 */
+input[type="password"]:focus {
+  outline: none;
+}
+
 @font-face {
   font-family: "TMoneyDungunbaram";
   src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_20-07@1.0/TmoneyRoundWindExtraBold.woff")
@@ -7,7 +28,8 @@
   font-weight: 800;
   font-display: swap;
 }
-/* 보통 두께 버전 추가 */
+
+/* 보통 굵기 버전 추가 */
 @font-face {
   font-family: "TMoneyDungunbaram_Reg";
   src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_20-07@1.0/TmoneyRoundWindRegular.woff")
@@ -15,7 +37,8 @@
   font-weight: normal;
   font-style: normal;
 }
-/* 여기어때 잘난체 (기존 설정 유지 시 사용) */
+
+/* 여기어때 한글체(기존 설정 유지) */
 @font-face {
   font-family: "YeogiGothic";
   src: url("/fonts/JalnanGothic.otf") format("opentype");
@@ -33,44 +56,50 @@
 }
 
 /* 2. 전역 변수 설정 (폰트 + 컬러) */
-
 :root {
-  /* 폰트 시스템 수정 */
   --font-logo: "Gaegu", cursive;
   --font-main: sans-serif;
-  --font-title:
-    "TMoneyDungunbaram_Reg", sans-serif; /* Jalnan 대신 티머니 적용 */
+  --font-title: "TMoneyDungunbaram_Reg", sans-serif;
   --font-sub: "Paperozi", sans-serif;
   --font-body: "Pretendard Variable", "Pretendard", sans-serif;
 
-  /* 컬러 팔레트 */
-  --color-brand: #2e8147; /* 브랜드 메인 그린 */
-  --color-bg: #ffffff; /* 메인 배경색 */
-  --color-surface: #e8f5e9; /* 면분할 / 카드 배경 / 강조 구역 */
-  --color-point: #ffb300; /* 포인트 컬러 (버튼, 아이콘) */
-  --color-info: #00838f; /* 정보성 데이터 (탄소 배출량, 거리 수치) */
-  /* 텍스트 컬러 */
-  --text-main: #222222; /* 본문 텍스트 */
-  --text-sub: #6b6666; /* 부가설명 텍스트 */
+  --color-brand: #2e8147;
+  --color-bg: #ffffff;
+  --color-surface: #e8f5e9;
+  --color-point: #ffb300;
+  --color-info: #00838f;
+  --text-main: #222222;
+  --text-sub: #6b6666;
   --color-carbon: #e53935;
+}
+
+html {
+  width: 100%;
+  overflow-x: hidden;
 }
 
 /* 3. 기본 스타일 적용 */
 body {
   margin: 0;
+  width: 100%;
   background-color: var(--color-bg);
   color: var(--text-main);
   font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
-  word-break: keep-all; /* 한글 줄바꿈을 단어 단위로 */
+  word-break: keep-all;
+  overflow-x: hidden;
 }
 
-/* 폰트 적용 예시: 제목 요소 등에 변수 사용 */
 h1,
 h2,
 h3,
 .title {
   font-family: var(--font-title);
+}
+
+#root,
+main {
+  width: 100%;
 }
 
 #root > div {
@@ -79,7 +108,42 @@ h3,
   min-height: 100vh;
 }
 
+img,
+svg,
+canvas {
+  max-width: 100%;
+}
+
 main {
   flex: 1;
   background-color: var(--color-bg);
+}
+
+input[type="date"],
+input[type="month"] {
+  min-height: 42px;
+  border: 1.5px solid #d7e6da;
+  border-radius: 12px;
+  padding: 0 14px;
+  background-color: #ffffff;
+  color: var(--text-main);
+  font-family: var(--font-body);
+  font-size: 14px;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease;
+}
+
+input[type="date"]:focus,
+input[type="month"]:focus {
+  outline: none;
+  border-color: var(--color-brand);
+  box-shadow: 0 0 0 4px rgba(46, 129, 71, 0.08);
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="month"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0.75;
 }

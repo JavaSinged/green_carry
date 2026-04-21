@@ -1,6 +1,7 @@
 import "./App.css";
 import Header from "./components/commons/Header";
 import Footer from "./components/commons/Footer";
+import MetaTag from "./components/commons/MetaTag";
 import { Route, Routes, Outlet } from "react-router-dom";
 import Home from "./pages/main/Home";
 import StoreView from "./pages/main/StoreView";
@@ -36,8 +37,6 @@ import AdminStoreManagement from "./pages/mypage/admin/AdminStoreManagement";
 import AdminReviewManagement from "./pages/mypage/admin/AdminReviewManagement";
 import AdminContainerManagement from "./pages/mypage/admin/AdminContainerManagement";
 
-// 🌟 문지기 컴포넌트
-
 import ProtectedRoute from "./context/ProtectedRoute";
 import ManagerDelAccount from "./pages/mypage/deleteMember/ManagerDelAccount";
 import UserOrderList from "./pages/mypage/user/UserOrderList";
@@ -65,90 +64,313 @@ const BasicLayout = () => {
   );
 };
 
+const withMeta = (element, title, description) => (
+  <>
+    <MetaTag title={title} description={description} />
+    {element}
+  </>
+);
+
 function App() {
   return (
     <AuthProvider>
       <div>
-        <ScrollToTop/>
+        <ScrollToTop />
         <Routes>
-          {/* ==================================================== */}
-          {/* 1. 퍼블릭 구역 (로그인한 사용자는 접근 불가) */}
-          {/* ==================================================== */}
           <Route element={<ProtectedRoute requireGuest={true} />}>
-            <Route path="/login" element={<Login />} />
-            <Route path="/account" element={<Account />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/userSignup" element={<UserSignup />} />
-            <Route path="/managerSignup" element={<ManagerSignup />} />
+            <Route
+              path="/login"
+              element={withMeta(
+                <Login />,
+                "로그인",
+                "그린캐리 계정으로 로그인하고 다회용기 배달 서비스를 이용해보세요.",
+              )}
+            />
+            <Route
+              path="/account"
+              element={withMeta(
+                <Account />,
+                "계정 찾기",
+                "그린캐리 계정 정보를 확인하고 로그인 정보를 찾아보세요.",
+              )}
+            />
+            <Route
+              path="/signup"
+              element={withMeta(
+                <Signup />,
+                "회원가입",
+                "그린캐리 회원가입 유형을 선택하고 서비스를 시작해보세요.",
+              )}
+            />
+            <Route
+              path="/userSignup"
+              element={withMeta(
+                <UserSignup />,
+                "개인 회원가입",
+                "그린캐리 개인 회원으로 가입하고 친환경 배달 서비스를 이용해보세요.",
+              )}
+            />
+            <Route
+              path="/managerSignup"
+              element={withMeta(
+                <ManagerSignup />,
+                "점주 회원가입",
+                "그린캐리 점주 회원으로 가입하고 매장 운영을 시작해보세요.",
+              )}
+            />
           </Route>
-          {/* ==================================================== */}
-          {/* 2. 헤더/푸터가 붙는 구역 (BasicLayout) */}
-          {/* ==================================================== */}
+
           <Route element={<BasicLayout />}>
-            {/* 공통 접근 구역 (로그인 여부 상관없음) */}
-            <Route path="/" element={<Home />} />
-            <Route path="/storeView/:id" element={<StoreView />} />
-            <Route path="/storeDetail/:id" element={<StoreDetail />} />
-            <Route path="/storeReviews/:id" element={<StoreReviewPage />} />
-            {/* ---------------------------------------------------- */}
-            {/* 일반 유저 (Grade: 1) 구역 */}
-            {/* ---------------------------------------------------- */}
+            <Route
+              path="/"
+              element={withMeta(
+                <Home />,
+                "홈",
+                "그린캐리에서 친환경 다회용기 배달 매장과 서비스를 만나보세요.",
+              )}
+            />
+            <Route
+              path="/storeView/:id"
+              element={withMeta(
+                <StoreView />,
+                "매장 목록",
+                "그린캐리에서 다회용기 배달이 가능한 매장을 찾아보세요.",
+              )}
+            />
+            <Route
+              path="/storeDetail/:id"
+              element={withMeta(
+                <StoreDetail />,
+                "매장 상세",
+                "매장 정보와 메뉴를 확인하고 친환경 배달을 주문해보세요.",
+              )}
+            />
+            <Route
+              path="/storeReviews/:id"
+              element={withMeta(
+                <StoreReviewPage />,
+                "매장 리뷰",
+                "그린캐리 이용자들의 매장 리뷰와 평점을 확인해보세요.",
+              )}
+            />
+
             <Route element={<ProtectedRoute requireUser={true} />}>
-              {/* 마이페이지 사이드바가 필요 없는 일반 유저 전용 페이지 */}
-              <Route path="/orderPage" element={<OrderPage />} />
-              <Route path="/paymentPage" element={<PaymentPage />} />
-              <Route path="/checkoutPage" element={<CheckoutPage />} />
-              {/* 마이페이지 사이드바(UserLayout)가 적용되는 페이지 */}
+              <Route
+                path="/orderPage"
+                element={withMeta(
+                  <OrderPage />,
+                  "주문하기",
+                  "장바구니를 확인하고 친환경 배달 주문을 진행하세요.",
+                )}
+              />
+              <Route
+                path="/paymentPage"
+                element={withMeta(
+                  <PaymentPage />,
+                  "결제하기",
+                  "그린캐리 주문 결제를 안전하게 진행하세요.",
+                )}
+              />
+              <Route
+                path="/checkoutPage"
+                element={withMeta(
+                  <CheckoutPage />,
+                  "주문 완료",
+                  "그린캐리 주문 완료 내역과 결제 결과를 확인하세요.",
+                )}
+              />
+
               <Route path="/mypage/user" element={<UserLayout />}>
-                <Route index element={<UserProfile />} />
-                <Route path="reviews" element={<UserReviewList />} />
-                <Route path="profile" element={<UserInfoEdit />} />
-                <Route path="userCS" element={<UserCS />} />
-                <Route path="orderList" element={<UserOrderList />} />
-                <Route path="deleteMember" element={<UserDelAccount />} />
+                <Route
+                  index
+                  element={withMeta(
+                    <UserProfile />,
+                    "마이페이지",
+                    "내 정보와 최근 활동을 그린캐리 마이페이지에서 확인하세요.",
+                  )}
+                />
+                <Route
+                  path="reviews"
+                  element={withMeta(
+                    <UserReviewList />,
+                    "내 리뷰",
+                    "작성한 리뷰와 평점을 한눈에 확인하세요.",
+                  )}
+                />
+                <Route
+                  path="profile"
+                  element={withMeta(
+                    <UserInfoEdit />,
+                    "회원정보 수정",
+                    "그린캐리 회원 정보를 수정하고 계정을 관리하세요.",
+                  )}
+                />
+                <Route
+                  path="userCS"
+                  element={withMeta(
+                    <UserCS />,
+                    "고객센터",
+                    "자주 묻는 질문과 문의 내역을 확인해보세요.",
+                  )}
+                />
+                <Route
+                  path="orderList"
+                  element={withMeta(
+                    <UserOrderList />,
+                    "주문 내역",
+                    "그린캐리 주문 내역과 주문 상태를 확인하세요.",
+                  )}
+                />
+                <Route
+                  path="deleteMember"
+                  element={withMeta(
+                    <UserDelAccount />,
+                    "회원 탈퇴",
+                    "그린캐리 계정 탈퇴를 진행하는 페이지입니다.",
+                  )}
+                />
               </Route>
-            </Route>{" "}
-            {/* ---------------------------------------------------- */}
-            {/* 사업자 파트너 (Grade: 2) 구역 */}
+            </Route>
+
             <Route element={<ProtectedRoute requireManager={true} />}>
               <Route path="/mypage/manager" element={<ManagerLayout />}>
-                <Route index element={<ManagerDashboard />} />
-                <Route path="profile" element={<ManagerInfoEdit />} />
-                <Route path="menus" element={<ManagerMenuList />} />
+                <Route
+                  index
+                  element={withMeta(
+                    <ManagerDashboard />,
+                    "점주 대시보드",
+                    "점주 대시보드에서 매장 운영 현황을 한눈에 확인하세요.",
+                  )}
+                />
+                <Route
+                  path="profile"
+                  element={withMeta(
+                    <ManagerInfoEdit />,
+                    "점주 정보 수정",
+                    "점주 계정과 매장 정보를 수정하세요.",
+                  )}
+                />
+                <Route
+                  path="menus"
+                  element={withMeta(
+                    <ManagerMenuList />,
+                    "메뉴 관리",
+                    "매장 메뉴를 등록하고 수정해보세요.",
+                  )}
+                />
                 <Route
                   path="menus/menuEdit/:storeId/:menuId?"
-                  element={<ManagerMenuEdit />}
+                  element={withMeta(
+                    <ManagerMenuEdit />,
+                    "메뉴 편집",
+                    "매장 메뉴 정보를 추가하거나 수정하세요.",
+                  )}
                 />
-                <Route path="deleteMember" element={<ManagerDelAccount />} />
-                <Route path="reviews" element={<ManagerReviewComment />} />
-                <Route path="orders" element={<ManagerOrderList />} />
-                <Route path="managerCS" element={<ManagerCS />} />
+                <Route
+                  path="deleteMember"
+                  element={withMeta(
+                    <ManagerDelAccount />,
+                    "점주 탈퇴",
+                    "점주 계정 탈퇴를 진행하는 페이지입니다.",
+                  )}
+                />
+                <Route
+                  path="reviews"
+                  element={withMeta(
+                    <ManagerReviewComment />,
+                    "리뷰 관리",
+                    "고객 리뷰를 확인하고 답글을 관리하세요.",
+                  )}
+                />
+                <Route
+                  path="orders"
+                  element={withMeta(
+                    <ManagerOrderList />,
+                    "주문 관리",
+                    "매장 주문 내역과 처리 상태를 관리하세요.",
+                  )}
+                />
+                <Route
+                  path="managerCS"
+                  element={withMeta(
+                    <ManagerCS />,
+                    "점주 고객센터",
+                    "점주용 문의와 안내를 확인하세요.",
+                  )}
+                />
               </Route>
             </Route>
-            {/* ---------------------------------------------------- */}
-            {/* 총괄 관리자 (Grade: 0) 구역 */}
+
             <Route element={<ProtectedRoute requireAdmin={true} />}>
               <Route path="/mypage/admin" element={<AdminLayout />}>
-                <Route index element={<AdminDashboard />} />
-                <Route path="members" element={<AdminUserManagement />} />
-                <Route path="stores" element={<AdminStoreManagement />}></Route>
+                <Route
+                  index
+                  element={withMeta(
+                    <AdminDashboard />,
+                    "관리자 대시보드",
+                    "관리자 대시보드에서 서비스 현황을 확인하세요.",
+                  )}
+                />
+                <Route
+                  path="members"
+                  element={withMeta(
+                    <AdminUserManagement />,
+                    "회원 관리",
+                    "그린캐리 회원 정보를 조회하고 관리하세요.",
+                  )}
+                />
+                <Route
+                  path="stores"
+                  element={withMeta(
+                    <AdminStoreManagement />,
+                    "매장 관리",
+                    "등록된 매장 정보를 조회하고 관리하세요.",
+                  )}
+                />
                 <Route
                   path="stores/detail/:storeId"
-                  element={<AdminStoreManagementDetail />}
-                ></Route>
-                <Route path="reviews" element={<AdminReviewManagement />} />
-                {/* 용기 리스트 */}
-                <Route path="containers" element={<AdminContainerList />} />
-                {/* 용기 수정 */}
+                  element={withMeta(
+                    <AdminStoreManagementDetail />,
+                    "매장 상세 관리",
+                    "매장 상세 정보와 상태를 관리하세요.",
+                  )}
+                />
+                <Route
+                  path="reviews"
+                  element={withMeta(
+                    <AdminReviewManagement />,
+                    "리뷰 관리",
+                    "서비스 리뷰를 조회하고 관리하세요.",
+                  )}
+                />
+                <Route
+                  path="containers"
+                  element={withMeta(
+                    <AdminContainerList />,
+                    "용기 관리",
+                    "다회용기 목록과 정보를 관리하세요.",
+                  )}
+                />
                 <Route
                   path="containers/detail/:productId"
-                  element={<AdminContainerManagement />}
+                  element={withMeta(
+                    <AdminContainerManagement />,
+                    "용기 상세 관리",
+                    "다회용기 상세 정보를 수정하고 관리하세요.",
+                  )}
                 />
               </Route>
             </Route>
-            {/* ---------------------------------------------------- */}
           </Route>
-          <Route path="*" element={<NotFound />} />
+
+          <Route
+            path="*"
+            element={withMeta(
+              <NotFound />,
+              "페이지를 찾을 수 없음",
+              "요청하신 페이지를 찾을 수 없습니다. 그린캐리 홈으로 이동해보세요.",
+            )}
+          />
         </Routes>
       </div>
     </AuthProvider>
