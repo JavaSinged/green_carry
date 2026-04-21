@@ -1,6 +1,5 @@
 .footer {
   width: 100%;
-  min-width: 1200px;
   box-sizing: border-box;
   background-color: var(--color-brand);
   color: #ffffff;
@@ -87,7 +86,7 @@
 }
 
 .link_column li::before {
-  content: "• ";
+  content: "•";
   color: var(--color-point);
   margin-right: 8px;
 }
@@ -149,7 +148,6 @@
   font-size: 0.8rem;
 }
 
-/* 가든 섹션 */
 .static_garden_wrap {
   padding: 70px 0 35px;
   text-align: center;
@@ -190,12 +188,7 @@
   font-weight: 300;
 }
 
-/* ===== 태블릿 반응형 (1200px 이하) ===== */
 @media (max-width: 1200px) {
-  .footer {
-    min-width: unset;
-  }
-
   .container {
     padding: 0 30px;
   }
@@ -213,7 +206,6 @@
   }
 }
 
-/* ===== 모바일 반응형 (768px 이하) ===== */
 @media (max-width: 768px) {
   .footer {
     padding: 25px 0;
@@ -223,7 +215,6 @@
     padding: 0 20px;
   }
 
-  /* 상단 섹션 세로 정렬 */
   .top_section {
     flex-direction: column;
     gap: 30px;
@@ -245,7 +236,6 @@
     margin-bottom: 20px;
   }
 
-  /* SNS 링크 그리드 배치 */
   .sns_links {
     display: grid;
     grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr;
@@ -260,7 +250,6 @@
     margin: 0;
   }
 
-  /* 링크 그룹 */
   .link_groups {
     width: 100%;
     gap: 30px;
@@ -277,7 +266,6 @@
     margin-bottom: 10px;
   }
 
-  /* 하단 섹션 세로 정렬 */
   .bottom_section {
     flex-direction: column;
     gap: 20px;
@@ -313,7 +301,6 @@
     font-size: 0.75rem;
   }
 
-  /* 가든 섹션 */
   .static_garden_wrap {
     padding: 50px 0 25px;
   }
@@ -333,7 +320,6 @@
   }
 }
 
-/* ===== 작은 모바일 (480px 이하) ===== */
 @media (max-width: 480px) {
   .container {
     padding: 0 15px;
@@ -347,7 +333,6 @@
     font-size: 0.85rem;
   }
 
-  /* SNS 링크 2x2 그리드 */
   .sns_links {
     grid-template-columns: 1fr 1fr;
     gap: 12px 20px;
@@ -361,7 +346,6 @@
     font-size: 0.8rem;
   }
 
-  /* 링크 그룹 세로 배치 */
   .link_groups {
     flex-direction: column;
     gap: 25px;
@@ -375,7 +359,6 @@
     font-size: 0.8rem;
   }
 
-  /* 회사 정보 줄바꿈 */
   .company_info p {
     font-size: 0.75rem;
   }
@@ -405,7 +388,6 @@
     margin-top: 5px;
   }
 
-  /* 가든 아이콘 크기 축소 */
   .garden_icons {
     font-size: 1.2rem;
     gap: 12px;

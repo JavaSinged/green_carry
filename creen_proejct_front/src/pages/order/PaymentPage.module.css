@@ -31,6 +31,7 @@ a {
   max-width: 1200px;
   margin: 50px auto;
   padding: 14px 20px 44px;
+  width: 100%;
 }
 
 .payment-top-text {
@@ -367,8 +368,19 @@ a {
     padding: 14px 14px 32px;
   }
 
+  .summary-card,
+  .info-card {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
   .point-row {
     flex-direction: column;
+  }
+
+  .point-row button {
+    width: 100%;
+    margin-left: 0 !important;
   }
 
   .payment-method-grid {
@@ -392,5 +404,33 @@ a {
 
   .footer-left h2 {
     font-size: 22px;
+  }
+}
+
+@media (max-width: 480px) {
+  .payment-main {
+    padding: 12px 10px 24px;
+  }
+
+  .summary-title {
+    font-size: 18px;
+  }
+
+  .total-row,
+  .price-row {
+    font-size: 14px;
+  }
+
+  .total-row strong {
+    font-size: 18px;
+  }
+
+  .carbon-value {
+    font-size: 40px;
+  }
+
+  .pay-btn {
+    height: 50px;
+    font-size: 16px;
   }
 }

@@ -231,7 +231,7 @@
 		CASE
 		WHEN o.delivery_type = 1 THEN 0
 		WHEN o.delivery_type = 2 THEN 1000
-		ELSE 2000
+		ELSE 3000
 		END AS deliveryPrice,
 
 		(
