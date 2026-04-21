@@ -1,1 +1,0 @@
-INDEX VERSION 1.134+C:\Users\user1\Desktop\creen_proejct\creen_carry_back\.metadata\.plugins\org.eclipse.jdt.core
