@@ -102,8 +102,10 @@ export default function StoreDetail() {
             return (a?.weekOfMonth ?? 0) - (b?.weekOfMonth ?? 0);
           }
 
-          const aOrder = dayOrder[String(a?.dayOfWeek ?? "").toLowerCase()] ?? 99;
-          const bOrder = dayOrder[String(b?.dayOfWeek ?? "").toLowerCase()] ?? 99;
+          const aOrder =
+            dayOrder[String(a?.dayOfWeek ?? "").toLowerCase()] ?? 99;
+          const bOrder =
+            dayOrder[String(b?.dayOfWeek ?? "").toLowerCase()] ?? 99;
           return aOrder - bOrder;
         });
 
@@ -202,7 +204,9 @@ export default function StoreDetail() {
       </div>
 
       <section className={styles.section}>
-        <h3 className={styles.storeName}>{storeInfo.storeName || "매장명 없음"}</h3>
+        <h3 className={styles.storeName}>
+          {storeInfo.storeName || "매장명 없음"}
+        </h3>
         <table className={styles.infoTable}>
           <tbody>
             <tr>
@@ -220,7 +224,9 @@ export default function StoreDetail() {
                   ? operatingHours
                       .filter((h) => h?.isDayOff === "N")
                       .map((h) => (
-                        <div key={`${h.dayOfWeek}-${h.weekOfMonth}-${h.openTime}`}>
+                        <div
+                          key={`${h.dayOfWeek}-${h.weekOfMonth}-${h.openTime}`}
+                        >
                           {dayMap[String(h.dayOfWeek ?? "").toLowerCase()] ||
                             h.dayOfWeek ||
                             "요일 정보 없음"}{" "}
@@ -286,10 +292,7 @@ export default function StoreDetail() {
               <th>상호명</th>
               <td>{storeInfo.storeName || "-"}</td>
             </tr>
-            <tr>
-              <th>사업자 주소</th>
-              <td>{storeInfo.storeOwnerAddress || "-"}</td>
-            </tr>
+
             <tr>
               <th>사업자등록번호</th>
               <td>{storeInfo.storeOwnerNo || "-"}</td>

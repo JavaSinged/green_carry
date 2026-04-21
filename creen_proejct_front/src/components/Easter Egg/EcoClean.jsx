@@ -42,7 +42,7 @@ const EcoClean = () => {
     const emojis = ["🥤", "🧃", "🥡", "🗑️", "🗞️", "🥫", "🚬", "🛍️"];
     const screenW = window.innerWidth;
 
-    trashDataRef.current = Array.from({ length: 20 }).map((_, i) => ({
+    trashDataRef.current = Array.from({ length: 25 }).map((_, i) => ({
       id: i,
       emoji: emojis[Math.floor(Math.random() * emojis.length)],
       x: Math.random() * (screenW - 100) + 50,
@@ -157,7 +157,7 @@ const EcoClean = () => {
       console.error("포인트 지급 실패:", error);
       const errorMsg =
         error.response?.status === 409
-          ? "이미 정화 보상을 받으셨습니다."
+          ? "이미 청소 보상을 받으셨습니다."
           : "보상 지급 중 오류가 발생했습니다.";
 
       Swal.fire({
