@@ -1,4 +1,57 @@
+# --- Build Artifacts ---
+target/
+build/
+out/
+
+# --- IDE Settings ---
+.idea/
+*.iml
+.settings/
+.project
+.classpath
+.factorypath
+
+# --- Secrets & Configs ---
+.env
+# 만약 로컬용 설정파일을 따로 쓴다면 제외
+application-local.properties
+application-dev.yml
+
+# --- OS & Logs ---
 .DS_Store
-green_carry_front/node_modules/
-green_carry_back/target/
-green_carry_back/.idea/
+*.log
+logs/
+
+# Dependencies
+node_modules/
+/.pnp
+.pnp.js
+
+# Testing
+/coverage
+
+# Production / Build
+/build
+/dist
+/.next/
+/out/
+
+# Misc
+.DS_Store
+*.pem
+
+# Debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Local env files (Security!)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Editor settings
+.vscode/
+.idea/
