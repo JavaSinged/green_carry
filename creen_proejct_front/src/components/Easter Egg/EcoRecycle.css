@@ -11,7 +11,7 @@
   -webkit-user-select: none !important;
   -webkit-user-drag: none !important; /* 이미지 강제 드래그 차단 */
 }
-
+/*이건주석임*/
 .eco-draggable:hover {
   background-color: rgba(76, 175, 80, 0.1) !important;
   transform: scale(1.02);
