@@ -41,7 +41,16 @@ const banners = [
     title: "우리의 오늘이 지구의 내일이 됩니다",
     img: "/image/banner/banner3.png",
   },
-  { img: "/image/banner/banner4.png" },
+  {
+    title: "달콤한 하루를 위해 오늘도 그린하게",
+    img: "/image/banner/banner4.png"
+  },
+  {
+    title: "건강하게, 싱그럽게",
+    img: "/image/banner/banner5.png"
+  },
+  { img: "/image/banner/banner6.png" },
+  { img: "/image/banner/banner7.png" },
 ];
 
 const categories = [
@@ -71,7 +80,7 @@ export default function Home() {
   const [searchTerm, setSearchTerm] = useState("");
   const [storeList, setStoreList] = useState([]);
 
-  // 1. 🌟 숫자 거리 계산 함수 (철저한 방어 로직 추가)
+  // 숫자 거리 계산 함수 (철저한 방어 로직 추가)
   const getNumericDistance = (storeLat, storeLng) => {
     const fallbackLat = isBrowser ? localStorage.getItem("LATITUDE") : null;
     const fallbackLng = isBrowser ? localStorage.getItem("LONGITUDE") : null;
@@ -114,7 +123,7 @@ export default function Home() {
       : `${distance.toFixed(1)}km`;
   };
 
-  // 🚀 서버 데이터 로드
+  // 서버 데이터 로드
   useEffect(() => {
     if (!API_BASE_URL) {
       setLoadError("서버 주소가 설정되지 않아 매장 목록을 불러올 수 없습니다.");
@@ -156,7 +165,7 @@ export default function Home() {
     };
   }, []);
 
-  // 🔍 검색, 카테고리, 그리고 거리(5km) 필터링
+  // 검색, 카테고리, 그리고 거리(5km) 필터링
   const filteredStores = storeList.filter((store) => {
     const storeName = String(store?.storeName ?? "");
     const isCategoryMatch =
@@ -167,7 +176,7 @@ export default function Home() {
       .toLowerCase()
       .includes(searchTerm.trim().toLowerCase());
 
-    // 🌟 [핵심] 머지 시 바뀔 수 있는 대/소문자 필드명 모두 대응
+    // 머지 시 바뀔 수 있는 대/소문자 필드명 대응
     const sLat = store.LATITUDE || store.latitude;
     const sLng = store.LONGITUDE || store.longitude;
     const distance = getNumericDistance(sLat, sLng);
@@ -293,7 +302,7 @@ export default function Home() {
             ))
           ) : filteredStores.length > 0 ? (
             filteredStores.map((store) => {
-              // 🌟 렌더링 시에도 대/소문자 필드명 모두 대응
+              // 렌더링 시에도 대/소문자 필드명 모두 대응
               const sLat = store.LATITUDE || store.latitude;
               const sLng = store.LONGITUDE || store.longitude;
               const numericDist = getNumericDistance(sLat, sLng);
