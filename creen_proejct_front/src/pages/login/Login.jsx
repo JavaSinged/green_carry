@@ -18,7 +18,7 @@ import EcoEarth from "../../components/Easter Egg/EcoEarth";
 
 const API_BASE_URL = import.meta.env.VITE_BACKSERVER?.trim() || "";
 const isBrowser = typeof window !== "undefined";
-
+//합치기용 주석
 const Login = () => {
   // 🌟 1번 이스터에그 상태 (로고 클릭)
   const [clickCount, setClickCount] = useState(0);
@@ -192,7 +192,12 @@ const Login = () => {
     setMember((prev) => ({ ...prev, memberGrade: tab === "personal" ? 1 : 2 }));
   };
 
-  const persistLoginSession = (loginUser, accessToken, refreshToken, memberId) => {
+  const persistLoginSession = (
+    loginUser,
+    accessToken,
+    refreshToken,
+    memberId,
+  ) => {
     // 브라우저 저장소 접근은 한 곳으로 모아두면 배포 환경 이슈를 추적하기 쉽습니다.
     if (!isBrowser) {
       return;
@@ -289,7 +294,10 @@ const Login = () => {
     setIsSubmitting(true);
 
     try {
-      const res = await axios.post(`${API_BASE_URL}/member/login`, loginPayload);
+      const res = await axios.post(
+        `${API_BASE_URL}/member/login`,
+        loginPayload,
+      );
       const { member: loginUser, accessToken, refreshToken } = res.data ?? {};
 
       if (loginUser && Number(loginUser.memberStatus) === 2) {
