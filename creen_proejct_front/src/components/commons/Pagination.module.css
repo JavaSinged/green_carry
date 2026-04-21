@@ -88,7 +88,7 @@
   .page_numbers {
     order: -1;
     width: 100%;
-    justify-content: center;
+    justify-content: flex-start;
     overflow-x: auto;
     padding-bottom: 4px;
     scrollbar-width: none;
