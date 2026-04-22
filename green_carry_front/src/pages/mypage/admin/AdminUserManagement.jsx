@@ -2,11 +2,8 @@ import { useEffect, useState, useMemo } from "react";
 import styles from "./AdminStoreManagement.module.css";
 import axios from "axios";
 
-
 import SearchIcon from "@mui/icons-material/Search";
 import UnfoldMoreIcon from "@mui/icons-material/UnfoldMore";
-import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import BusinessCenterIcon from "@mui/icons-material/BusinessCenter";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
@@ -16,10 +13,8 @@ export default function AdminUserManagement() {
   const [memberList, setMemberList] = useState([]);
   const backHost = import.meta.env.VITE_BACKSERVER;
 
-
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
-
 
   const [searchTerm, setSearchTerm] = useState("");
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
@@ -35,25 +30,20 @@ export default function AdminUserManagement() {
       });
   }, []);
 
-
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
-    setCurrentPage(1); // 검색 시 무조건 1페이지로 리셋
+    setCurrentPage(1);
   };
 
-  // 정렬 클릭 핸들러
   const handleSort = (key) => {
     let direction = "asc";
-    // 같은 컬럼을 다시 클릭하면 정렬 방향 반전
     if (sortConfig.key === key && sortConfig.direction === "asc") {
       direction = "desc";
     }
     setSortConfig({ key, direction });
   };
 
-  // 데이터 가공 파이프라인 (필터링 -> 정렬)
   const processedMembers = useMemo(() => {
-    // 검색 (회원 아이디 기준)
     let filtered = memberList;
     if (searchTerm) {
       filtered = filtered.filter((member) =>
@@ -61,7 +51,6 @@ export default function AdminUserManagement() {
       );
     }
 
-    // 정렬
     if (sortConfig.key) {
       filtered.sort((a, b) => {
         if (a[sortConfig.key] < b[sortConfig.key]) {
@@ -85,24 +74,11 @@ export default function AdminUserManagement() {
     indexOfLastItem,
   );
 
-  // 페이지 이동 핸들러
-  const handlePrevPage = () => {
-    if (currentPage > 1) setCurrentPage(currentPage - 1);
-  };
-  const handleNextPage = () => {
-    if (currentPage < totalPages) setCurrentPage(currentPage + 1);
-  };
-  const handlePageClick = (pageNumber) => {
-    setCurrentPage(pageNumber);
-  };
-
   return (
     <div className={styles.dashboard_container}>
-      {/* 1. 헤더 영역 */}
       <div className={styles.header}>
         <h2 className={styles.title}>회원 테이블</h2>
         <div className={styles.search_wrap}>
-
           <input
             type="search"
             placeholder="회원 아이디 검색"
@@ -114,13 +90,11 @@ export default function AdminUserManagement() {
         </div>
       </div>
 
-      {/* 2. 테이블 영역 */}
       <div className={styles.table_wrap}>
         <table className={styles.table}>
           <thead>
             <tr>
               <th className={`${styles.col_left} ${styles.col_name}`}>
-                {/* onClick 이벤트 연결 및 cursor 속성 추가 */}
                 <div
                   style={{
                     display: "flex",
@@ -169,7 +143,6 @@ export default function AdminUserManagement() {
             {currentMembers.length > 0 ? (
               currentMembers.map((member, index) => (
                 <tr key={index} className={styles.table_row}>
-                  {/* 프로필 섹션 */}
                   <td className={`${styles.col_left} ${styles.col_name}`}>
                     <div className={styles.store_info}>
                       <div className={styles.store_image_placeholder}>
@@ -199,9 +172,9 @@ export default function AdminUserManagement() {
                     </div>
                   </td>
 
-                  {/* 회원 분류 */}
                   <td className={`${styles.col_left} ${styles.col_grade}`}>
-                    <div style={{ display: "flex", alignItems: "center", paddingLeft: "28px" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                      <BusinessCenterIcon fontSize="small" style={{ visibility: "hidden" }} />
                       <span className={styles.store_name}>
                         {member.memberGrade === 1
                           ? "일반 회원"
@@ -209,10 +182,10 @@ export default function AdminUserManagement() {
                             ? "사업자 회원"
                             : "관리자"}
                       </span>
+                      <UnfoldMoreIcon className={styles.sort_icon} style={{ visibility: "hidden" }} />
                     </div>
                   </td>
 
-                  {/* 상태 뱃지 */}
                   <td className={`${styles.col_center} ${styles.col_status}`}>
                     <span
                       className={styles.badge}
@@ -246,7 +219,6 @@ export default function AdminUserManagement() {
         </table>
       </div>
 
-      {/* 3. 페이지네이션 영역 */}
       <Pagination
         currentPage={currentPage}
         totalPages={totalPages}
