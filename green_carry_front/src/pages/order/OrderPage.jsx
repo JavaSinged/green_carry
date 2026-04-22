@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from "react"; // 🌟 useContext 추가
-import { AuthContext } from "../../../context/AuthContext"; // 🌟 AuthContext 추가
+import { AuthContext } from "../../context/AuthContext";
 import styles from "./OrderPage.module.css";
 import Header from "../../components/commons/Header";
 import Footer from "../../components/commons/Footer";
