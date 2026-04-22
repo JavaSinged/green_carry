@@ -40,7 +40,6 @@ const TotalSalesChart = () => {
           currentSeries: res.data.currentSeries,
           pastSeries: res.data.pastSeries,
         });
-        console.log("서버 응답 데이터:", res.data);
       });
   }, []);
 

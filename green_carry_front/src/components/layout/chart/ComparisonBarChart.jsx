@@ -41,8 +41,6 @@ const CarbonComparisonChart = () => {
           currentSeries: currentCarbon,
           pastSeries: pastCarbon,
         });
-
-        console.log("서버 응답 데이터:", res.data);
       });
   }, []);
 
