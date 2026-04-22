@@ -2,6 +2,8 @@ import { useEffect, useState, useMemo } from "react";
 import styles from "./AdminStoreManagement.module.css";
 import axios from "axios";
 
+
+
 import SearchIcon from "@mui/icons-material/Search";
 import UnfoldMoreIcon from "@mui/icons-material/UnfoldMore";
 import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
@@ -9,15 +11,17 @@ import BusinessCenterIcon from "@mui/icons-material/BusinessCenter";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import Pagination from "../../../components/commons/Pagination";
 
+
+
 export default function AdminUserManagement() {
   const [memberList, setMemberList] = useState([]);
   const backHost = import.meta.env.VITE_BACKSERVER;
-
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
-
   const [searchTerm, setSearchTerm] = useState("");
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
+
+
 
   useEffect(() => {
     axios
@@ -30,10 +34,14 @@ export default function AdminUserManagement() {
       });
   }, []);
 
+
+
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
     setCurrentPage(1);
   };
+
+
 
   const handleSort = (key) => {
     let direction = "asc";
@@ -43,6 +51,8 @@ export default function AdminUserManagement() {
     setSortConfig({ key, direction });
   };
 
+
+
   const processedMembers = useMemo(() => {
     let filtered = [...memberList];
     if (searchTerm) {
@@ -50,6 +60,8 @@ export default function AdminUserManagement() {
         member.memberId.toLowerCase().includes(searchTerm.toLowerCase()),
       );
     }
+
+
 
     if (sortConfig.key) {
       filtered.sort((a, b) => {
@@ -65,10 +77,13 @@ export default function AdminUserManagement() {
     return filtered;
   }, [memberList, searchTerm, sortConfig]);
 
+
   const totalPages = Math.ceil(processedMembers.length / itemsPerPage);
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentMembers = processedMembers.slice(indexOfFirstItem, indexOfLastItem);
+
+
 
   return (
     <div className={styles.dashboard_container}>
@@ -85,6 +100,7 @@ export default function AdminUserManagement() {
           <SearchIcon className={styles.search_icon} />
         </div>
       </div>
+
 
       <div className={styles.table_wrap}>
         <table className={styles.table}>
@@ -135,7 +151,7 @@ export default function AdminUserManagement() {
                       <span className={styles.grade_text}>
                         {member.memberGrade === 1 ? "일반 회원" : member.memberGrade === 2 ? "사업자 회원" : "관리자"}
                       </span>
-                      <UnfoldMoreIcon className={styles.hidden_icon} />
+                      <UnfoldMoreIcon className={`${styles.sort_icon} ${styles.hidden_icon}`} />
                     </div>
                   </td>
                   <td className={`${styles.col_center} ${styles.col_status}`}>
