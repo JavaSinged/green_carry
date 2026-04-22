@@ -395,6 +395,7 @@
 .store_name_row {
   display: flex;
   align-items: center;
+  gap: 8px;
 }
 .point_pending {
   color: #999;

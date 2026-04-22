@@ -133,8 +133,6 @@ const HeaderNotification = () => {
       // 2. DB 업데이트 성공 후, 프론트엔드 상태 싹 비우기
       setNotifications([]);
       setUnreadCount(0);
-
-      console.log("✅ 모든 알림이 읽음 처리되고 삭제되었습니다.");
     } catch (err) {
       console.error("지우기 실패:", err);
     }
@@ -163,7 +161,9 @@ const HeaderNotification = () => {
                   <div
                     key={noti.notiId || Math.random()}
                     className={styles.noti_item}
-                    onClick={(e) => handleNotiClick(e, noti.notiId, noti.navUrl)}
+                    onClick={(e) =>
+                      handleNotiClick(e, noti.notiId, noti.navUrl)
+                    }
                   >
                     <p className={styles.noti_msg}>{noti.message}</p>
                     <span className={styles.noti_time}>

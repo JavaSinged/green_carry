@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from "react"; // 🌟 useContext 추가
+import React, { useEffect, useState, useContext } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import styles from "./OrderPage.module.css";
 import Header from "../../components/commons/Header";
@@ -16,8 +16,8 @@ import axios from "axios";
 
 const OrderPage = () => {
   const navigate = useNavigate();
-  const { user } = useContext(AuthContext); // 🌟 로그인 유저 정보 가져오기
-  const backHost = import.meta.env.VITE_BACKSERVER; // 🌟 백엔드 호스트 선언
+  const { user } = useContext(AuthContext);
+  const backHost = import.meta.env.VITE_BACKSERVER;
 
   // Zustand 스토어 데이터 추출
   const cartList = useCartStore((state) => state.cart);
@@ -43,32 +43,32 @@ const OrderPage = () => {
   const isCartEmpty = !cartList || cartList.length === 0;
   const Co2PerKm = 80;
 
-  // 🌟 [추가] 결제창 진입 시 최신 포인트 동기화 (마이페이지 안 봐도 여기서 갱신)
+  // 🌟 [수정] 결제창 진입 시 DB 값으로 로컬스토리지 포인트 강제 갱신
   useEffect(() => {
     const fetchLatestPoint = async () => {
-      if (!user?.memberId) return;
+      // 컨텍스트에 없으면 로컬스토리지에서라도 가져옴
+      const memberId = user?.memberId || localStorage.getItem("memberId");
+
+      if (!memberId) return;
+
       try {
         const token = localStorage.getItem("accessToken");
         const config = { headers: { Authorization: `Bearer ${token}` } };
 
-        // 서버에서 현재 유저의 최신 포인트를 직접 조회
-        // (참고: API 주소는 형님의 백엔드 설정에 맞게 /member/points 등으로 조정하세요)
+        // 🌟 형님이 알려주신 포인트 전용 API 호출
         const res = await axios.get(
-          `${backHost}/member/point-history/${user.memberId}`,
+          `${backHost}/member/point/${memberId}`,
           config,
         );
 
-        // 서버에서 받아온 최신 포인트를 로컬스토리지에 즉시 업데이트
-        // res.data[0].currentPoint 등 형님이 보내주시는 데이터 구조에 맞춰서 쓰시면 됩니다.
-        // 여기서는 예시로 res.data.currentPoint라고 가정합니다.
-        if (res.data && res.data.length > 0) {
-          // 형님 DB 구조상 가장 최근 내역의 잔액을 가져오거나,
-          // 멤버 테이블에서 직접 point만 가져오는 전용 API를 쓰시는 게 좋습니다.
-          // 일단 로컬스토리지를 최신화해두면 결제 페이지에서 오차 없이 사용 가능합니다.
-          console.log("포인트 동기화 완료");
+        // 🌟 서버에서 받아온 진짜 포인트 값을 로컬스토리지에 덮어쓰기
+        // res.data가 숫자 바로 오는 구조라면 그대로 넣으시면 됩니다.
+        if (res.data !== undefined) {
+          localStorage.setItem("memberPoint", res.data);
+          console.log("DB 포인트와 로컬스토리지 동기화 완료:", res.data);
         }
       } catch (err) {
-        console.error("최신 포인트 갱신 실패:", err);
+        console.error("결제 전 포인트 동기화 실패:", err);
       }
     };
 
