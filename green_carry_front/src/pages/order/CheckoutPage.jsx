@@ -135,6 +135,7 @@ const CheckoutPage = () => {
     axios
       .get(`${import.meta.env.VITE_BACKSERVER}/stores/order/${orderId}`)
       .then((res) => {
+        console.log(res.data);
         // 🌟 [보안 로직 추가]
         const loggedInMemberId =
           localStorage.getItem("memberId") || user?.memberId;
