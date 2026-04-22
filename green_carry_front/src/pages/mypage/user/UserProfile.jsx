@@ -202,7 +202,7 @@ const UserProfile = () => {
                     // 🌟 SQL 별칭 orderStatus 사용
                     const isCancelled = item.orderStatus === 9;
                     const isPending =
-                      item.orderStatus >= 1 && item.orderStatus <= 5;
+                      item.orderStatus >= 1 && item.orderStatus <= 4;
                     const hasUsed = item.usedPoint > 0;
                     const hasGet = item.getPoint > 0;
 
