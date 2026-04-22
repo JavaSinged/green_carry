@@ -84,7 +84,17 @@ const UserProfile = () => {
   };
 
   useEffect(() => {
+    // 1. 처음 컴포넌트가 떴을 때 한 번 즉시 실행
     fetchUserData();
+
+    // 2. 5초마다 서버에서 최신 데이터(포인트, 내역 등)를 가져옴
+    // 프로젝트 발표 때는 "실시간성 확보를 위해 폴링을 구현했다"고 하시면 됩니다.
+    const pollingId = setInterval(() => {
+      fetchUserData();
+    }, 5000); // 5초 주기
+
+    // 3. [중요] 컴포넌트가 사라질 때(언마운트) 인터벌을 꼭 꺼줘야 메모리가 안 터집니다.
+    return () => clearInterval(pollingId);
   }, [fetchUserData]);
 
   useEffect(() => {

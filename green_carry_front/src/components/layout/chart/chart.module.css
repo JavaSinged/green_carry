@@ -33,6 +33,25 @@
   margin-bottom: 20px;
 }
 
+.carbonContainer .headerFlex {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  margin-bottom: 20px;
+}
+
+.carbonContainer .valueGroup {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.carbonContainer .subTitle {
+  margin: 0;
+  text-align: left;
+}
+
 /* 텍스트 스타일 */
 .title {
   font-family: var(--font-title);

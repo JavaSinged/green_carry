@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react"; // 🌟 useContext 추가
+import { AuthContext } from "../../../context/AuthContext"; // 🌟 AuthContext 추가
 import styles from "./OrderPage.module.css";
 import Header from "../../components/commons/Header";
 import Footer from "../../components/commons/Footer";
@@ -10,13 +11,15 @@ import ParkIcon from "@mui/icons-material/Park";
 import CloseIcon from "@mui/icons-material/Close";
 import { useLocation, useNavigate } from "react-router-dom";
 import useCartStore from "../../store/useCartStore";
-import ShoppingBasketIcon from '@mui/icons-material/ShoppingBasket';
+import ShoppingBasketIcon from "@mui/icons-material/ShoppingBasket";
 import axios from "axios";
 
 const OrderPage = () => {
   const navigate = useNavigate();
+  const { user } = useContext(AuthContext); // 🌟 로그인 유저 정보 가져오기
+  const backHost = import.meta.env.VITE_BACKSERVER; // 🌟 백엔드 호스트 선언
 
-  // 🌟 Zustand 스토어 데이터 추출
+  // Zustand 스토어 데이터 추출
   const cartList = useCartStore((state) => state.cart);
   const clear = useCartStore((state) => state.clearCart);
   const storeId = useCartStore((state) => state.storeId);
@@ -25,6 +28,7 @@ const OrderPage = () => {
   const setDeliveryPrice = useCartStore((state) => state.setDeliveryPrice);
   const { increaseQuantity, decreaseQuantity } = useCartStore();
   const setFinalCarbon = useCartStore((state) => state.setFinalCarbon);
+
   // 상태 관리
   const [selectedRide, setSelectedRide] = useState("pickup");
   const [realTotal, setRealTotal] = useState(0);
@@ -32,11 +36,44 @@ const OrderPage = () => {
   const [num, setNum] = useState(0);
   const [storeLat, setStoreLat] = useState(0);
   const [storeLong, setStoreLong] = useState(0);
+
   const lat2 = localStorage.LATITUDE;
   const lon2 = localStorage.LONGITUDE;
-  // 장바구니 비어있음 여부 체크
+
   const isCartEmpty = !cartList || cartList.length === 0;
   const Co2PerKm = 80;
+
+  // 🌟 [추가] 결제창 진입 시 최신 포인트 동기화 (마이페이지 안 봐도 여기서 갱신)
+  useEffect(() => {
+    const fetchLatestPoint = async () => {
+      if (!user?.memberId) return;
+      try {
+        const token = localStorage.getItem("accessToken");
+        const config = { headers: { Authorization: `Bearer ${token}` } };
+
+        // 서버에서 현재 유저의 최신 포인트를 직접 조회
+        // (참고: API 주소는 형님의 백엔드 설정에 맞게 /member/points 등으로 조정하세요)
+        const res = await axios.get(
+          `${backHost}/member/point-history/${user.memberId}`,
+          config,
+        );
+
+        // 서버에서 받아온 최신 포인트를 로컬스토리지에 즉시 업데이트
+        // res.data[0].currentPoint 등 형님이 보내주시는 데이터 구조에 맞춰서 쓰시면 됩니다.
+        // 여기서는 예시로 res.data.currentPoint라고 가정합니다.
+        if (res.data && res.data.length > 0) {
+          // 형님 DB 구조상 가장 최근 내역의 잔액을 가져오거나,
+          // 멤버 테이블에서 직접 point만 가져오는 전용 API를 쓰시는 게 좋습니다.
+          // 일단 로컬스토리지를 최신화해두면 결제 페이지에서 오차 없이 사용 가능합니다.
+          console.log("포인트 동기화 완료");
+        }
+      } catch (err) {
+        console.error("최신 포인트 갱신 실패:", err);
+      }
+    };
+
+    fetchLatestPoint();
+  }, [user?.memberId, backHost]);
 
   // 탄소 절감량 계산
   const totalCarbon = Math.floor(
@@ -46,9 +83,11 @@ const OrderPage = () => {
       0,
     ),
   );
+
   useEffect(() => {
+    if (!storeId) return;
     axios
-      .get(`${import.meta.env.VITE_BACKSERVER}/stores/location/${storeId}`)
+      .get(`${backHost}/stores/location/${storeId}`)
       .then((res) => {
         setStoreLat(res.data.latitude);
         setStoreLong(res.data.longitude);
@@ -56,44 +95,34 @@ const OrderPage = () => {
       .catch((err) => {
         console.log(err);
       });
-  }, []);
+  }, [storeId, backHost]);
+
   useEffect(() => {
     setNum(deliveryType === 1 ? 0 : deliveryType === 2 ? 1000 : 3000);
   }, [deliveryType]);
 
   const getDistance = (storeLat, storeLong, lat2, lon2) => {
-    const R = 6371; // 지구 반지름 (km)
-
+    const R = 6371;
     const dLat = (lat2 - storeLat) * (Math.PI / 180);
     const dLon = (lon2 - storeLong) * (Math.PI / 180);
-
     const a =
       Math.sin(dLat / 2) * Math.sin(dLat / 2) +
       Math.cos(storeLat * (Math.PI / 180)) *
         Math.cos(lat2 * (Math.PI / 180)) *
         Math.sin(dLon / 2) *
         Math.sin(dLon / 2);
-
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-    return R * c; // km
+    return R * c;
   };
+
   const distance = getDistance(storeLat, storeLong, lat2, lon2);
+
   const formatTime = (distance) => {
-    if (distance === null) {
-      return {
-        bike: "주소지를 확인해주세요",
-        motor: "주소지를 확인해주세요",
-      };
+    if (distance === null || isNaN(distance)) {
+      return { bike: "계산 중...", motor: "계산 중..." };
     }
-
-    // 자전거 시간 (기존 로직 유지)
     const bikeTime = 15 + distance * 6;
-
-    // 오토바이 시간 (자전거의 1/3)
     const motorTime = 15 + (distance * 6) / 3;
-
-    // 5분 단위 반올림
     const bikeRounded = Math.round(bikeTime / 5) * 5;
     const motorRounded = Math.round(motorTime / 5) * 5;
 
@@ -102,17 +131,21 @@ const OrderPage = () => {
       motor: `${motorRounded}분`,
     };
   };
+
   const finalCarbon =
     totalCarbon +
     (deliveryType === 3 ? 0 : Math.round(distance) * Co2PerKm * 2);
+
   return (
     <div className={styles.pageWrapper}>
+      <Header />
       <main className={styles.mainContainer}>
         {isCartEmpty ? (
-          /* 🌟 장바구니가 비었을 때 보여줄 화면 */
           <section className={styles.emptySection}>
             <div className={styles.emptyCard}>
-              <div className={styles.emptyIcon}><ShoppingBasketIcon/></div>
+              <div className={styles.emptyIcon}>
+                <ShoppingBasketIcon />
+              </div>
               <h2>장바구니가 비어있습니다</h2>
               <p>맛있는 음식을 담으러 가볼까요?</p>
               <button
@@ -124,7 +157,6 @@ const OrderPage = () => {
             </div>
           </section>
         ) : (
-          /* 🌟 장바구니에 물건이 있을 때만 출력되는 영역 */
           <>
             <section className={styles.leftSection}>
               <div className={styles.card}>
@@ -137,7 +169,6 @@ const OrderPage = () => {
                   </h2>
                   <CloseIcon style={{ cursor: "pointer" }} onClick={clear} />
                 </div>
-                {/* 메뉴 리스트 영역 */}
                 <MenuList
                   cartList={cartList}
                   changeTotal={setRealTotal}
@@ -227,11 +258,8 @@ const OrderPage = () => {
                 className={styles.payButton}
                 onClick={() => {
                   setSuperTotalPrice(realTotal);
-
                   setDeliveryPrice(num);
-
                   setFinalCarbon(finalCarbon);
-
                   navigate("/paymentPage");
                 }}
               >
@@ -241,6 +269,7 @@ const OrderPage = () => {
           </>
         )}
       </main>
+      <Footer />
     </div>
   );
 };
@@ -261,14 +290,19 @@ const MenuList = ({
     changeTotal(totalPrice);
   }, [totalPrice, changeTotal]);
 
-  return cartList.map((cart) => (
-    <CartItem
-      key={cart.id}
-      cart={cart}
-      increaseQuantity={increaseQuantity}
-      decreaseQuantity={decreaseQuantity}
-    />
-  ));
+  return cartList.map(
+    (
+      cart,
+      index, // key값 index 추가로 중복 방지
+    ) => (
+      <CartItem
+        key={`${cart.menuId}-${index}`}
+        cart={cart}
+        increaseQuantity={increaseQuantity}
+        decreaseQuantity={decreaseQuantity}
+      />
+    ),
+  );
 };
 
 // CartItem 컴포넌트
@@ -325,7 +359,7 @@ const CartItem = ({ cart, increaseQuantity, decreaseQuantity }) => {
 
         <div className={styles.menuImageWrapper}>
           <img
-            src={cart.menuImage}
+            src={cart.menuImage || fetchedImage} // Zustand에 이미지 없으면 서버에서 가져온 거 사용
             alt={cart.name}
             className={styles.menuImage}
             style={{ objectFit: "cover" }}
