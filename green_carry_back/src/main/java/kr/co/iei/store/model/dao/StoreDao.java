@@ -85,4 +85,6 @@ public interface StoreDao {
 
 	Store getStoreLocation(Integer storeId);
 
+	int deductMemberPoint(Order order);
+
 }

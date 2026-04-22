@@ -5,19 +5,22 @@
 
 	<select id="selectAllStore">
 		SELECT s.*,
-       (SELECT NVL(AVG(review_rating), 0)
-        FROM review_tbl r
-        WHERE r.store_id = s.store_id) AS storeRating,
-       (SELECT COUNT(*)
-        FROM review_tbl r
-        WHERE r.store_id = s.store_id) AS reviewCount
-FROM store_tbl s
-WHERE EXISTS (
-    SELECT 1
-    FROM menu_tbl m
-    WHERE m.store_id = s.store_id
-)
-ORDER BY storeRating DESC, store_id
+		(SELECT NVL(AVG(review_rating), 0)
+		FROM
+		review_tbl r
+		WHERE r.store_id = s.store_id) AS storeRating,
+		(SELECT
+		COUNT(*)
+		FROM review_tbl r
+		WHERE r.store_id = s.store_id) AS reviewCount
+		FROM store_tbl s
+		WHERE EXISTS (
+		SELECT 1
+		FROM menu_tbl m
+		WHERE m.store_id
+		= s.store_id
+		)
+		ORDER BY storeRating DESC, store_id
 	</select>
 
 	<select id="findStoreById" parameterType="int"
@@ -119,20 +122,21 @@ ORDER BY storeRating DESC, store_id
 
 	<update id="updatePoint">
 		UPDATE member_tbl m
-		SET m.member_point =
-		m.member_point + (SELECT o.get_point - o.used_point
+		SET m.member_point = m.member_point + (
+		/* 🌟 이제 사용한 포인트(- used_point)는 여기서 빼지 않습니다! */
+		SELECT o.get_point
 		FROM order_tbl o
 		WHERE o.order_id = #{orderId}
 		AND o.member_id = m.member_id
-		AND
-		o.point_reward = 0)
-		WHERE EXISTS (SELECT 1
+		AND o.point_reward = 0
+		)
+		WHERE EXISTS (
+		SELECT 1
 		FROM order_tbl o
-		WHERE
-		o.order_id = #{orderId}
+		WHERE o.order_id = #{orderId}
 		AND o.member_id = m.member_id
-		AND o.point_reward
-		= 0)
+		AND o.point_reward = 0
+		)
 	</update>
 
 	<update id="addReduceCarbon">
@@ -406,7 +410,8 @@ ORDER BY storeRating DESC, store_id
 		o.order_status
 		AS orderStatus,
 		m.member_phone AS memberPhone,
-		o.delivery_address AS deliveryAddress,
+		o.delivery_address AS
+		deliveryAddress,
 		o.get_point AS
 		getPoint,
 		o.review_status AS
@@ -476,7 +481,8 @@ ORDER BY storeRating DESC, store_id
 		WHERE o.store_id = #{storeId}
 		AND o.order_status > 0
 		ORDER BY
-		o.order_id DESC
+		o.order_id
+		DESC
 	</select>
 
 	<update id="changeOrderStatus">
@@ -544,6 +550,15 @@ ORDER BY storeRating DESC, store_id
 		ORDER BY deliveryType ASC
 	</select>
 
+	<update id="deductMemberPoint">
+		UPDATE member_tbl
+		SET member_point = member_point -
+		#{usedPoint}
+		WHERE member_id = #{memberId}
+		AND member_point >=
+		#{usedPoint} /* 🌟 중요: 잔액이 쓰는 포인트보다 많을 때만 수행 */
+	</update>
+
 	<select id="selectStoreReviewStats" resultType="map">
 		SELECT
 		NVL(AVG(review_rating), 0) AS "avgRating",
@@ -598,24 +613,28 @@ ORDER BY storeRating DESC, store_id
 		SET
 		(member_point, total_carbon_reduce) = (
 		SELECT
-		m.member_point +
-		o.used_point - o.get_point,
-		GREATEST(m.total_carbon_reduce -
-		(o.get_point / 1000.0), 0)
-		FROM order_tbl o
-		WHERE o.member_id =
-		m.member_id
+		/* 1. 사용한 포인트는 무조건 복구 +
+		보상받은 포인트가 있다면 회수 */
+		m.member_point + o.used_point - (CASE WHEN
+		o.point_reward = 1 THEN o.get_point ELSE
+		0 END),
+
+		/* 2. 탄소 절감량도 보상받은 적이
+		있을 때만 회수 (음수 방지) */
+		GREATEST(m.total_carbon_reduce - (CASE WHEN
+		o.point_reward = 1 THEN (o.get_point / 1000.0) ELSE 0
+		END), 0)
+		FROM
+		order_tbl o
+		WHERE o.member_id = m.member_id
 		AND o.order_id = #{orderId}
-		AND o.point_reward = 1
 		)
-		WHERE
-		EXISTS (
+		WHERE EXISTS (
 		SELECT 1
 		FROM order_tbl o
 		WHERE o.member_id = m.member_id
-		AND
-		o.order_id = #{orderId}
-		AND o.point_reward = 1
+		AND o.order_id = #{orderId}
+		/* 🌟 상태가 취소(9)로 변할 때 실행되도록 서비스 로직에서 관리 */
 		)
 	</update>
 
