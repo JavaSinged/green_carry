@@ -76,6 +76,7 @@ const MemberCountChart = () => {
     legend: {
       position: "top",
       horizontalAlign: "right",
+      fontSize: "12px",
     },
   };
 

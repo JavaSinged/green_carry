@@ -92,6 +92,7 @@ const TotalSalesChart = () => {
     legend: {
       position: "top",
       horizontalAlign: "right",
+      fontSize: "12px",
     },
     grid: {
       borderColor: "#f1f1f1",

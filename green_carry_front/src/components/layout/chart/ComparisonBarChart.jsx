@@ -108,7 +108,7 @@ const CarbonComparisonChart = () => {
     legend: {
       position: "top",
       horizontalAlign: "right",
-      fontSize: "14px",
+      fontSize: "12px",
       markers: { radius: 12 },
       itemMargin: { horizontal: 10, vertical: 5 },
     },
