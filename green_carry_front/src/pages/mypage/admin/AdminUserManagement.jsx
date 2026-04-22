@@ -2,7 +2,7 @@ import { useEffect, useState, useMemo } from "react";
 import styles from "./AdminStoreManagement.module.css";
 import axios from "axios";
 
-// MUI Icons 임포트
+
 import SearchIcon from "@mui/icons-material/Search";
 import UnfoldMoreIcon from "@mui/icons-material/UnfoldMore";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
@@ -16,11 +16,11 @@ export default function AdminUserManagement() {
   const [memberList, setMemberList] = useState([]);
   const backHost = import.meta.env.VITE_BACKSERVER;
 
-  // 페이지네이션 상태
+
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
 
-  // 📌 검색어 및 정렬 상태 추가
+
   const [searchTerm, setSearchTerm] = useState("");
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
 
@@ -35,13 +35,13 @@ export default function AdminUserManagement() {
       });
   }, []);
 
-  // 📌 검색어 입력 핸들러
+
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
     setCurrentPage(1); // 검색 시 무조건 1페이지로 리셋
   };
 
-  // 📌 정렬 클릭 핸들러
+  // 정렬 클릭 핸들러
   const handleSort = (key) => {
     let direction = "asc";
     // 같은 컬럼을 다시 클릭하면 정렬 방향 반전
@@ -51,10 +51,9 @@ export default function AdminUserManagement() {
     setSortConfig({ key, direction });
   };
 
-  // 📌 데이터 가공 파이프라인 (필터링 -> 정렬)
-  // useMemo를 사용하여 검색어, 정렬기준, 원본데이터가 바뀔 때만 재계산하여 성능 최적화
+  // 데이터 가공 파이프라인 (필터링 -> 정렬)
   const processedMembers = useMemo(() => {
-    // 1. 검색 (회원 아이디 기준)
+    // 검색 (회원 아이디 기준)
     let filtered = memberList;
     if (searchTerm) {
       filtered = filtered.filter((member) =>
@@ -62,7 +61,7 @@ export default function AdminUserManagement() {
       );
     }
 
-    // 2. 정렬
+    // 정렬
     if (sortConfig.key) {
       filtered.sort((a, b) => {
         if (a[sortConfig.key] < b[sortConfig.key]) {
@@ -78,7 +77,6 @@ export default function AdminUserManagement() {
     return filtered;
   }, [memberList, searchTerm, sortConfig]);
 
-  // 📌 가공된 데이터(processedMembers)를 기준으로 페이지네이션 계산
   const totalPages = Math.ceil(processedMembers.length / itemsPerPage);
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -104,7 +102,7 @@ export default function AdminUserManagement() {
       <div className={styles.header}>
         <h2 className={styles.title}>회원 테이블</h2>
         <div className={styles.search_wrap}>
-          {/* 📌 onChange 이벤트 및 value 연결 */}
+
           <input
             type="search"
             placeholder="회원 아이디 검색"
@@ -121,8 +119,8 @@ export default function AdminUserManagement() {
         <table className={styles.table}>
           <thead>
             <tr>
-              <th className={styles.col_left}>
-                {/* 📌 onClick 이벤트 연결 및 cursor 속성 추가 */}
+              <th className={`${styles.col_left} ${styles.col_name}`}>
+                {/* onClick 이벤트 연결 및 cursor 속성 추가 */}
                 <div
                   style={{
                     display: "flex",
@@ -136,7 +134,7 @@ export default function AdminUserManagement() {
                   <UnfoldMoreIcon className={styles.sort_icon} />
                 </div>
               </th>
-              <th className={styles.col_left}>
+              <th className={`${styles.col_left} ${styles.col_grade}`}>
                 <div
                   style={{
                     display: "flex",
@@ -150,11 +148,12 @@ export default function AdminUserManagement() {
                   <UnfoldMoreIcon className={styles.sort_icon} />
                 </div>
               </th>
-              <th className={styles.col_left}>
+              <th className={`${styles.col_center} ${styles.col_status}`}>
                 <div
                   style={{
                     display: "flex",
                     alignItems: "center",
+                    justifyContent: "center",
                     gap: "8px",
                     cursor: "pointer",
                   }}
@@ -171,7 +170,7 @@ export default function AdminUserManagement() {
               currentMembers.map((member, index) => (
                 <tr key={index} className={styles.table_row}>
                   {/* 프로필 섹션 */}
-                  <td className={styles.col_left}>
+                  <td className={`${styles.col_left} ${styles.col_name}`}>
                     <div className={styles.store_info}>
                       <div className={styles.store_image_placeholder}>
                         <img
@@ -201,18 +200,20 @@ export default function AdminUserManagement() {
                   </td>
 
                   {/* 회원 분류 */}
-                  <td className={styles.col_left}>
-                    <span className={styles.store_name}>
-                      {member.memberGrade === 1
-                        ? "일반 회원"
-                        : member.memberGrade === 2
-                          ? "사업자 회원"
-                          : "관리자"}
-                    </span>
+                  <td className={`${styles.col_left} ${styles.col_grade}`}>
+                    <div style={{ display: "flex", alignItems: "center", paddingLeft: "28px" }}>
+                      <span className={styles.store_name}>
+                        {member.memberGrade === 1
+                          ? "일반 회원"
+                          : member.memberGrade === 2
+                            ? "사업자 회원"
+                            : "관리자"}
+                      </span>
+                    </div>
                   </td>
 
                   {/* 상태 뱃지 */}
-                  <td className={styles.col_center}>
+                  <td className={`${styles.col_center} ${styles.col_status}`}>
                     <span
                       className={styles.badge}
                       style={{
@@ -220,7 +221,6 @@ export default function AdminUserManagement() {
                           member.memberStatus === 1 ? "#E8F5E9" : "#FFEBEE",
                         color:
                           member.memberStatus === 1 ? "#2E7D32" : "#D32F2F",
-                        padding: "4px 12px",
                       }}
                     >
                       {member.memberStatus === 1 ? "정상" : "탈퇴"}
