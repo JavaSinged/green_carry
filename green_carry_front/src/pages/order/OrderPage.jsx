@@ -138,7 +138,6 @@ const OrderPage = () => {
 
   return (
     <div className={styles.pageWrapper}>
-      <Header />
       <main className={styles.mainContainer}>
         {isCartEmpty ? (
           <section className={styles.emptySection}>
@@ -269,7 +268,6 @@ const OrderPage = () => {
           </>
         )}
       </main>
-      <Footer />
     </div>
   );
 };
