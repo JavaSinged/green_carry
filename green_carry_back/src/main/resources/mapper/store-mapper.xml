@@ -222,6 +222,7 @@
 		s.store_thumb AS
 		storeThumb,
 		s.store_id,
+		o.member_id AS memberId,
 		o.order_id AS orderId,
 		o.used_point AS usedPoint,
 		m.total_carbon_reduce AS totalReduceCarbon,

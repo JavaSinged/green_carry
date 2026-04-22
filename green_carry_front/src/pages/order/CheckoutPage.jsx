@@ -107,16 +107,16 @@ const CheckoutPage = () => {
     }
   }, [orderId]);
 
-  // 4. 최신 포인트 정보 서버 동기화
+  // 4. 최신 포인트 정보 서버 동기화 (형님이 말씀하신 경로로 수정)
   const fetchLatestPoint = async () => {
-    const memberId = localStorage.getItem("memberId");
+    const memberId = localStorage.getItem("memberId") || user?.memberId;
     if (!memberId) return;
 
     try {
       const res = await axios.get(
-        `${import.meta.env.VITE_BACKSERVER}/member/${memberId}`,
+        `${import.meta.env.VITE_BACKSERVER}/member/point/${memberId}`,
       );
-      const latestPoint = res.data.memberPoint || 0;
+      const latestPoint = res.data || 0; // 숫자로 바로 오는 경우
       localStorage.setItem("memberPoint", latestPoint);
 
       setUser((prevUser) => ({
@@ -128,13 +128,34 @@ const CheckoutPage = () => {
     }
   };
 
-  // 5. 주문 상세 데이터 조회
+  // 5. 주문 상세 데이터 조회 (🌟본인 확인 보안 로직 추가)
   const fetchOrderDetails = () => {
     if (!orderId) return;
 
     axios
       .get(`${import.meta.env.VITE_BACKSERVER}/stores/order/${orderId}`)
       .then((res) => {
+        // 🌟 [보안 로직 추가]
+        const loggedInMemberId =
+          localStorage.getItem("memberId") || user?.memberId;
+        const orderOwnerId = res.data.memberId;
+
+        if (
+          loggedInMemberId &&
+          orderOwnerId &&
+          Number(loggedInMemberId) !== Number(orderOwnerId)
+        ) {
+          Swal.fire({
+            title: "접근 제한",
+            text: "본인의 주문 정보만 확인할 수 있습니다.",
+            icon: "error",
+            confirmButtonText: "확인",
+          }).then(() => {
+            navigate("/", { replace: true });
+          });
+          return;
+        }
+
         setOrderList(res.data.items ?? []);
         setUsedPoint(Number(res.data.usedPoint ?? 0));
         setGetPoint(Number(res.data.getPoint ?? 0));
@@ -162,7 +183,7 @@ const CheckoutPage = () => {
       });
   };
 
-  // 6. 🌟 도착 예정 시간 계산 및 실시간 타이머 (형님 요청 사항 적용)
+  // 6. 도착 예정 시간 계산 및 실시간 타이머
   useEffect(() => {
     if (rawOrderStatus === 5 && completeDate) {
       const timeText = completeDate.includes(" ")
@@ -188,7 +209,6 @@ const CheckoutPage = () => {
       return;
     }
 
-    // 🌟 거리 계산 + 조리 시간 합산 로직
     const distance = getNumericDistance(storeLat, storeLong);
     const travelTime = deliveryType === 1 ? 0 : Math.ceil((distance || 0) * 6);
     const totalMinutes = Number(expectedTime) + travelTime;
@@ -267,7 +287,7 @@ const CheckoutPage = () => {
     });
   });
 
-  // 나머지 데이터 연동 및 폴링 설정
+  // 8. 기타 연동 로직
   useEffect(() => {
     if (!storeId) return;
     axios
@@ -298,7 +318,6 @@ const CheckoutPage = () => {
     fetchLatestPoint();
   }, []);
 
-  // 가격 합산 및 최종 결제 금액 계산
   useEffect(() => {
     const total = orderList.reduce(
       (sum, item) => sum + Number(item.price ?? 0) * Number(item.quantity ?? 0),
@@ -317,7 +336,7 @@ const CheckoutPage = () => {
     setFinalPrice(paymentAmount);
   }, [orderAmount, deliveryPrice, usedPoint]);
 
-  // 네이버 지도 렌더링
+  // 9. 네이버 지도 렌더링
   useEffect(() => {
     const checkNaver = setInterval(() => {
       if (window.naver && window.naver.maps && mapElement.current) {
@@ -555,6 +574,14 @@ const CheckoutPage = () => {
                   >
                     {remainingTimeText}
                   </span>
+                  <span
+                    style={{
+                      fontSize: "20px",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    {targetArrivalTime}
+                  </span>
                 </div>
               </div>
             </div>
@@ -662,7 +689,7 @@ const OrderListMap = ({ orderList }) =>
     <OrderItemList key={`orderList-${index}`} cart={cart} />
   ));
 const OrderItemList = ({ cart }) => (
-  <div>
+  <div style={{ marginBottom: "10px" }}>
     <div className={`${styles.orderRow} ${styles.order_price}`}>
       <span>
         {cart.menuName} * {cart.quantity}
@@ -670,7 +697,12 @@ const OrderItemList = ({ cart }) => (
       <span>{(cart.price * cart.quantity).toLocaleString()}원</span>
     </div>
     {cart.optionString && (
-      <p className={styles.option_list}>{cart.optionString}</p>
+      <p
+        className={styles.option_list}
+        style={{ fontSize: "12px", color: "#888" }}
+      >
+        {cart.optionString}
+      </p>
     )}
   </div>
 );
