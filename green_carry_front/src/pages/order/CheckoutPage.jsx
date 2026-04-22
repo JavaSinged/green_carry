@@ -49,6 +49,24 @@ const CheckoutPage = () => {
   const [targetArrivalTime, setTargetArrivalTime] = useState("--:--");
   const isFirst = useRef(true);
 
+  // 🌟 [추가] 0순위 보안 가드: 비로그인 유저 차단 로직
+  useEffect(() => {
+    const loggedInMemberId = localStorage.getItem("memberId") || user?.memberId;
+
+    // 로컬스토리지에도 없고 컨텍스트에도 없으면 로그인 안 한 것임
+    if (!loggedInMemberId) {
+      Swal.fire({
+        title: "로그인 필요",
+        text: "로그인 후 이용 가능합니다.",
+        icon: "warning",
+        confirmButtonText: "로그인하러 가기",
+      }).then(() => {
+        // replace: true를 써야 뒤로가기로 다시 이 페이지에 못 들어옵니다.
+        navigate("/login", { replace: true });
+      });
+    }
+  }, [user, navigate]);
+
   // 1. 하버사인 공식 기반 거리 계산 함수
   const getNumericDistance = (storeLat, storeLng) => {
     const myLat = parseFloat(
@@ -62,7 +80,7 @@ const CheckoutPage = () => {
 
     if (isNaN(myLat) || isNaN(myLng) || isNaN(sLat) || isNaN(sLng)) return null;
 
-    const R = 6371; // 지구 반지름 (km)
+    const R = 6371;
     const dLat = ((sLat - myLat) * Math.PI) / 180;
     const dLng = ((sLng - myLng) * Math.PI) / 180;
 
@@ -107,7 +125,7 @@ const CheckoutPage = () => {
     }
   }, [orderId]);
 
-  // 4. 최신 포인트 정보 서버 동기화 (형님이 말씀하신 경로로 수정)
+  // 4. 최신 포인트 정보 서버 동기화
   const fetchLatestPoint = async () => {
     const memberId = localStorage.getItem("memberId") || user?.memberId;
     if (!memberId) return;
@@ -116,7 +134,7 @@ const CheckoutPage = () => {
       const res = await axios.get(
         `${import.meta.env.VITE_BACKSERVER}/member/point/${memberId}`,
       );
-      const latestPoint = res.data || 0; // 숫자로 바로 오는 경우
+      const latestPoint = res.data || 0;
       localStorage.setItem("memberPoint", latestPoint);
 
       setUser((prevUser) => ({
@@ -128,15 +146,14 @@ const CheckoutPage = () => {
     }
   };
 
-  // 5. 주문 상세 데이터 조회 (🌟본인 확인 보안 로직 추가)
+  // 5. 주문 상세 데이터 조회 (본인 확인 보안 로직 포함)
   const fetchOrderDetails = () => {
     if (!orderId) return;
 
     axios
       .get(`${import.meta.env.VITE_BACKSERVER}/stores/order/${orderId}`)
       .then((res) => {
-        console.log(res.data);
-        // 🌟 [보안 로직 추가]
+        // 🌟 [보안 로직: 아이디 대조]
         const loggedInMemberId =
           localStorage.getItem("memberId") || user?.memberId;
         const orderOwnerId = res.data.memberId;
@@ -144,7 +161,7 @@ const CheckoutPage = () => {
         if (
           loggedInMemberId &&
           orderOwnerId &&
-          Number(loggedInMemberId) !== Number(orderOwnerId)
+          String(loggedInMemberId).trim() !== String(orderOwnerId).trim()
         ) {
           Swal.fire({
             title: "접근 제한",
