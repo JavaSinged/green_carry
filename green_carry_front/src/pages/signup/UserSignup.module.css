@@ -19,9 +19,9 @@
   top: -5%;
   left: 0;
   width: 100%;
-  height: 110%;
+  height: 100%;
   /* JSX에서 --bg-image 변수로 이미지를 넘겨줘야 완벽하게 작동합니다 */
-  background-size: 110%;
+  background-size: 100%;
   background-position: center;
   z-index: -1;
   animation: signupBgBreathe 12s ease-in-out infinite alternate;

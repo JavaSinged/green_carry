@@ -11,6 +11,9 @@
   overflow: hidden !important;
   z-index: 1;
   animation: bg-breathe 12s ease-in-out infinite alternate;
+  background-repeat: no-repeat; /* 사진이 여러 개로 복제되는 걸 방지 */
+  background-size: cover; /* 화면 가로세로 중 큰 쪽에 맞춰 꽉 채움 */
+  background-position: center;
 }
 
 .signup_container::after {
