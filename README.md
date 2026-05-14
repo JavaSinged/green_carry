@@ -480,6 +480,7 @@ Toss Payments, Naver Maps/Geocode, Daum Postcode, Cloudinary, Gmail SMTP를 연�
 
 ## 문서 링크
 
+- [Spec](https://docs.google.com/spreadsheets/d/1y5An1r5wMXSMTQPvI4N7ahxKFxeL8jKXqveL0prBrEk/edit?gid=0#gid=0)
 - [ERD](https://www.erdcloud.com/d/jihoxxucLefwcYJMj)
 - [Figma](https://www.figma.com/design/23TrLwzZlitTNLkalzGG44/GreenCarry?node-id=0-1&t=219nPYaQOkhi9IX7-1)
 - [GitHub](https://github.com/JavaSinged/green_carry)
