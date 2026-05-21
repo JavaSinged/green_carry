@@ -88,7 +88,7 @@ const PaymentPage = () => {
     }
     console.log("주문하려는 매장 ID:", storeId);
     console.log(cartList);
-    // 🌟 결제 시점의 최신 데이터를 담은 orderData
+    //  결제 시점의 최신 데이터를 담은 orderData
     const orderData = {
       memberId: memberId,
       storeId: storeId,
@@ -103,8 +103,7 @@ const PaymentPage = () => {
         optionString: item.options?.map((o) => o.optionName).join(",") || "",
       })),
       totalPrice: totalPrice,
-      // 🌟 [수정 핵심] 화면(g)과 서버(kg)의 단위를 맞춥니다.
-      // 만약 서버 DB가 g 단위를 쓴다면 / 1000 을 지우세요!
+
       getPoint: totalCarbon,
     };
 
