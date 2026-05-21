@@ -18,7 +18,7 @@ export default function AdminContainerList() {
   const navigate = useNavigate();
   const backHost = import.meta.env.VITE_BACKSERVER;
 
-  // 코덱스가 수정함: Cloudinary 절대 URL과 기존 상대 경로를 함께 처리
+  // Cloudinary 절대 URL과 기존 상대 경로를 함께 처리
   const resolveImageUrl = (imagePath) => {
     if (!imagePath) return "/image/default_container.png";
     if (/^https?:\/\//i.test(imagePath)) {
