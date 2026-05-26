@@ -379,20 +379,20 @@ green_carry/
 
 ```bash
 cd green_carry_front
-pnpm install
-pnpm dev
+npm install
+npm run dev
 ```
 
 빌드:
 
 ```bash
-pnpm build
+npm build
 ```
 
 린트:
 
 ```bash
-pnpm lint
+npm lint
 ```
 
 ### Backend
@@ -409,10 +409,6 @@ mvn spring-boot:run
 ```
 
 ## 환경 변수
-
-민감 정보는 실제 운영 환경에서 `.env` 또는 서버 환경변수로 분리해야 합니다.
-아래 값은 예시이며 실제 키는 커밋하지 않습니다.
-
 ### Frontend `.env`
 
 ```env
