@@ -62,8 +62,7 @@
 
 .table_wrap {
   width: 100%;
-  overflow-x: auto;
-  min-height: 520px;
+  overflow-x: hidden; /* 스크롤 제거 */
 }
 
 .table {
@@ -71,7 +70,7 @@
   border-collapse: collapse;
   text-align: center;
   font-family: var(--font-body);
-  table-layout: fixed;
+  table-layout: auto; /* 핵심 변경 */
 }
 
 .table th,
@@ -79,9 +78,10 @@
   padding: 12px;
   border-bottom: 1px solid #f0f0f0;
   vertical-align: middle;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+
+  /* 줄바꿈 허용 */
+  white-space: normal;
+  word-break: break-word;
 }
 
 .table th {
@@ -92,21 +92,16 @@
   border-bottom: 2px solid #f0f0f0;
 }
 
-.col_name {
-  width: 320px;
-}
-.col_desc {
-  width: 230px;
-}
-.col_emissions {
-  width: 200px;
-}
+/* 기존 width 제거 (핵심) */
+.col_name,
+.col_desc,
+.col_emissions,
 .col_action {
-  width: 100px;
+  width: auto;
 }
 
 .table_row {
-  height: 120px;
+  min-height: 100px;
 }
 
 .table_row:hover {
@@ -127,12 +122,12 @@
 .store_info {
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: 12px;
 }
 
 .store_image_placeholder {
-  width: 90px;
-  height: 90px;
+  width: 70px;   /* 줄임 */
+  height: 70px;
   background: var(--color-bg);
   border-radius: 8px;
   flex-shrink: 0;
@@ -148,7 +143,7 @@
 
 .store_name {
   margin: 0;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--text-main);
 }
@@ -156,7 +151,7 @@
 .badge {
   background-color: var(--color-surface);
   color: var(--color-brand);
-  padding: 6px 14px;
+  padding: 6px 10px;
   border-radius: 20px;
   font-size: 12px;
   font-weight: 600;
@@ -246,6 +241,7 @@
   margin-left: 8px;
 }
 
+/* 모바일 */
 @media (max-width: 768px) {
   .dashboard_container {
     padding: 20px 16px;
@@ -263,11 +259,8 @@
     width: 100%;
   }
 
+  /* 기존 min-width 제거 (핵심) */
   .table {
-    min-width: 850px;
-  }
-
-  .table_wrap {
-    min-height: 0;
+    width: 100%;
   }
 }
