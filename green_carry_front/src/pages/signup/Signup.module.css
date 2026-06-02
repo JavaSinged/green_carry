@@ -170,7 +170,7 @@
 }
 
 .ecoBubble {
-  /* 코덱스가 수정함: Signup.jsx에서 CSS Modules로 직접 참조하도록 로컬 클래스 추가 */
+  /*  Signup.jsx에서 CSS Modules로 직접 참조하도록 로컬 클래스 추가 */
   position: absolute;
   background: rgba(255, 255, 255, 0.2);
   border-radius: 50%;
@@ -181,7 +181,7 @@
 }
 
 .particleLeaf {
-  /* 코덱스가 수정함: Signup.jsx에서 CSS Modules로 직접 참조하도록 로컬 클래스 추가 */
+  /*  Signup.jsx에서 CSS Modules로 직접 참조하도록 로컬 클래스 추가 */
   position: fixed;
   background-color: var(--color-brand);
   border-radius: 80% 0 80% 0;
@@ -192,7 +192,7 @@
 }
 
 .firefly {
-  /* 코덱스가 수정함: Signup.jsx 반딧불 효과를 CSS Modules로 연결 */
+  /*  Signup.jsx 반딧불 효과를 CSS Modules로 연결 */
   position: fixed;
   width: 6px;
   height: 6px;

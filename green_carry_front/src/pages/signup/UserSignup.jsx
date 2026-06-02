@@ -119,7 +119,7 @@ const UserSignup = () => {
       return;
     }
     try {
-      // 코덱스가 수정함: 인증 메일 발송 시도마다 이메일 중복 검사를 다시 수행
+      //  인증 메일 발송 시도마다 이메일 중복 검사를 다시 수행
       const res = await axios.get(
         `${import.meta.env.VITE_BACKSERVER}/member/emailDupCheck`,
         {
@@ -154,7 +154,7 @@ const UserSignup = () => {
       const res = await axios.post(
         `${import.meta.env.VITE_BACKSERVER}/member/email-verification`,
         {
-        memberEmail: member.memberEmail,
+          memberEmail: member.memberEmail,
         },
       );
       setMailAuthCode(res.data);
@@ -226,7 +226,7 @@ const UserSignup = () => {
       fullAddress += extraAddress !== "" ? ` (${extraAddress})` : "";
     }
 
-    // 코덱스가 수정함: 네이버 Geocoding API로 좌표를 변환
+    //  네이버 Geocoding API로 좌표를 변환
     if (window.naver && naver.maps.Service) {
       naver.maps.Service.geocode({ query: fullAddress }, (status, response) => {
         if (status === naver.maps.Service.Status.OK) {
@@ -388,7 +388,10 @@ const UserSignup = () => {
 
     setIsJoining(true);
     try {
-      await axios.post(`${import.meta.env.VITE_BACKSERVER}/member/userSignup`, member);
+      await axios.post(
+        `${import.meta.env.VITE_BACKSERVER}/member/userSignup`,
+        member,
+      );
       await Swal.fire({
         icon: "success",
         text: "회원가입이 완료되었습니다. 로그인 페이지로 이동합니다.",
@@ -681,7 +684,11 @@ const UserSignup = () => {
               </div>
             </div>
 
-            <button type="submit" className={styles.signupBtn} disabled={isJoining}>
+            <button
+              type="submit"
+              className={styles.signupBtn}
+              disabled={isJoining}
+            >
               {isJoining ? (
                 <>
                   <ButtonSpinner />

@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class orderDetail {
-    // 코덱스가 수정함: 주문 상세에서 옵션 문자열과 배달 유형별 금액을 함께 매핑하기 위한 필드 정리.
+    //  주문 상세에서 옵션 문자열과 배달 유형별 금액을 함께 매핑하기 위한 필드 정리.
     private String menuName;
     private String menuImage;
     private int quantity;

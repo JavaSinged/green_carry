@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @Data
 @Alias("orderListByStoreId")
 public class OrderListByStoreId {
-	// 코덱스가 수정함: delivery_type 원본을 받아 서비스에서 금액으로 계산할 수 있게 필드 추가.
+	//  delivery_type 원본을 받아 서비스에서 금액으로 계산할 수 있게 필드 추가.
 	private Long orderId;
 	private String memberId;
 	private String memberEmail;

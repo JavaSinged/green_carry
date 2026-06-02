@@ -9,7 +9,7 @@ import java.util.Map;
 
 @Mapper
 public interface StoreDao {
-    // 코덱스가 수정함: 중복 선언과 실제 사용되지 않는 시그니처를 정리해 DAO 계약을 단순화했습니다.
+    //  중복 선언과 실제 사용되지 않는 시그니처를 정리해 DAO 계약을 단순화했습니다.
     List<Store> selectAllStore();
 
     Store findStoreById(Integer storeId);

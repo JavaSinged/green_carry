@@ -51,7 +51,7 @@ public class ProductCarbonController {
             @ModelAttribute ProductCarbon product,
             @RequestParam(value = "uploadFile", required = false) MultipartFile uploadFile) {
         try {
-            // 코덱스가 수정함: 용기 이미지는 컨트롤러에서 바로 Cloudinary 업로드 처리
+            //  용기 이미지는 컨트롤러에서 바로 Cloudinary 업로드 처리
             if (uploadFile != null && !uploadFile.isEmpty()) {
                 Map uploadParams = ObjectUtils.asMap(
                         "folder", STORE_IMAGE_FOLDER,

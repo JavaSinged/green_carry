@@ -63,7 +63,7 @@ public class AdminService {
 		return detailList;
 	}
 
-	// 코덱스가 수정함: DB에는 delivery_type만 저장되어 있어서 서비스 계층에서 금액으로 변환해 사용함.
+	//  DB에는 delivery_type만 저장되어 있어서 서비스 계층에서 금액으로 변환해 사용함.
 	private int resolveDeliveryFee(int deliveryType) {
 		switch (deliveryType) {
 		case 2:

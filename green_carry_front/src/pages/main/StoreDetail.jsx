@@ -42,7 +42,7 @@ const dayOrder = {
 };
 
 export default function StoreDetail() {
-  // 코덱스가 수정함: 배포 환경에서 깨지기 쉬운 API/지도 초기화 흐름을 안전하게 감쌌습니다.
+  //  배포 환경에서 깨지기 쉬운 API/지도 초기화 흐름을 안전하게 감쌌습니다.
   const { id } = useParams();
   const storeId = Number(id);
 

@@ -9,7 +9,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Pagination from "../../../components/commons/Pagination";
 
-// 코덱스가 수정함: 정의되지 않은 searchKeyword 참조를 제거하고 검색, 정렬, 페이지네이션 흐름을 하나로 정리함.
+//  정의되지 않은 searchKeyword 참조를 제거하고 검색, 정렬, 페이지네이션 흐름을 하나로 정리함.
 export default function AdminStoreManagement() {
   const navigate = useNavigate();
   const [stores, setStores] = useState([]);

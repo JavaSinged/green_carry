@@ -9,7 +9,7 @@ const API_BASE_URL = import.meta.env.VITE_BACKSERVER?.trim() || "";
 const isBrowser = typeof window !== "undefined";
 
 export default function StoreReviewPage() {
-  // 코덱스가 수정함: 리뷰/매장 로딩과 페이지 이동을 배포 환경에서 더 안전하게 처리합니다.
+  //  리뷰/매장 로딩과 페이지 이동을 배포 환경에서 더 안전하게 처리합니다.
   const { id } = useParams();
   const storeId = Number(id);
   const navigate = useNavigate();

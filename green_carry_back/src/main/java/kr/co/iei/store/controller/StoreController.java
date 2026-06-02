@@ -38,7 +38,7 @@ public class StoreController {
 	@Autowired
 	private NotificationService notificationService;
 
-	// 코덱스가 수정함: 컨트롤러 입력 검증과 알림 분기를 단순화해 런타임 오류 가능성을 줄였습니다.
+	//  컨트롤러 입력 검증과 알림 분기를 단순화해 런타임 오류 가능성을 줄였습니다.
 
 	@GetMapping
 	public ResponseEntity<?> getStores() {

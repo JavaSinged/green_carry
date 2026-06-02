@@ -13,7 +13,7 @@ import { AuthContext } from "../../context/AuthContext";
 const API_BASE_URL = import.meta.env.VITE_BACKSERVER?.trim() || "";
 
 export default function StoreView() {
-  // 코덱스가 수정함: 매장/메뉴 로딩과 검색 필터를 배포 환경에서 안전하게 처리합니다.
+  //  매장/메뉴 로딩과 검색 필터를 배포 환경에서 안전하게 처리합니다.
   const { id } = useParams();
   const navigate = useNavigate();
   const storeId = Number(id);

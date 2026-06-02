@@ -13,7 +13,7 @@ import java.util.Map;
 
 @Service
 public class StoreService {
-	// 코덱스가 수정함: null 방어와 중복 로직 정리를 통해 store 서비스 안정성을 높였습니다.
+	//  null 방어와 중복 로직 정리를 통해 store 서비스 안정성을 높였습니다.
 	@Autowired
 	private StoreDao storeDao;
 
@@ -157,7 +157,7 @@ public class StoreService {
 	@Transactional
 	public int changeOrderStatus(Integer orderId, int status, Integer expectedTime) {
 		if (status == 9) {
-			// 코덱스가 수정함: 롤백 후 취소 결과만 반환해 취소 분기 흐름을 단순화합니다.
+			//  롤백 후 취소 결과만 반환해 취소 분기 흐름을 단순화합니다.
 			storeDao.rollbackPoint(orderId);
 			return storeDao.cancelOrder(orderId);
 		}
@@ -192,7 +192,7 @@ public class StoreService {
 			return 0;
 		}
 
-		// 코덱스가 수정함: 포인트 반영 성공 시에만 후속 적립/탄소 누적을 실행합니다.
+		//  포인트 반영 성공 시에만 후속 적립/탄소 누적을 실행합니다.
 		storeDao.pointReward(orderId);
 		storeDao.addReduceCarbon(orderId);
 		return setPoint;

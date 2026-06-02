@@ -8,7 +8,7 @@ import styles from "./UserSignup.module.css";
 import ButtonSpinner from "../../components/commons/ButtonSpinner";
 
 const ManagerSignup = () => {
-  // 코덱스가 수정함: leafData와 fireflyData를 함께 사용
+  //  leafData와 fireflyData를 함께 사용
   const {
     containerRef,
     bubblesRef,
@@ -159,7 +159,7 @@ const ManagerSignup = () => {
       return;
     }
     try {
-      // 코덱스가 수정함: 인증 메일 발송 시도마다 이메일 중복 검사를 다시 수행
+      //  인증 메일 발송 시도마다 이메일 중복 검사를 다시 수행
       const res = await axios.get(
         `${import.meta.env.VITE_BACKSERVER}/member/emailDupCheck`,
         {
@@ -194,7 +194,7 @@ const ManagerSignup = () => {
       const res = await axios.post(
         `${import.meta.env.VITE_BACKSERVER}/member/email-verification`,
         {
-        memberEmail: member.memberEmail,
+          memberEmail: member.memberEmail,
         },
       );
       setMailAuthCode(res.data);
@@ -634,7 +634,9 @@ const ManagerSignup = () => {
                     )}
                   </button>
                 </div>
-                <div className={`${styles.signupInputInner} ${styles.signupMt10}`}>
+                <div
+                  className={`${styles.signupInputInner} ${styles.signupMt10}`}
+                >
                   <input
                     type="text"
                     className={styles.signupInputUnderline}
@@ -825,7 +827,11 @@ const ManagerSignup = () => {
             */}
 
             {/* 가입 버튼 */}
-            <button type="submit" className={styles.signupBtn} disabled={isJoining}>
+            <button
+              type="submit"
+              className={styles.signupBtn}
+              disabled={isJoining}
+            >
               {isJoining ? (
                 <>
                   <ButtonSpinner />
@@ -843,4 +849,3 @@ const ManagerSignup = () => {
 };
 
 export default ManagerSignup;
-

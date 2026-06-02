@@ -23,7 +23,7 @@ import axios from "axios";
 import { useParams } from "react-router-dom";
 import Pagination from "../../../components/commons/Pagination";
 
-// 코덱스가 수정함: 관리자 주문 상세 화면에서 배송비와 최종 결제 금액을 함께 표시하도록 정리함.
+//  관리자 주문 상세 화면에서 배송비와 최종 결제 금액을 함께 표시하도록 정리함.
 const AdminStoreManagementDetail = () => {
   const { storeId } = useParams();
   const backHost = import.meta.env.VITE_BACKSERVER;

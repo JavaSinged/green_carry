@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Data
 @Alias("orderItem")
 public class OrderItem {
-	// 코덱스가 수정함: 주문 상세 조회에서 배달 유형별 금액을 함께 받기 위한 필드 추가.
+	//  주문 상세 조회에서 배달 유형별 금액을 함께 받기 위한 필드 추가.
 	private String menuName;
 	private Integer menuId;
 	private Integer quantity;

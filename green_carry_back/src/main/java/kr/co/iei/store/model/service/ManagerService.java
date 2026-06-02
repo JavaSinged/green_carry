@@ -40,7 +40,7 @@ public class ManagerService {
 
 	@Transactional
 	public int insertMenuAll(MenuSaveRequest request) {
-		// 코덱스가 수정함: 저장 실패 시 연관 데이터 저장을 건너뛰어 트랜잭션 경계를 명확히 했습니다.
+		//  저장 실패 시 연관 데이터 저장을 건너뛰어 트랜잭션 경계를 명확히 했습니다.
 		// 🌟 1. DB 삽입 전, 사진 파일이 있다면 하드디스크에 저장하고 경로를 DTO에 세팅
 		saveImageFile(request);
 
