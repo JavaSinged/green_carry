@@ -12,13 +12,12 @@ const useCartStore = create(
       storeId: 0,
       finalCarbon: 0,
 
-      // 🛒 장바구니 담기 (중복 체크 수정)
+      // 장바구니 담기 (중복 체크 수정)
       addToCart: (newItem) =>
         set((state) => {
           const existingItemIndex = state.cart.findIndex((item) => {
             const isSameMenu = String(item.menuId) === String(newItem.menuId);
 
-            // 🚨 [수정 포인트] 모달에서 'options'로 보내므로 이름을 맞춥니다.
             const isSameOptions =
               JSON.stringify(item.options) === JSON.stringify(newItem.options);
 
@@ -53,7 +52,7 @@ const useCartStore = create(
           storeId: 0,
         }),
 
-      // ➕ 수량 증가 (이름 options로 통일)
+      // 수량 증가 (이름 options로 통일)
       increaseQuantity: (menuId, options) =>
         set((state) => ({
           cart: state.cart.map((c) =>
@@ -64,7 +63,7 @@ const useCartStore = create(
           ),
         })),
 
-      // ➖ 수량 감소 (이름 options로 통일)
+      //수량 감소 (이름 options로 통일)
       decreaseQuantity: (menuId, options) =>
         set((state) => ({
           cart: state.cart
