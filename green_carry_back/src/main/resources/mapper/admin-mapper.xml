@@ -47,7 +47,6 @@
 		SELECT o.order_id,
 			o.member_id,
 			m.member_email,
-			/* 코덱스가 수정함: delivery_type 원본만 조회하고 금액 계산은 서비스에서 처리 */
 			(SELECT NVL(SUM(d.price * d.quantity), 0)
 			 FROM order_detail d
 			 WHERE d.order_id = o.order_id) AS total_price,
