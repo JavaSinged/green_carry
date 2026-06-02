@@ -1,4 +1,4 @@
-/* 🌟 정전 오버레이: 빛샘 현상 완벽 차단 및 애니메이션 최적화 */
+/*  정전 오버레이: 빛샘 현상 완벽 차단 및 애니메이션 최적화 */
 .blackout-overlay {
   position: fixed;
   top: 0;
@@ -8,7 +8,7 @@
   z-index: 99998;
   pointer-events: none; /* 클릭은 아래로 통과 */
 
-  /* 🌟 형님이 정하신 블랙 농도와 제가 추가한 가변 크기(--flashlight-size) 적용 */
+  /*  형님이 정하신 블랙 농도와 제가 추가한 가변 크기(--flashlight-size) 적용 */
   background: radial-gradient(
     circle var(--flashlight-size) at var(--mouse-x) var(--mouse-y),
     rgba(0, 0, 0, 0) 0%,
@@ -17,7 +17,7 @@
     rgba(0, 0, 0, 1) 100%
   );
 
-  /* 🌟 손전등 크기가 바뀔 때 부드럽게 변하도록 트랜지션 추가 */
+  /*  손전등 크기가 바뀔 때 부드럽게 변하도록 트랜지션 추가 */
   transition: background 0.5s ease-in-out;
   animation: flicker-out 1s ease-out forwards;
 }
@@ -26,7 +26,7 @@
 .secret-coupon {
   position: fixed;
   background: #000;
-  color: #2ecc71; /* 🌟 초록색 포인트로 가독성 업 */
+  color: #2ecc71; /*  초록색 포인트로 가독성 업 */
   padding: 12px 20px;
   border: 2px dashed #2ecc71;
   border-radius: 5px;
@@ -44,7 +44,7 @@
   transform: scale(1.1);
 }
 
-/* 🌟 형님이 만드신 그 레전드 깜빡이 효과 */
+/*  형님이 만드신 그 레전드 깜빡이 효과 */
 @keyframes flicker-out {
   0% {
     opacity: 0;

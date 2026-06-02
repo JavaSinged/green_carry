@@ -37,7 +37,7 @@ const EcoRecycle = () => {
   useEffect(() => {
     if (!isActive) return;
 
-    // 🌟 배너 슬라이드, 카드, 이미지 등을 뜯어낼 수 있도록 타겟 설정
+    //  배너 슬라이드, 카드, 이미지 등을 뜯어낼 수 있도록 타겟 설정
     const targetSelectors =
       "img, button, h2, h3, div[class*='card_item'], div[class*='banner_slide']";
     const targets = document.querySelectorAll(targetSelectors);
@@ -48,7 +48,7 @@ const EcoRecycle = () => {
       const target = e.target.closest(".eco-draggable");
       if (!target) return;
 
-      // 🌟 핵심: 텍스트 선택(파란 블록) 및 기본 유령 이미지 드래그 원천 차단
+      //  핵심: 텍스트 선택(파란 블록) 및 기본 유령 이미지 드래그 원천 차단
       e.preventDefault();
 
       originRef.current = target;
@@ -86,7 +86,7 @@ const EcoRecycle = () => {
     const handlePointerUp = (e) => {
       if (!cloneRef.current || !originRef.current) return;
 
-      // 🌟 복제 요소가 마우스를 가리지 않도록 숨긴 뒤, 현재 위치의 요소(쓰레기통) 확인
+      //  복제 요소가 마우스를 가리지 않도록 숨긴 뒤, 현재 위치의 요소(쓰레기통) 확인
       cloneRef.current.style.display = "none";
       const dropZone = document.elementFromPoint(e.clientX, e.clientY);
       const isBin = dropZone && dropZone.closest(".eco-recycle-bin");

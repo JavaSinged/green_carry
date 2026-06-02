@@ -45,7 +45,7 @@ const DeliveryPathStats = ({ data }) => {
                 />
               </div>
 
-              {/* 🌟 amountTooltip 클래스 적용 (제공된 CSS 사용) */}
+              {/*  amountTooltip 클래스 적용 (제공된 CSS 사용) */}
               <div className={styles.amountTooltip}>
                 {(item.seriesAmount || 0).toLocaleString()}원 (
                 {item.orderCount || 0}건)

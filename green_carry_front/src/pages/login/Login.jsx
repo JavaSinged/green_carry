@@ -20,7 +20,7 @@ const API_BASE_URL = import.meta.env.VITE_BACKSERVER?.trim() || "";
 const isBrowser = typeof window !== "undefined";
 //합치기용 주석
 const Login = () => {
-  // 🌟 1번 이스터에그 상태 (로고 클릭)
+  //  1번 이스터에그 상태 (로고 클릭)
   const [clickCount, setClickCount] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -85,7 +85,7 @@ const Login = () => {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
-  // 유저 카운트 및 🌟[추가] 커뮤니티 탄소 절감량 상태
+  // 유저 카운트 및 [추가] 커뮤니티 탄소 절감량 상태
   const [userCount, setUserCount] = useState(0);
   const [communityCarbon, setCommunityCarbon] = useState(0);
 
@@ -412,7 +412,7 @@ const Login = () => {
             맛있는 한 끼
           </h2>
           <div className="stats">
-            {/* 🌟 실제 데이터 바인딩 영역 */}
+            {/*  실제 데이터 바인딩 영역 */}
             <div className="stat-item">
               🌿 함께 아낀 탄소{" "}
               <span className="stat-value">

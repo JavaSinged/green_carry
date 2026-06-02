@@ -34,7 +34,7 @@ button {
   flex-direction: column;
   color: var(--color-bg);
   overflow-x: hidden;
-  overflow-y: auto; /* 🌟 모바일 대응: 컨텐츠 길어지면 스크롤 허용 */
+  overflow-y: auto; /*  모바일 대응: 컨텐츠 길어지면 스크롤 허용 */
   transition: background-position 0.2s ease-out;
   z-index: 1;
   animation: bg-breathe 12s ease-in-out infinite alternate;
@@ -453,15 +453,15 @@ button {
   border-radius: 10px !important;
 }
 
-/* --- 11. 🌟 📱 모바일 대응 미디어 쿼리 (통합) 🌟 --- */
+/* --- 11.모바일 대응 미디어 쿼리 (통합)  --- */
 @media (max-width: 1024px) {
   .screen-container {
-    /* 🌟 1. scroll을 fixed로 변경 (배경은 가만히 있고 내용만 움직이게) */
+    /*  1. scroll을 fixed로 변경 (배경은 가만히 있고 내용만 움직이게) */
     background-attachment: fixed !important;
     background-size: cover !important;
     background-position: center !important;
 
-    /* 🌟 2. 높이 설정 최적화 */
+    /*  2. 높이 설정 최적화 */
     height: auto; /* 고정 높이 해제 */
     min-height: 100vh; /* 최소 화면 높이는 확보 */
     overflow-y: visible; /* 스크롤은 브라우저 기본 스크롤 사용 */

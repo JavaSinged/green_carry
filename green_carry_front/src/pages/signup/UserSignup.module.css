@@ -14,7 +14,7 @@
   z-index: 1;
 }
 
-/* 🌟 [추가 기능] 모바일 배경 꿀렁임 방지용 고정 레이어 */
+/*  [추가 기능] 모바일 배경 꿀렁임 방지용 고정 레이어 */
 .signupScreenContainer::before {
   content: "";
   position: fixed;
@@ -395,7 +395,7 @@
   }
 }
 
-/* --- 🌟 [추가 기능] 모바일 대응 미디어 쿼리 통합 --- */
+/* ---  [추가 기능] 모바일 대응 미디어 쿼리 통합 --- */
 @media (max-width: 768px) {
   .signupMainContent {
     padding: 40px 15px; /* 상단 여백 줄임 */
@@ -466,7 +466,7 @@
   }
 }
 
-/* --- 🌟 모바일 전용 화질 보호 애니메이션 (미디어 쿼리 닫는 중괄호 } 바깥에 추가) --- */
+/* ---  모바일 전용 화질 보호 애니메이션 (미디어 쿼리 닫는 중괄호 } 바깥에 추가) --- */
 @keyframes signupBgBreatheMobile {
   0% {
     transform: scale(1);

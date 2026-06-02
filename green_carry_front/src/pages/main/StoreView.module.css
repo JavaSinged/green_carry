@@ -46,7 +46,7 @@
   justify-content: center;
 }
 
-/* 🌟 타이틀과 별점 박스를 가로로 배치 */
+/*  타이틀과 별점 박스를 가로로 배치 */
 .title_row {
   display: flex;
   align-items: center;
@@ -64,7 +64,7 @@
   font-weight: 800;
 }
 
-/* 🌟 별점 및 리뷰 링크 박스 */
+/*  별점 및 리뷰 링크 박스 */
 .store_rating_box {
   display: flex;
   align-items: center;

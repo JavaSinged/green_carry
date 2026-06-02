@@ -41,7 +41,7 @@ public class ManagerService {
 	@Transactional
 	public int insertMenuAll(MenuSaveRequest request) {
 		//  저장 실패 시 연관 데이터 저장을 건너뛰어 트랜잭션 경계를 명확히 했습니다.
-		// 🌟 1. DB 삽입 전, 사진 파일이 있다면 하드디스크에 저장하고 경로를 DTO에 세팅
+		//  1. DB 삽입 전, 사진 파일이 있다면 하드디스크에 저장하고 경로를 DTO에 세팅
 		saveImageFile(request);
 
 		// 2. 메뉴 기본 정보 삽입 (DB 컬럼에는 사진 경로 문자열이 들어감)
@@ -59,7 +59,7 @@ public class ManagerService {
 	// --- [2. 메뉴 수정 로직] ---
 	@Transactional
 	public int updateMenuAll(MenuSaveRequest request) {
-		// 🌟 1. 사진 수정이 발생했다면 새 사진을 저장하고 DTO에 경로 세팅
+		//  1. 사진 수정이 발생했다면 새 사진을 저장하고 DTO에 경로 세팅
 		saveImageFile(request);
 
 		// 2. 메뉴 기본 정보 업데이트

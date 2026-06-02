@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 const ReviewStatsChart = ({ data }) => {
   const navigate = useNavigate();
 
-  // 🌟 [수정됨] 데이터가 없거나, 총 리뷰 건수가 0건일 때 통일된 문구 출력
+  //  [수정됨] 데이터가 없거나, 총 리뷰 건수가 0건일 때 통일된 문구 출력
   if (!data || !data.series || data.totalCount === 0) {
     return (
       <div className={styles.noData}>당월 리뷰 데이터가 존재하지 않습니다.</div>

@@ -36,7 +36,7 @@ const EcoRider = () => {
     }
   };
 
-  // 🌟 3. 스페이스바 감지 로직 (새로 추가됨!)
+  //  3. 스페이스바 감지 로직 (새로 추가됨!)
   useEffect(() => {
     const handleSpacebar = (e) => {
       // 게임이 켜져있고, 누른 키가 스페이스바(Space)일 때

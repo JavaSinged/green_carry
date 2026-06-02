@@ -43,7 +43,7 @@ const OrderPage = () => {
   const isCartEmpty = !cartList || cartList.length === 0;
   const Co2PerKm = 80;
 
-  // 🌟 [수정] 결제창 진입 시 DB 값으로 로컬스토리지 포인트 강제 갱신
+  //  [수정] 결제창 진입 시 DB 값으로 로컬스토리지 포인트 강제 갱신
   useEffect(() => {
     const fetchLatestPoint = async () => {
       // 컨텍스트에 없으면 로컬스토리지에서라도 가져옴
@@ -55,13 +55,13 @@ const OrderPage = () => {
         const token = localStorage.getItem("accessToken");
         const config = { headers: { Authorization: `Bearer ${token}` } };
 
-        // 🌟 형님이 알려주신 포인트 전용 API 호출
+        //  형님이 알려주신 포인트 전용 API 호출
         const res = await axios.get(
           `${backHost}/member/point/${memberId}`,
           config,
         );
 
-        // 🌟 서버에서 받아온 진짜 포인트 값을 로컬스토리지에 덮어쓰기
+        //  서버에서 받아온 진짜 포인트 값을 로컬스토리지에 덮어쓰기
         // res.data가 숫자 바로 오는 구조라면 그대로 넣으시면 됩니다.
         if (res.data !== undefined) {
           localStorage.setItem("memberPoint", res.data);

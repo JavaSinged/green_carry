@@ -1,4 +1,4 @@
-/* 🌟 우주 모드 활성화 시 body와 root 설정 */
+/*  우주 모드 활성화 시 body와 root 설정 */
 body.eco-earth-mode {
   overflow: hidden !important; /* 스크롤바 숨김 */
   background-color: #000 !important; /* 우주 배경색 */
@@ -15,7 +15,7 @@ body.eco-earth-mode #root {
   z-index: 10;
 }
 
-/* 🌟 웹사이트 컨텐츠 전체를 3D로 왜곡시켜 회전시킴 */
+/*  웹사이트 컨텐츠 전체를 3D로 왜곡시켜 회전시킴 */
 body.eco-earth-mode #root > div:first-child {
   transform-style: preserve-3d;
   /* 1. scale(0.65)로 화면을 작게 만들어 우주에 떠 있는 느낌을 줌

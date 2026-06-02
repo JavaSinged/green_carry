@@ -801,7 +801,6 @@ export default function StoreInfoEdit() {
                 onChange={handleImageChange}
               />
 
-              {/* ?뙚 ?대?吏 ?꾩뿉 寃뱀퀜吏?而⑦뀗痢?*/}
               <div
                 className={`${styles.uploadContent} ${previewImg ? styles.hasPreview : ""}`}
               >
@@ -818,7 +817,7 @@ export default function StoreInfoEdit() {
             </div>
           </div>
         </div>
-        {/* ?곸뾽?쒓컙 諛??대Т???ㅼ젙 */}
+
         <div className={styles.sectionDivider}>운영시간 및 휴무일 설정</div>
 
         <div className={styles.formRow}>
@@ -988,7 +987,6 @@ export default function StoreInfoEdit() {
           </div>
         </div>
 
-        {/* ?대Т???ㅼ젙 */}
         <div className={styles.formRow}>
           <label className={styles.label}>휴무일</label>
           <div className={styles.inputWrap}>

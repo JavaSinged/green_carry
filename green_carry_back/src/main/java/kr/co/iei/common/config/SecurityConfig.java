@@ -27,7 +27,7 @@ public class SecurityConfig {
 	        .csrf(csrf -> csrf.disable())
 	        .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 	        .authorizeHttpRequests(auth -> auth
-	            // 🌟 일단 모든 경로를 다 열어서(permitAll) 에러부터 없애보세요!
+	            //  일단 모든 경로를 다 열어서(permitAll) 에러부터 없애보세요!
 	            .requestMatchers("/**").permitAll() 
 	        )
 	        .formLogin(form -> form.disable())

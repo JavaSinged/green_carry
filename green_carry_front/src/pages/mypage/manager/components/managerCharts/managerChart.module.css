@@ -157,7 +157,7 @@
   color: #bbb;
 }
 
-/* --- 🌟 툴팁(금액 호버) 기능을 위해 추가된 코드 --- */
+/* ---  툴팁(금액 호버) 기능을 위해 추가된 코드 --- */
 
 .item {
   position: relative; /* 툴팁 배치의 기준점 */
@@ -218,7 +218,7 @@
   border-top: 5px solid #333;
 }
 
-/* 🌟 마우스 호버 시 툴팁 출력 */
+/*  마우스 호버 시 툴팁 출력 */
 .barContainer:hover .amountTooltip {
   opacity: 1;
   visibility: visible;

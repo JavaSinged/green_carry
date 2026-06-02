@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
 import Swal from "sweetalert2";
-import axios from "axios"; // 🌟 axios 추가
+import axios from "axios"; //  axios 추가
 import "./EcoDrone.css";
 
 const EcoDrone = () => {
   const [isActive, setIsActive] = useState(false);
   const [isDropped, setIsDropped] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false); // 🌟 중복 요청 방지
+  const [isSubmitting, setIsSubmitting] = useState(false); //  중복 요청 방지
 
   const droneRef = useRef(null);
   const targetPos = useRef({ x: -100, y: 100 });
@@ -59,7 +59,7 @@ const EcoDrone = () => {
     };
   }, [isActive, isDropped]);
 
-  // 🌟 로컬 스토리지 포인트 동기화 (전역 업데이트)
+  //  로컬 스토리지 포인트 동기화 (전역 업데이트)
   const syncPoints = (newPoint) => {
     const member = JSON.parse(localStorage.getItem("member"));
     if (member) {

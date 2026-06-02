@@ -130,7 +130,7 @@ const StoreStats = () => {
 
             setOrderStatsData(finalOrderData);
 
-            // ⭐ 리뷰 통계 데이터 가공 및 설정
+            //  리뷰 통계 데이터 가공 및 설정
             const rd = reviewRes.data;
             const total = rd.totalCount || 1; // 0으로 나누기 방지
 

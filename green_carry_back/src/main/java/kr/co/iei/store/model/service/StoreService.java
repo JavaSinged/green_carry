@@ -44,7 +44,7 @@ public class StoreService {
 
 	@Transactional
 	public int insertOrder(Order order) {
-		// 🌟 1. 포인트 선차감 (이게 핵심입니다 형님!)
+		//  1. 포인트 선차감 (이게 핵심입니다 형님!)
 		// 사용한 포인트가 있을 때만 실행
 		if (order.getUsedPoint() > 0) {
 			// memberDao든 storeDao든 멤버 포인트를 깎는 메소드를 호출합니다.

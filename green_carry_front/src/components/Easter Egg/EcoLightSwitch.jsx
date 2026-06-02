@@ -25,7 +25,7 @@ const EcoLightSwitch = () => {
   const handlePointerDown = (e) => {
     setIsDragging(true);
     startY.current = e.clientY;
-    // 🌟 마우스를 강제로 꽉 잡음 (드래그 안 끊김)
+    //  마우스를 강제로 꽉 잡음 (드래그 안 끊김)
     e.target.setPointerCapture(e.pointerId);
   };
 
@@ -41,7 +41,7 @@ const EcoLightSwitch = () => {
   const handlePointerUp = (e) => {
     if (!isDragging) return;
     setIsDragging(false);
-    // 🌟 잡았던 마우스 놓아주기
+    //  잡았던 마우스 놓아주기
     e.target.releasePointerCapture(e.pointerId);
 
     // 80px 이상 당겼으면 스위치 작동
@@ -64,7 +64,7 @@ const EcoLightSwitch = () => {
           }}
         ></div>
 
-        {/* 🌟 손잡이에 직접 이벤트 바인딩 + transform 삭제 (줄이 밀어주는 대로만 움직임) */}
+        {/*  손잡이에 직접 이벤트 바인딩 + transform 삭제 (줄이 밀어주는 대로만 움직임) */}
         <div
           className="eco-handle"
           onPointerDown={handlePointerDown}

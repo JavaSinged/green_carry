@@ -1,7 +1,7 @@
 import { create } from "zustand";
 
 const useAccountStore = create((set) => ({
-  // 1. 🌟 상태 (State) 모음
+  // 1.  상태 (State) 모음
   activeTab: "findId",
   isCodeSent: false,
   isVerified: false,
@@ -14,7 +14,7 @@ const useAccountStore = create((set) => ({
   pwError: "",
   matchError: "",
 
-  // 2. 🌟 상태를 변경하는 기본 함수들 (Setter)
+  // 2.  상태를 변경하는 기본 함수들 (Setter)
   setIsCodeSent: (status) => set({ isCodeSent: status }),
   setIsVerified: (status) => set({ isVerified: status }),
   setInputCode: (code) => set({ inputCode: code }),
@@ -27,7 +27,7 @@ const useAccountStore = create((set) => ({
     })),
   setIsTimerActive: (status) => set({ isTimerActive: status }),
 
-  // 3. 🌟 복잡한 비즈니스 로직 함수들
+  // 3.  복잡한 비즈니스 로직 함수들
   // 입력칸 글자 변경 로직
   handleInputChange: (e) =>
     set((state) => ({

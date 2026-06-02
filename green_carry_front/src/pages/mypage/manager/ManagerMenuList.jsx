@@ -128,7 +128,7 @@ const ManagerMenuList = () => {
               }}
             >
               <div className={styles.image_placeholder}>
-                {/* 🌟 1. 이미지가 있으면 img 태그를, 없으면 기본 아이콘을 출력합니다. */}
+                {/*  1. 이미지가 있으면 img 태그를, 없으면 기본 아이콘을 출력합니다. */}
                 {menu.menuImage ? (
                   <img
                     src={menu.menuImage}

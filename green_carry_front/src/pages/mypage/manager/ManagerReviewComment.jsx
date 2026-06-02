@@ -12,7 +12,7 @@ const ManagerReviewComment = () => {
   const [reviews, setReviews] = useState([]);
   const [replyInputs, setReplyInputs] = useState({});
 
-  // 🌟 페이지네이션 관련 상태
+  //  페이지네이션 관련 상태
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5; // 한 페이지에 보여줄 리뷰 개수
 
@@ -43,12 +43,12 @@ const ManagerReviewComment = () => {
     if (storeId) fetchReviews();
   }, [storeId]);
 
-  // 🌟 페이지 변경 시 최상단으로 부드럽게 스크롤 이동
+  //  페이지 변경 시 최상단으로 부드럽게 스크롤 이동
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [currentPage]);
 
-  // 🌟 현재 페이지에 해당하는 데이터 계산
+  //  현재 페이지에 해당하는 데이터 계산
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = reviews.slice(indexOfFirstItem, indexOfLastItem);
@@ -124,7 +124,7 @@ const ManagerReviewComment = () => {
           <p className={styles.noData}>아직 등록된 리뷰가 없습니다.</p>
         ) : (
           <>
-            {/* 🌟 전체 리스트가 아닌 현재 페이지의 아이템(currentItems)만 출력 */}
+            {/*  전체 리스트가 아닌 현재 페이지의 아이템(currentItems)만 출력 */}
             {currentItems.map((review) => (
               <div
                 key={review.orderId}
@@ -219,7 +219,7 @@ const ManagerReviewComment = () => {
               </div>
             ))}
 
-            {/* 🌟 페이지네이션 UI 추가 */}
+            {/*  페이지네이션 UI 추가 */}
             <Pagination
               currentPage={currentPage}
               totalPages={totalPages}

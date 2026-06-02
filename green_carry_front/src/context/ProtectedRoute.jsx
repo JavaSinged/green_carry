@@ -11,7 +11,7 @@ const ProtectedRoute = ({
 }) => {
   const { isLogin, user, isLoading } = useContext(AuthContext);
 
-  // 🌟 마법의 메모장 2개 준비
+  //  마법의 메모장 2개 준비
   const isInitialCheckDone = useRef(false); // 로딩 검사가 끝났는지 체크
   const wasLoggedInInitially = useRef(false); // 로딩 끝난 직후 로그인 상태였는지 체크
 
@@ -20,7 +20,7 @@ const ProtectedRoute = ({
     return null;
   }
 
-  // 🌟 2. 로딩이 딱 끝난 그 순간! 원래 로그인되어 있던 사람인지 기록합니다.
+  //  2. 로딩이 딱 끝난 그 순간! 원래 로그인되어 있던 사람인지 기록합니다.
   if (!isInitialCheckDone.current) {
     wasLoggedInInitially.current = isLogin;
     isInitialCheckDone.current = true; // 이제 첫 기록 끝!

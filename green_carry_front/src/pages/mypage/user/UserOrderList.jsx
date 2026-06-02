@@ -4,7 +4,7 @@ import styles from "./UserOrderList.module.css";
 import ReviewModal from "../../../components/layout/ReviewModal";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
-import { AuthContext } from "../../../context/AuthContext"; // 🌟 AuthContext 경로 확인 필수!
+import { AuthContext } from "../../../context/AuthContext"; //  AuthContext 경로 확인 필수!
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import Pagination from "../../../components/commons/Pagination";
@@ -13,7 +13,7 @@ import { withButtonLoading } from "../../../utils/buttonLoading";
 const UserOrderListPage = () => {
   const backHost = import.meta.env.VITE_BACKSERVER;
   const navigate = useNavigate();
-  const { user, setUser } = useContext(AuthContext); // 🌟 전역 유저 상태 제어
+  const { user, setUser } = useContext(AuthContext); //  전역 유저 상태 제어
   const [orderList, setOrderList] = useState([]);
   const memberId = localStorage.getItem("memberId");
 
@@ -69,7 +69,7 @@ const UserOrderListPage = () => {
     setCurrentPage(1);
   }, [startDate, endDate]);
 
-  // 🌟 주문 취소 및 실시간 포인트 복구 로직
+  //  주문 취소 및 실시간 포인트 복구 로직
   const cancelOrder = withButtonLoading(async (_event, orderId) => {
     Swal.fire({
       title: "주문 취소",
@@ -93,7 +93,7 @@ const UserOrderListPage = () => {
                 // 1. 로컬스토리지 갱신 (새로고침 시 유지용)
                 localStorage.setItem("memberPoint", latestPoint);
 
-                // 2. 🌟 핵심: 전역 상태 업데이트 (Header 등 실시간 반영)
+                // 2.  핵심: 전역 상태 업데이트 (Header 등 실시간 반영)
                 if (user) {
                   setUser({ ...user, memberPoint: latestPoint });
                 }

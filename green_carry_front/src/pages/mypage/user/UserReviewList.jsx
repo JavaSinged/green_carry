@@ -14,7 +14,7 @@ const UserReviewList = () => {
   const today = new Date();
   const currentMonthStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}`;
 
-  // 🌟 [추가] 페이지네이션 상태
+  //  [추가] 페이지네이션 상태
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5; // 한 페이지에 보여줄 리뷰 개수
   const handlePrevPage = () => {
@@ -47,7 +47,7 @@ const UserReviewList = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [currentPage]);
 
-  // 🌟 [추가] 필터 변경 시 1페이지로 리셋
+  //  [추가] 필터 변경 시 1페이지로 리셋
   useEffect(() => {
     setCurrentPage(1);
   }, [startDate, endDate]);
@@ -91,7 +91,7 @@ const UserReviewList = () => {
     return true;
   });
 
-  // 🌟 [추가] 현재 페이지 리뷰 계산 로직
+  //  [추가] 현재 페이지 리뷰 계산 로직
   const totalPages = Math.ceil(filteredReviews.length / itemsPerPage);
   const currentReviews = filteredReviews.slice(
     (currentPage - 1) * itemsPerPage,
@@ -117,7 +117,7 @@ const UserReviewList = () => {
       </div>
 
       <div className={styles.review_list}>
-        {/* 🌟 [수정] filteredReviews 대신 currentReviews 사용 */}
+        {/*  [수정] filteredReviews 대신 currentReviews 사용 */}
         {currentReviews.length > 0 ? (
           currentReviews.map((review) => (
             <div key={review.orderId} className={styles.review_card}>
@@ -184,7 +184,7 @@ const UserReviewList = () => {
                       </span>
 
                       <span className={styles.star_rating}>
-                        ⭐ {review.reviewRating?.toFixed(1) || "0.0"}
+                        {review.reviewRating?.toFixed(1) || "0.0"}
                       </span>
                     </div>
                     <div className={styles.bubble_content}>
@@ -236,7 +236,7 @@ const UserReviewList = () => {
         )}
       </div>
 
-      {/* 🌟 [추가] 페이지네이션 UI */}
+      {/*  [추가] 페이지네이션 UI */}
       <Pagination
         currentPage={currentPage}
         totalPages={totalPages}

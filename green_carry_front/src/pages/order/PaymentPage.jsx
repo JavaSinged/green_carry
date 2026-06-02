@@ -73,7 +73,7 @@ const PaymentPage = () => {
   const totalCarbon = useCartStore((state) => state.finalCarbon);
   const totalPrice = itemPrice + deliveryPrice - ecoPoint;
 
-  // 🌟 [핵심] 페이지 로드 시 로컬 스토리지에서 포인트 바로 가져오기
+  //  [핵심] 페이지 로드 시 로컬 스토리지에서 포인트 바로 가져오기
   useEffect(() => {
     const savedPoint = localStorage.getItem("memberPoint");
     if (savedPoint) {

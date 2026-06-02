@@ -26,14 +26,14 @@
   z-index: 1;
 }
 
-/* 🌟 1. 황무지 이미지 (기본 상태) */
+/*  1. 황무지 이미지 (기본 상태) */
 .wasteland {
   background-image: url("https://images.unsplash.com/photo-1509316785289-025f5b846b35?q=80&w=1920");
   filter: grayscale(100%) brightness(0.4); /* 흑백에 어둡게 처리 */
   opacity: 1;
 }
 
-/* 🌟 2. 숲 이미지 (완료 시 나타남) */
+/*  2. 숲 이미지 (완료 시 나타남) */
 .forest {
   background-image: url("/image/login/lo3.jpg");
   opacity: 0; /* 처음엔 숨김 */
@@ -150,7 +150,7 @@
   background-color: rgba(255, 255, 255, 0.2);
 }
 
-/* 🌟 미션 완료 시 버튼 활성화 (GreenCarry 포인트 컬러) */
+/*  미션 완료 시 버튼 활성화 (GreenCarry 포인트 컬러) */
 .active_btn {
   background-color: #2e7d32 !important;
   border-color: #2e7d32 !important;

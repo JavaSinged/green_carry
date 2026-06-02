@@ -6,14 +6,14 @@ import styles from "./NotFound.module.css";
 export default function NotFound() {
   const navigate = useNavigate();
 
-  // 🌟 상태 관리: 심어진 꽃들의 정보와 미션 완료 여부
+  //  상태 관리: 심어진 꽃들의 정보와 미션 완료 여부
   const [flowers, setFlowers] = useState([]);
   const [isRestored, setIsRestored] = useState(false);
 
   // 사용할 꽃/풀 이모지
   const flowerEmojis = ["🌸", "🌼", "🌷", "🌹", "🌿", "🍀", "☘️"];
 
-  // 🌟 클릭 시 꽃 심기 핸들러
+  //  클릭 시 꽃 심기 핸들러
   const handlePlantFlower = (e) => {
     if (isRestored) return; // 미션 완료 시 중단
 
@@ -29,7 +29,7 @@ export default function NotFound() {
     setFlowers((prev) => [...prev, newFlower]);
   };
 
-  // 🌟 10개 달성 시 미션 완료 처리
+  //  10개 달성 시 미션 완료 처리
   useEffect(() => {
     if (flowers.length === 10 && !isRestored) {
       setIsRestored(true);
@@ -54,12 +54,12 @@ export default function NotFound() {
 
   return (
     <div className={styles.container} onClick={handlePlantFlower}>
-      {/* 🌟 1층: 기본 황무지 배경 (처음엔 보이고, 완료 시 사라짐) */}
+      {/*  1층: 기본 황무지 배경 (처음엔 보이고, 완료 시 사라짐) */}
       <div
         className={`${styles.bg_layer} ${styles.wasteland} ${isRestored ? styles.fade_out : ""}`}
       ></div>
 
-      {/* 🌟 2층: 복구된 숲 배경 (처음엔 숨겨져 있다가, 완료 시 나타남) */}
+      {/*  2층: 복구된 숲 배경 (처음엔 숨겨져 있다가, 완료 시 나타남) */}
       <div
         className={`${styles.bg_layer} ${styles.forest} ${isRestored ? styles.fade_in : ""}`}
       ></div>
@@ -79,7 +79,7 @@ export default function NotFound() {
         </span>
       ))}
 
-      {/* 🌟 메인 컨텐츠 영역 */}
+      {/*  메인 컨텐츠 영역 */}
       <div className={styles.content}>
         <h1 className={styles.title}>404</h1>
 

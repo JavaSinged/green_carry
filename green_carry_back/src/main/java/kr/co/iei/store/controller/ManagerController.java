@@ -50,7 +50,7 @@ public class ManagerController {
     @PostMapping(value = "/{storeId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> insertMenu(
             @PathVariable Long storeId, 
-            @ModelAttribute MenuSaveRequest request) { // 🌟 @RequestBody 대신 @ModelAttribute 사용
+            @ModelAttribute MenuSaveRequest request) { //  @RequestBody 대신 @ModelAttribute 사용
         
         request.setStoreId(storeId);
         
@@ -63,7 +63,7 @@ public class ManagerController {
     public ResponseEntity<?> updateMenu(
             @PathVariable Long storeId,
             @PathVariable Long menuId,
-            @ModelAttribute MenuSaveRequest request) { // 🌟 여기도 변경
+            @ModelAttribute MenuSaveRequest request) { //  여기도 변경
 
         request.setStoreId(storeId);
         request.setMenuId(menuId);

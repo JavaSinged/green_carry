@@ -57,7 +57,7 @@
   display: flex;
   gap: 20px;
   padding: 20px;
-  background-color: var(--color-surface); /* 🌟 면분할 연한 그린 */
+  background-color: var(--color-surface); /*  면분할 연한 그린 */
   border-radius: 15px;
   margin-bottom: 30px;
   text-align: left;
@@ -178,7 +178,7 @@
   cursor: pointer;
 }
 
-/* 🌟 별점 스타일 (진짜 앱처럼!) */
+/*  별점 스타일 (진짜 앱처럼!) */
 .stars {
   font-size: 2.2rem; /* 별을 큼직하게 */
   display: flex;
@@ -197,7 +197,7 @@
 }
 
 .active_star {
-  color: var(--color-point); /* 🌟 포인트 컬러(노란/주황) 적용 */
+  color: var(--color-point); /*  포인트 컬러(노란/주황) 적용 */
 }
 
 .inactive_star {
@@ -233,7 +233,7 @@
 .submit_btn {
   width: 100%;
   padding: 18px;
-  background-color: var(--color-brand); /* 🌟 메인 브랜드 컬러 */
+  background-color: var(--color-brand); /*  메인 브랜드 컬러 */
   color: #ffffff;
   border: none;
   border-radius: 12px;

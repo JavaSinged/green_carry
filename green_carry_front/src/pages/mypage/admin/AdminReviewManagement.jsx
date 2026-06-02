@@ -9,11 +9,11 @@ const ManagerReviewComment = () => {
   const [reviews, setReviews] = useState([]); // 전체 리뷰 데이터
   const [filteredReviews, setFilteredReviews] = useState([]); // 필터링된 리뷰 데이터
 
-  // 🌟 날짜 필터링 상태
+  //  날짜 필터링 상태
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
 
-  // 🌟 페이지네이션 관련 상태
+  //  페이지네이션 관련 상태
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
@@ -42,12 +42,12 @@ const ManagerReviewComment = () => {
     fetchReviews();
   }, []);
 
-  // 🌟 페이지 변경 시 최상단 스크롤
+  //  페이지 변경 시 최상단 스크롤
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [currentPage]);
 
-  // 🌟 날짜 필터링 적용 함수
+  //  날짜 필터링 적용 함수
   useEffect(() => {
     if (startDate && endDate) {
       if (startDate > endDate) {
@@ -69,7 +69,7 @@ const ManagerReviewComment = () => {
     }
   }, [startDate, endDate, reviews]); // 날짜나 원본 데이터가 바뀌면 실행
 
-  // 🌟 필터 초기화
+  //  필터 초기화
   const resetFilter = () => {
     setStartDate("");
     setEndDate("");
@@ -77,7 +77,7 @@ const ManagerReviewComment = () => {
     setCurrentPage(1);
   };
 
-  // 🌟 현재 페이지에 해당하는 데이터 계산 (filteredReviews 기준)
+  //  현재 페이지에 해당하는 데이터 계산 (filteredReviews 기준)
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredReviews.slice(indexOfFirstItem, indexOfLastItem);
@@ -87,7 +87,7 @@ const ManagerReviewComment = () => {
     <div className={styles.page}>
       <h2 className={styles.pageTitle}>리뷰 관리</h2>
 
-      {/* 🌟 날짜 필터 부분 클래스명 수정 */}
+      {/*  날짜 필터 부분 클래스명 수정 */}
       <div className={styles.filter_row}>
         <input
           type="date"

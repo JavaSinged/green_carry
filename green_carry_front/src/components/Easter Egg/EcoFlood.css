@@ -84,7 +84,7 @@
   }
 }
 
-/* 🌟 휩쓸려가는 요소 스타일 */
+/*  휩쓸려가는 요소 스타일 */
 .eco-swept {
   will-change: transform, filter !important;
   transition: filter 0.5s ease;

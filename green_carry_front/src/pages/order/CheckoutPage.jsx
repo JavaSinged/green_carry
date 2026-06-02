@@ -49,7 +49,7 @@ const CheckoutPage = () => {
   const [targetArrivalTime, setTargetArrivalTime] = useState("--:--");
   const isFirst = useRef(true);
 
-  // 🌟 [추가] 0순위 보안 가드: 비로그인 유저 차단 로직
+  //  [추가] 0순위 보안 가드: 비로그인 유저 차단 로직
   useEffect(() => {
     const loggedInMemberId = localStorage.getItem("memberId") || user?.memberId;
 
@@ -153,7 +153,7 @@ const CheckoutPage = () => {
     axios
       .get(`${import.meta.env.VITE_BACKSERVER}/stores/order/${orderId}`)
       .then((res) => {
-        // 🌟 [보안 로직: 아이디 대조]
+        //  [보안 로직: 아이디 대조]
         const loggedInMemberId =
           localStorage.getItem("memberId") || user?.memberId;
         const orderOwnerId = res.data.memberId;

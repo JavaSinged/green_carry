@@ -4,7 +4,7 @@
   align-items: center;
   justify-content: center;
 
-  /* 🌟 1. 모바일 스크롤 부활 (회원가입은 입력칸이 많아서 필수입니다) */
+  /*  1. 모바일 스크롤 부활 (회원가입은 입력칸이 많아서 필수입니다) */
   position: relative; /* fixed 대신 relative 사용 */
   width: 100%;
   min-height: 100vh; /* height: 100vh 대신 min-height 사용 */
@@ -12,14 +12,14 @@
   overflow-y: auto; /* hidden 대신 auto로 변경하여 스크롤 허용 */
   z-index: 1;
 
-  /* 🌟 2. 로그인 화면의 '마법의 4줄' 복사 적용 (배경 꽉 채우기 + 고정) */
+  /*  2. 로그인 화면의 '마법의 4줄' 복사 적용 (배경 꽉 채우기 + 고정) */
   background-size: 110%; /* 화면 꽉 채우면서 애니메이션 여백 확보 */
   background-position: center center !important;
   background-repeat: no-repeat !important; /* 중복 방지 */
   background-attachment: fixed !important; /* 스크롤 내려도 배경은 고정 */
   background-color: var(--color-brand);
 
-  /* 🌟 3. 부드러운 줌인 효과 */
+  /*  3. 부드러운 줌인 효과 */
   animation: bg-breathe 12s ease-in-out infinite alternate;
 }
 

@@ -85,7 +85,7 @@ public class MemberService {
 			// member.getMemberPw() : 방금 입력한 새 비밀번호 (평문)
 			// existingMember.getMemberPw() : DB에 있던 예전 비밀번호 (암호문)
 			if (passwordEncoder.matches(member.getMemberPw(), existingMember.getMemberPw())) {
-				return -1; // 🌟 똑같으면 업데이트를 멈추고 -1을 반환! (이게 컨트롤러로 갑니다)
+				return -1; //  똑같으면 업데이트를 멈추고 -1을 반환! (이게 컨트롤러로 갑니다)
 			}
 		}
 
@@ -127,7 +127,7 @@ public class MemberService {
 		return authCode; // 테스트를 위해 리턴하거나 메모리에 저장
 	}
 
-	// 🌟 [추가] 컨트롤러에서 호출하는 검증 메서드 구현
+	//  [추가] 컨트롤러에서 호출하는 검증 메서드 구현
 	public boolean checkAuthCode(String email, String inputCode) {
 		// 1. 해당 이메일로 발송된 번호가 있는지 확인
 		String savedCode = authCodeMap.get(email);
@@ -267,7 +267,7 @@ public class MemberService {
 			throw new RuntimeException("이미 리뷰를 작성한 주문입니다.");
 		}
 
-		// 🌟 3. Cloudinary 파일 업로드 처리
+		//  3. Cloudinary 파일 업로드 처리
 		if (uploadFile != null && !uploadFile.isEmpty()) {
 			try {
 				// Cloudinary 업로드 설정 (리뷰 폴더 경로 지정)
@@ -344,7 +344,7 @@ public class MemberService {
 	        throw new IllegalStateException("이미 획득한 보상입니다.");
 	    }
 
-	    // 2. 이스터에그 보상 설정 (🌟 확장성 있게 switch 문으로 변경)
+	    // 2. 이스터에그 보상 설정 ( 확장성 있게 switch 문으로 변경)
 	    int reward = 0;
 	    switch (eggName) {
 	        case "NIGHT_COUPON":
@@ -365,7 +365,7 @@ public class MemberService {
 	    memberDao.insertEasterEgg(memberId, eggName, reward);
 
 	    // 4. 최종 포인트 반환 (기존 getPointByMemberId 활용)
-	    // 🌟 이 리턴값이 컨트롤러를 타고 프론트의 로컬스토리지까지 갱신할 겁니다.
+	    //  이 리턴값이 컨트롤러를 타고 프론트의 로컬스토리지까지 갱신할 겁니다.
 	    return memberDao.getPointByMemberId(memberId);
 	}
 

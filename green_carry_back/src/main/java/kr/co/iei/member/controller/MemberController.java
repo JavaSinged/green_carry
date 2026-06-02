@@ -90,7 +90,7 @@ public class MemberController {
 			// 1. Access Token 생성
 			String accessToken = jwtUtil.createToken(loginMember.getMemberId(), loginMember.getMemberGrade());
 
-			// 🌟 2. [중복 로그인 방지 핵심] Redis에 최신 토큰 저장
+			//  2. [중복 로그인 방지 핵심] Redis에 최신 토큰 저장
 			// Key: "AUTH:아이디", Value: "액세스 토큰", 만료시간: 2시간(토큰 수명과 맞춤)
 			//redisTemplate.opsForValue().set("AUTH:" + loginMember.getMemberId(), accessToken, 2, TimeUnit.HOURS);
 
@@ -121,7 +121,7 @@ public class MemberController {
 	    String memberId = request.get("memberId");
 	    
 	    if (memberId != null) {
-	        // 🌟 Redis에서 해당 유저의 최신 토큰 정보를 삭제하여 중복 로그인 로직 초기화
+	        //  Redis에서 해당 유저의 최신 토큰 정보를 삭제하여 중복 로그인 로직 초기화
 	        redisTemplate.delete("AUTH:" + memberId);
 	        System.out.println("✅ Redis 삭제 완료: " + memberId);
 	    }

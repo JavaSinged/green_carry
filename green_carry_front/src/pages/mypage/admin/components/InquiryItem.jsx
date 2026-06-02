@@ -110,7 +110,7 @@ export default function InquiryItem({
                 onChange={(e) => setAnswerInput(e.target.value)}
                 style={{
                   resize: "none",
-                }} /* 🌟 요기에 크기 고정 옵션 추가했습니다! */
+                }} /*  요기에 크기 고정 옵션 추가했습니다! */
               />
               <button className={styles.submitBtn} onClick={submitAnswer}>
                 답변 등록

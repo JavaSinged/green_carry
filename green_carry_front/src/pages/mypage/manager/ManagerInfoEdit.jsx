@@ -27,7 +27,7 @@ export default function ManagerInfoEdit() {
   const [managerInfo, setManagerInfo] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // 🌟 프로필 수정용 상태 추가
+  //  프로필 수정용 상태 추가
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [profileData, setProfileData] = useState({
     memberName: "",
@@ -51,7 +51,7 @@ export default function ManagerInfoEdit() {
     confirmPw: "",
   });
 
-  // 🌟 관리자(사용자) 정보 불러오기
+  //  관리자(사용자) 정보 불러오기
   useEffect(() => {
     if (user && user.memberId) {
       api
@@ -73,7 +73,7 @@ export default function ManagerInfoEdit() {
     }
   }, [user]);
 
-  // 🌟 프로필 정보 변경 핸들러
+  //  프로필 정보 변경 핸들러
   const handleProfileDataChange = (e) => {
     const { name, value } = e.target;
     setProfileData({ ...profileData, [name]: value });
@@ -115,12 +115,12 @@ export default function ManagerInfoEdit() {
         const finalPath =
           serverPath === "SUCCESS_NO_IMAGE" ? previewImg : serverPath;
 
-        // 🌟 1. 개별 로컬 스토리지 아이템 덮어쓰기
+        //  1. 개별 로컬 스토리지 아이템 덮어쓰기
         localStorage.setItem("memberThumb", finalPath);
         localStorage.setItem("memberName", profileData.memberName);
         localStorage.setItem("memberPhone", profileData.memberPhone);
 
-        // 🌟 2. member 객체가 통째로 저장되어 있을 경우를 대비한 업데이트
+        //  2. member 객체가 통째로 저장되어 있을 경우를 대비한 업데이트
         const storedMember = JSON.parse(localStorage.getItem("member"));
         if (storedMember) {
           storedMember.memberThumb = finalPath;
@@ -129,7 +129,7 @@ export default function ManagerInfoEdit() {
           localStorage.setItem("member", JSON.stringify(storedMember));
         }
 
-        // 🌟 3. 전역 상태(Context) user 업데이트
+        //  3. 전역 상태(Context) user 업데이트
         setUser({
           ...user,
           memberThumb: finalPath,
@@ -137,7 +137,7 @@ export default function ManagerInfoEdit() {
           memberPhone: profileData.memberPhone,
         });
 
-        // 🌟 4. 현재 페이지의 컴포넌트 상태 업데이트
+        //  4. 현재 페이지의 컴포넌트 상태 업데이트
         setPreviewImg(finalPath);
         setManagerInfo((prev) => ({
           ...prev,
@@ -165,7 +165,7 @@ export default function ManagerInfoEdit() {
 
   return (
     <div className={styles.right}>
-      {/* 🌟 수정된 프로필 편집 섹션 */}
+      {/*  수정된 프로필 편집 섹션 */}
       <section
         className={`${styles.right_main} ${
           isEditingProfile

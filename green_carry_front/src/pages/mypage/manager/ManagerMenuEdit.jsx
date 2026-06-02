@@ -104,7 +104,7 @@ const ManagerMenuEdit = () => {
           menuStatus: res.data.menuStatus,
         });
 
-        // 🌟 기존 이미지가 있다면 서버 주소를 붙여서 미리보기 세팅
+        //  기존 이미지가 있다면 서버 주소를 붙여서 미리보기 세팅
         if (imagePath) {
           setPreviewUrl(imagePath);
         } else {
@@ -174,7 +174,7 @@ const ManagerMenuEdit = () => {
     setIsListOpen(false);
   };
 
-  // 🌟 [수정된 부분] 저장 로직: 빈 값 방어 코드 추가
+  //  [수정된 부분] 저장 로직: 빈 값 방어 코드 추가
   const handleSave = () => {
     // 필수값 검사 (가격, 이름 등)
     if (!menu.menuName || !menu.menuPrice) {

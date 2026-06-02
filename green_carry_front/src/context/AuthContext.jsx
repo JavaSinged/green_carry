@@ -99,7 +99,7 @@ export const AuthProvider = ({ children }) => {
       logoutTimerRef.current = null;
     }
 
-    // 🌟 2. 백엔드 Redis 데이터 삭제 시도
+    //  2. 백엔드 Redis 데이터 삭제 시도
     // memberId는 AuthContext 상태나 localStorage에서 가져옵니다.
     const memberId = user?.memberId || localStorage.getItem("memberId");
 
@@ -113,7 +113,7 @@ export const AuthProvider = ({ children }) => {
       // 서버 통신 실패 시에도 로그아웃은 진행되어야 하므로 에러 로그만 기록
       console.error("서버 로그아웃 요청 실패 (Redis 삭제 안됨):", err);
     } finally {
-      // 🌟 3. 로컬 인증 데이터 삭제 및 리다이렉트 (공통 로직)
+      //  3. 로컬 인증 데이터 삭제 및 리다이렉트 (공통 로직)
       if (isExpired === true) {
         fireStyledSwal(
           "warning",
@@ -138,7 +138,7 @@ export const AuthProvider = ({ children }) => {
     const grade = localStorage.getItem("memberGrade");
     const id = localStorage.getItem("memberId");
     const thumb = localStorage.getItem("memberThumb");
-    const point = localStorage.getItem("memberPoint"); // 🌟 [추가] 포인트 로드
+    const point = localStorage.getItem("memberPoint"); //  [추가] 포인트 로드
 
     const lat = localStorage.getItem("LATITUDE");
     const lng = localStorage.getItem("LONGITUDE");
@@ -153,7 +153,7 @@ export const AuthProvider = ({ children }) => {
         const decodedPayload = JSON.parse(atob(payload));
         const currentTime = Math.floor(Date.now() / 1000);
 
-        // 🌟 전역 유저 객체 생성 (포인트 포함)
+        //  전역 유저 객체 생성 (포인트 포함)
         const userData = {
           memberId: id,
           memberName: name,

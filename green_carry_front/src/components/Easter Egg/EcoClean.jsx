@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import Swal from "sweetalert2";
-import axios from "axios"; // 🌟 axios 추가
+import axios from "axios"; //  axios 추가
 import "./EcoClean.css";
 
 const EcoClean = () => {
@@ -9,7 +9,7 @@ const EcoClean = () => {
   const trashDataRef = useRef([]);
   const requestRef = useRef();
 
-  // 🌟 1. 'clean' 타이핑 감지
+  //  1. 'clean' 타이핑 감지
   useEffect(() => {
     let keys = [];
     const secretWord = "clean";
@@ -25,7 +25,7 @@ const EcoClean = () => {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
-  // 🌟 포인트 로컬 스토리지 동기화 함수
+  //  포인트 로컬 스토리지 동기화 함수
   const syncPoints = (newPoint) => {
     const member = JSON.parse(localStorage.getItem("member"));
     if (member) {
@@ -109,11 +109,11 @@ const EcoClean = () => {
         }
       });
 
-      // 🌟 승리 조건 달성 시 (모든 쓰레기 청소 완료)
+      //  승리 조건 달성 시 (모든 쓰레기 청소 완료)
       if (activeCount === 0 && trashDataRef.current.length > 0) {
         cancelAnimationFrame(requestRef.current);
         trashDataRef.current = []; // 중복 호출 방지
-        handleGameWin(); // 🌟 포인트 지급 처리 함수 호출
+        handleGameWin(); //  포인트 지급 처리 함수 호출
         return;
       }
 
@@ -123,7 +123,7 @@ const EcoClean = () => {
     requestRef.current = requestAnimationFrame(update);
   };
 
-  // 🌟 게임 승리 시 서버 통신 처리
+  //  게임 승리 시 서버 통신 처리
   const handleGameWin = async () => {
     const memberId = localStorage.getItem("memberId");
 

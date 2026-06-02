@@ -58,7 +58,7 @@
   transition: all 0.2s;
 }
 
-/* 🌟 신규 주문(1: 접수대기)일 때 확실하게 눈에 띄게 강조 */
+/*  신규 주문(1: 접수대기)일 때 확실하게 눈에 띄게 강조 */
 .newOrder {
   border: 2px solid #ff4757;
   background-color: #fffafb;

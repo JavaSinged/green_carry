@@ -1,4 +1,4 @@
-/* 🌟 분리수거 대상 요소들 */
+/*  분리수거 대상 요소들 */
 .eco-draggable {
   border: 2px dashed #4caf50 !important;
   cursor: grab !important;
@@ -6,7 +6,7 @@
   position: relative;
   z-index: 100;
 
-  /* 🌟 지저분한 기본 드래그 속성 완벽 차단 */
+  /*  지저분한 기본 드래그 속성 완벽 차단 */
   user-select: none !important;
   -webkit-user-select: none !important;
   -webkit-user-drag: none !important; /* 이미지 강제 드래그 차단 */
@@ -23,7 +23,7 @@
   filter: grayscale(100%);
 }
 
-/* 🌟 마우스에 따라다니는 '가짜(복제)' 요소 (투명 유령 아님!) */
+/*  마우스에 따라다니는 '가짜(복제)' 요소 (투명 유령 아님!) */
 .eco-clone {
   position: fixed !important;
   z-index: 99999 !important;

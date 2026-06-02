@@ -47,7 +47,7 @@ const EcoFlood = () => {
   useEffect(() => {
     if (!isActive) return;
 
-    // 🌟 화면의 거의 모든 요소를 휩쓸기 대상으로 선정
+    //  화면의 거의 모든 요소를 휩쓸기 대상으로 선정
     const allElements = document.querySelectorAll(
       "header, nav, section, .card_item, img, h1, h2, h3, p, button, .banner_slide, .category_item",
     );
@@ -70,7 +70,7 @@ const EcoFlood = () => {
           transform: el.style.transform || "none",
           position: el.style.position || "static",
         },
-        // 🌟 휩쓸려갈 때의 물리 값
+        //  휩쓸려갈 때의 물리 값
         vx: (Math.random() - 0.5) * 15, // 좌우로 밀리는 속도
         vRot: (Math.random() - 0.5) * 30, // 회전 속도
         phase: Math.random() * Math.PI * 2, // 파도 타는 타이밍
@@ -104,7 +104,7 @@ const EcoFlood = () => {
         if (data.isSwept) {
           const depth = Math.max(0, data.rect.top - waterTopY);
 
-          // 🌟 물리 시뮬레이션: 물의 흐름에 따라 옆으로 밀리고 둥둥 뜸
+          //  물리 시뮬레이션: 물의 흐름에 따라 옆으로 밀리고 둥둥 뜸
           const driftX = data.vx * (h / 20); // 수위가 높을수록 더 멀리 밀림
           const floatY = Math.sin(h * 0.1 + data.phase) * 10 - depth; // 물 위로 뜨려는 힘
           const rot = data.vRot * (h / 50);
