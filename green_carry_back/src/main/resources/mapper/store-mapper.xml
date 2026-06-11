@@ -123,7 +123,6 @@
 	<update id="updatePoint">
 		UPDATE member_tbl m
 		SET m.member_point = m.member_point + (
-		/* 🌟 이제 사용한 포인트(- used_point)는 여기서 빼지 않습니다! */
 		SELECT o.get_point
 		FROM order_tbl o
 		WHERE o.order_id = #{orderId}
@@ -557,7 +556,7 @@
 		#{usedPoint}
 		WHERE member_id = #{memberId}
 		AND member_point >=
-		#{usedPoint} /* 🌟 중요: 잔액이 쓰는 포인트보다 많을 때만 수행 */
+		#{usedPoint} /*잔액이 쓰는 포인트보다 많을 때만 수행 */
 	</update>
 
 	<select id="selectStoreReviewStats" resultType="map">
@@ -635,7 +634,7 @@
 		FROM order_tbl o
 		WHERE o.member_id = m.member_id
 		AND o.order_id = #{orderId}
-		/* 🌟 상태가 취소(9)로 변할 때 실행되도록 서비스 로직에서 관리 */
+		/* 상태가 취소(9)로 변할 때 실행되도록 서비스 로직에서 관리 */
 		)
 	</update>
 
