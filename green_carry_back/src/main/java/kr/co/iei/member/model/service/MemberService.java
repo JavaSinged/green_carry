@@ -1,15 +1,12 @@
 package kr.co.iei.member.model.service;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,8 +21,6 @@ import kr.co.iei.member.model.vo.PointHistory;
 import kr.co.iei.member.model.vo.Review;
 import kr.co.iei.store.model.dao.StoreDao;
 import kr.co.iei.utils.EmailSender;
-import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.ObjectMapper;
 
 @Service
 public class MemberService {
