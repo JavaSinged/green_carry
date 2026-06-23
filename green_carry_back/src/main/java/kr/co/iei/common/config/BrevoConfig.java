@@ -10,10 +10,9 @@ public class BrevoConfig {
 
     @Bean
     public RestClient brevoRestClient(
-            RestClient.Builder builder,
             @Value("${brevo.api-key}") String apiKey
     ) {
-        return builder
+        return RestClient.builder()
                 .baseUrl("https://api.brevo.com/v3")
                 .defaultHeader("accept", "application/json")
                 .defaultHeader("api-key", apiKey)
