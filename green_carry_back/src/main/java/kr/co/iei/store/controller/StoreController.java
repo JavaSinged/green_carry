@@ -207,7 +207,6 @@ public class StoreController {
 					message = "메뉴가 준비되었습니다! 픽업/배달을 확인해주세요.";
 				}
 				else if (status == 5) {
-					storeService.updatePoint(orderId);
 					message = "맛있게 드셨나요? 픽업/배달이 완료되었습니다. 🌿";
 				}
 				else if (status == 9) {

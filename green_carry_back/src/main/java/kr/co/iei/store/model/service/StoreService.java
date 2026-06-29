@@ -59,9 +59,10 @@ public class StoreService {
 		}
 
 		// 2. 주문 메인 저장 (기존 로직)
-		int result = storeDao.insertOrder(order);
-		if (result != 1)
-			return 0;
+		int orderResult = storeDao.insertOrder(order);
+		if (orderResult != 1) {
+			throw new RuntimeException("주문 기본 정보 저장 실패");
+		}
 
 		int orderId = order.getOrderId();
 		String memberId = order.getMemberId();
@@ -157,12 +158,28 @@ public class StoreService {
 	@Transactional
 	public int changeOrderStatus(Integer orderId, int status, Integer expectedTime) {
 		if (status == 9) {
-			//  롤백 후 취소 결과만 반환해 취소 분기 흐름을 단순화합니다.
-			storeDao.rollbackPoint(orderId);
-			return storeDao.cancelOrder(orderId);
+			int rollbackResult = storeDao.rollbackPoint(orderId);
+			if (rollbackResult != 1) {
+				throw new RuntimeException("주문 취소 포인트 롤백 실패");
+			}
+
+			int cancelResult = storeDao.cancelOrder(orderId);
+			if (cancelResult != 1) {
+				throw new RuntimeException("주문 취소 상태 변경 실패");
+			}
+			return cancelResult;
 		}
 
-		return storeDao.changeOrderStatus(orderId, status, expectedTime);
+		int changeResult = storeDao.changeOrderStatus(orderId, status, expectedTime);
+		if (changeResult != 1) {
+			throw new RuntimeException("주문 상태 변경 실패");
+		}
+
+		if (status == 5) {
+			updatePoint(orderId);
+		}
+
+		return changeResult;
 	}
 
 	public Map<String, Object> selectStoreReviewStats(int storeId) {
@@ -189,7 +206,7 @@ public class StoreService {
 	public int updatePoint(Integer orderId) {
 		int setPoint = storeDao.updatePoint(orderId);
 		if (setPoint != 1) {
-			return 0;
+			throw new RuntimeException("주문 완료 포인트 반영 실패");
 		}
 
 		//  포인트 반영 성공 시에만 후속 적립/탄소 누적을 실행합니다.
